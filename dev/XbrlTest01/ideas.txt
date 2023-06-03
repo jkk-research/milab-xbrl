@@ -1,0 +1,14 @@
+Unique identification
+ IdentifierType:EntityID:Year:ProviderID:ProviderExtra
+ 
+Folder structure
+
+Year
+  PoviderID
+    reportList.json (with all jsons)
+    reports
+      h1/h2/EntityID/
+   
+   
+   
+https://filings.xbrl.org/529900MBH2PPLPLX3782/2021-12-31/ESEF/HU/0/BIF%20Konszolidált%20Éves%20Jelentés%202021.json
