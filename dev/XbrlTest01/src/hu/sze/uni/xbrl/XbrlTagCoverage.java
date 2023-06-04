@@ -74,13 +74,13 @@ public class XbrlTagCoverage implements XbrlConsts, XbrlListener {
 
 		System.out.println(currentFiling + " : " + fRep.getAbsolutePath());
 	}
-	
+
 	public XbrlUtilsCounter cntDimKeys = new XbrlUtilsCounter(true);
 
 	@Override
 	public void handleXbrlInfo(XbrlInfoType type, Map info) {
 		if ( type == XbrlInfoType.Fact ) {
-			for ( Object k : ((Map)info.get("dimensions")).keySet() ) {
+			for (Object k : ((Map) info.get("dimensions")).keySet()) {
 				cntDimKeys.add(k);
 			}
 			String tag = XbrlUtils.access(info, AccessCmd.Peek, null, "dimensions", "concept");
@@ -167,13 +167,13 @@ public class XbrlTagCoverage implements XbrlConsts, XbrlListener {
 					} else {
 						colNameList.add(lastContents);
 					}
-					colNames.put(col, lastContents);					
+					colNames.put(col, lastContents);
 				}
 			} else if ( "row".equals(name) ) {
 				if ( collectValues ) {
 					String tag = values.get(colTag);
 					Map m = (Map) taxonomy.get(tag);
-					for ( String cn : colNameList ) {
+					for (String cn : colNameList) {
 						m.put(cn, values.get(cn));
 					}
 					values.clear();
@@ -191,7 +191,7 @@ public class XbrlTagCoverage implements XbrlConsts, XbrlListener {
 
 	public void readTaxonomy(String fileName) throws Exception {
 		File f = new File(fileName);
-		
+
 		if ( !f.exists() ) {
 			return;
 		}
@@ -256,7 +256,7 @@ public class XbrlTagCoverage implements XbrlConsts, XbrlListener {
 		row = sheet.createRow(rowCount++);
 
 		String[] cols = { "Filing ID", "Company", "Year", "File" };
-		Object[][] paths = { { "attributes", "fxo_id" }, { "attributes", XbrlFilingManager.ENTITY_NAME }, { "attributes", XbrlFilingManager.REPORT_YEAR },
+		Object[][] paths = { { "attributes", "fxo_id" }, { "attributes", XbrlFilingManager.ENTITY_NAME }, { "attributes", XbrlFilingManager.REPORT_DATE },
 				{ "attributes", XbrlFilingManager.REPORT_FILE }, };
 
 		for (int i = 0; i < cols.length; ++i) {
@@ -299,7 +299,7 @@ public class XbrlTagCoverage implements XbrlConsts, XbrlListener {
 			System.out.println("Exporting namespace " + ns);
 			Map content = namespaces.peek(ns);
 			nsContent.add(content);
-			
+
 			Set<String> filings = (Set) content.get(FILINGS);
 
 			row = sheet.createRow(rowCount++);
@@ -318,7 +318,7 @@ public class XbrlTagCoverage implements XbrlConsts, XbrlListener {
 				}
 			}
 		}
-		
+
 		for (int i = 0; i < nsColCount; ++i) {
 			sheet.autoSizeColumn(i);
 		}
@@ -328,9 +328,9 @@ public class XbrlTagCoverage implements XbrlConsts, XbrlListener {
 			public int compare(Map o1, Map o2) {
 				Set<String> f1 = (Set) o1.get(FILINGS);
 				Set<String> f2 = (Set) o2.get(FILINGS);
-				
+
 				int d = f2.size() - f1.size();
-				
+
 				if ( 0 == d ) {
 					d = ((String) o1.get(NAME)).compareTo((String) o2.get(NAME));
 				}
@@ -338,20 +338,27 @@ public class XbrlTagCoverage implements XbrlConsts, XbrlListener {
 				return d;
 			}
 		});
-		
+
 		for (Map content : nsContent) {
 			String ns = (String) content.get(NAME);
-			
+
 			Set<String> filings = (Set) content.get(FILINGS);
 			List taxCols = Collections.EMPTY_LIST;
-			
+
 			XbrlUtilsFactory taxonomy = (XbrlUtilsFactory) namespaces.get(ns).get(TAXONOMY);
 			Map tm = (Map) taxonomy.peek(META);
 			if ( null != tm ) {
 				taxCols = (List) tm.get(META);
 			}
 
-			Sheet sheetNS = wb.createSheet(ns + " (" + filings.size() + ")");
+			String sName = ns + " (" + filings.size() + ")";
+			Sheet sheetNS = wb.getSheet(sName);
+
+			if ( null == sheetNS ) {
+				sheetNS = wb.createSheet(sName);
+			} else {
+				System.out.println("Repeated sheet: " + sName);
+			}
 			int rowCountNS = 0;
 			row = sheetNS.createRow(rowCountNS++);
 			colCount = 0;
@@ -359,12 +366,12 @@ public class XbrlTagCoverage implements XbrlConsts, XbrlListener {
 			c = row.createCell(colCount++);
 			c.setCellValue("Tag");
 			c.setCellStyle(centered);
-			
+
 			c = row.createCell(colCount++);
 			c.setCellValue("Input format attribute");
 			c.setCellStyle(centered);
-			
-			for ( Object tc : taxCols) {
+
+			for (Object tc : taxCols) {
 				c = row.createCell(colCount++);
 				c.setCellValue((String) tc);
 				c.setCellStyle(centered);
@@ -397,7 +404,7 @@ public class XbrlTagCoverage implements XbrlConsts, XbrlListener {
 				if ( !taxCols.isEmpty() ) {
 					tm = (Map) taxonomy.peek(tn);
 					if ( null != tm ) {
-						for ( Object tc : taxCols) {
+						for (Object tc : taxCols) {
 							c = row.createCell(colCount++);
 							c.setCellValue((String) tm.get(tc));
 						}
@@ -405,7 +412,7 @@ public class XbrlTagCoverage implements XbrlConsts, XbrlListener {
 						colCount += taxCols.size();
 					}
 				}
-				
+
 				c = row.createCell(colCount++);
 				c.setCellValue(tagFilings.size());
 
@@ -421,8 +428,7 @@ public class XbrlTagCoverage implements XbrlConsts, XbrlListener {
 			for (int i = 0; i < colCount; ++i) {
 				sheetNS.autoSizeColumn(i);
 			}
-			sheetNS.createFreezePane(taxCols.size() + 2, 1);
-
+			sheetNS.createFreezePane(taxCols.size() + 3, 1);
 		}
 
 		File f = new File(fileName);

@@ -12,3 +12,16 @@ Year
    
    
 https://filings.xbrl.org/529900MBH2PPLPLX3782/2021-12-31/ESEF/HU/0/BIF%20Konszolidált%20Éves%20Jelentés%202021.json
+
+700 files
+java.util.zip.ZipException: only DEFLATED entries can have EXT descriptor
+
+Unzip error with file /Users/lkedves/work/xbrl/data/reports/2020/xbrl.org/82/0f/259400DZXF7UJKK2AY35/ESEF-PL-0/259400DZXF7UJKK2AY35-2020-12-31.zip
+Unzip error with file /Users/lkedves/work/xbrl/data/reports/2020/xbrl.org/67/33/259400O79EWIK4XZPL40/ESEF-PL-0/GrupaACP-2020-12-31.zip
+Unzip error with file /Users/lkedves/work/xbrl/data/reports/2020/xbrl.org/67/33/259400O79EWIK4XZPL40/ESEF-PL-1/259400O79EWIK4XZPL40-2020-12-31.zip
+Unzip error with file /Users/lkedves/work/xbrl/data/reports/2021/xbrl.org/f6/0b/P4GTT6GF1W40CVIMFR43/ESEF-PL-0/ESEF_Skonsolidowane_sprawozdanie_finansowe_GK_PKOBP_SA_31.12.2021.zip
+
+File count: 699
+Fail count: 1
+Report dir fail 
+   /Users/lkedves/work/xbrl/data/reports/2020/xbrl.org/6c/d2/315700GZJC0X5GELP252/ESEF-CZ-0/FIDUROCK_Nemovitosti_a.s._FINAL

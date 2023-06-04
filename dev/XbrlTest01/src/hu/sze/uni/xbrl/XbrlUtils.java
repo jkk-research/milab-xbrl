@@ -1,9 +1,11 @@
 package hu.sze.uni.xbrl;
 
+import java.io.BufferedInputStream;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileOutputStream;
 import java.io.IOException;
+import java.net.URL;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Map;
@@ -19,7 +21,7 @@ public class XbrlUtils implements XbrlConsts {
 		XML_TRANSLATE.put("unitRef", "unit");
 		XML_TRANSLATE.put("name", "concept");
 	}
-	
+
 	public static StringBuilder sbAppend(StringBuilder sb, Object sep, boolean strict, Object... objects) {
 		for (Object ob : objects) {
 			String str = toString(ob);
@@ -35,18 +37,17 @@ public class XbrlUtils implements XbrlConsts {
 				}
 			}
 		}
-		
+
 		return sb;
 	}
-	
+
 	public static void dump(Object sep, boolean strict, Object... objects) {
 		StringBuilder sb = sbAppend(null, sep, strict, objects);
-		
+
 		if ( null != sb ) {
 			System.out.println(sb);
 		}
 	}
-
 
 	public static <RetType> RetType access(Object root, AccessCmd cmd, Object val, Object... path) {
 		Object ret = null;
@@ -85,21 +86,35 @@ public class XbrlUtils implements XbrlConsts {
 
 	public static File searchByName(File f, String name) {
 		File ret = null;
-		
-		if ( name.toLowerCase().equals(f.getName().toLowerCase())) {
-			return f;
-		} else if (f.isDirectory()) {
-			for (File ff : f.listFiles()) {
-				ret = searchByName(ff, name);
-				if ( null != ret ) {
-					break;
+
+		if ( null != f ) {
+			if ( name.toLowerCase().equals(f.getName().toLowerCase()) ) {
+				return f;
+			} else if ( f.isDirectory() ) {
+				for (File ff : f.listFiles()) {
+					ret = searchByName(ff, name);
+					if ( null != ret ) {
+						break;
+					}
 				}
 			}
-	  }
+		}
 		
 		return ret;
 	}
-	
+
+	public static void download(String url, File file) {
+		try (BufferedInputStream in = new BufferedInputStream(new URL(url).openStream()); FileOutputStream fileOutputStream = new FileOutputStream(file)) {
+			byte dataBuffer[] = new byte[1024];
+			int bytesRead;
+			while ((bytesRead = in.read(dataBuffer, 0, 1024)) != -1) {
+				fileOutputStream.write(dataBuffer, 0, bytesRead);
+			}
+		} catch (Throwable e) {
+			e.printStackTrace();
+		}
+	}
+
 	public static String getHashName(String dirName) {
 		int hash = dirName.hashCode();
 
@@ -111,7 +126,7 @@ public class XbrlUtils implements XbrlConsts {
 	}
 
 	public static File getHashDir(File root, String dirName) {
-		String path = getHashName( dirName);
+		String path = getHashName(dirName);
 
 		File f = new File(root, path);
 

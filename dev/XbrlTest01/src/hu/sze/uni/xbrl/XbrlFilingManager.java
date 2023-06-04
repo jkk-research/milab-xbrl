@@ -1,24 +1,27 @@
 package hu.sze.uni.xbrl;
 
-import java.io.BufferedInputStream;
 import java.io.File;
-import java.io.FileOutputStream;
+import java.io.FileNotFoundException;
 import java.io.FileReader;
-import java.net.URL;
+import java.io.FilenameFilter;
+import java.io.IOException;
+import java.text.MessageFormat;
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
 import java.util.TreeMap;
 import java.util.TreeSet;
+import java.util.concurrent.TimeUnit;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
-import javax.xml.parsers.SAXParser;
-import javax.xml.parsers.SAXParserFactory;
-
 import org.json.simple.parser.JSONParser;
+import org.json.simple.parser.ParseException;
 
 @SuppressWarnings({ "rawtypes" })
 public class XbrlFilingManager implements XbrlConsts {
@@ -26,39 +29,80 @@ public class XbrlFilingManager implements XbrlConsts {
 	public static final String ENTITY_NAME = "__EntityName";
 	public static final String ENTITY_ID = "__EntityId";
 	public static final String LOCAL_DIR = "__LocalDir";
-	public static final String REPORT_YEAR = "__ReportYear";
+	public static final String REPORT_DATE = "__ReportDate";
 	public static final String REPORT_ID = "__ReportId";
 	public static final String REPORT_FILE = "__ReportFile";
 
-	private static final String[] URL_ATTS = { "fxo_id", "json_url", "report_url", "package_url" };
+	private static final FilenameFilter FF_JSON = new FilenameFilter() {
+		@Override
+		public boolean accept(File dir, String name) {
+			return name.toLowerCase().endsWith(".json");
+		}
+	};
+	private static final String FMT_API = XBRL_ORG_ADDR + "/api/filings?include=entity,language&sort=-date_added&page%5Bsize%5D={0,number,#}&page%5Bnumber%5D=1";
 
-	// "https://filings.xbrl.org/api/filings?include=entity&filter=%5B%5D&sort=-date_added&page%5Bsize%5D=200&page%5Bnumber%5D=1",
-	// https://filings.xbrl.org/api/filings?include=entity,language&filter=%5B%5D&sort=-date_added&page%5Bsize%5D=20&page%5Bnumber%5D=1&_=1684136794691
-// https://filings.xbrl.org/api/filings?include=entity,language&filter=%5B%7B%22name%22%3A%22country%22%2C%22op%22%3A%22eq%22%2C%22val%22%3A%22HU%22%7D%5D&sort=-date_added&page%5Bsize%5D=20&page%5Bnumber%5D=1&_=1684747335434
-// https://www.random.org/integer-sets/?sets=1&num=100&min=1&max=6000&commas=on&sort=on&order=index&format=plain&rnd=new
-// https://filings.xbrl.org/api/filings?include=entity,language&filter=%5B%7B%22name%22%3A%22country%22%2C%22op%22%3A%22eq%22%2C%22val%22%3A%22HU%22%7D%5D&sort=-date_added&page%5Bsize%5D=60&page%5Bnumber%5D=1
+//https://www.random.org/integer-sets/?sets=1&num=100&min=0&max=6939&commas=on&sort=on&order=index&format=plain&rnd=new
+
 	File repoRoot;
 
-	List<Map> filings;
-	Map<String, Map> entities;
+	JSONParser parser = new JSONParser();
 
-	Pattern PT_FXO = Pattern.compile("(?<eid>\\w+)-(?<year>\\d+)-(\\d+-\\d+)-(?<extra>.*)");
+	Map<String, Map> entities;
+	Map<String, Map> reports = new TreeMap<>();
+
+	Set<Map> downloaded = new HashSet<>();
+
+	Pattern PT_FXO = Pattern.compile("(?<eid>\\w+)-(?<date>\\d+-\\d+-\\d+)-(?<extra>.*)");
 
 	public XbrlFilingManager(String repoPath) throws Exception {
 		repoRoot = new File(repoPath);
 
-		JSONParser p = new JSONParser();
+		File srcRoot = new File(repoRoot, "sources/xbrl.org");
 
-//		File fAll = new File(repoRoot, "ApiResponse.json");
-//		File fAll = new File(repoRoot, "filings.all.json");
-		File fAll = new File(repoRoot, "FilingsHu.json");
-
-		if ( !fAll.exists() ) {
-			throw new RuntimeException("Missing all " + fAll.getAbsolutePath());
+		if ( !srcRoot.exists() ) {
+			srcRoot.mkdirs();
 		}
-		Object allFilings = p.parse(new FileReader(fAll));
 
-		filings = XbrlUtils.access(allFilings, AccessCmd.Peek, null, "data");
+		File updates = new File(srcRoot, "updates");
+		if ( !updates.exists() ) {
+			updates.mkdirs();
+		}
+
+		for (File resp : updates.listFiles(FF_JSON)) {
+			loadReports(resp);
+		}
+
+		File fPing = new File(srcRoot, "ping.json");
+
+		long dPing = TimeUnit.MILLISECONDS.toDays(fPing.exists() ? fPing.lastModified() : 0);
+		long dNow = TimeUnit.MILLISECONDS.toDays(System.currentTimeMillis());
+
+		if ( 0 < (dNow - dPing) ) {
+			String url = MessageFormat.format(FMT_API, 1);
+			XbrlUtils.download(url, fPing);
+
+			Object ret = parser.parse(new FileReader(fPing));
+			long count = XbrlUtils.access(ret, AccessCmd.Peek, 0L, "meta", "count");
+			long diff = count - reports.size();
+
+			if ( 0 < diff ) {
+				SimpleDateFormat fmt = new SimpleDateFormat("YYYY-MM-dd");
+				String fName = fmt.format(new Date(System.currentTimeMillis())) + ".json";
+				File f = new File(updates, fName);
+				String u2 = MessageFormat.format(FMT_API, diff + 1);
+				XbrlUtils.download(u2, f);
+				loadReports(f);
+			}
+		}
+	}
+
+	public void loadReports(File fAll) throws IOException, ParseException, FileNotFoundException {
+		Object allFilings = parser.parse(new FileReader(fAll));
+
+		System.out.println("Reading API response: " + fAll.getName());
+
+		long count = XbrlUtils.access(allFilings, AccessCmd.Peek, 0L, "meta", "count");
+		ArrayList<Map> filings = XbrlUtils.access(allFilings, AccessCmd.Peek, null, "data");
 
 		entities = new TreeMap<>();
 		List<Map> included = XbrlUtils.access(allFilings, AccessCmd.Peek, null, "included");
@@ -69,13 +113,12 @@ public class XbrlFilingManager implements XbrlConsts {
 			}
 		}
 
-		Map<String, Integer> counts = new TreeMap<>();
-		int mc = 0;
+		System.out.println("Repeated ID\tOld fxo_id\tNew id\tNew fxo_id");
 
-		for (Map f : filings) {
-			String eRef = XbrlUtils.access(f, AccessCmd.Peek, null, "relationships", "entity", "data", "id");
+		for (Map filing : filings) {
+			String eRef = XbrlUtils.access(filing, AccessCmd.Peek, null, "relationships", "entity", "data", "id");
 			Map eAtts = entities.get(eRef);
-			Map fAtts = XbrlUtils.access(f, AccessCmd.Peek, null, "attributes");
+			Map fAtts = XbrlUtils.access(filing, AccessCmd.Peek, null, "attributes");
 			XbrlUtils.access(fAtts, AccessCmd.Set, eAtts.get("name"), ENTITY_NAME);
 			XbrlUtils.access(fAtts, AccessCmd.Set, eAtts.get("identifier"), ENTITY_ID);
 
@@ -83,31 +126,34 @@ public class XbrlFilingManager implements XbrlConsts {
 			Matcher m = PT_FXO.matcher(xoid);
 
 			if ( m.matches() ) {
-				++mc;
-
-				String year = m.group("year");
+				String date = m.group("date");
 				String eid = m.group("eid");
 				String extra = m.group("extra");
-				
-				XbrlUtils.access(fAtts, AccessCmd.Set, year, REPORT_YEAR);
 
-				StringBuilder sb = XbrlUtils.sbAppend(null, File.separator, true, "reports", year, XBRL_SOURCE_FILINGS, XbrlUtils.getHashName(eid), extra);
-				XbrlUtils.access(fAtts, AccessCmd.Set, sb.toString(), LOCAL_DIR);
+				XbrlUtils.access(fAtts, AccessCmd.Set, date, REPORT_DATE);
 
-				sb = XbrlUtils.sbAppend(null, IDSEP, true, XBRL_ENTITYID_LEI, eid, year, XBRL_SOURCE_FILINGS, extra);
-				XbrlUtils.access(fAtts, AccessCmd.Set, sb.toString(), REPORT_ID);
-			}
+				StringBuilder sb = XbrlUtils.sbAppend(null, File.separator, true, "reports", date.substring(0, 4), XBRL_SOURCE_FILINGS, XbrlUtils.getHashName(eid), extra);
+				String localDir = sb.toString();
+				XbrlUtils.access(fAtts, AccessCmd.Set, localDir, LOCAL_DIR);
+				if ( new File(repoRoot, localDir).exists() ) {
+					System.out.println("Downloaded: " + localDir);
+					downloaded.add(filing);
+				}
 
-			for (String u : URL_ATTS) {
-				String addr = XbrlUtils.access(fAtts, AccessCmd.Peek, null, u);
+				sb = XbrlUtils.sbAppend(null, IDSEP, true, XBRL_ENTITYID_LEI, eid, date, XBRL_SOURCE_FILINGS, extra);
+				String internalId = sb.toString();
+				XbrlUtils.access(fAtts, AccessCmd.Set, internalId, REPORT_ID);
 
-				if ( null != addr ) {
-					counts.put(u, counts.getOrDefault(u, 0) + 1);
+				Map old = reports.get(internalId);
+				if ( null != old ) {
+					System.out.println(old.get("id") + "\t" + XbrlUtils.access(old, AccessCmd.Peek, null, "attributes", "fxo_id") + "\t" + filing.get("id") + "\t" + xoid);
+				} else {
+					reports.put(internalId, filing);
 				}
 			}
 		}
 
-		System.out.println("Total count: " + filings.size() + ", fxo match: " + mc + ", url attribute counts: " + counts);
+		System.out.println("Returned count: " + count + ", size of filings: " + filings.size() + ", local report count: " + reports.size());
 	}
 
 	public Map<String, String> getAllEntities(Map<String, String> target, String filter) {
@@ -147,14 +193,14 @@ public class XbrlFilingManager implements XbrlConsts {
 		return target;
 	}
 
-	public List<Map> getFilings(Map<String, Object> match, List<Map> target) {
+	public ArrayList<Map> getFilings(Map<String, Object> match, ArrayList<Map> target) {
 		if ( null == target ) {
 			target = new ArrayList<>();
 		} else {
 			target.clear();
 		}
 
-		for (Map f : filings) {
+		for (Map f : reports.values()) {
 			Map atts = XbrlUtils.access(f, AccessCmd.Peek, null, "attributes");
 
 			for (Map.Entry<String, Object> me : match.entrySet()) {
@@ -216,15 +262,8 @@ public class XbrlFilingManager implements XbrlConsts {
 			if ( !remoteFile.exists() ) {
 				url = url.replace(" ", "%20");
 				System.out.println("Accessing file " + fName + " from URL: " + url);
-				try (BufferedInputStream in = new BufferedInputStream(new URL(url).openStream()); FileOutputStream fileOutputStream = new FileOutputStream(remoteFile)) {
-					byte dataBuffer[] = new byte[1024];
-					int bytesRead;
-					while ((bytesRead = in.read(dataBuffer, 0, 1024)) != -1) {
-						fileOutputStream.write(dataBuffer, 0, bytesRead);
-					}
-				} catch (Throwable e) {
-					e.printStackTrace();
-				}
+//				XbrlUtils.download(url, remoteFile);
+				return null;
 			} else {
 				System.out.println("Resolving file from local cache " + fName);
 			}
@@ -234,13 +273,14 @@ public class XbrlFilingManager implements XbrlConsts {
 				try {
 					XbrlUtils.unzip(remoteFile, ret);
 				} catch (Throwable e) {
+					System.err.println("Unzip error with file " + remoteFile);
 					e.printStackTrace(System.err);
 				}
 			} else {
 				ret = remoteFile;
 			}
 		} else {
-			System.out.println("Resolving file from local cache " + fName);
+//			System.out.println("Resolving file from local cache " + fName);
 		}
 
 		return ret;
@@ -251,30 +291,53 @@ public class XbrlFilingManager implements XbrlConsts {
 		String home = System.getProperty("user.home");
 		XbrlFilingManager fm = new XbrlFilingManager(home + "/work/xbrl/data");
 
-		for (String s : fm.getEntityNames(null, "group")) {
-			System.out.println(s);
-		}
+//		for (String s : fm.getEntityNames(null, "group")) {
+//			System.out.println(s);
+//		}
 
-		Map<String, Object> match = new HashMap<>();
+//		Map<String, Object> match = new HashMap<>();
 
 //		match.put(ENTITY_NAME, "Budapesti Ingatlan Hasznos");
-		match.put("country", "HU");
+//		match.put("country", "HU");
+//		List<Map> fl = fm.getFilings(match, null);
 
-		List<Map> fl = fm.getFilings(match, null);
+//		Set<Map> fl = new HashSet<>();
+//
+//		ArrayList<Map> flAll = fm.getFilings(match, null);
+//		String content = new String(Files.readAllBytes(Paths.get("random.txt")), StandardCharsets.UTF_8);
+//
+//		String[] indexes = content.split(", ");
+//
+//		for (String is : indexes) {
+//			Map lm = flAll.get(Integer.parseInt(is));
+//
+////			File ff = fm.getReport(lm, XbrlReportType.Package);
+////			System.out.println(ff.getCanonicalPath());
+//			fl.add(lm);
+//		}
+
+		Set<Map> fl = fm.downloaded;
+
+		if ( fl.isEmpty() ) {
+			return;
+		}
 
 		Map<XbrlReportFormat, File> repFiles = new TreeMap<>();
-		
+
 		Map<Map, File> repToRead = new HashMap<>();
 		ArrayList<File> repDirFail = new ArrayList<>();
 
 		for (Map lm : fl) {
-			XbrlUtils.dump(",", true, XbrlUtils.access(lm, AccessCmd.Peek, null, "attributes", ENTITY_NAME), XbrlUtils.access(lm, AccessCmd.Peek, null, "attributes", REPORT_ID));
+//			XbrlUtils.dump(",", true, XbrlUtils.access(lm, AccessCmd.Peek, null, "attributes", ENTITY_NAME), XbrlUtils.access(lm, AccessCmd.Peek, null, "attributes", REPORT_ID));
 
 			File ff = fm.getReport(lm, XbrlReportType.Package);
-			System.out.println(ff.getCanonicalPath());
+			if ( null == ff ) {
+				continue;
+			}
+//			System.out.println(ff.getCanonicalPath());
 
 			File repDir = XbrlUtils.searchByName(ff, "reports");
-			
+
 			if ( null == repDir ) {
 				// old reports had no "reports" subfolder
 				repDir = ff;
@@ -291,22 +354,23 @@ public class XbrlFilingManager implements XbrlConsts {
 						String fn = fRep.getName().toUpperCase();
 						int d = fn.lastIndexOf('.');
 						String type = fn.substring(d + 1).toUpperCase();
-						
+
 						try {
 							repFiles.put(XbrlReportFormat.valueOf(type), fRep);
-						} catch ( Throwable e ) {
-							
+						} catch (Throwable e) {
+//							System.out.println("wtf? " + ff.getName());
 						}
 
 					}
 				}
-				
+
 				if ( repFiles.isEmpty() ) {
-					System.out.println("Report file not found in " + ff.getName());
+//					System.out.println("Report file not found in " + ff.getName());
+					repDirFail.add(ff);
 				} else {
 					File fRep = repFiles.values().iterator().next();
-					
-					System.out.println("Report file to read " + fRep.getName());
+
+//					System.out.println("Report file to read " + fRep.getName());
 					repToRead.put(lm, fRep);
 
 				}
@@ -315,36 +379,34 @@ public class XbrlFilingManager implements XbrlConsts {
 
 		System.out.println("File count: " + repToRead.size());
 		System.out.println("Fail count: " + repDirFail.size());
-		
-		
+
 		System.out.println("\n\nReport dir fail ");
 
-		for ( File f : repDirFail ) {
+		for (File f : repDirFail) {
 			System.out.println("   " + f.getAbsolutePath());
 		}
-
-		SAXParserFactory factory = SAXParserFactory.newInstance();
-		SAXParser xmlParser = factory.newSAXParser();
 
 		XbrlTagCoverage listener = new XbrlTagCoverage();
 		listener.readTaxonomy("TaxonomyDefs.xlsx");
 
-		XbrlHandlerInnerXhtml xhtmlHandler = new XbrlHandlerInnerXhtml();
-		xhtmlHandler.setListener(listener);
-		
-		System.out.println("\n\nReport to read ");
+		XbrlReportLoader loader = new XbrlReportLoader(listener);
 
-		for ( Map.Entry<Map, File>  ee : repToRead.entrySet() ) {
+		for (Map.Entry<Map, File> ee : repToRead.entrySet()) {
 			Map key = ee.getKey();
-			File f = ee.getValue();			
+			File f = ee.getValue();
 			listener.setCurrentFiling(key, f);
-			xmlParser.parse(f, xhtmlHandler);
+			try {
+				loader.load(f);
+			} catch (Throwable e) {
+				System.err.println("Parse error with file " + f);
+				e.printStackTrace(System.err);
+			}
 		}
-		
-		System.out.println("Dim keys" + listener.cntDimKeys);
-				
-		listener.writeExcel("TaxonomyCoverageHu.xlsx");
-		
+
+//		System.out.println("Dim keys" + listener.cntDimKeys);
+//	listener.writeExcel("TaxonomyCoverageHu.xlsx");
+		listener.writeExcel("TaxonomyCoverage700-2.xlsx");
+
 		System.out.println("Process complete in " + (System.currentTimeMillis() - t) + " msec.");
 	}
 }

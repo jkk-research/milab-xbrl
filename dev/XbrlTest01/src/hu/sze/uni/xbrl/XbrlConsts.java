@@ -1,5 +1,7 @@
 package hu.sze.uni.xbrl;
 
+import java.io.File;
+
 public interface XbrlConsts {
 	enum ContainerType {
 		Arr, Map,
@@ -14,17 +16,40 @@ public interface XbrlConsts {
 	}
 
 	enum XbrlReportType {
-		Json, Package, 
+		Json, Package,
 	}
-	
+
 	enum XbrlReportFormat {
-		XHTML, XBRL, JSON, XML
+		XHTML(false), HTML(false), XBRL(true), JSON(false), XML(true) /* ?? */,;
+
+		public final boolean isXml;
+
+		private XbrlReportFormat(boolean isXml) {
+			this.isXml = isXml;
+		}
+
+		public static XbrlReportFormat getFormat(File f) {
+			XbrlReportFormat ret = null;
+
+			if ( f.exists() ) {
+				String fn = f.getName().toUpperCase();
+				int d = fn.lastIndexOf('.');
+				String type = fn.substring(d + 1).toUpperCase();
+
+				try {
+					ret = XbrlReportFormat.valueOf(type);
+				} catch (Throwable e) {
+				}
+			}
+
+			return ret;
+		}
 	}
 
 	String XML_ELEMENT = "XmlElement";
 	String XML_ATTRIBUTES = "XmlAttributes";
 	String XML_CONTENT = "XmlContent";
-	
+
 	String KEY_XBRL_ID = "id";
 	String KEY_XBRL_CTXREF = "contextRef";
 	String KEY_XBRL_UNITREF = "unitRef";
@@ -33,7 +58,7 @@ public interface XbrlConsts {
 	String KEY_XBRL_STARTDATE = "startDate";
 	String KEY_XBRL_ENDDATE = "endDate";
 	String KEY_XBRL_INSTANT = "instant";
-	
+
 	String KEY_XBRL_UNIT_MEASURE = "measure";
 	String KEY_XBRL_UNIT_NUMERATOR = "unitNumerator";
 	String KEY_XBRL_UNIT_DENOMINATOR = "unitDenominator";
