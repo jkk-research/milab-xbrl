@@ -44,6 +44,7 @@ public class XbrlTagCoverage implements XbrlConsts, XbrlListener {
 	public static final String TAXONOMY = "taxonomy";
 	public static final String META = ".";
 	public static final String FORMAT = "format";
+	public static final String CELL_ADDRESS = "__CellAddress";
 
 	Map<String, Map> filings = new TreeMap<>();
 
@@ -243,6 +244,7 @@ public class XbrlTagCoverage implements XbrlConsts, XbrlListener {
 		int rowCount = 0;
 		Row row;
 		Cell c;
+		Hyperlink link;
 
 		wb = fileName.toLowerCase().endsWith(".xlsx") ? new XSSFWorkbook() : new HSSFWorkbook();
 
@@ -289,17 +291,19 @@ public class XbrlTagCoverage implements XbrlConsts, XbrlListener {
 			}
 			
 			int idx = 1;
-			Hyperlink link = hlpCreate.createHyperlink(Hyperlink.LINK_URL);
+			link = hlpCreate.createHyperlink(Hyperlink.LINK_URL);
 		  link.setAddress(XbrlFilingManager.XBRL_ORG_ADDR + "/filing/" + XbrlUtils.toString(XbrlUtils.access(key, AccessCmd.Peek, null, paths[idx])));
 		  row.getCell(idx).setHyperlink(link);
+		  
+		  key.put(CELL_ADDRESS, "'Filings'!B" + rowCount);
 
-		  idx = cols.length - 1;
-			 link = hlpCreate.createHyperlink(Hyperlink.LINK_URL);
-		  String url = XbrlFilingManager.XBRL_ORG_ADDR + XbrlUtils.toString(XbrlUtils.access(key, AccessCmd.Peek, null, paths[idx]));
-			 url = url.replace(" ", "%20");
-			link.setAddress(url);
-		  row.getCell(idx).setHyperlink(link);
-
+//		  idx = cols.length - 1;
+//			 link = hlpCreate.createHyperlink(Hyperlink.LINK_URL);
+//		  String url = XbrlFilingManager.XBRL_ORG_ADDR + XbrlUtils.toString(XbrlUtils.access(key, AccessCmd.Peek, null, paths[idx]));
+//			 url = url.replace(" ", "%20");
+//			link.setAddress(url);
+//		  row.getCell(idx).setHyperlink(link);
+		  
 		}
 
 		for (int i = 0; i < cols.length; ++i) {
@@ -327,18 +331,30 @@ public class XbrlTagCoverage implements XbrlConsts, XbrlListener {
 			Map content = namespaces.peek(ns);
 			nsContent.add(content);
 
-			Set<String> filings = (Set) content.get(FILINGS);
+			Set<String> nsFilings = (Set) content.get(FILINGS);
 
 			row = sheet.createRow(rowCount++);
 			colCount = 0;
 			c = row.createCell(colCount++);
 			c.setCellValue(ns);
+			
+			String sName = ns + " (" + nsFilings.size() + ")";
+		  link = hlpCreate.createHyperlink(Hyperlink.LINK_DOCUMENT);
+//		  link.setAddress("'" + sName + "'");
+		  link.setAddress("'" + sName + "'!A1");
+		  c.setHyperlink(link);
+			
 			c = row.createCell(colCount++);
-			c.setCellValue(filings.size());
+			c.setCellValue(nsFilings.size());
 
-			for (String ff : filings) {
+			for (String ff : nsFilings) {
 				c = row.createCell(colCount++);
 				c.setCellValue(ff);
+				
+				String strLink = (String) filings.get(ff).get(CELL_ADDRESS);
+			  link = hlpCreate.createHyperlink(Hyperlink.LINK_DOCUMENT);
+			  link.setAddress(strLink);
+		  	c.setHyperlink(link);
 
 				if ( colCount > nsColCount ) {
 					nsColCount = colCount;
@@ -369,7 +385,7 @@ public class XbrlTagCoverage implements XbrlConsts, XbrlListener {
 		for (Map content : nsContent) {
 			String ns = (String) content.get(NAME);
 
-			Set<String> filings = (Set) content.get(FILINGS);
+			Set<String> nsFilings = (Set) content.get(FILINGS);
 			List taxCols = Collections.EMPTY_LIST;
 
 			XbrlUtilsFactory taxonomy = (XbrlUtilsFactory) namespaces.get(ns).get(TAXONOMY);
@@ -378,7 +394,7 @@ public class XbrlTagCoverage implements XbrlConsts, XbrlListener {
 				taxCols = (List) tm.get(META);
 			}
 
-			String sName = ns + " (" + filings.size() + ")";
+			String sName = ns + " (" + nsFilings.size() + ")";
 			Sheet sheetNS = wb.getSheet(sName);
 
 			if ( null == sheetNS ) {
@@ -408,10 +424,15 @@ public class XbrlTagCoverage implements XbrlConsts, XbrlListener {
 			c.setCellValue("Count");
 			c.setCellStyle(rotated);
 
-			for (String ff : filings) {
+			for (String ff : nsFilings) {
 				c = row.createCell(colCount++);
 				c.setCellValue(ff);
 				c.setCellStyle(rotated);
+				
+				String strLink = (String) filings.get(ff).get(CELL_ADDRESS);
+			  link = hlpCreate.createHyperlink(Hyperlink.LINK_DOCUMENT);
+			  link.setAddress(strLink);
+		  	c.setHyperlink(link);
 			}
 			row.setHeight((short) -1);
 
@@ -443,7 +464,7 @@ public class XbrlTagCoverage implements XbrlConsts, XbrlListener {
 				c = row.createCell(colCount++);
 				c.setCellValue(tagFilings.size());
 
-				for (String ff : filings) {
+				for (String ff : nsFilings) {
 					if ( tagFilings.contains(ff) ) {
 						c = row.createCell(colCount);
 						c.setCellValue("X");
