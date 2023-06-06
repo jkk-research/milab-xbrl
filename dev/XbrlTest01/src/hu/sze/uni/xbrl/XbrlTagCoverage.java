@@ -20,6 +20,8 @@ import org.apache.poi.hssf.usermodel.HSSFWorkbook;
 import org.apache.poi.openxml4j.opc.OPCPackage;
 import org.apache.poi.ss.usermodel.Cell;
 import org.apache.poi.ss.usermodel.CellStyle;
+import org.apache.poi.ss.usermodel.CreationHelper;
+import org.apache.poi.ss.usermodel.Hyperlink;
 import org.apache.poi.ss.usermodel.Row;
 import org.apache.poi.ss.usermodel.Sheet;
 import org.apache.poi.ss.usermodel.Workbook;
@@ -244,6 +246,8 @@ public class XbrlTagCoverage implements XbrlConsts, XbrlListener {
 
 		wb = fileName.toLowerCase().endsWith(".xlsx") ? new XSSFWorkbook() : new HSSFWorkbook();
 
+	   CreationHelper hlpCreate = wb.getCreationHelper();
+	   
 		CellStyle rotated = wb.createCellStyle();
 		rotated.setRotation((short) 90);
 
@@ -255,9 +259,19 @@ public class XbrlTagCoverage implements XbrlConsts, XbrlListener {
 
 		row = sheet.createRow(rowCount++);
 
-		String[] cols = { "Filing ID", "Company", "Year", "File" };
-		Object[][] paths = { { "attributes", "fxo_id" }, { "attributes", XbrlFilingManager.ENTITY_NAME }, { "attributes", XbrlFilingManager.REPORT_DATE },
-				{ "attributes", XbrlFilingManager.REPORT_FILE }, };
+		String[] cols = { "Date added", "Filing ID", "Country", "Period end", "Company", 
+				"Err", "Warn", "Inco", "Package URL",  };
+		Object[][] paths = { 
+				{ "attributes", "date_added" }, 
+				{ "attributes", "fxo_id" }, 
+				{ "attributes", "country" },
+				{ "attributes", "period_end" }, 
+				{ "attributes", XbrlFilingManager.ENTITY_NAME }, 
+				{ "attributes", "error_count" }, 
+				{ "attributes", "warning_count" }, 
+				{ "attributes", "inconsistency_count" }, 
+				{ "attributes", "package_url" }, 
+			};
 
 		for (int i = 0; i < cols.length; ++i) {
 			c = row.createCell(i);
@@ -273,12 +287,25 @@ public class XbrlTagCoverage implements XbrlConsts, XbrlListener {
 				String value = XbrlUtils.toString(XbrlUtils.access(key, AccessCmd.Peek, null, paths[i]));
 				c.setCellValue(value);
 			}
+			
+			int idx = 1;
+			Hyperlink link = hlpCreate.createHyperlink(Hyperlink.LINK_URL);
+		  link.setAddress(XbrlFilingManager.XBRL_ORG_ADDR + "/filing/" + XbrlUtils.toString(XbrlUtils.access(key, AccessCmd.Peek, null, paths[idx])));
+		  row.getCell(idx).setHyperlink(link);
+
+		  idx = cols.length - 1;
+			 link = hlpCreate.createHyperlink(Hyperlink.LINK_URL);
+		  String url = XbrlFilingManager.XBRL_ORG_ADDR + XbrlUtils.toString(XbrlUtils.access(key, AccessCmd.Peek, null, paths[idx]));
+			 url = url.replace(" ", "%20");
+			link.setAddress(url);
+		  row.getCell(idx).setHyperlink(link);
+
 		}
 
 		for (int i = 0; i < cols.length; ++i) {
 			sheet.autoSizeColumn(i);
 		}
-		sheet.createFreezePane(1, 1);
+		sheet.createFreezePane(2, 1);
 
 		String[] cols2 = { "Name", "Count", "Filings..." };
 

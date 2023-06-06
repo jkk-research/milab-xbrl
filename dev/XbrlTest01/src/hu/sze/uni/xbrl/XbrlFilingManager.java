@@ -405,7 +405,7 @@ public class XbrlFilingManager implements XbrlConsts {
 
 //		System.out.println("Dim keys" + listener.cntDimKeys);
 //	listener.writeExcel("TaxonomyCoverageHu.xlsx");
-		listener.writeExcel("TaxonomyCoverage700-2.xlsx");
+		listener.writeExcel("TaxonomyCoverageAll.xlsx");
 
 		System.out.println("Process complete in " + (System.currentTimeMillis() - t) + " msec.");
 	}
