@@ -1,4 +1,4 @@
-package hu.sze.milab.dustsimple;
+package hu.sze.milab.dust;
 
 public final class DustException extends RuntimeException implements DustConsts {
 	private static final long serialVersionUID = 1L;

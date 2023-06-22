@@ -1,4 +1,4 @@
-package hu.sze.milab.dustsimple;
+package hu.sze.milab.dust;
 
 public interface DustConsts {
 	String EXT_JAR = ".jar";
@@ -24,16 +24,8 @@ public interface DustConsts {
 		One, Set, Arr, Map;
 	};
 
-	enum BootParam {
-		LaunchParams, LaunchConfig, AppModule
-	};
-
-	enum MindRoot {
-		Action, Self, Dialog,
-	};
-
 	enum MindAccess {
-		Check, Peek, Commit, Get, Set, Insert, Delete,
+		Check, Peek, Get, Set, Insert, Delete, Reset, Commit, 
 	};
 
 	enum MindAction {
@@ -44,7 +36,4 @@ public interface DustConsts {
 		Waiting, Processing, Reject, Pass, Read, ReadAccept, Accept, Error,
 	};
 
-	enum MindListener {
-		Interceptor, Monitor, Processor, Follower,
-	};
 }
