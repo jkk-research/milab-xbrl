@@ -8,7 +8,7 @@ public final class DustException extends RuntimeException implements DustConsts 
 	}
 
 	public static void swallow(Throwable src, Object... params) {
-		Dust.dump(src, params);
+		Dust.dumpObs(src, params);
 		src.printStackTrace();
 	}
 
@@ -17,7 +17,7 @@ public final class DustException extends RuntimeException implements DustConsts 
 			throw (DustException) src;
 		}
 	
-		Dust.dump(src, params);
+		Dust.dumpObs(src, params);
 		throw new DustException(src);
 	}
 }

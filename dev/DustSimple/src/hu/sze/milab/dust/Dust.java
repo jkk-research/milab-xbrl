@@ -31,7 +31,7 @@ public class Dust implements DustConsts {
 		}
 	}
 
-	public static void dump(Object... obs) {
+	public static void dumpObs(Object... obs) {
 		log(null, obs);
 	}
 

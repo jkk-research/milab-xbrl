@@ -31,7 +31,7 @@ public class DustImpl extends Dust {
 
 		MindHandle h1 = Dust.createHandle();
 
-		Dust.dump(h1);
+		Dust.dumpObs(h1);
 
 	}
 }

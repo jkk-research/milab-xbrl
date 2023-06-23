@@ -3,5 +3,9 @@
 	<classpathentry excluding="hu/sze/milab/dust/poi/" kind="src" path="src"/>
 	<classpathentry kind="con" path="org.eclipse.jdt.launching.JRE_CONTAINER"/>
 	<classpathentry combineaccessrules="false" exported="true" kind="src" path="/DustExtLibs"/>
+	<classpathentry exported="true" kind="lib" path="/DustExtLibs/lib/poi/poi-3.14-20160307.jar"/>
+	<classpathentry exported="true" kind="lib" path="/DustExtLibs/lib/poi/poi-ooxml-3.14-20160307.jar"/>
+	<classpathentry exported="true" kind="lib" path="/DustExtLibs/lib/poi/poi-ooxml-schemas-3.14-20160307.jar"/>
+	<classpathentry exported="true" kind="lib" path="/DustExtLibs/lib/poi/xmlbeans-2.6.0.jar"/>
 	<classpathentry kind="output" path="bin"/>
 </classpath>

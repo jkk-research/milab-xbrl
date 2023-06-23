@@ -62,7 +62,7 @@ public class DustBrain implements DustBrainConsts, DustImpl.BrainImpl {
 
 	static public void dumpHandle(String prefix, MindHandle bh) {
 		Map k = resolveKnowledge(bh, false);
-		Dust.dump(prefix, (null == k) ? "???" : DustUtils.toString(k));
+		Dust.dumpObs(prefix, (null == k) ? "???" : DustUtils.toString(k));
 	}
 
 	static public Map resolveKnowledge(MindHandle bh, boolean createIfMissing) {
