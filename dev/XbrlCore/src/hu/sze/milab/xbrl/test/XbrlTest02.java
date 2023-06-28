@@ -1,23 +1,88 @@
 package hu.sze.milab.xbrl.test;
 
 import java.io.File;
+import java.util.Map;
+import java.util.TreeMap;
+
+import javax.xml.parsers.DocumentBuilder;
+import javax.xml.parsers.DocumentBuilderFactory;
+
+import org.w3c.dom.Document;
+import org.w3c.dom.Element;
+import org.w3c.dom.NamedNodeMap;
+import org.w3c.dom.Node;
+import org.w3c.dom.NodeList;
 
 import hu.sze.milab.dust.Dust;
 import hu.sze.milab.dust.brain.DustImpl;
-import hu.sze.milab.dust.stream.DustStreamConsts;
+import hu.sze.milab.dust.stream.DustStreamUrlCache;
 import hu.sze.milab.dust.stream.DustStreamXmlAgent;
+import hu.sze.milab.dust.stream.DustStreamXmlLoader;
+import hu.sze.milab.xbrl.XbrlConsts;
 
-public class XbrlTest02 implements DustStreamConsts {
+public class XbrlTest02 implements XbrlConsts {
+
+	private static File dataDir;
+	private static File out;
+	private static File in;
 
 	public static void main(String[] args) throws Exception {
 		DustImpl.main(args);
 
 		String data = System.getProperty("user.home") + "/work/xbrl/data";
-		File dataDir = new File(data);
+		dataDir = new File(data);
 
-		File out = new File("out");
+		out = new File("out");
 		out.mkdirs();
 
+		in = new File("in");
+		in.mkdirs();
+
+//		readReports(args);
+		readTaxonomy(args);
+	}
+
+	public static void readTaxonomy(String[] args) throws Exception {
+		File txMeta = new File("in/EFRAG-ESRS-2022-PoC-Taxonomy/META-INF");
+
+		DocumentBuilderFactory dbf = DocumentBuilderFactory.newInstance();
+
+		DocumentBuilder db = dbf.newDocumentBuilder();
+		Document catalog = db.parse(new File(txMeta, "catalog.xml"));
+		Document taxPack = db.parse(new File(txMeta, "taxonomyPackage.xml"));
+
+		Map<String, String> rewrite = new TreeMap<>();
+		NodeList nl = catalog.getElementsByTagName("rewriteURI");
+		for (int ni = nl.getLength(); ni-- > 0;) {
+			NamedNodeMap atts = nl.item(ni).getAttributes();
+			rewrite.put(atts.getNamedItem("uriStartString").getNodeValue(), atts.getNamedItem("rewritePrefix").getNodeValue());
+		}
+		
+		DustStreamUrlCache c = new DustStreamUrlCache(new File(dataDir, "urlCache"), false);
+		DustStreamXmlLoader xLoader = new DustStreamXmlLoader(c);
+		
+		String[] ATTS = {"name", "id", "type", "substitutionGroup", "abstract","nillable","xbrli:periodType"};
+		Map<String, String> def = new TreeMap<>();
+
+		nl = taxPack.getElementsByTagName("tp:entryPointDocument");
+		for (int ni = nl.getLength(); ni-- > 0;) {
+			String url = nl.item(ni).getAttributes().getNamedItem("href").getNodeValue();
+			Element taxonomy = xLoader.loadNamespace(txMeta, url, rewrite);
+			
+			NodeList el = taxonomy.getElementsByTagName("xsd:element");
+			for (int ei = el.getLength(); ei-- > 0;) {
+				NamedNodeMap atts = el.item(ei).getAttributes();
+				
+				for ( String a : ATTS ) {
+					Node aa = atts.getNamedItem(a);
+					def.put(a, (null == aa) ? "-" : aa.getNodeValue());
+				}
+				Dust.dumpObs("  ", def);
+			}
+		}
+	}
+
+	public static void readReports(String[] args) throws Exception {
 		DustStreamXmlAgent aXml = new DustStreamXmlAgent();
 
 		aXml.agentExecAction(MindAction.Init);
@@ -67,18 +132,4 @@ public class XbrlTest02 implements DustStreamConsts {
 
 	}
 
-	/*
-	 * 
-	 * if(header.length() > 50){ //Length of String for my test
-	 * sheet.setColumnWidth(0, 18000); //Set column width, you'll probably want to
-	 * tweak the second int CellStyle style = wb.createCellStyle(); //Create new
-	 * style style.setWrapText(true); //Set wordwrap cell.setCellStyle(style);
-	 * //Apply style to cell cell.setCellValue(header); //Write header }
-	 * 
-	 * 
-	 * 
-	 * public void setCellValue(double value)
-	 * 
-	 * dCell.setCellValue(123);
-	 */
 }
