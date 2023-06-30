@@ -2,9 +2,9 @@ package hu.sze.milab.xbrl;
 
 import hu.sze.milab.dust.Dust;
 import hu.sze.milab.dust.DustMetaConsts;
-import hu.sze.milab.dust.stream.DustStreamConsts;
+import hu.sze.milab.dust.stream.xml.DustStreamXmlConsts;
 
-public interface XbrlConsts extends DustMetaConsts, DustStreamConsts {
+public interface XbrlConsts extends DustMetaConsts, DustStreamXmlConsts {
 
 	enum XbrlInfoType {
 		Context, Unit, Fact
