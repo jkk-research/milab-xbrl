@@ -327,7 +327,7 @@ public class XbrlTagCoverage implements XbrlConsts, XbrlListener {
 		ArrayList<Map> nsContent = new ArrayList<>();
 
 		for (String ns : namespaces.keys()) {
-			System.out.println("Exporting namespace " + ns);
+//			System.out.println("Exporting namespace " + ns);
 			Map content = namespaces.peek(ns);
 			nsContent.add(content);
 

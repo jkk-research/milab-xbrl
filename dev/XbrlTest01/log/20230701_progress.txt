@@ -1,0 +1,403 @@
+===== PREPARATION =====
+
+--- already downloaded, 32/307, ~10% ---
+
+Downloaded: reports/2022/xbrl.org/94/ed/549300MBWR5H8SIJLE03/ESEF-SE-0
+Downloaded: reports/2022/xbrl.org/e6/56/5967007LIEEXZX4VQO21/ESEF-NO-0
+Downloaded: reports/2022/xbrl.org/f6/0b/P4GTT6GF1W40CVIMFR43/ESEF-PL-0
+Downloaded: reports/2022/xbrl.org/1a/81/213800XKDG12NQG8VC53/ESEF-GB-0
+Downloaded: reports/2022/xbrl.org/03/15/815600522538355AE429/ESEF-IT-0
+Downloaded: reports/2022/xbrl.org/65/66/Q2GQA2KF6XJ24W42G291/ESEF-GB-0
+Downloaded: reports/2022/xbrl.org/bc/9d/H7FNTJ4851HG0EXQ1Z70/ESEF-GB-0
+Downloaded: reports/2022/xbrl.org/63/7a/549300PZMFIQR79Q0T97/ESEF-IS-0
+Downloaded: reports/2021/xbrl.org/9e/a0/5493001BABFV7P27OW30/ESEF-SI-0
+Downloaded: reports/2021/xbrl.org/63/7a/549300PZMFIQR79Q0T97/ESEF-IS-0
+Downloaded: reports/2021/xbrl.org/db/2f/529900UNUKYZ9HND3309/ESEF-AT-0
+Downloaded: reports/2021/xbrl.org/82/3f/529900BI5KIGX6YLX375/ESEF-AT-1
+Downloaded: reports/2021/xbrl.org/94/53/549300KCFVCFTUJZYT59/ESEF-HU-1
+Downloaded: reports/2021/xbrl.org/94/53/549300KCFVCFTUJZYT59/ESEF-HU-0
+Downloaded: reports/2021/xbrl.org/31/ae/213800M7T3CYVZ3ZRT12/ESEF-NO-0
+Downloaded: reports/2021/xbrl.org/b6/bf/815600A029117B20DD63/ESEF-IT-0
+Downloaded: reports/2021/xbrl.org/9a/d0/RRUN0TCQ1K2JDV7MXO75/ESEF-AT-0
+Downloaded: reports/2021/xbrl.org/ca/39/PRNXTNXHBI0TSY1V8P17/ESEF-HR-0
+Downloaded: reports/2021/xbrl.org/62/ff/5967007LIEEXZX5PU005/ESEF-NO-1
+Downloaded: reports/2021/xbrl.org/ae/d7/XLEZHWWOI4HFQDGL4793/ESEF-PL-0
+Downloaded: reports/2021/xbrl.org/29/a2/5967007LIEEXZX51WW28/ESEF-NO-0
+Downloaded: reports/2021/xbrl.org/8c/fd/M312WZV08Y7LYUC71685/ESEF-NO-0
+Downloaded: reports/2021/xbrl.org/24/ae/B64D6Y3LBJS4ANNPCU93/ESEF-NL-0
+Downloaded: reports/2021/xbrl.org/e6/3d/BFXS5XCH7N0Y05NIXW11/ESEF-NL-0
+Downloaded: reports/2021/xbrl.org/ef/98/5493000LKS7B3UTF7H35/ESEF-PL-0
+Downloaded: reports/2021/xbrl.org/f6/0b/P4GTT6GF1W40CVIMFR43/ESEF-PL-0
+Downloaded: reports/2020/xbrl.org/82/0f/259400DZXF7UJKK2AY35/ESEF-PL-0
+Downloaded: reports/2020/xbrl.org/73/b7/259400QHDOZWMJ103294/ESEF-PL-0
+Downloaded: reports/2020/xbrl.org/85/b6/KR6LSKV3BTSJRD41IF75/ESEF-CZ-0
+Downloaded: reports/2020/xbrl.org/93/05/I6SS27Q1Q3385V753S50/ESEF-AT-0
+Downloaded: reports/2020/xbrl.org/9a/d0/RRUN0TCQ1K2JDV7MXO75/ESEF-AT-0
+Downloaded: reports/2020/xbrl.org/e5/52/529900VYY1MRNR59PN57/ESEF-AT-0
+
+Returned count: 307, size of filings: 307, local report count: 307
+
+--- Will download the missing ones ----
+Accessing file htb-2020-12-31.zip from URL: https://filings.xbrl.org/0W5QHUNYV4W7GJO62R27/2020-12-31/ESEF/AT/1/htb-2020-12-31.zip
+Accessing file htb-2021-12-31.zip from URL: https://filings.xbrl.org/0W5QHUNYV4W7GJO62R27/2021-12-31/ESEF/AT/0/htb-2021-12-31.zip
+Accessing file 0W5QHUNYV4W7GJO62R27-2022-12-31-de.zip from URL: https://filings.xbrl.org/0W5QHUNYV4W7GJO62R27/2022-12-31/ESEF/AT/0/0W5QHUNYV4W7GJO62R27-2022-12-31-de.zip
+Accessing file 1VUV7VQFKUOQSJ21A208-2020-12-31AR.zip from URL: https://filings.xbrl.org/1VUV7VQFKUOQSJ21A208/2020-12-31/ESEF/FR/0/1VUV7VQFKUOQSJ21A208-2020-12-31AR.zip
+Accessing file 1VUV7VQFKUOQSJ21A208-2021-12-31-fr.zip from URL: https://filings.xbrl.org/1VUV7VQFKUOQSJ21A208/2021-12-31/ESEF/FR/0/1VUV7VQFKUOQSJ21A208-2021-12-31-fr.zip
+Accessing file 1VUV7VQFKUOQSJ21A208-2022-12-31-fr.zip from URL: https://filings.xbrl.org/1VUV7VQFKUOQSJ21A208/2022-12-31/ESEF/FR/0/1VUV7VQFKUOQSJ21A208-2022-12-31-fr.zip
+Accessing file 1VUV7VQFKUOQSJ21A208-2022-12-31.zip from URL: https://filings.xbrl.org/1VUV7VQFKUOQSJ21A208/2022-12-31/ESEF/GB/0/1VUV7VQFKUOQSJ21A208-2022-12-31.zip
+Accessing file Nordax-2022-12-31-sv.zip from URL: https://filings.xbrl.org/21380057HUGFEAF25W84/2022-12-31/ESEF/NO/0/Nordax-2022-12-31-sv.zip
+Accessing file Nordax-2022-12-31-sv.zip from URL: https://filings.xbrl.org/21380057HUGFEAF25W84/2022-12-31/ESEF/SE/0/Nordax-2022-12-31-sv.zip
+Accessing file 2138005M92IEIQVEL297-2021-12-31-en.zip from URL: https://filings.xbrl.org/2138005M92IEIQVEL297/2021-12-31/ESEF/EE/0/2138005M92IEIQVEL297-2021-12-31-en.zip
+Accessing file 21380081EP12LC86CB82-2021-12-31.zip from URL: https://filings.xbrl.org/21380081EP12LC86CB82/2021-12-31/ESEF/GB/0/21380081EP12LC86CB82-2021-12-31.zip
+Accessing file 21380081EP12LC86CB82-2022-12-31.zip from URL: https://filings.xbrl.org/21380081EP12LC86CB82/2023-02-14/ESEF/GB/0/21380081EP12LC86CB82-2022-12-31.zip
+Accessing file apsbankplc-2021-12-31-en.zip from URL: https://filings.xbrl.org/213800A1O379I6DMCU10/2021-12-31/ESEF/MT/0/apsbankplc-2021-12-31-en.zip
+Accessing file 213800CXIBLC2TMIGI76-2021-12-31.zip from URL: https://filings.xbrl.org/213800CXIBLC2TMIGI76/2021-12-31/ESEF/GB/0/213800CXIBLC2TMIGI76-2021-12-31.zip
+Accessing file 213800CXIBLC2TMIGI76-2022-12-31.zip from URL: https://filings.xbrl.org/213800CXIBLC2TMIGI76/2022-12-31/ESEF/GB/0/213800CXIBLC2TMIGI76-2022-12-31.zip
+Accessing file 213800IBT39XQ9C4CP71-2021-12-31.zip from URL: https://filings.xbrl.org/213800IBT39XQ9C4CP71/2021-12-31/ESEF/GB/0/213800IBT39XQ9C4CP71-2021-12-31.zip
+Accessing file 213800IBT39XQ9C4CP71-2022-12-31.zip from URL: https://filings.xbrl.org/213800IBT39XQ9C4CP71/2022-12-31/ESEF/GB/0/213800IBT39XQ9C4CP71-2022-12-31.zip
+Accessing file 213800M7T3CYVZ3ZRT12-2022-12-31-no.zip from URL: https://filings.xbrl.org/213800M7T3CYVZ3ZRT12/2022-12-31/ESEF/NO/0/213800M7T3CYVZ3ZRT12-2022-12-31-no.zip
+Accessing file 213800MBWEIJDM5CU638-2021-12-31.zip from URL: https://filings.xbrl.org/213800MBWEIJDM5CU638/2021-12-31/ESEF/GB/0/213800MBWEIJDM5CU638-2021-12-31.zip
+Accessing file 213800MBWEIJDM5CU638-2022-12-31.zip from URL: https://filings.xbrl.org/213800MBWEIJDM5CU638/2022-12-31/ESEF/GB/0/213800MBWEIJDM5CU638-2022-12-31.zip
+Accessing file 213800S1TDKIB1IUTS72-2022-09-30.zip from URL: https://filings.xbrl.org/213800S1TDKIB1IUTS72/2022-09-30/ESEF/GB/0/213800S1TDKIB1IUTS72-2022-09-30.zip
+Accessing file 213800T6NS9N2WQ3B328-2021-12-31.zip from URL: https://filings.xbrl.org/213800T6NS9N2WQ3B328/2021-12-31/ESEF/GB/0/213800T6NS9N2WQ3B328-2021-12-31.zip
+Accessing file 213800T6NS9N2WQ3B328-2022-12-31.zip from URL: https://filings.xbrl.org/213800T6NS9N2WQ3B328/2022-12-31/ESEF/GB/0/213800T6NS9N2WQ3B328-2022-12-31.zip
+Accessing file 213800U93SZC44VXN635-2022-12-31.zip from URL: https://filings.xbrl.org/213800U93SZC44VXN635/2022-12-31/ESEF/GB/0/213800U93SZC44VXN635-2022-12-31.zip
+Accessing file 213800UUGANOMFJ9X769-2021-12-31.zip from URL: https://filings.xbrl.org/213800UUGANOMFJ9X769/2021-12-31/ESEF/GB/0/213800UUGANOMFJ9X769-2021-12-31.zip
+Accessing file 213800WTQKOQI8ELD692-2021-12-31.zip from URL: https://filings.xbrl.org/213800WTQKOQI8ELD692/2021-12-31/ESEF/GB/0/213800WTQKOQI8ELD692-2021-12-31.zip
+Accessing file 213800WTQKOQI8ELD692-2022-12-31-en.zip from URL: https://filings.xbrl.org/213800WTQKOQI8ELD692/2022-12-31/ESEF/GB/0/213800WTQKOQI8ELD692-2022-12-31-en.zip
+Accessing file 213800X5WU57YL9GPK89-2021-12-31.zip from URL: https://filings.xbrl.org/213800X5WU57YL9GPK89/2021-12-31/ESEF/GB/0/213800X5WU57YL9GPK89-2021-12-31.zip
+Accessing file 213800X5WU57YL9GPK89-2022-12-31.zip from URL: https://filings.xbrl.org/213800X5WU57YL9GPK89/2022-12-31/ESEF/GB/0/213800X5WU57YL9GPK89-2022-12-31.zip
+Accessing file 213800XKDG12NQG8VC53-2021-12-31.zip from URL: https://filings.xbrl.org/213800XKDG12NQG8VC53/2021-12-31/ESEF/GB/0/213800XKDG12NQG8VC53-2021-12-31.zip
+Accessing file 254900A5MFKWK5468712-2021-12-31.zip from URL: https://filings.xbrl.org/254900A5MFKWK5468712/2021-12-31/ESEF/GB/0/254900A5MFKWK5468712-2021-12-31.zip
+Accessing file 254900A5MFKWK5468712-2022-12-31.zip from URL: https://filings.xbrl.org/254900A5MFKWK5468712/2022-12-31/ESEF/GB/0/254900A5MFKWK5468712-2022-12-31.zip
+Accessing file 254900WR3I1Z9NPC7D84-2021-12-31-en.zip from URL: https://filings.xbrl.org/254900WR3I1Z9NPC7D84/2021-12-31/ESEF/IS/0/254900WR3I1Z9NPC7D84-2021-12-31-en.zip
+Accessing file 254900WR3I1Z9NPC7D84-2022-12-31-en.zip from URL: https://filings.xbrl.org/254900WR3I1Z9NPC7D84/2022-12-31/ESEF/IS/0/254900WR3I1Z9NPC7D84-2022-12-31-en.zip
+Accessing file gnb_2021-12-31_pl.zip from URL: https://filings.xbrl.org/2594000SEGUR418W2G08/2021-12-31/ESEF/PL/0/gnb_2021-12-31_pl.zip
+Accessing file 259400BCOV9JJIGLYF05-2020-12-31.zip from URL: https://filings.xbrl.org/259400BCOV9JJIGLYF05/2020-12-31/ESEF/PL/1/259400BCOV9JJIGLYF05-2020-12-31.zip
+Accessing file BankGospodarstwaKr-2021-12-31.zip from URL: https://filings.xbrl.org/259400BCOV9JJIGLYF05/2021-12-31/ESEF/PL/0/BankGospodarstwaKr-2021-12-31.zip
+Accessing file SSF_BGK_EN-2021-12-31.zip from URL: https://filings.xbrl.org/259400BCOV9JJIGLYF05/2021-12-31/ESEF/PL/1/SSF_BGK_EN-2021-12-31.zip
+Accessing file BankGospodarstwaKraj-2022-12-31.zip from URL: https://filings.xbrl.org/259400BCOV9JJIGLYF05/2022-12-31/ESEF/PL/0/BankGospodarstwaKraj-2022-12-31.zip
+Accessing file SSF_BGK_EN_2022-12-31.zip from URL: https://filings.xbrl.org/259400BCOV9JJIGLYF05/2022-12-31/ESEF/PL/1/SSF_BGK_EN_2022-12-31.zip
+Accessing file mBank-SSF-2021-12-31-pl.zip from URL: https://filings.xbrl.org/259400DZXF7UJKK2AY35/2021-12-31/ESEF/PL/0/mBank-SSF-2021-12-31-pl.zip
+Accessing file mBank-SSF-2022-12-31-pl.zip from URL: https://filings.xbrl.org/259400DZXF7UJKK2AY35/2022-12-31/ESEF/PL/0/mBank-SSF-2022-12-31-pl.zip
+Accessing file pbkm-2020-12-31.zip from URL: https://filings.xbrl.org/259400IT0Y6PJJ2UIZ94/2020-12-31/ESEF/PL/0/pbkm-2020-12-31.zip
+Accessing file ESEF_SantanderBankPolska.zip from URL: https://filings.xbrl.org/259400LGXW3K0GDAG361/2021-12-31/ESEF/PL/0/ESEF_SantanderBankPolska.zip
+Accessing file ESEF_SantanderBankPolska.zip from URL: https://filings.xbrl.org/259400LGXW3K0GDAG361/2022-12-31/ESEF/PL/0/ESEF_SantanderBankPolska.zip
+Accessing file grupamillennium-2020-12-31.zip from URL: https://filings.xbrl.org/259400OFDZ9KPZEO8K78/2020-12-31/ESEF/PL/0/grupamillennium-2020-12-31.zip
+Accessing file grupamillennium-2021-12-31-pl.zip from URL: https://filings.xbrl.org/259400OFDZ9KPZEO8K78/2021-12-31/ESEF/PL/0/grupamillennium-2021-12-31-pl.zip
+Accessing file grupamillennium-2022-12-31-pl.zip from URL: https://filings.xbrl.org/259400OFDZ9KPZEO8K78/2022-12-31/ESEF/PL/0/grupamillennium-2022-12-31-pl.zip
+Accessing file ESEF-Alior_Bank_SA_20211231.zip from URL: https://filings.xbrl.org/259400QHDOZWMJ103294/2021-12-31/ESEF/PL/0/ESEF-Alior_Bank_SA_20211231.zip
+Accessing file Alior-2022-12-31-pl.zip from URL: https://filings.xbrl.org/259400QHDOZWMJ103294/2022-12-31/ESEF/PL/0/Alior-2022-12-31-pl.zip
+Accessing file PL_Skonsolidowane Sprawozdanie Finansowe ING Bank Slaski_2020.zip from URL: https://filings.xbrl.org/259400YLRTOBISHBVX41/2020-12-31/ESEF/PL/0/PL_Skonsolidowane%20Sprawozdanie%20Finansowe%20ING%20Bank%20Slaski_2020.zip
+Accessing file PL_ING_Bank_Slaski_Skonsolidowane_sprawozdanie_finansowe_2021.zip from URL: https://filings.xbrl.org/259400YLRTOBISHBVX41/2021-12-31/ESEF/PL/0/PL_ING_Bank_Slaski_Skonsolidowane_sprawozdanie_finansowe_2021.zip
+Accessing file PL_ING_Bank_Slaski_Skonsolidowane_sprawozdanie_finansowe_2022.zip from URL: https://filings.xbrl.org/259400YLRTOBISHBVX41/2022-12-31/ESEF/PL/0/PL_ING_Bank_Slaski_Skonsolidowane_sprawozdanie_finansowe_2022.zip
+Accessing file 2HI3YI5320L3RW6NJ957-2021-12-31.zip from URL: https://filings.xbrl.org/2HI3YI5320L3RW6NJ957/2021-12-31/ESEF/GB/0/2HI3YI5320L3RW6NJ957-2021-12-31.zip
+Accessing file 2HI3YI5320L3RW6NJ957-2022-12-31.zip from URL: https://filings.xbrl.org/2HI3YI5320L3RW6NJ957/2023-02-14/ESEF/GB/0/2HI3YI5320L3RW6NJ957-2022-12-31.zip
+Accessing file 2IGI19DL77OX0HC3ZE78-2022-10-31-en.zip from URL: https://filings.xbrl.org/2IGI19DL77OX0HC3ZE78/2022-10-31/ESEF/LU/0/2IGI19DL77OX0HC3ZE78-2022-10-31-en.zip
+Accessing file equa-2020-12-31.zip from URL: https://filings.xbrl.org/31570010000000026673/2020-12-31/ESEF/CZ/0/equa-2020-12-31.zip
+Accessing file 31570010000000043842-2020-12-31.zip from URL: https://filings.xbrl.org/31570010000000043842/2020-12-31/ESEF/CZ/0/31570010000000043842-2020-12-31.zip
+Accessing file ingbank-20211231.zip from URL: https://filings.xbrl.org/3TK20IVIUJ8J3ZU0QE75/2021-12-31/ESEF/NL/0/ingbank-20211231.zip
+Accessing file ingbank-2022-12-31-en.zip from URL: https://filings.xbrl.org/3TK20IVIUJ8J3ZU0QE75/2022-12-31/ESEF/NL/0/ingbank-2022-12-31-en.zip
+Accessing file 635400AKJBGNS5WNQL34-2021-12-31-T01.zip from URL: https://filings.xbrl.org/3U8WV1YX2VMUHH7Z1Q21/2021-12-31/ESEF/GB/0/635400AKJBGNS5WNQL34-2021-12-31-T01.zip
+Accessing file 4ZHCHI4KYZG2WVRT8631-2022-03-31-en.zip from URL: https://filings.xbrl.org/4ZHCHI4KYZG2WVRT8631/2022-03-31/ESEF/LU/0/4ZHCHI4KYZG2WVRT8631-2022-03-31-en.zip
+Accessing file oekbag.zip from URL: https://filings.xbrl.org/5299000OVRLMF858L016/2020-12-31/ESEF/AT/0/oekbag.zip
+Accessing file oekbag.zip from URL: https://filings.xbrl.org/5299000OVRLMF858L016/2020-12-31/ESEF/AT/1/oekbag.zip
+Accessing file oekbag-2021-12-31-de.zip from URL: https://filings.xbrl.org/5299000OVRLMF858L016/2021-12-31/ESEF/AT/0/oekbag-2021-12-31-de.zip
+Accessing file oekbag-2022-12-31-de.zip from URL: https://filings.xbrl.org/5299000OVRLMF858L016/2022-12-31/ESEF/AT/0/oekbag-2022-12-31-de.zip
+Accessing file btv-2020-12-31.zip from URL: https://filings.xbrl.org/5299003ATVTQVPTW4735/2020-12-31/ESEF/AT/0/btv-2020-12-31.zip
+Accessing file btv-2021-12-31-de.zip from URL: https://filings.xbrl.org/5299003ATVTQVPTW4735/2021-12-31/ESEF/AT/0/btv-2021-12-31-de.zip
+Accessing file btvag-2022-12-31-de.zip from URL: https://filings.xbrl.org/5299003ATVTQVPTW4735/2022-12-31/ESEF/AT/0/btvag-2022-12-31-de.zip
+Accessing file bksbankag.zip from URL: https://filings.xbrl.org/529900B9P29R8W03IX88/2020-12-31/ESEF/AT/0/bksbankag.zip
+Accessing file bksbankag-2021-12-31-de.zip from URL: https://filings.xbrl.org/529900B9P29R8W03IX88/2021-12-31/ESEF/AT/0/bksbankag-2021-12-31-de.zip
+Accessing file bksbankag-2022-12-31-de.zip from URL: https://filings.xbrl.org/529900B9P29R8W03IX88/2022-12-31/ESEF/AT/0/bksbankag-2022-12-31-de.zip
+Accessing file oberoesterreichischelandesbankaktiengesellschaft.zip from URL: https://filings.xbrl.org/529900BI5KIGX6YLX375/2020-12-31/ESEF/AT/0/oberoesterreichischelandesbankaktiengesellschaft.zip
+Accessing file ooelandesbankag-2021-12-31-de.zip from URL: https://filings.xbrl.org/529900BI5KIGX6YLX375/2021-12-31/ESEF/AT/0/ooelandesbankag-2021-12-31-de.zip
+Accessing file ooelandesbankag-2022-12-31-de.zip from URL: https://filings.xbrl.org/529900BI5KIGX6YLX375/2022-12-31/ESEF/AT/0/ooelandesbankag-2022-12-31-de.zip
+Accessing file 529900D4CD6DIB3CI904-2020-12-31_de.zip from URL: https://filings.xbrl.org/529900D4CD6DIB3CI904/2020-12-31/ESEF/AT/0/529900D4CD6DIB3CI904-2020-12-31_de.zip
+Accessing file 529900D4CD6DIB3CI904-2021-12-31-de.zip from URL: https://filings.xbrl.org/529900D4CD6DIB3CI904/2021-12-31/ESEF/AT/0/529900D4CD6DIB3CI904-2021-12-31-de.zip
+Accessing file 529900D4CD6DIB3CI904-2022-12-31-de.zip from URL: https://filings.xbrl.org/529900D4CD6DIB3CI904/2022-12-31/ESEF/AT/0/529900D4CD6DIB3CI904-2022-12-31-de.zip
+Accessing file 529900D4CD6DIB3CI904-2022-12-31-en.zip from URL: https://filings.xbrl.org/529900D4CD6DIB3CI904/2022-12-31/ESEF/AT/1/529900D4CD6DIB3CI904-2022-12-31-en.zip
+Accessing file 529900D4CD6DIB3CI904-2022-12-31-de.zip from URL: https://filings.xbrl.org/529900D4CD6DIB3CI904/2022-12-31/ESEF/AT/2/529900D4CD6DIB3CI904-2022-12-31-de.zip
+Accessing file hrvatskapostanska-2021-12-31-hr.zip from URL: https://filings.xbrl.org/529900D5G4V6THXC5P79/2021-12-31/ESEF/HR/0/hrvatskapostanska-2021-12-31-hr.zip
+Accessing file hrvatskapostanskabanka-2021-12-31-en.zip from URL: https://filings.xbrl.org/529900D5G4V6THXC5P79/2021-12-31/ESEF/HR/1/hrvatskapostanskabanka-2021-12-31-en.zip
+Accessing file hrvatskapostanska-2021-12-31-hr.zip from URL: https://filings.xbrl.org/529900D5G4V6THXC5P79/2021-12-31/ESEF/HR/2/hrvatskapostanska-2021-12-31-hr.zip
+Accessing file BNGB-2022-12-31.zip from URL: https://filings.xbrl.org/529900GGYMNGRQTDOO93/2022-12-31/ESEF/NL/0/BNGB-2022-12-31.zip
+Accessing file 2021-04-30 08-58-08 - RLB_KA_IFRS_2020_Final für Veröffentlichung.zip from URL: https://filings.xbrl.org/529900GPOO9ISPD1EE83/2020-12-31/ESEF/AT/0/2021-04-30%2008-58-08%20-%20RLB_KA_IFRS_2020_Final%20für%20Veröffentlichung.zip
+Accessing file rlbnoew-2021-12-31-de.zip from URL: https://filings.xbrl.org/529900GPOO9ISPD1EE83/2021-12-31/ESEF/AT/0/rlbnoew-2021-12-31-de.zip
+Accessing file rlbnoewienag-2022-12-31-de.zip from URL: https://filings.xbrl.org/529900GPOO9ISPD1EE83/2022-12-31/ESEF/AT/0/rlbnoewienag-2022-12-31-de.zip
+Accessing file 529900I1UZV70CZRAU55-2022-12-31-en.zip from URL: https://filings.xbrl.org/529900I1UZV70CZRAU55/2022-12-31/ESEF/LU/0/529900I1UZV70CZRAU55-2022-12-31-en.zip
+Accessing file bawagpsk-2020-12-31.zip from URL: https://filings.xbrl.org/529900ICA8XQYGIKR372/2021-06-14/ESEF/AT/0/bawagpsk-2020-12-31.zip
+Accessing file bawagpskbank-2021-12-31-de.zip from URL: https://filings.xbrl.org/529900ICA8XQYGIKR372/2021-12-31/ESEF/AT/0/bawagpskbank-2021-12-31-de.zip
+Accessing file bawagpskbank-2022-12-31-de.zip from URL: https://filings.xbrl.org/529900ICA8XQYGIKR372/2022-12-31/ESEF/AT/0/bawagpskbank-2022-12-31-de.zip
+Accessing file 529900ODI3047E2LIV03-2020-12-31.zip from URL: https://filings.xbrl.org/529900ODI3047E2LIV03/2020-12-31/ESEF/FI/0/529900ODI3047E2LIV03-2020-12-31.zip
+Accessing file NordeaBankAbp-2020-12-31.zip from URL: https://filings.xbrl.org/529900ODI3047E2LIV03/2020-12-31/ESEF/FI/1/NordeaBankAbp-2020-12-31.zip
+Accessing file nord-2021-12-31-sv.zip from URL: https://filings.xbrl.org/529900ODI3047E2LIV03/2021-12-31/ESEF/FI/1/nord-2021-12-31-sv.zip
+Accessing file nord-2021-12-31-sv.zip from URL: https://filings.xbrl.org/529900ODI3047E2LIV03/2021-12-31/ESEF/NO/0/nord-2021-12-31-sv.zip
+Accessing file nordea-2022-12-31-sv.zip from URL: https://filings.xbrl.org/529900ODI3047E2LIV03/2022-12-31/ESEF/FI/0/nordea-2022-12-31-sv.zip
+Accessing file FIM_20211231_CON_AFR_529900Q2C3I7VCILLG45.zip from URL: https://filings.xbrl.org/529900Q2C3I7VCILLG45/2021-12-31/ESEF/MT/0/FIM_20211231_CON_AFR_529900Q2C3I7VCILLG45.zip
+Accessing file BOV_20211231_CON_AFR_529900RWC8ZYB066JF16.zip from URL: https://filings.xbrl.org/529900RWC8ZYB066JF16/2021-12-31/ESEF/MT/0/BOV_20211231_CON_AFR_529900RWC8ZYB066JF16.zip
+Accessing file MTB_20211231_CON_AFR_529900SYUCFQHI3JZQ05.zip from URL: https://filings.xbrl.org/529900SYUCFQHI3JZQ05/2021-12-31/ESEF/MT/0/MTB_20211231_CON_AFR_529900SYUCFQHI3JZQ05.zip
+Accessing file LOM_20211231_CON_AFR_529900UIRB65OY6U4B21.zip from URL: https://filings.xbrl.org/529900UIRB65OY6U4B21/2021-12-31/ESEF/MT/0/LOM_20211231_CON_AFR_529900UIRB65OY6U4B21.zip
+Accessing file addikobankag_eng.zip from URL: https://filings.xbrl.org/529900UKZBMDBDZIXD62/2020-12-31/ESEF/AT/0/addikobankag_eng.zip
+Accessing file addikobankag.zip from URL: https://filings.xbrl.org/529900UKZBMDBDZIXD62/2020-12-31/ESEF/AT/1/addikobankag.zip
+Accessing file addikobankag-2021-12-31-en.zip from URL: https://filings.xbrl.org/529900UKZBMDBDZIXD62/2021-12-31/ESEF/AT/0/addikobankag-2021-12-31-en.zip
+Accessing file addikobankag-2021-12-31-de.zip from URL: https://filings.xbrl.org/529900UKZBMDBDZIXD62/2021-12-31/ESEF/AT/1/addikobankag-2021-12-31-de.zip
+Accessing file addikobankag-2022-12-31-de.zip from URL: https://filings.xbrl.org/529900UKZBMDBDZIXD62/2022-12-31/ESEF/AT/0/addikobankag-2022-12-31-de.zip
+Accessing file rlbstmkag.zip from URL: https://filings.xbrl.org/529900UNUKYZ9HND3309/2020-12-31/ESEF/AT/0/rlbstmkag.zip
+Accessing file rlbstmkag-2022-12-31.zip from URL: https://filings.xbrl.org/529900UNUKYZ9HND3309/2022-12-31/ESEF/AT/0/rlbstmkag-2022-12-31.zip
+Accessing file 529900VYY1MRNR59PN57-2021-12-31-de.zip from URL: https://filings.xbrl.org/529900VYY1MRNR59PN57/2021-12-31/ESEF/AT/0/529900VYY1MRNR59PN57-2021-12-31-de.zip
+Accessing file 529900VYY1MRNR59PN57-2022-12-31-de.zip from URL: https://filings.xbrl.org/529900VYY1MRNR59PN57/2022-12-31/ESEF/AT/0/529900VYY1MRNR59PN57-2022-12-31-de.zip
+Accessing file 5493000LKS7B3UTF7H35-2020-12-31.zip from URL: https://filings.xbrl.org/5493000LKS7B3UTF7H35/2020-12-31/ESEF/PL/0/5493000LKS7B3UTF7H35-2020-12-31.zip
+Accessing file SSF_Grupy_Banku_Pekao_31.12.2022.zip from URL: https://filings.xbrl.org/5493000LKS7B3UTF7H35/2022-12-31/ESEF/PL/0/SSF_Grupy_Banku_Pekao_31.12.2022.zip
+Accessing file 5493001BABFV7P27OW30-2021-12-31.zip from URL: https://filings.xbrl.org/5493001BABFV7P27OW30/2021-12-31/ESEF/GB/0/5493001BABFV7P27OW30-2021-12-31.zip
+Accessing file 5493001BABFV7P27OW30-2021-12-31-sl.zip from URL: https://filings.xbrl.org/5493001BABFV7P27OW30/2021-12-31/ESEF/SI/1/5493001BABFV7P27OW30-2021-12-31-sl.zip
+Accessing file 5493001BABFV7P27OW30-2022-12-31.zip from URL: https://filings.xbrl.org/5493001BABFV7P27OW30/2022-12-31/ESEF/GB/0/5493001BABFV7P27OW30-2022-12-31.zip
+Accessing file 5493001BABFV7P27OW30-2022-12-31-en.zip from URL: https://filings.xbrl.org/5493001BABFV7P27OW30/2022-12-31/ESEF/SI/0/5493001BABFV7P27OW30-2022-12-31-en.zip
+Accessing file 5493001BABFV7P27OW30-2022-12-31-sl.zip from URL: https://filings.xbrl.org/5493001BABFV7P27OW30/2022-12-31/ESEF/SI/1/5493001BABFV7P27OW30-2022-12-31-sl.zip
+Accessing file ESEF_RO_2023.zip from URL: https://filings.xbrl.org/54930034L83M3E7JWI25/2022-12-31/ESEF/RO/0/ESEF_RO_2023.zip
+Accessing file ESEF_EN_PATRIA_BANK.zip from URL: https://filings.xbrl.org/54930034L83M3E7JWI25/2022-12-31/ESEF/RO/1/ESEF_EN_PATRIA_BANK.zip
+Accessing file blue-2021-12-31-sv.zip from URL: https://filings.xbrl.org/5493004FETDD2Z2FY510/2021-12-31/ESEF/NO/0/blue-2021-12-31-sv.zip
+Accessing file blue-2021-12-31-sv.zip from URL: https://filings.xbrl.org/5493004FETDD2Z2FY510/2021-12-31/ESEF/SE/0/blue-2021-12-31-sv.zip
+Accessing file blue-2022-12-31-sv.zip from URL: https://filings.xbrl.org/5493004FETDD2Z2FY510/2022-12-31/ESEF/SE/0/blue-2022-12-31-sv.zip
+Accessing file 549300685QG7DJS55M76-2020-12-31.zip from URL: https://filings.xbrl.org/549300685QG7DJS55M76/2020-12-31/ESEF/ES/0/549300685QG7DJS55M76-2020-12-31.zip
+Accessing file esef-2020-12-31.zip from URL: https://filings.xbrl.org/5493007BWYDPQZLZ0Y27/2020-12-31/ESEF/AT/0/esef-2020-12-31.zip
+Accessing file hyponoe-2021-12-31.zip from URL: https://filings.xbrl.org/5493007BWYDPQZLZ0Y27/2021-12-31/ESEF/AT/0/hyponoe-2021-12-31.zip
+Accessing file hyponoe-2022-12-31-de.zip from URL: https://filings.xbrl.org/5493007BWYDPQZLZ0Y27/2022-12-31/ESEF/AT/0/hyponoe-2022-12-31-de.zip
+Accessing file 549300A2F46GR0UOM390-2021-12-31-hr.zip from URL: https://filings.xbrl.org/549300A2F46GR0UOM390/2021-12-31/ESEF/HR/0/549300A2F46GR0UOM390-2021-12-31-hr.zip
+Accessing file 549300A2F46GR0UOM390-2021-12-31-hr.zip from URL: https://filings.xbrl.org/549300A2F46GR0UOM390/2021-12-31/ESEF/HR/1/549300A2F46GR0UOM390-2021-12-31-hr.zip
+Accessing file lansforsakringarbank-2021-12-31-sv.zip from URL: https://filings.xbrl.org/549300C6TUMDXNOVXS82/2021-12-31/ESEF/SE/0/lansforsakringarbank-2021-12-31-sv.zip
+Accessing file sparnord-2021-12-31.zip from URL: https://filings.xbrl.org/549300DHT635Q5P8J715/2021-12-31/ESEF/NO/0/sparnord-2021-12-31.zip
+Accessing file 549300DM53OEWHWUO647-2021-12-31-sv.zip from URL: https://filings.xbrl.org/549300DM53OEWHWUO647/2021-12-31/ESEF/SE/0/549300DM53OEWHWUO647-2021-12-31-sv.zip
+Accessing file 549300DM53OEWHWUO647-2021-12-31-en.zip from URL: https://filings.xbrl.org/549300DM53OEWHWUO647/2021-12-31/ESEF/SE/1/549300DM53OEWHWUO647-2021-12-31-en.zip
+Accessing file 549300DM53OEWHWUO647-2022-12-31-sv.zip from URL: https://filings.xbrl.org/549300DM53OEWHWUO647/2022-12-31/ESEF/SE/0/549300DM53OEWHWUO647-2022-12-31-sv.zip
+Accessing file 549300DVPJYGNF2P7B03-2020-12-31.zip from URL: https://filings.xbrl.org/549300DVPJYGNF2P7B03/2020-12-31/ESEF/AT/0/549300DVPJYGNF2P7B03-2020-12-31.zip
+Accessing file 549300DVPJYGNF2P7B03-2021-12-31-de.zip from URL: https://filings.xbrl.org/549300DVPJYGNF2P7B03/2021-12-31/ESEF/AT/0/549300DVPJYGNF2P7B03-2021-12-31-de.zip
+Accessing file 549300DVPJYGNF2P7B03-2022-12-31.zip from URL: https://filings.xbrl.org/549300DVPJYGNF2P7B03/2022-12-31/ESEF/AT/0/549300DVPJYGNF2P7B03-2022-12-31.zip
+Accessing file sandnessparebank-2021-12-31.zip from URL: https://filings.xbrl.org/549300G2EWXR3BRFKQ37/2021-12-31/ESEF/NO/0/sandnessparebank-2021-12-31.zip
+Accessing file 549300G2EWXR3BRFKQ37-2022-12-31-no.zip from URL: https://filings.xbrl.org/549300G2EWXR3BRFKQ37/2022-12-31/ESEF/NO/0/549300G2EWXR3BRFKQ37-2022-12-31-no.zip
+Accessing file dnbbankasa-2021-12-31-nb.zip from URL: https://filings.xbrl.org/549300GKFG0RYRRQ1414/2021-12-31/ESEF/NO/0/dnbbankasa-2021-12-31-nb.zip
+Accessing file dnbbankasa-2022-12-31-nb.zip from URL: https://filings.xbrl.org/549300GKFG0RYRRQ1414/2022-12-31/ESEF/NO/0/dnbbankasa-2022-12-31-nb.zip
+Accessing file 549300L7YCATGO57ZE10-2021-12-31-it.zip from URL: https://filings.xbrl.org/549300L7YCATGO57ZE10/2021-12-31/ESEF/IT/0/549300L7YCATGO57ZE10-2021-12-31-it.zip
+Accessing file 549300L7YCATGO57ZE10-2022-12-31.zip from URL: https://filings.xbrl.org/549300L7YCATGO57ZE10/2022-12-31/ESEF/IT/0/549300L7YCATGO57ZE10-2022-12-31.zip
+Accessing file avanza-2021-12-31-sv.zip from URL: https://filings.xbrl.org/549300MBWR5H8SIJLE03/2021-12-31/ESEF/SE/0/avanza-2021-12-31-sv.zip
+Accessing file LLOY-2020-12-31-en.zip from URL: https://filings.xbrl.org/549300PPXHEU2JF0AM85/2021-12-31/ESEF/GB/0/LLOY-2020-12-31-en.zip
+Accessing file 549300PPXHEU2JF0AM85-2022-12-31.zip from URL: https://filings.xbrl.org/549300PPXHEU2JF0AM85/2022-12-31/ESEF/GB/0/549300PPXHEU2JF0AM85-2022-12-31.zip
+Accessing file sparebank1srbankasa-2021-12-31-nb.zip from URL: https://filings.xbrl.org/549300Q3OIWRHQUQM052/2021-12-31/ESEF/NO/0/sparebank1srbankasa-2021-12-31-nb.zip
+Accessing file sparebank1srbankasa-2022-12-31-nb.zip from URL: https://filings.xbrl.org/549300Q3OIWRHQUQM052/2022-12-31/ESEF/NO/0/sparebank1srbankasa-2022-12-31-nb.zip
+Accessing file 549300SXM92LQ05OJQ76-2021-12-31-en.zip from URL: https://filings.xbrl.org/549300SXM92LQ05OJQ76/2021-12-31/ESEF/NO/0/549300SXM92LQ05OJQ76-2021-12-31-en.zip
+Accessing file SNN-2022-12-31-en.zip from URL: https://filings.xbrl.org/549300SXM92LQ05OJQ76/2022-12-31/ESEF/NO/0/SNN-2022-12-31-en.zip
+Accessing file sb-2021-12-31-en.zip from URL: https://filings.xbrl.org/549300TK038P6EV4YU51/2021-12-31/ESEF/LT/0/sb-2021-12-31-en.zip
+Accessing file sb-2021-12-31-en.zip from URL: https://filings.xbrl.org/549300TK038P6EV4YU51/2021-12-31/ESEF/LT/1/sb-2021-12-31-en.zip
+Accessing file 549300TK038P6EV4YU51-2022-12-31-en.zip from URL: https://filings.xbrl.org/549300TK038P6EV4YU51/2022-12-31/ESEF/LT/0/549300TK038P6EV4YU51-2022-12-31-en.zip
+Accessing file 549300TK038P6EV4YU51-2022-12-31-lt.zip from URL: https://filings.xbrl.org/549300TK038P6EV4YU51/2022-12-31/ESEF/LT/1/549300TK038P6EV4YU51-2022-12-31-lt.zip
+Accessing file 549300U497VKMF6R3Q14-2022-12-31-en.zip from URL: https://filings.xbrl.org/549300U497VKMF6R3Q14/2022-12-31/ESEF/NO/0/549300U497VKMF6R3Q14-2022-12-31-en.zip
+Accessing file spol-2022-12-31-en.zip from URL: https://filings.xbrl.org/549300VRM6G42M8OWN49/2022-12-31/ESEF/NO/0/spol-2022-12-31-en.zip
+Accessing file spol-2022-12-31-en.zip from URL: https://filings.xbrl.org/549300VRM6G42M8OWN49/2022-12-31/ESEF/NO/1/spol-2022-12-31-en.zip
+Accessing file MMB_20211231_CON_AFR_549300X34UUBDEUL1Z91.zip from URL: https://filings.xbrl.org/549300X34UUBDEUL1Z91/2021-12-31/ESEF/MT/1/MMB_20211231_CON_AFR_549300X34UUBDEUL1Z91.zip
+Accessing file 5967007LIEEXZX4N9429-2022-12-31-no.zip from URL: https://filings.xbrl.org/5967007LIEEXZX4N9429/2022-12-31/ESEF/NO/0/5967007LIEEXZX4N9429-2022-12-31-no.zip
+Accessing file sparebank1srstnorge-2021-12-31-nb.zip from URL: https://filings.xbrl.org/5967007LIEEXZX4VQO21/2021-12-31/ESEF/NO/0/sparebank1srstnorge-2021-12-31-nb.zip
+Accessing file 5967007LIEEXZX51WW28-2022-12-31-no.zip from URL: https://filings.xbrl.org/5967007LIEEXZX51WW28/2022-12-31/ESEF/NO/0/5967007LIEEXZX51WW28-2022-12-31-no.zip
+Accessing file 5967007LIEEXZX5PU005-2021-12-31-no.zip from URL: https://filings.xbrl.org/5967007LIEEXZX5PU005/2021-12-31/ESEF/NO/0/5967007LIEEXZX5PU005-2021-12-31-no.zip
+Accessing file 5967007LIEEXZX5PU005-2021-12-31-no.zip from URL: https://filings.xbrl.org/5967007LIEEXZX5PU005/2021-12-31/ESEF/NO/2/5967007LIEEXZX5PU005-2021-12-31-no.zip
+Accessing file 5967007LIEEXZX5PU005-2022-12-31-no.zip from URL: https://filings.xbrl.org/5967007LIEEXZX5PU005/2022-12-31/ESEF/NO/0/5967007LIEEXZX5PU005-2022-12-31-no.zip
+Accessing file 5967007LIEEXZX6OK028-2021-12-31-no.zip from URL: https://filings.xbrl.org/5967007LIEEXZX6OK028/2021-12-31/ESEF/NO/0/5967007LIEEXZX6OK028-2021-12-31-no.zip
+Accessing file 5967007LIEEXZX6OK028-2022-12-31-no.zip from URL: https://filings.xbrl.org/5967007LIEEXZX6OK028/2022-12-31/ESEF/NO/0/5967007LIEEXZX6OK028-2022-12-31-no.zip
+Accessing file storebrandbank-2021-12-31-nb.zip from URL: https://filings.xbrl.org/5967007LIEEXZX6Q3K70/2021-12-31/ESEF/NO/0/storebrandbank-2021-12-31-nb.zip
+Accessing file storebrandbank-2022-12-31-nb.zip from URL: https://filings.xbrl.org/5967007LIEEXZX6Q3K70/2022-12-31/ESEF/NO/0/storebrandbank-2022-12-31-nb.zip
+Accessing file sparebank1nordmre-2021-12-31-nb.zip from URL: https://filings.xbrl.org/5967007LIEEXZX737S20/2021-12-31/ESEF/NO/0/sparebank1nordmre-2021-12-31-nb.zip
+Accessing file sb1rh-2021-12-31-nb.zip from URL: https://filings.xbrl.org/5967007LIEEXZX73ZK25/2021-12-31/ESEF/NO/0/sb1rh-2021-12-31-nb.zip
+Accessing file sb1rh-2022-12-31-nb.zip from URL: https://filings.xbrl.org/5967007LIEEXZX73ZK25/2022-12-31/ESEF/NO/0/sb1rh-2022-12-31-nb.zip
+Accessing file sparebank1ostfoldakershus-2021-12-31-nb.zip from URL: https://filings.xbrl.org/5967007LIEEXZX7D8W16/2021-12-31/ESEF/NO/0/sparebank1ostfoldakershus-2021-12-31-nb.zip
+Accessing file sparebank1ostfoldakershus-2022-12-31-nb.zip from URL: https://filings.xbrl.org/5967007LIEEXZX7D8W16/2022-12-31/ESEF/NO/0/sparebank1ostfoldakershus-2022-12-31-nb.zip
+Accessing file 5967007LIEEXZX7H3S04-2021-12-31-no.zip from URL: https://filings.xbrl.org/5967007LIEEXZX7H3S04/2021-12-31/ESEF/NO/0/5967007LIEEXZX7H3S04-2021-12-31-no.zip
+Accessing file 5967007LIEEXZX7H3S04-2022-12-31-no.zip from URL: https://filings.xbrl.org/5967007LIEEXZX7H3S04/2022-12-31/ESEF/NO/0/5967007LIEEXZX7H3S04-2022-12-31-no.zip
+Accessing file 5967007LIEEXZX7TG883-2021-12-31-no.zip from URL: https://filings.xbrl.org/5967007LIEEXZX7TG883/2021-12-31/ESEF/NO/0/5967007LIEEXZX7TG883-2021-12-31-no.zip
+Accessing file 5967007LIEEXZX7TG883-2022-12-31-no.zip from URL: https://filings.xbrl.org/5967007LIEEXZX7TG883/2022-12-31/ESEF/NO/0/5967007LIEEXZX7TG883-2022-12-31-no.zip
+Accessing file 5967007LIEEXZXB8WO76-2021-12-31-en.zip from URL: https://filings.xbrl.org/5967007LIEEXZXB8WO76/2021-12-31/ESEF/NO/0/5967007LIEEXZXB8WO76-2021-12-31-en.zip
+Accessing file 635400C8EK6DRI12LJ39-2021-12-31-en.zip from URL: https://filings.xbrl.org/635400C8EK6DRI12LJ39/2021-12-31/ESEF/GB/0/635400C8EK6DRI12LJ39-2021-12-31-en.zip
+Accessing file 635400C8EK6DRI12LJ39-2022-12-31.zip from URL: https://filings.xbrl.org/635400C8EK6DRI12LJ39/2022-12-31/ESEF/GB/0/635400C8EK6DRI12LJ39-2022-12-31.zip
+Accessing file 635400L14KNHZXPUZM19-2021-12-31.zip from URL: https://filings.xbrl.org/635400L14KNHZXPUZM19/2021-12-31/ESEF/CY/0/635400L14KNHZXPUZM19-2021-12-31.zip
+Accessing file 635400L14KNHZXPUZM19-2021-12-31.zip from URL: https://filings.xbrl.org/635400L14KNHZXPUZM19/2021-12-31/ESEF/GB/0/635400L14KNHZXPUZM19-2021-12-31.zip
+Accessing file 635400L14KNHZXPUZM19-2022-12-31.zip from URL: https://filings.xbrl.org/635400L14KNHZXPUZM19/2022-12-31/ESEF/GB/0/635400L14KNHZXPUZM19-2022-12-31.zip
+Accessing file 635400XT3V7WHLSFYY25-2020-12-31.zip from URL: https://filings.xbrl.org/635400XT3V7WHLSFYY25/2020-12-31/ESEF/ES/0/635400XT3V7WHLSFYY25-2020-12-31.zip
+Accessing file DEVO-2021-12-31.zip from URL: https://filings.xbrl.org/724500A1FNICHSDF2I11/2021-12-31/ESEF/NL/0/DEVO-2021-12-31.zip
+Accessing file DEVO-2022-12-31.zip from URL: https://filings.xbrl.org/724500A1FNICHSDF2I11/2022-12-31/ESEF/NL/0/DEVO-2022-12-31.zip
+Accessing file alan-2021-12-31-sv.zip from URL: https://filings.xbrl.org/7437006WYM821IJ3MN73/2021-12-31/ESEF/FI/0/alan-2021-12-31-sv.zip
+Accessing file alan-2022-12-31-sv.zip from URL: https://filings.xbrl.org/7437006WYM821IJ3MN73/2022-12-31/ESEF/FI/0/alan-2022-12-31-sv.zip
+Accessing file 7437006WYM821IJ3MN73-2022-12-31.zip from URL: https://filings.xbrl.org/7437006WYM821IJ3MN73/2022-12-31/ESEF/GB/0/7437006WYM821IJ3MN73-2022-12-31.zip
+Accessing file 743700GC62JLHFBUND16-2021-12-31-sv.zip from URL: https://filings.xbrl.org/743700GC62JLHFBUND16/2021-12-31/ESEF/FI/0/743700GC62JLHFBUND16-2021-12-31-sv.zip
+Accessing file UnitedBankers-2020-12-31.zip from URL: https://filings.xbrl.org/743700J2WO3J6XGFPG77/2020-12-31/ESEF/FI/0/UnitedBankers-2020-12-31.zip
+Accessing file UnitedBankersOyj-2021-12-31-fi.zip from URL: https://filings.xbrl.org/743700J2WO3J6XGFPG77/2021-12-31/ESEF/FI/0/UnitedBankersOyj-2021-12-31-fi.zip
+Accessing file 743700J2WO3J6XGFPG77-2022-12-31-fi.zip from URL: https://filings.xbrl.org/743700J2WO3J6XGFPG77/2022-12-31/ESEF/FI/0/743700J2WO3J6XGFPG77-2022-12-31-fi.zip
+Accessing file cabk-2020-12-31.zip from URL: https://filings.xbrl.org/7CUNS533WID6K7DGFI87/2020-12-31/ESEF/ES/0/cabk-2020-12-31.zip
+Accessing file 7CUNS533WID6K7DGFI87-20211231-es.zip from URL: https://filings.xbrl.org/7CUNS533WID6K7DGFI87/2021-12-31/ESEF/ES/0/7CUNS533WID6K7DGFI87-20211231-es.zip
+Accessing file 7CUNS533WID6K7DGFI87-20221231-es.zip from URL: https://filings.xbrl.org/7CUNS533WID6K7DGFI87/2022-12-31/ESEF/ES/0/7CUNS533WID6K7DGFI87-20221231-es.zip
+Accessing file sb1smn-2021-12-31AR.zip from URL: https://filings.xbrl.org/7V6Z97IO7R1SEAO84Q32/2021-12-31/ESEF/NO/0/sb1smn-2021-12-31AR.zip
+Accessing file SB1SMN-2022-12-31-nb.zip from URL: https://filings.xbrl.org/7V6Z97IO7R1SEAO84Q32/2022-12-31/ESEF/NO/0/SB1SMN-2022-12-31-nb.zip
+Accessing file 84S0VF8TSMH0T6D4K848-2022-03-31.zip from URL: https://filings.xbrl.org/84S0VF8TSMH0T6D4K848/2022-03-31/ESEF/GB/0/84S0VF8TSMH0T6D4K848-2022-03-31.zip
+Accessing file 8EWQ2UQKS07AKK8ANH81-20201231.zip from URL: https://filings.xbrl.org/8EWQ2UQKS07AKK8ANH81/2020-12-31/ESEF/ES/0/8EWQ2UQKS07AKK8ANH81-20201231.zip
+Accessing file 8EWQ2UQKS07AKK8ANH81-20211231-es.zip from URL: https://filings.xbrl.org/8EWQ2UQKS07AKK8ANH81/2021-12-31/ESEF/ES/0/8EWQ2UQKS07AKK8ANH81-20211231-es.zip
+Accessing file 8EWQ2UQKS07AKK8ANH81-20221231-es.zip from URL: https://filings.xbrl.org/8EWQ2UQKS07AKK8ANH81/2022-12-31/ESEF/ES/0/8EWQ2UQKS07AKK8ANH81-20221231-es.zip
+Accessing file RBI.zip from URL: https://filings.xbrl.org/9ZHRYM6F437SQJ6OUG95/2020-12-31/ESEF/AT/0/RBI.zip
+Accessing file RBI-2020-12-31.zip from URL: https://filings.xbrl.org/9ZHRYM6F437SQJ6OUG95/2020-12-31/ESEF/AT/1/RBI-2020-12-31.zip
+Accessing file RBI-2021-12-31-en.zip from URL: https://filings.xbrl.org/9ZHRYM6F437SQJ6OUG95/2021-12-31/ESEF/AT/0/RBI-2021-12-31-en.zip
+Accessing file 9ZHRYM6F437SQJ6OUG95-2021-12-31.zip from URL: https://filings.xbrl.org/9ZHRYM6F437SQJ6OUG95/2021-12-31/ESEF/AT/1/9ZHRYM6F437SQJ6OUG95-2021-12-31.zip
+Accessing file rbi-2022-12-31-en.zip from URL: https://filings.xbrl.org/9ZHRYM6F437SQJ6OUG95/2022-12-31/ESEF/AT/0/rbi-2022-12-31-en.zip
+Accessing file rbi-2022-12-31-de.zip from URL: https://filings.xbrl.org/9ZHRYM6F437SQJ6OUG95/2022-12-31/ESEF/AT/1/rbi-2022-12-31-de.zip
+Accessing file NIBC-2021-12-31.zip from URL: https://filings.xbrl.org/B64D6Y3LBJS4ANNPCU93/2021-12-31/ESEF/NL/1/NIBC-2021-12-31.zip
+Accessing file NIBC-2022-12-31.zip from URL: https://filings.xbrl.org/B64D6Y3LBJS4ANNPCU93/2022-12-31/ESEF/NL/0/NIBC-2022-12-31.zip
+Accessing file BFXS5XCH7N0Y05NIXW11-2022-12-31-en.zip from URL: https://filings.xbrl.org/BFXS5XCH7N0Y05NIXW11/2022-12-31/ESEF/NL/0/BFXS5XCH7N0Y05NIXW11-2022-12-31-en.zip
+Accessing file CXUHEGU3MADZ2CEV7C11-2021-12-31-el.zip from URL: https://filings.xbrl.org/CXUHEGU3MADZ2CEV7C11/2021-12-31/ESEF/CY/0/CXUHEGU3MADZ2CEV7C11-2021-12-31-el.zip
+Accessing file D1HEB8VEU6D9M8ZUXG17-2020-12-31.zip from URL: https://filings.xbrl.org/D1HEB8VEU6D9M8ZUXG17/2020-12-31/ESEF/AT/0/D1HEB8VEU6D9M8ZUXG17-2020-12-31.zip
+Accessing file D1HEB8VEU6D9M8ZUXG17-2020-12-31.zip from URL: https://filings.xbrl.org/D1HEB8VEU6D9M8ZUXG17/2020-12-31/ESEF/AT/1/D1HEB8VEU6D9M8ZUXG17-2020-12-31.zip
+Accessing file D1HEB8VEU6D9M8ZUXG17-2021-12-31-de.zip from URL: https://filings.xbrl.org/D1HEB8VEU6D9M8ZUXG17/2021-12-31/ESEF/AT/0/D1HEB8VEU6D9M8ZUXG17-2021-12-31-de.zip
+Accessing file D1HEB8VEU6D9M8ZUXG17-2022-12-31.zip from URL: https://filings.xbrl.org/D1HEB8VEU6D9M8ZUXG17/2022-12-31/ESEF/AT/0/D1HEB8VEU6D9M8ZUXG17-2022-12-31.zip
+Accessing file RABO-2021-12-31.zip from URL: https://filings.xbrl.org/DG3RU1DBUFHT4ZF9WN62/2021-12-31/ESEF/NL/0/RABO-2021-12-31.zip
+Accessing file RABO-2022-12-31.zip from URL: https://filings.xbrl.org/DG3RU1DBUFHT4ZF9WN62/2022-12-31/ESEF/NL/0/RABO-2022-12-31.zip
+Accessing file ES7IP3U3RHIGC71XBU11-2022-10-31.zip from URL: https://filings.xbrl.org/ES7IP3U3RHIGC71XBU11/2022-10-31/ESEF/GB/0/ES7IP3U3RHIGC71XBU11-2022-10-31.zip
+Accessing file SEB-2021-12-31-en.zip from URL: https://filings.xbrl.org/F3JS33DEI6XQ4ZBPTN86/2021-12-31/ESEF/SE/0/SEB-2021-12-31-en.zip
+Accessing file SEB-2021-12-31-sv.zip from URL: https://filings.xbrl.org/F3JS33DEI6XQ4ZBPTN86/2021-12-31/ESEF/SE/1/SEB-2021-12-31-sv.zip
+Accessing file SEB-2022-12-31-sv.zip from URL: https://filings.xbrl.org/F3JS33DEI6XQ4ZBPTN86/2022-12-31/ESEF/SE/0/SEB-2022-12-31-sv.zip
+Accessing file F8SB4JFBSYQFRQEH3Z21-2022-09-30.zip from URL: https://filings.xbrl.org/F8SB4JFBSYQFRQEH3Z21/2022-09-30/ESEF/LU/0/F8SB4JFBSYQFRQEH3Z21-2022-09-30.zip
+Accessing file F8SB4JFBSYQFRQEH3Z21-2022-09-30.zip from URL: https://filings.xbrl.org/F8SB4JFBSYQFRQEH3Z21/2022-09-30/ESEF/LU/1/F8SB4JFBSYQFRQEH3Z21-2022-09-30.zip
+Accessing file G5GSEF7VJP5I7OUK5573-2021-12-31.zip from URL: https://filings.xbrl.org/G5GSEF7VJP5I7OUK5573/2021-12-31/ESEF/GB/0/G5GSEF7VJP5I7OUK5573-2021-12-31.zip
+Accessing file G5GSEF7VJP5I7OUK5573-2022-12-31.zip from URL: https://filings.xbrl.org/G5GSEF7VJP5I7OUK5573/2022-12-31/ESEF/GB/0/G5GSEF7VJP5I7OUK5573-2022-12-31.zip
+Accessing file 000439-2021-12-31.zip from URL: https://filings.xbrl.org/GDI8P8WHFH4PS5YTU851/2022-12-31/ESEF/PT/0/000439-2021-12-31.zip
+Accessing file Sydbank-2021-12-31-da.zip from URL: https://filings.xbrl.org/GP5DT10VX1QRQUKVBK64/2021-12-31/ESEF/DK/0/Sydbank-2021-12-31-da.zip
+Accessing file Sydbank-2022-12-31-da.zip from URL: https://filings.xbrl.org/GP5DT10VX1QRQUKVBK64/2022-12-31/ESEF/DK/0/Sydbank-2022-12-31-da.zip
+Accessing file SBAB-2022-12-31-sv.zip from URL: https://filings.xbrl.org/H0YX5LBGKDVOWCXBZ594/2022-12-31/ESEF/SE/0/SBAB-2022-12-31-sv.zip
+Accessing file H7FNTJ4851HG0EXQ1Z70-2021-12-31.zip from URL: https://filings.xbrl.org/H7FNTJ4851HG0EXQ1Z70/2021-12-31/ESEF/GB/0/H7FNTJ4851HG0EXQ1Z70-2021-12-31.zip
+Accessing file H7FNTJ4851HG0EXQ1Z70-2021-12-31.zip from URL: https://filings.xbrl.org/H7FNTJ4851HG0EXQ1Z70/2021-12-31/ESEF/GB/1/H7FNTJ4851HG0EXQ1Z70-2021-12-31.zip
+Accessing file rlbooeag-2021-12-31.zip from URL: https://filings.xbrl.org/I6SS27Q1Q3385V753S50/2021-12-31/ESEF/AT/0/rlbooeag-2021-12-31.zip
+Accessing file rlbooeag-2021-12-31-de.zip from URL: https://filings.xbrl.org/I6SS27Q1Q3385V753S50/2021-12-31/ESEF/AT/1/rlbooeag-2021-12-31-de.zip
+Accessing file rlbooeag-2022-12-31-de.zip from URL: https://filings.xbrl.org/I6SS27Q1Q3385V753S50/2022-12-31/ESEF/AT/0/rlbooeag-2022-12-31-de.zip
+Accessing file rlbooeag-2022-12-31-de.zip from URL: https://filings.xbrl.org/I6SS27Q1Q3385V753S50/2022-12-31/ESEF/AT/1/rlbooeag-2022-12-31-de.zip
+Accessing file mmb-vyrocni-zprava-2020-cz.zip from URL: https://filings.xbrl.org/I6USJ58BDV2BO5KP3C31/2020-12-31/ESEF/CZ/0/mmb-vyrocni-zprava-2020-cz.zip
+Accessing file I6USJ58BDV2BO5KP3C31-2020-12-31.zip from URL: https://filings.xbrl.org/I6USJ58BDV2BO5KP3C31/2020-12-31/ESEF/CZ/1/I6USJ58BDV2BO5KP3C31-2020-12-31.zip
+Accessing file kb-2020-12-31.zip from URL: https://filings.xbrl.org/IYKCAVNFR8QGF00HV840/2020-12-31/ESEF/CZ/0/kb-2020-12-31.zip
+Accessing file JEUVK5RWVJEN8W0C9M24-2021-12-31-en.zip from URL: https://filings.xbrl.org/JEUVK5RWVJEN8W0C9M24/2021-12-31/ESEF/GR/0/JEUVK5RWVJEN8W0C9M24-2021-12-31-en.zip
+Accessing file JEUVK5RWVJEN8W0C9M24-2022-12-31-en.zip from URL: https://filings.xbrl.org/JEUVK5RWVJEN8W0C9M24/2022-12-31/ESEF/GR/0/JEUVK5RWVJEN8W0C9M24-2022-12-31-en.zip
+Accessing file JHE42UYNWWTJB8YTTU19-2022-09-30.zip from URL: https://filings.xbrl.org/JHE42UYNWWTJB8YTTU19/2022-09-30/ESEF/GB/0/JHE42UYNWWTJB8YTTU19-2022-09-30.zip
+Accessing file rlbstmkag-2021-12-31-de.zip from URL: https://filings.xbrl.org/LEI529900UNUKYZ9HND3309/2021-12-31/ESEF/AT/0/rlbstmkag-2021-12-31-de.zip
+Accessing file swed-2021-12-31-sv.zip from URL: https://filings.xbrl.org/M312WZV08Y7LYUC71685/2021-12-31/ESEF/SE/0/swed-2021-12-31-sv.zip
+Accessing file swed-2022-12-31-sv.zip from URL: https://filings.xbrl.org/M312WZV08Y7LYUC71685/2022-12-31/ESEF/SE/0/swed-2022-12-31-sv.zip
+Accessing file danskebank-2022-12-31-en.zip from URL: https://filings.xbrl.org/MAES062Z21O4RZ2U7M96/2022-12-31/ESEF/NO/0/danskebank-2022-12-31-en.zip
+Accessing file SF_GRUPA BOS_31_12_2020.zip from URL: https://filings.xbrl.org/MKP1B7E76TN04CD85Z79/2020-12-31/ESEF/PL/0/SF_GRUPA%20BOS_31_12_2020.zip
+Accessing file SF_GRUPA BOS_31_12_2021wg ESEF.zip from URL: https://filings.xbrl.org/MKP1B7E76TN04CD85Z79/2021-12-31/ESEF/PL/0/SF_GRUPA%20BOS_31_12_2021wg%20ESEF.zip
+Accessing file SF_GRUPA_BOS_2022-12-31_pl.zip from URL: https://filings.xbrl.org/MKP1B7E76TN04CD85Z79/2022-12-31/ESEF/PL/0/SF_GRUPA_BOS_2022-12-31_pl.zip
+Accessing file MP6I5ZYZBEU3UXPYFY54-2021-12-31.zip from URL: https://filings.xbrl.org/MP6I5ZYZBEU3UXPYFY54/2021-12-31/ESEF/GB/0/MP6I5ZYZBEU3UXPYFY54-2021-12-31.zip
+Accessing file MP6I5ZYZBEU3UXPYFY54-2022-12-31.zip from URL: https://filings.xbrl.org/MP6I5ZYZBEU3UXPYFY54/2022-12-31/ESEF/GB/0/MP6I5ZYZBEU3UXPYFY54-2022-12-31.zip
+Accessing file hand-2021-12-31-sv.zip from URL: https://filings.xbrl.org/NHBDILHZTYCNBV5UYZ31/2021-12-31/ESEF/SE/0/hand-2021-12-31-sv.zip
+Accessing file hand-2022-12-31-sv.zip from URL: https://filings.xbrl.org/NHBDILHZTYCNBV5UYZ31/2022-12-31/ESEF/SE/0/hand-2022-12-31-sv.zip
+Accessing file NMH2KF074RKAGTH4CM63-2020-12-31.zip from URL: https://filings.xbrl.org/NMH2KF074RKAGTH4CM63/2020-12-31/ESEF/PL/0/NMH2KF074RKAGTH4CM63-2020-12-31.zip
+Accessing file BNPParibasBankPol-2021-12-31.zip from URL: https://filings.xbrl.org/NMH2KF074RKAGTH4CM63/2021-12-31/ESEF/PL/0/BNPParibasBankPol-2021-12-31.zip
+Accessing file BNPParibasBankPolska-2022-12-31-pl.zip from URL: https://filings.xbrl.org/NMH2KF074RKAGTH4CM63/2022-12-31/ESEF/PL/0/BNPParibasBankPolska-2022-12-31-pl.zip
+Accessing file NS54DT27LJMDYN1YFP35-2022-12-31-DE.zip from URL: https://filings.xbrl.org/NS54DT27LJMDYN1YFP35/2022-12-31/ESEF/AT/2/NS54DT27LJMDYN1YFP35-2022-12-31-DE.zip
+Accessing file OQ3T05P7YR8P5YJEVI93-2021-12-31.zip from URL: https://filings.xbrl.org/OQ3T05P7YR8P5YJEVI93/2021-12-31/ESEF/GB/0/OQ3T05P7YR8P5YJEVI93-2021-12-31.zip
+Accessing file OQ3T05P7YR8P5YJEVI93-2022-12-31.zip from URL: https://filings.xbrl.org/OQ3T05P7YR8P5YJEVI93/2022-12-31/ESEF/GB/0/OQ3T05P7YR8P5YJEVI93-2022-12-31.zip
+Accessing file ESEF_Skonsolidowane_sprawozdanie_finansowe_GK_PKOBPSA_31.12.2020.zip from URL: https://filings.xbrl.org/P4GTT6GF1W40CVIMFR43/2020-12-31/ESEF/PL/0/ESEF_Skonsolidowane_sprawozdanie_finansowe_GK_PKOBPSA_31.12.2020.zip
+Accessing file PQOH26KWDF7CG10L6792-2020-12-31.zip from URL: https://filings.xbrl.org/PQOH26KWDF7CG10L6792/2020-12-31/ESEF/AT/0/PQOH26KWDF7CG10L6792-2020-12-31.zip
+Accessing file PQOH26KWDF7CG10L6792-2021-12-31-de.zip from URL: https://filings.xbrl.org/PQOH26KWDF7CG10L6792/2021-12-31/ESEF/AT/0/PQOH26KWDF7CG10L6792-2021-12-31-de.zip
+Accessing file PQOH26KWDF7CG10L6792-2022-12-31.zip from URL: https://filings.xbrl.org/PQOH26KWDF7CG10L6792/2022-12-31/ESEF/AT/0/PQOH26KWDF7CG10L6792-2022-12-31.zip
+Accessing file Q2GQA2KF6XJ24W42G291-2021-12-31-en.zip from URL: https://filings.xbrl.org/Q2GQA2KF6XJ24W42G291/2021-12-31/ESEF/GB/0/Q2GQA2KF6XJ24W42G291-2021-12-31-en.zip
+Accessing file RIL4VBPDB0M7Z3KXSF19-2021-12-31-en.zip from URL: https://filings.xbrl.org/RIL4VBPDB0M7Z3KXSF19/2021-12-31/ESEF/IS/0/RIL4VBPDB0M7Z3KXSF19-2021-12-31-en.zip
+Accessing file RIL4VBPDB0M7Z3KXSF19-2022-12-31-en.zip from URL: https://filings.xbrl.org/RIL4VBPDB0M7Z3KXSF19/2022-12-31/ESEF/IS/0/RIL4VBPDB0M7Z3KXSF19-2022-12-31-en.zip
+Accessing file RILFO74KP1CM8P6PCT96-2021-12-31.zip from URL: https://filings.xbrl.org/RILFO74KP1CM8P6PCT96/2021-12-31/ESEF/GB/0/RILFO74KP1CM8P6PCT96-2021-12-31.zip
+Accessing file RILFO74KP1CM8P6PCT96-2022-12-31.zip from URL: https://filings.xbrl.org/RILFO74KP1CM8P6PCT96/2022-12-31/ESEF/GB/0/RILFO74KP1CM8P6PCT96-2022-12-31.zip
+Accessing file oberbankag-2022-12-31-de.zip from URL: https://filings.xbrl.org/RRUN0TCQ1K2JDV7MXO75/2022-12-31/ESEF/AT/0/oberbankag-2022-12-31-de.zip
+Accessing file TU5V87TL5Q0UV1EW4H93-2021-12-31.zip from URL: https://filings.xbrl.org/TU5V87TL5Q0UV1EW4H93/2021-12-31/ESEF/LU/0/TU5V87TL5Q0UV1EW4H93-2021-12-31.zip
+Accessing file V0VY22PV9D0HFTF8EI62-2020-12-31.zip from URL: https://filings.xbrl.org/V0VY22PV9D0HFTF8EI62/2020-12-31/ESEF/AT/0/V0VY22PV9D0HFTF8EI62-2020-12-31.zip
+Accessing file V0VY22PV9D0HFTF8EI62-2021-12-31-de.zip from URL: https://filings.xbrl.org/V0VY22PV9D0HFTF8EI62/2021-12-31/ESEF/AT/0/V0VY22PV9D0HFTF8EI62-2021-12-31-de.zip
+Accessing file V0VY22PV9D0HFTF8EI62-2022-12-31.zip from URL: https://filings.xbrl.org/V0VY22PV9D0HFTF8EI62/2022-12-31/ESEF/AT/0/V0VY22PV9D0HFTF8EI62-2022-12-31.zip
+Accessing file VWMYAEQSTOPNV0SUGU82-20201231.zip from URL: https://filings.xbrl.org/VWMYAEQSTOPNV0SUGU82/2020-12-31/ESEF/ES/0/VWMYAEQSTOPNV0SUGU82-20201231.zip
+Accessing file VWMYAEQSTOPNV0SUGU82-20211231-es.zip from URL: https://filings.xbrl.org/VWMYAEQSTOPNV0SUGU82/2021-12-31/ESEF/ES/0/VWMYAEQSTOPNV0SUGU82-20211231-es.zip
+Accessing file 3 skons_sprawozdanie finansowe_2020.zip from URL: https://filings.xbrl.org/XLEZHWWOI4HFQDGL4793/2020-12-31/ESEF/PL/0/3%20skons_sprawozdanie%20finansowe_2020.zip
+Accessing file 3_skons_sprawozdanie_finansowe_2022.zip from URL: https://filings.xbrl.org/XLEZHWWOI4HFQDGL4793/2022-12-31/ESEF/PL/0/3_skons_sprawozdanie_finansowe_2022.zip
+File count: 32
+Fail count: 0
+
+
+--- Executing download (but only used the previously downloaded ones, error in the process ---
+
+Process complete in 194639 msec.
+
+
+--- Running again, UNZIP the fresh downloads ---
+
+Process complete in 230499 msec.
+
+File count: 301
+Fail count: 6
+
+
+Resolving file from local cache mBank-SSF-2021-12-31-pl.zip
+Unzipping mBank-SSF-2021-12-31-pl.zip to: mBank-SSF-2021-12-31-pl
+Unzip error with file /Users/lkedves/work/xbrl/data/reports/2021/xbrl.org/82/0f/259400DZXF7UJKK2AY35/ESEF-PL-0/mBank-SSF-2021-12-31-pl.zip
+java.util.zip.ZipException: only DEFLATED entries can have EXT descriptor
+	at java.base/java.util.zip.ZipInputStream.readLOC(ZipInputStream.java:312)
+	at java.base/java.util.zip.ZipInputStream.getNextEntry(ZipInputStream.java:124)
+	at hu.sze.uni.xbrl.XbrlUtils.unzip(XbrlUtils.java:142)
+	at hu.sze.uni.xbrl.XbrlFilingManager.getReport(XbrlFilingManager.java:278)
+	at hu.sze.uni.xbrl.XbrlFilingManager.main(XbrlFilingManager.java:338)
+Report dir not found in mBank-SSF-2021-12-31-pl
+
+
+Resolving file from local cache 2021-04-30 08-58-08 - RLB_KA_IFRS_2020_Final für Veröffentlichung.zip
+Unzipping 2021-04-30 08-58-08 - RLB_KA_IFRS_2020_Final für Veröffentlichung.zip to: 2021-04-30 08-58-08 - RLB_KA_IFRS_2020_Final für Veröffentlichung
+Unzip error with file /Users/lkedves/work/xbrl/data/reports/2020/xbrl.org/1b/45/529900GPOO9ISPD1EE83/ESEF-AT-0/2021-04-30 08-58-08 - RLB_KA_IFRS_2020_Final für Veröffentlichung.zip
+java.lang.IllegalArgumentException: malformed input off : 46, length : 1
+	at java.base/java.lang.StringCoding.throwMalformed(StringCoding.java:698)
+	at java.base/java.lang.StringCoding.decodeUTF8_0(StringCoding.java:885)
+	at java.base/java.lang.StringCoding.newStringUTF8NoRepl(StringCoding.java:978)
+	at java.base/java.lang.System$2.newStringUTF8NoRepl(System.java:2270)
+	at java.base/java.util.zip.ZipCoder$UTF8.toString(ZipCoder.java:60)
+	at java.base/java.util.zip.ZipCoder.toString(ZipCoder.java:87)
+	at java.base/java.util.zip.ZipInputStream.readLOC(ZipInputStream.java:302)
+	at java.base/java.util.zip.ZipInputStream.getNextEntry(ZipInputStream.java:124)
+	at hu.sze.uni.xbrl.XbrlUtils.unzip(XbrlUtils.java:142)
+	at hu.sze.uni.xbrl.XbrlFilingManager.getReport(XbrlFilingManager.java:278)
+	at hu.sze.uni.xbrl.XbrlFilingManager.main(XbrlFilingManager.java:338)
+Caused by: java.nio.charset.MalformedInputException: Input length = 1
+	... 11 more
+Report dir not found in 2021-04-30 08-58-08 - RLB_KA_IFRS_2020_Final für Veröffentlichung
+
+
+Resolving file from local cache SF_GRUPA BOS_31_12_2020.zip
+Unzipping SF_GRUPA BOS_31_12_2020.zip to: SF_GRUPA BOS_31_12_2020
+Unzip error with file /Users/lkedves/work/xbrl/data/reports/2020/xbrl.org/30/9a/MKP1B7E76TN04CD85Z79/ESEF-PL-0/SF_GRUPA BOS_31_12_2020.zip
+java.util.zip.ZipException: only DEFLATED entries can have EXT descriptor
+	at java.base/java.util.zip.ZipInputStream.readLOC(ZipInputStream.java:312)
+	at java.base/java.util.zip.ZipInputStream.getNextEntry(ZipInputStream.java:124)
+	at hu.sze.uni.xbrl.XbrlUtils.unzip(XbrlUtils.java:142)
+	at hu.sze.uni.xbrl.XbrlFilingManager.getReport(XbrlFilingManager.java:278)
+	at hu.sze.uni.xbrl.XbrlFilingManager.main(XbrlFilingManager.java:338)
+Report dir not found in SF_GRUPA BOS_31_12_2020
+
+
+Resolving file from local cache ESEF_Skonsolidowane_sprawozdanie_finansowe_GK_PKOBPSA_31.12.2020.zip
+Unzipping ESEF_Skonsolidowane_sprawozdanie_finansowe_GK_PKOBPSA_31.12.2020.zip to: ESEF_Skonsolidowane_sprawozdanie_finansowe_GK_PKOBPSA_31.12.2020
+Unzip error with file /Users/lkedves/work/xbrl/data/reports/2020/xbrl.org/f6/0b/P4GTT6GF1W40CVIMFR43/ESEF-PL-0/ESEF_Skonsolidowane_sprawozdanie_finansowe_GK_PKOBPSA_31.12.2020.zip
+java.util.zip.ZipException: only DEFLATED entries can have EXT descriptor
+	at java.base/java.util.zip.ZipInputStream.readLOC(ZipInputStream.java:312)
+	at java.base/java.util.zip.ZipInputStream.getNextEntry(ZipInputStream.java:124)
+	at hu.sze.uni.xbrl.XbrlUtils.unzip(XbrlUtils.java:142)
+	at hu.sze.uni.xbrl.XbrlFilingManager.getReport(XbrlFilingManager.java:278)
+	at hu.sze.uni.xbrl.XbrlFilingManager.main(XbrlFilingManager.java:338)
+Report dir not found in ESEF_Skonsolidowane_sprawozdanie_finansowe_GK_PKOBPSA_31.12.2020
+
+
+Resolving file from local cache 3 skons_sprawozdanie finansowe_2020.zip
+Unzipping 3 skons_sprawozdanie finansowe_2020.zip to: 3 skons_sprawozdanie finansowe_2020
+Unzip error with file /Users/lkedves/work/xbrl/data/reports/2020/xbrl.org/ae/d7/XLEZHWWOI4HFQDGL4793/ESEF-PL-0/3 skons_sprawozdanie finansowe_2020.zip
+java.util.zip.ZipException: only DEFLATED entries can have EXT descriptor
+	at java.base/java.util.zip.ZipInputStream.readLOC(ZipInputStream.java:312)
+	at java.base/java.util.zip.ZipInputStream.getNextEntry(ZipInputStream.java:124)
+	at hu.sze.uni.xbrl.XbrlUtils.unzip(XbrlUtils.java:142)
+	at hu.sze.uni.xbrl.XbrlFilingManager.getReport(XbrlFilingManager.java:278)
+	at hu.sze.uni.xbrl.XbrlFilingManager.main(XbrlFilingManager.java:338)
+Report dir not found in 3 skons_sprawozdanie finansowe_2020
+
+Report dir fail 
+   /Users/lkedves/work/xbrl/data/reports/2021/xbrl.org/ab/c9/259400LGXW3K0GDAG361/ESEF-PL-0/ESEF_SantanderBankPolska
+   
+   (multiple nesting)
