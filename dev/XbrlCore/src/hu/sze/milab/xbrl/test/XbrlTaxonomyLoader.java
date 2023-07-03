@@ -10,8 +10,6 @@ import java.util.TreeMap;
 import java.util.TreeSet;
 
 import org.w3c.dom.Element;
-import org.w3c.dom.NamedNodeMap;
-import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
 
 import hu.sze.milab.dust.Dust;
@@ -19,8 +17,9 @@ import hu.sze.milab.dust.dev.DustDevCounter;
 import hu.sze.milab.dust.stream.xml.DustStreamXmlConsts;
 import hu.sze.milab.dust.stream.xml.DustStreamXmlLoader;
 import hu.sze.milab.dust.utils.DustUtils;
-import hu.sze.milab.dust.utils.DustUtilsFactory;
 import hu.sze.milab.dust.utils.DustUtils.QueueContainer;
+import hu.sze.milab.dust.utils.DustUtilsFactory;
+import hu.sze.milab.dust.utils.DustUtilsFile;
 
 class XbrlTaxonomyLoader implements DustStreamXmlLoader.NamespaceProcessor, DustStreamXmlConsts {
 
@@ -28,31 +27,19 @@ class XbrlTaxonomyLoader implements DustStreamXmlLoader.NamespaceProcessor, Dust
 		Element e;
 		Map<String, Element> items = new TreeMap<>();
 
-		public NamespaceData(Element eNS, NodeList el) {
+		public NamespaceData(Element eNS) {
 			this.e = eNS;
-
-			int ec = el.getLength();
-			for (int ei = 0; ei < ec; ++ei) {
-
-				Node item = el.item(ei);
-				NamedNodeMap atts = item.getAttributes();
-
-				if ( null != atts ) {
-					String id = atts.getNamedItem("id").getNodeValue();
-					items.put(id, (Element) item);
-				}
-			}
 		}
 	}
-	
+
 	class LinkData {
 		Element link;
 		Element from;
 		Element to;
-		
+
 		public LinkData(Element link, Map<String, Element> links) {
 			this.link = link;
-			
+
 			String ref = link.getAttribute("xlink:from");
 			this.from = links.get(ref);
 			ref = link.getAttribute("xlink:to");
@@ -62,7 +49,7 @@ class XbrlTaxonomyLoader implements DustStreamXmlLoader.NamespaceProcessor, Dust
 
 	DustDevCounter linkInfo = new DustDevCounter(true);
 	Set<String> allFiles = new TreeSet<>();
-	
+
 	Map<String, NamespaceData> namespaces = new TreeMap<>();
 	Map<String, NamespaceData> nsByUrl = new TreeMap<>();
 
@@ -73,14 +60,14 @@ class XbrlTaxonomyLoader implements DustStreamXmlLoader.NamespaceProcessor, Dust
 	void setRootFolder(File root) {
 		allFiles.clear();
 		addFolder(root);
-		
+
 		Dust.dumpObs("Files to visit in folder", root.getName(), allFiles.size());
 	}
 
 	void addFolder(File dir) {
 		for (File f : dir.listFiles()) {
 			if ( f.isFile() ) {
-				if ( f.getName().startsWith(".")) {
+				if ( f.getName().startsWith(".") ) {
 					continue;
 				}
 				try {
@@ -110,7 +97,27 @@ class XbrlTaxonomyLoader implements DustStreamXmlLoader.NamespaceProcessor, Dust
 				Dust.dumpObs("   ", s);
 			}
 		}
-		
+
+		Set<String> skipUrl = new TreeSet<>();
+
+		for (String conceptRef : locLinks.keys()) {
+			String[] ref = conceptRef.split("#");
+
+			NamespaceData nsd = nsByUrl.get(ref[0]);
+			if ( null == nsd ) {
+				skipUrl.add(ref[0]);
+			} else {
+				Element e = nsd.items.get(ref[1]);
+				if ( null == e ) {
+					Dust.dumpObs("Referred concept not found", conceptRef);
+				}
+			}
+		}
+
+		for (String uu : skipUrl) {
+			Dust.dumpObs("Referred url not found", uu);
+		}
+
 		linkInfo.dump();
 	}
 
@@ -132,40 +139,52 @@ class XbrlTaxonomyLoader implements DustStreamXmlLoader.NamespaceProcessor, Dust
 		}
 
 //		Dust.dumpObs("  Reading url", url);
-
-		el = root.getElementsByTagName("xsd:element");
-		if ( 0 < el.getLength() ) {
-			NamespaceData nsd = new NamespaceData(root, el);
-
-			String ns = root.getAttribute("targetNamespace");
-			namespaces.put(ns, nsd);
-			nsByUrl.put(url, nsd);
-
-			Dust.dumpObs("      Registered namespace", ns);
-		}
-
-		if ( root.getTagName().endsWith("linkbase") ) {
-//			Dust.dumpObs("      Linkbase found", url);
-			
-			Map<String, Element> labeledLinks = new TreeMap<>();
-
-			
-			String[] LINK_ATTS = {"xlink:type", "xlink:role", "xlink:arcrole"};
+		
+		if ( root.getTagName().endsWith(":schema")) {
+			NamespaceData nsd = null;
 			
 			el = root.getElementsByTagName("*");
 			for (int ei = el.getLength(); ei-- > 0;) {
 				Element e = (Element) el.item(ei);
 				
+				String id = e.getAttribute("id");
+				if ( !DustUtils.isEmpty(id) ) {
+					if ( null == nsd ) {
+						nsd = new NamespaceData(root);
+						String ns = root.getAttribute("targetNamespace");
+						namespaces.put(ns, nsd);
+
+						nsByUrl.put(url, nsd);
+
+						Dust.dumpObs("      Registered namespace", ns);
+					}
+					
+					nsd.items.put(id, e);
+				}
+			}
+		}
+
+		if ( root.getTagName().endsWith("linkbase") ) {
+//			Dust.dumpObs("      Linkbase found", url);
+
+			Map<String, Element> labeledLinks = new TreeMap<>();
+
+			String[] LINK_ATTS = { "xlink:type", "xlink:role", "xlink:arcrole" };
+
+			el = root.getElementsByTagName("*");
+			for (int ei = el.getLength(); ei-- > 0;) {
+				Element e = (Element) el.item(ei);
+
 				String lbl = e.getAttribute("xlink:label");
 				if ( !DustUtils.isEmpty(lbl) ) {
 					labeledLinks.put(lbl, e);
 				}
-				
+
 				String tn = e.getTagName();
-				if ( tn.startsWith("link")) {
+				if ( tn.startsWith("link") ) {
 					linkInfo.add(tn);
-					
-					for (String an : LINK_ATTS ) {
+
+					for (String an : LINK_ATTS) {
 						String av = e.getAttribute(an);
 						if ( !DustUtils.isEmpty(av) ) {
 							linkInfo.add(tn + " " + an + ": " + av);
@@ -173,24 +192,26 @@ class XbrlTaxonomyLoader implements DustStreamXmlLoader.NamespaceProcessor, Dust
 					}
 				}
 			}
-			
+
 			el = root.getElementsByTagName("*");
 			for (int ei = el.getLength(); ei-- > 0;) {
 				Element e = (Element) el.item(ei);
-				
+
 				String type = e.getAttribute("xlink:type");
-				
-				if  ( "arc".equals(type)) {
+
+				if ( "arc".equals(type) ) {
 					LinkData ld = new LinkData(e, labeledLinks);
-					
+
 					allLinks.add(ld);
-					
+
 					String ref = ld.from.getAttribute("xlink:href");
 					if ( !DustUtils.isEmpty(ref) ) {
+						ref = optLocalizeUrl(ref, url);
 						locLinks.get(ref).add(ld);
 					}
 					ref = ld.to.getAttribute("xlink:href");
 					if ( !DustUtils.isEmpty(ref) ) {
+						ref = optLocalizeUrl(ref, url);
 						locLinks.get(ref).add(ld);
 					}
 				}
@@ -200,18 +221,20 @@ class XbrlTaxonomyLoader implements DustStreamXmlLoader.NamespaceProcessor, Dust
 		el = root.getElementsByTagName("link:linkbaseRef");
 		for (int ei = el.getLength(); ei-- > 0;) {
 			String href = ((Element) el.item(ei)).getAttribute("xlink:href");
-			String refUrl = href;
-
-			if ( DustUtils.isEmpty(href) ) {
-				Dust.dumpObs(" HEH?");
-			} else {
-				if ( !href.contains(":") ) {
-//					int sep = url.lastIndexOf("/");
-//					refUrl = url.substring(0, sep + 1) + href;
-					refUrl = DustUtils.replacePostfix(url, "/", href);
-				}
-				loader.enqueue(href, refUrl);
-			}
+			String refUrl = optLocalizeUrl(href, url);
+			loader.enqueue(href, refUrl);
 		}
+	}
+
+	public String optLocalizeUrl(String href, String url) {
+		String refUrl = href;
+
+		if ( !href.contains(":") ) {
+			refUrl = DustUtils.replacePostfix(url, "/", href);
+		}
+
+		refUrl = DustUtilsFile.optRemoveUpFromPath(refUrl);
+
+		return refUrl;
 	}
 }
