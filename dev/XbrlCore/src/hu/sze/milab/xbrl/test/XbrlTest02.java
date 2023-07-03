@@ -51,29 +51,40 @@ public class XbrlTest02 implements XbrlConsts {
 		DocumentBuilder db = dbf.newDocumentBuilder();
 
 //		XbrlTaxonomyToExcel toExcel = new XbrlTaxonomyToExcel();
-		XbrlTaxonomyLoader loader = new XbrlTaxonomyLoader();
-
+		
 		for (String taxRoot : args) {
 			Dust.dumpObs("Reading taxonomy", taxRoot);
-			File txMeta = new File(in, taxRoot + "/META-INF");
+			
+			File fRoot = new File(in, taxRoot);
+			File txMeta = new File(fRoot, "META-INF");
+			
+			XbrlTaxonomyLoader taxonomyCollector = new XbrlTaxonomyLoader();
+			taxonomyCollector.setRootFolder(txMeta.getParentFile());
 
-			Document catalog = db.parse(new File(txMeta, "catalog.xml"));
-			Element taxPack = db.parse(new File(txMeta, "taxonomyPackage.xml")).getDocumentElement();
+			File fCat = new File(txMeta, "catalog.xml");
+			Document catalog = db.parse(fCat);
+			File fTaxPack = new File(txMeta, "taxonomyPackage.xml");
+			Element taxPack = db.parse(fTaxPack).getDocumentElement();
+			
+			taxonomyCollector.setSeen(fCat, fTaxPack);
 
-			Map<String, String> rewrite = new TreeMap<>();
+
+			Map<String, String> uriRewrite = new TreeMap<>();
 			NodeList nl = catalog.getElementsByTagName("rewriteURI");
 			for (int ni = nl.getLength(); ni-- > 0;) {
 				NamedNodeMap atts = nl.item(ni).getAttributes();
-				rewrite.put(atts.getNamedItem("uriStartString").getNodeValue(), atts.getNamedItem("rewritePrefix").getNodeValue());
+				uriRewrite.put(atts.getNamedItem("uriStartString").getNodeValue(), atts.getNamedItem("rewritePrefix").getNodeValue());
 			}
-
-			DustStreamXmlLoader xLoader = new DustStreamXmlLoader(c);
+			
+			DustStreamXmlLoader xmlLoader = new DustStreamXmlLoader(c);
 
 			nl = taxPack.getElementsByTagName("tp:entryPointDocument");
 			for (int ni = 0; ni < nl.getLength(); ++ni ) {
 				String url = nl.item(ni).getAttributes().getNamedItem("href").getNodeValue();
-				xLoader.loadNamespace(txMeta, url, loader, rewrite);
+				xmlLoader.loadNamespace(txMeta, url, taxonomyCollector, uriRewrite);
 			}
+			
+			taxonomyCollector.dump();
 
 //			toExcel.save(out, taxRoot);
 		}
