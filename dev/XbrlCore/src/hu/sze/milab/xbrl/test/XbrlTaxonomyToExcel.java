@@ -15,6 +15,7 @@ import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
 
 import hu.sze.milab.dust.Dust;
+import hu.sze.milab.dust.stream.DustStreamUtils;
 import hu.sze.milab.dust.stream.xml.DustStreamXmlLoader;
 import hu.sze.milab.dust.utils.DustUtils;
 import hu.sze.milab.dust.utils.DustUtils.QueueContainer;
@@ -54,25 +55,10 @@ class XbrlTaxonomyToExcel implements DustStreamXmlLoader.NamespaceProcessor {
 				if ( null != atts ) {
 					if ( null == sheet ) {
 						String nsOrig = root.getAttribute("targetNamespace");
-						String ns = nsOrig;
-						int sep = ns.indexOf("://");
-						if ( -1 != sep ) {
-							ns = ns.substring(sep + 3);
-						}
-						ns = ns.replace("/", "_");
-						
-						int nl = ns.length();
-						if ( 31 <= nl ) {
-							ns = ns.substring(nl - 31, nl);
-//							sep = ns.indexOf("_");
-//							String s1 = ns.substring(0, sep);
-//							String s2 = ns.substring(nl - 31 + sep + 2, nl);
-//							ns = s1 + ".." + s2;
-//							nl = ns.length();
-						}
+						String ns = DustStreamUtils.cutExcelSheetName(nsOrig);
 						
 						sheet = wb.getSheet(ns);
-						
+					
 						if ( null != sheet ) {
 							Dust.dumpObs("  Skipping duplicated sheet", ns, "for namespace", nsOrig);
 							return;

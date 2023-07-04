@@ -50,8 +50,6 @@ public class XbrlTest02 implements XbrlConsts {
 		DocumentBuilderFactory dbf = DocumentBuilderFactory.newInstance();
 		DocumentBuilder db = dbf.newDocumentBuilder();
 
-//		XbrlTaxonomyToExcel toExcel = new XbrlTaxonomyToExcel();
-		
 		for (String taxRoot : args) {
 			Dust.dumpObs("Reading taxonomy", taxRoot);
 			
@@ -86,7 +84,7 @@ public class XbrlTest02 implements XbrlConsts {
 			
 			taxonomyCollector.dump();
 
-//			toExcel.save(out, taxRoot);
+			taxonomyCollector.save(out, taxRoot);
 		}
 	}
 

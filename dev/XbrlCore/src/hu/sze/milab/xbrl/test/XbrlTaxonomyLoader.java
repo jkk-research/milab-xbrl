@@ -1,19 +1,32 @@
 package hu.sze.milab.xbrl.test;
 
 import java.io.File;
+import java.io.FileOutputStream;
 import java.net.URL;
 import java.nio.file.Paths;
+import java.util.ArrayList;
+import java.util.Comparator;
 import java.util.HashSet;
+import java.util.Iterator;
 import java.util.Map;
 import java.util.Set;
 import java.util.TreeMap;
 import java.util.TreeSet;
 
+import org.apache.poi.ss.usermodel.Cell;
+import org.apache.poi.ss.usermodel.CellStyle;
+import org.apache.poi.ss.usermodel.Row;
+import org.apache.poi.ss.usermodel.Sheet;
+import org.apache.poi.ss.usermodel.Workbook;
+import org.apache.poi.xssf.usermodel.XSSFWorkbook;
 import org.w3c.dom.Element;
+import org.w3c.dom.NamedNodeMap;
+import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
 
 import hu.sze.milab.dust.Dust;
 import hu.sze.milab.dust.dev.DustDevCounter;
+import hu.sze.milab.dust.stream.DustStreamUtils;
 import hu.sze.milab.dust.stream.xml.DustStreamXmlConsts;
 import hu.sze.milab.dust.stream.xml.DustStreamXmlLoader;
 import hu.sze.milab.dust.utils.DustUtils;
@@ -121,6 +134,157 @@ class XbrlTaxonomyLoader implements DustStreamXmlLoader.NamespaceProcessor, Dust
 		linkInfo.dump();
 	}
 
+	DustUtils.Indexer<String> attCols = new DustUtils.Indexer<String>();
+	private static final String[] KNOWN_ATT_COLS = { "name", "id", "type", "substitutionGroup", "xbrli:periodType", "abstract", "nillable", "cyclesAllowed", 
+			"xbrli:balance", "roleURI", "arcroleURI", "http://www.xbrl.org/2003/role/label" };
+
+	private Workbook wb;
+	CellStyle csLabel;
+	CellStyle csHeader;
+
+	private int colCount;
+
+	public void save(File dir, String taxName) throws Exception {
+		for (String a : KNOWN_ATT_COLS) {
+			attCols.getIndex(a);
+		}
+		colCount = attCols.getSize();
+
+		wb = new XSSFWorkbook();
+
+		csLabel = wb.createCellStyle();
+		csLabel.setWrapText(true);
+
+		csHeader = wb.createCellStyle();
+		csHeader.setAlignment(CellStyle.ALIGN_CENTER);
+		csHeader.setVerticalAlignment(CellStyle.VERTICAL_CENTER);
+
+		Sheet sheet;
+		Row row;
+		ArrayList<String> sheetNames = new ArrayList<>();
+
+		for (Map.Entry<String, NamespaceData> ne : namespaces.entrySet()) {
+			String nsOrig = ne.getKey();
+			String ns = DustStreamUtils.cutExcelSheetName(nsOrig);
+
+			Dust.dumpObs("  Creating sheet", ns, "for namespace", nsOrig);
+			sheet = wb.createSheet(ns);
+			sheetNames.add(ns);
+
+			int rc = 0;
+
+			row = sheet.createRow(rc++);
+			for (String an : attCols.keys()) {
+				Cell c;
+				int ax = attCols.getIndex(an);
+				
+				if ( an.startsWith("http:") ) {
+					int sep = an.lastIndexOf("/");
+					if ( -1 != sep ) {
+						an = an.substring(sep + 1);
+					}
+
+					sheet.setColumnWidth(ax, 80 * 256);
+				}
+
+				c = row.createCell(ax);
+				c.setCellValue(an);
+				c.setCellStyle(csHeader);
+			}
+
+			NamespaceData nd = ne.getValue();
+			String url = (String) nd.e.getUserData(XML_DATA_DOCURL);
+
+			for (Map.Entry<String, Element> ie : nd.items.entrySet()) {
+				Element e = ie.getValue();
+				row = sheet.createRow(rc++);
+
+				NamedNodeMap atts = e.getAttributes();
+				int ac = atts.getLength();
+				for (int ai = 0; ai < ac; ++ai) {
+					Node a = atts.item(ai);
+					storeValue(row, a.getNodeName(), a.getNodeValue());
+				}
+
+				String id = url + "#" + ie.getKey();
+
+				Set<LinkData> lds = locLinks.peek(id);
+
+				if ( null != lds ) {
+					for (LinkData ld : lds) {
+						if ( "http://www.xbrl.org/2003/arcrole/concept-label".equals(ld.link.getAttribute("xlink:arcrole")) ) {
+							String role = ld.to.getAttribute("xlink:role");
+							String val = ld.to.getTextContent();
+							Cell c = storeValue(row, role, val);
+							c.setCellStyle(csLabel);
+						}
+					}
+				}
+			}
+
+			sheet.createFreezePane(1, 1);
+		}
+
+		sheetNames.sort(new Comparator<String>() {
+			@Override
+			public int compare(String o1, String o2) {
+				return wb.getSheet(o2).getLastRowNum() - wb.getSheet(o1).getLastRowNum();
+			}
+		});
+
+		for (int i = 0; i < sheetNames.size(); ++i) {
+			wb.setSheetOrder(sheetNames.get(i), i);
+		}
+
+		File f = new File(dir, taxName + ".xlsx");
+		FileOutputStream fileOut = new FileOutputStream(f);
+
+		wb.write(fileOut);
+		fileOut.flush();
+		fileOut.close();
+
+		wb.close();
+	}
+
+	public Cell storeValue(Row row, String colName, String value) {
+		Cell c;
+		int ax = attCols.getIndex(colName);
+
+		if ( ax >= colCount ) {
+			addAttCol(colName);
+			colCount = ax + 1;
+		}
+
+		c = row.createCell(ax);
+		c.setCellValue(value);
+
+		return c;
+	}
+
+	private void addAttCol(String an) {
+		int cw = 0;
+
+		if ( an.startsWith("http:") ) {
+			int sep = an.lastIndexOf("/");
+			if ( -1 != sep ) {
+				an = an.substring(sep + 1);
+			}
+
+			cw = 80 * 256;
+		}
+
+		for (Iterator<Sheet> it = wb.sheetIterator(); it.hasNext();) {
+			Sheet sheet = it.next();
+			Cell c = sheet.getRow(0).createCell(colCount);
+			c.setCellValue(an);
+			c.setCellStyle(csHeader);
+
+			if ( 0 < cw ) {
+				sheet.setColumnWidth(colCount, cw);
+			}
+		}
+	}
+
 	@Override
 	public void namespaceLoaded(Element root, QueueContainer<String> loader) {
 		NodeList el;
@@ -139,14 +303,14 @@ class XbrlTaxonomyLoader implements DustStreamXmlLoader.NamespaceProcessor, Dust
 		}
 
 //		Dust.dumpObs("  Reading url", url);
-		
-		if ( root.getTagName().endsWith(":schema")) {
+
+		if ( root.getTagName().endsWith(":schema") ) {
 			NamespaceData nsd = null;
-			
+
 			el = root.getElementsByTagName("*");
 			for (int ei = el.getLength(); ei-- > 0;) {
 				Element e = (Element) el.item(ei);
-				
+
 				String id = e.getAttribute("id");
 				if ( !DustUtils.isEmpty(id) ) {
 					if ( null == nsd ) {
@@ -158,7 +322,7 @@ class XbrlTaxonomyLoader implements DustStreamXmlLoader.NamespaceProcessor, Dust
 
 						Dust.dumpObs("      Registered namespace", ns);
 					}
-					
+
 					nsd.items.put(id, e);
 				}
 			}
