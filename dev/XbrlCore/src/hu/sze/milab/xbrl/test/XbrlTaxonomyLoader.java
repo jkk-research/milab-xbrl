@@ -15,6 +15,8 @@ import java.util.TreeSet;
 
 import org.apache.poi.ss.usermodel.Cell;
 import org.apache.poi.ss.usermodel.CellStyle;
+import org.apache.poi.ss.usermodel.CreationHelper;
+import org.apache.poi.ss.usermodel.Hyperlink;
 import org.apache.poi.ss.usermodel.Row;
 import org.apache.poi.ss.usermodel.Sheet;
 import org.apache.poi.ss.usermodel.Workbook;
@@ -35,6 +37,18 @@ import hu.sze.milab.dust.utils.DustUtilsFactory;
 import hu.sze.milab.dust.utils.DustUtilsFile;
 
 class XbrlTaxonomyLoader implements DustStreamXmlLoader.NamespaceProcessor, DustStreamXmlConsts {
+
+	interface CellUpdater {
+		String update(String oldVal, String val);
+	}
+
+	CellUpdater concat = new CellUpdater() {
+
+		@Override
+		public String update(String oldVal, String val) {
+			return oldVal.contains(val) ? oldVal : oldVal + "\n" + val;
+		}
+	};
 
 	class NamespaceData {
 		Element e;
@@ -134,9 +148,14 @@ class XbrlTaxonomyLoader implements DustStreamXmlLoader.NamespaceProcessor, Dust
 		linkInfo.dump();
 	}
 
+
 	DustUtils.Indexer<String> attCols = new DustUtils.Indexer<String>();
-	private static final String[] KNOWN_ATT_COLS = { "name", "id", "type", "substitutionGroup", "xbrli:periodType", "abstract", "nillable", "cyclesAllowed", 
-			"xbrli:balance", "roleURI", "arcroleURI", "http://www.xbrl.org/2003/role/label" };
+	private static final String[] KNOWN_ATT_COLS = { "name", "id", "type", "substitutionGroup", "xbrli:periodType",
+			"Parent", "Children",
+			"http://www.xbrl.org/2003/role/label", 
+//			"abstract", "nillable", "xbrli:balance", "cyclesAllowed", "roleURI", "arcroleURI",
+//			"http://www.xbrl.org/2003/role/label", "http://www.xbrl.org/2003/role/documentation" 
+	};
 
 	private Workbook wb;
 	CellStyle csLabel;
@@ -151,6 +170,8 @@ class XbrlTaxonomyLoader implements DustStreamXmlLoader.NamespaceProcessor, Dust
 		colCount = attCols.getSize();
 
 		wb = new XSSFWorkbook();
+
+		CreationHelper hlpCreate = wb.getCreationHelper();
 
 		csLabel = wb.createCellStyle();
 		csLabel.setWrapText(true);
@@ -177,14 +198,16 @@ class XbrlTaxonomyLoader implements DustStreamXmlLoader.NamespaceProcessor, Dust
 			for (String an : attCols.keys()) {
 				Cell c;
 				int ax = attCols.getIndex(an);
-				
+
 				if ( an.startsWith("http:") ) {
 					int sep = an.lastIndexOf("/");
 					if ( -1 != sep ) {
 						an = an.substring(sep + 1);
 					}
 
-					sheet.setColumnWidth(ax, 80 * 256);
+					if ( !"deprecatedDateLabel".equals(an) ) {
+						sheet.setColumnWidth(ax, 80 * 256);
+					}
 				}
 
 				c = row.createCell(ax);
@@ -203,20 +226,109 @@ class XbrlTaxonomyLoader implements DustStreamXmlLoader.NamespaceProcessor, Dust
 				int ac = atts.getLength();
 				for (int ai = 0; ai < ac; ++ai) {
 					Node a = atts.item(ai);
-					storeValue(row, a.getNodeName(), a.getNodeValue());
+					storeValue(row, a.getNodeName(), a.getNodeValue(), concat);
 				}
 
-				String id = url + "#" + ie.getKey();
+				String eid = ie.getKey();
+				String id = url + "#" + eid;
 
 				Set<LinkData> lds = locLinks.peek(id);
 
 				if ( null != lds ) {
 					for (LinkData ld : lds) {
-						if ( "http://www.xbrl.org/2003/arcrole/concept-label".equals(ld.link.getAttribute("xlink:arcrole")) ) {
-							String role = ld.to.getAttribute("xlink:role");
-							String val = ld.to.getTextContent();
-							Cell c = storeValue(row, role, val);
-							c.setCellStyle(csLabel);
+
+//						String arcRole = ld.link.getAttribute("xlink:arcrole");
+						String arcType = ld.link.getTagName();
+						String role = null;
+						String val = null;
+						CellStyle cs = csLabel;
+						String uri = null;
+						String co = null;
+
+						NodeList enl;
+						int sep;
+						CellUpdater u = concat;
+
+//						switch ( arcRole ) {
+						switch ( arcType ) {
+						case "link:labelArc":
+							role = ld.to.getAttribute("xlink:role");
+							val = ld.to.getTextContent();
+//							cs = csLabel;
+							break;
+						case "link:referenceArc":
+							role = ld.to.getAttribute("xlink:role");
+
+							enl = ld.to.getChildNodes();
+							StringBuilder sb = new StringBuilder();
+
+							for (int i = 0; i < enl.getLength(); ++i) {
+								Node item = enl.item(i);
+								if ( item instanceof Element ) {
+									Element ce = (Element) item;
+									String ceVal = ce.getTextContent();
+									if ( !DustUtils.isEmpty(ceVal) ) {
+										String cetn = ce.getTagName();
+										if ( cetn.endsWith(":URI") ) {
+											uri = ceVal;
+										} else {
+											sb.append(cetn).append(": ").append(ceVal).append(", ");
+										}
+									}
+								}
+							}
+							val = sb.toString();
+							break;
+						case "link:presentationArc":
+							if ( ld.to.getAttribute("xlink:href").endsWith(eid) ) {
+								role = "Parent";
+								val = ld.from.getAttribute("xlink:href");
+							} else if ( ld.from.getAttribute("xlink:href").endsWith(eid) ) {
+								co = ld.link.getAttribute("order");
+								role = "Children";
+								val = ld.to.getAttribute("xlink:href");
+							} else {
+								Dust.dumpObs("huh?");
+							}
+
+							break;
+						case "link:definitionArc":
+							role = ld.link.getAttribute("xlink:arcrole");
+							if ( ld.to.getAttribute("xlink:href").endsWith(eid) ) {
+								role = role + " parent";
+								val = ld.from.getAttribute("xlink:href");
+							} else if ( ld.from.getAttribute("xlink:href").endsWith(eid) ) {
+								role = role + " child";
+								val = ld.to.getAttribute("xlink:href");
+							} else {
+								Dust.dumpObs("huh?");
+							}
+
+							break;
+						default:
+							continue;
+						}
+
+						if ( null != role ) {
+							sep = val.indexOf("#");
+							if ( -1 != sep ) {
+								val = val.substring(sep + 1);
+							}
+							
+							if ( null != co ) {
+								val = co + " " + val;
+							}
+							Cell c = storeValue(row, role, val, u);
+							if ( null != cs ) {
+								c.setCellStyle(csLabel);
+							}
+
+							if ( null != uri ) {
+								Hyperlink link = hlpCreate.createHyperlink(Hyperlink.LINK_URL);
+								uri = uri.replace(" ", "%20");
+								link.setAddress(uri);
+								c.setHyperlink(link);
+							}
 						}
 					}
 				}
@@ -246,7 +358,7 @@ class XbrlTaxonomyLoader implements DustStreamXmlLoader.NamespaceProcessor, Dust
 		wb.close();
 	}
 
-	public Cell storeValue(Row row, String colName, String value) {
+	public Cell storeValue(Row row, String colName, String value, CellUpdater updater) {
 		Cell c;
 		int ax = attCols.getIndex(colName);
 
@@ -255,8 +367,14 @@ class XbrlTaxonomyLoader implements DustStreamXmlLoader.NamespaceProcessor, Dust
 			colCount = ax + 1;
 		}
 
-		c = row.createCell(ax);
-		c.setCellValue(value);
+		c = row.getCell(ax);
+
+		if ( null == c ) {
+			c = row.createCell(ax);
+			c.setCellValue(value);
+		} else {
+			c.setCellValue(updater.update(c.getStringCellValue(), value));
+		}
 
 		return c;
 	}
@@ -264,13 +382,16 @@ class XbrlTaxonomyLoader implements DustStreamXmlLoader.NamespaceProcessor, Dust
 	private void addAttCol(String an) {
 		int cw = 0;
 
-		if ( an.startsWith("http:") ) {
+//		if ( an.startsWith("http:") ) 
+		{
 			int sep = an.lastIndexOf("/");
 			if ( -1 != sep ) {
 				an = an.substring(sep + 1);
+				if ( !"deprecatedDateLabel".equals(an) ) {
+					cw = 80 * 256;
+				}
 			}
 
-			cw = 80 * 256;
 		}
 
 		for (Iterator<Sheet> it = wb.sheetIterator(); it.hasNext();) {

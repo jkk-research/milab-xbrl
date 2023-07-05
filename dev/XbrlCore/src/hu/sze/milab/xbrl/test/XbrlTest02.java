@@ -26,6 +26,8 @@ public class XbrlTest02 implements XbrlConsts {
 	private static File in;
 
 	public static void main(String[] args) throws Exception {
+		long ts = System.currentTimeMillis();
+		
 		DustImpl.main(args);
 
 		String data = System.getProperty("user.home") + "/work/xbrl/data";
@@ -42,6 +44,8 @@ public class XbrlTest02 implements XbrlConsts {
 				"EFRAG-ESRS-2022-PoC-Taxonomy", 
 				"IFRSAT-2022-03-24", 
 				});
+		
+		Dust.dumpObs("Process complete in", System.currentTimeMillis() - ts, "msec.");
 	}
 
 	public static void readTaxonomy(String[] args) throws Exception {
@@ -84,7 +88,7 @@ public class XbrlTest02 implements XbrlConsts {
 			
 			taxonomyCollector.dump();
 
-			taxonomyCollector.save(out, taxRoot);
+			taxonomyCollector.save(out, taxRoot + "_refs");
 		}
 	}
 
