@@ -84,11 +84,17 @@ class XbrlTaxonomyLoader implements DustStreamXmlLoader.NamespaceProcessor, Dust
 	@SuppressWarnings({ "unchecked", "rawtypes" })
 	DustUtilsFactory<String, Set<LinkData>> locLinks = new DustUtilsFactory.Simple(true, HashSet.class);
 
-	void setRootFolder(File root) {
+	File root;
+	Map<String, String> uriRewrite;
+	
+	public XbrlTaxonomyLoader(File root, Map<String, String> uriRewrite) {
+		this.root = root;
+		this.uriRewrite = uriRewrite;
+
 		allFiles.clear();
 		addFolder(root);
 
-		Dust.dumpObs("Files to visit in folder", root.getName(), allFiles.size());
+		Dust.dumpObs("Files to visit in folder", root.getName(), allFiles.size());		
 	}
 
 	void addFolder(File dir) {
@@ -129,7 +135,7 @@ class XbrlTaxonomyLoader implements DustStreamXmlLoader.NamespaceProcessor, Dust
 
 		for (String conceptRef : locLinks.keys()) {
 			String[] ref = conceptRef.split("#");
-
+			
 			NamespaceData nsd = nsByUrl.get(ref[0]);
 			if ( null == nsd ) {
 				skipUrl.add(ref[0]);
@@ -148,11 +154,8 @@ class XbrlTaxonomyLoader implements DustStreamXmlLoader.NamespaceProcessor, Dust
 		linkInfo.dump();
 	}
 
-
 	DustUtils.Indexer<String> attCols = new DustUtils.Indexer<String>();
-	private static final String[] KNOWN_ATT_COLS = { "name", "id", "type", "substitutionGroup", "xbrli:periodType",
-			"Parent", "Children",
-			"http://www.xbrl.org/2003/role/label", 
+	private static final String[] KNOWN_ATT_COLS = { "name", "id", "type", "substitutionGroup", "xbrli:periodType", "Parent", "Children", "http://www.xbrl.org/2003/role/label",
 //			"abstract", "nillable", "xbrli:balance", "cyclesAllowed", "roleURI", "arcroleURI",
 //			"http://www.xbrl.org/2003/role/label", "http://www.xbrl.org/2003/role/documentation" 
 	};
@@ -237,7 +240,6 @@ class XbrlTaxonomyLoader implements DustStreamXmlLoader.NamespaceProcessor, Dust
 				if ( null != lds ) {
 					for (LinkData ld : lds) {
 
-//						String arcRole = ld.link.getAttribute("xlink:arcrole");
 						String arcType = ld.link.getTagName();
 						String role = null;
 						String val = null;
@@ -249,12 +251,10 @@ class XbrlTaxonomyLoader implements DustStreamXmlLoader.NamespaceProcessor, Dust
 						int sep;
 						CellUpdater u = concat;
 
-//						switch ( arcRole ) {
 						switch ( arcType ) {
-						case "link:labelArc":
+						case "X link:labelArc":
 							role = ld.to.getAttribute("xlink:role");
 							val = ld.to.getTextContent();
-//							cs = csLabel;
 							break;
 						case "link:referenceArc":
 							role = ld.to.getAttribute("xlink:role");
@@ -314,7 +314,7 @@ class XbrlTaxonomyLoader implements DustStreamXmlLoader.NamespaceProcessor, Dust
 							if ( -1 != sep ) {
 								val = val.substring(sep + 1);
 							}
-							
+
 							if ( null != co ) {
 								val = co + " " + val;
 							}
@@ -371,10 +371,13 @@ class XbrlTaxonomyLoader implements DustStreamXmlLoader.NamespaceProcessor, Dust
 
 		if ( null == c ) {
 			c = row.createCell(ax);
-			c.setCellValue(value);
 		} else {
-			c.setCellValue(updater.update(c.getStringCellValue(), value));
+			value = updater.update(c.getStringCellValue(), value);
 		}
+		if ( value.length() > 32767 ) {
+			value = value.substring(0, 32700) + " ... [truncated!]";
+		}
+		c.setCellValue(value);
 
 		return c;
 	}
@@ -425,7 +428,8 @@ class XbrlTaxonomyLoader implements DustStreamXmlLoader.NamespaceProcessor, Dust
 
 //		Dust.dumpObs("  Reading url", url);
 
-		if ( root.getTagName().endsWith(":schema") ) {
+//		if ( root.getTagName().endsWith(":schema") ) 
+		{
 			NamespaceData nsd = null;
 
 			el = root.getElementsByTagName("*");
@@ -437,11 +441,11 @@ class XbrlTaxonomyLoader implements DustStreamXmlLoader.NamespaceProcessor, Dust
 					if ( null == nsd ) {
 						nsd = new NamespaceData(root);
 						String ns = root.getAttribute("targetNamespace");
-						namespaces.put(ns, nsd);
-
+						if ( !DustUtils.isEmpty(ns) ) {
+							namespaces.put(ns, nsd);
+							Dust.dumpObs("      Registered namespace", ns);
+						}
 						nsByUrl.put(url, nsd);
-
-						Dust.dumpObs("      Registered namespace", ns);
 					}
 
 					nsd.items.put(id, e);
@@ -449,7 +453,9 @@ class XbrlTaxonomyLoader implements DustStreamXmlLoader.NamespaceProcessor, Dust
 			}
 		}
 
-		if ( root.getTagName().endsWith("linkbase") ) {
+		if ( root.getTagName().endsWith("linkbase") )
+
+		{
 //			Dust.dumpObs("      Linkbase found", url);
 
 			Map<String, Element> labeledLinks = new TreeMap<>();
@@ -516,6 +522,20 @@ class XbrlTaxonomyLoader implements DustStreamXmlLoader.NamespaceProcessor, Dust
 
 		if ( !href.contains(":") ) {
 			refUrl = DustUtils.replacePostfix(url, "/", href);
+		} else {
+			for (Map.Entry<String, String> e : uriRewrite.entrySet()) {
+				String prefix = e.getKey();
+				if ( url.startsWith(prefix) ) {
+					File f = new File(root, e.getValue());
+					f = new File(f, url.substring(prefix.length()));
+					try {
+						refUrl = f.toURI().toURL().toString();
+					} catch (Throwable e1) {
+						e1.printStackTrace();
+					}
+					break;
+				}
+			}
 		}
 
 		refUrl = DustUtilsFile.optRemoveUpFromPath(refUrl);

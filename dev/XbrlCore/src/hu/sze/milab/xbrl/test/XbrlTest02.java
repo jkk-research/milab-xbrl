@@ -41,8 +41,9 @@ public class XbrlTest02 implements XbrlConsts {
 
 //		readReports(args);
 		readTaxonomy(new String[] { 
-				"EFRAG-ESRS-2022-PoC-Taxonomy", 
-				"IFRSAT-2022-03-24", 
+//				"EFRAG-ESRS-2022-PoC-Taxonomy", 
+//				"IFRSAT-2022-03-24", 
+				"esef_taxonomy_2022",
 				});
 		
 		Dust.dumpObs("Process complete in", System.currentTimeMillis() - ts, "msec.");
@@ -60,16 +61,10 @@ public class XbrlTest02 implements XbrlConsts {
 			File fRoot = new File(in, taxRoot);
 			File txMeta = new File(fRoot, "META-INF");
 			
-			XbrlTaxonomyLoader taxonomyCollector = new XbrlTaxonomyLoader();
-			taxonomyCollector.setRootFolder(txMeta.getParentFile());
-
 			File fCat = new File(txMeta, "catalog.xml");
 			Document catalog = db.parse(fCat);
 			File fTaxPack = new File(txMeta, "taxonomyPackage.xml");
 			Element taxPack = db.parse(fTaxPack).getDocumentElement();
-			
-			taxonomyCollector.setSeen(fCat, fTaxPack);
-
 
 			Map<String, String> uriRewrite = new TreeMap<>();
 			NodeList nl = catalog.getElementsByTagName("rewriteURI");
@@ -79,6 +74,9 @@ public class XbrlTest02 implements XbrlConsts {
 			}
 			
 			DustStreamXmlLoader xmlLoader = new DustStreamXmlLoader(c);
+			
+			XbrlTaxonomyLoader taxonomyCollector = new XbrlTaxonomyLoader(fRoot, uriRewrite);
+			taxonomyCollector.setSeen(fCat, fTaxPack);
 
 			nl = taxPack.getElementsByTagName("tp:entryPointDocument");
 			for (int ni = 0; ni < nl.getLength(); ++ni ) {
