@@ -23,6 +23,8 @@ import java.util.regex.Pattern;
 import org.json.simple.parser.JSONParser;
 import org.json.simple.parser.ParseException;
 
+import hu.sze.milab.dust.DustException;
+
 @SuppressWarnings({ "rawtypes" })
 public class XbrlFilingManager implements XbrlConsts {
 	public static final String XBRL_ORG_ADDR = "https://filings.xbrl.org";
@@ -51,6 +53,7 @@ public class XbrlFilingManager implements XbrlConsts {
 	Map<String, Map> reports = new TreeMap<>();
 
 	Set<Map> downloaded = new HashSet<>();
+	boolean downloadOnly = true;
 
 	Pattern PT_FXO = Pattern.compile("(?<eid>\\w+)-(?<date>\\d+-\\d+-\\d+)-(?<extra>.*)");
 
@@ -72,7 +75,8 @@ public class XbrlFilingManager implements XbrlConsts {
 			loadReports(resp);
 		}
 
-		if ( doUpdate ) {
+//		if ( doUpdate ) 
+		{
 			File fPing = new File(srcRoot, "ping.json");
 
 			long dPing = TimeUnit.MILLISECONDS.toDays(fPing.exists() ? fPing.lastModified() : 0);
@@ -155,7 +159,7 @@ public class XbrlFilingManager implements XbrlConsts {
 			}
 		}
 
-		System.out.println("Returned count: " + count + ", size of filings: " + filings.size() + ", local report count: " + reports.size());
+		System.out.println("Returned count: " + count + ", size of filings: " + filings.size() + ", local report count: " + reports.size() + ", downloaded: " + downloaded.size());
 	}
 
 	public Map<String, String> getAllEntities(Map<String, String> target, String filter) {
@@ -233,6 +237,14 @@ public class XbrlFilingManager implements XbrlConsts {
 
 		return target;
 	}
+	
+	int segmentSize = 10;
+	int downloadLimit = 1000;
+	long tsStart = -1;
+	long tsSeg = -1;
+	
+	long sizeAll = 0;
+	long sizeSeg = 0;
 
 	public File getReport(Map filing, XbrlReportType repType) throws Exception {
 		File ret = null;
@@ -266,10 +278,37 @@ public class XbrlFilingManager implements XbrlConsts {
 			if ( !remoteFile.exists() ) {
 				url = url.replace(" ", "%20");
 				System.out.println("Accessing file " + fName + " from URL: " + url);
+				
+				if ( -1 == tsSeg ) {
+					tsSeg = System.currentTimeMillis();
+					if ( -1 == tsStart ) {
+						tsStart = tsSeg;
+					}
+				}
+				
 				XbrlUtils.download(url, remoteFile);
+				--downloadLimit;
+				
+				long s = remoteFile.length();
+				sizeAll += s;
+				sizeSeg += s;
+				if ( 0 == (downloadLimit % segmentSize )) {
+					long ts = System.currentTimeMillis();
+					System.out.println("Remaining downloads " + downloadLimit + 
+							", segment speed: " + (sizeSeg / (ts - tsSeg)) + 
+							", total speed: " + (sizeAll / (ts - tsStart))
+						);
+					
+					tsSeg = -1;
+					sizeSeg = 0;
+				}
 				return null;
 			} else {
 				System.out.println("Resolving file from local cache " + fName);
+			}
+			
+			if ( downloadOnly ) {
+				return null;
 			}
 
 			if ( repType == XbrlReportType.Package ) {
@@ -336,6 +375,9 @@ public class XbrlFilingManager implements XbrlConsts {
 //			XbrlUtils.dump(",", true, XbrlUtils.access(lm, AccessCmd.Peek, null, "attributes", ENTITY_NAME), XbrlUtils.access(lm, AccessCmd.Peek, null, "attributes", REPORT_ID));
 
 			File ff = fm.getReport(lm, XbrlReportType.Package);
+			if ( 0 >= fm.downloadLimit ) {
+				DustException.wrap(null, "Download limit exceeded");
+			}
 			if ( null == ff ) {
 				continue;
 			}
