@@ -30,13 +30,13 @@ import hu.sze.milab.dust.Dust;
 import hu.sze.milab.dust.dev.DustDevCounter;
 import hu.sze.milab.dust.stream.DustStreamUtils;
 import hu.sze.milab.dust.stream.xml.DustStreamXmlConsts;
-import hu.sze.milab.dust.stream.xml.DustStreamXmlLoader;
+import hu.sze.milab.dust.stream.xml.DustStreamXmlDocumentGraphLoader;
 import hu.sze.milab.dust.utils.DustUtils;
 import hu.sze.milab.dust.utils.DustUtils.QueueContainer;
 import hu.sze.milab.dust.utils.DustUtilsFactory;
 import hu.sze.milab.dust.utils.DustUtilsFile;
 
-class XbrlTaxonomyLoader implements DustStreamXmlLoader.NamespaceProcessor, DustStreamXmlConsts {
+class XbrlTaxonomyLoader implements DustStreamXmlDocumentGraphLoader.XmlDocumentProcessor, DustStreamXmlConsts {
 
 	interface CellUpdater {
 		String update(String oldVal, String val);
@@ -410,7 +410,7 @@ class XbrlTaxonomyLoader implements DustStreamXmlLoader.NamespaceProcessor, Dust
 	}
 
 	@Override
-	public void namespaceLoaded(Element root, QueueContainer<String> loader) {
+	public void documentLoaded(Element root, QueueContainer<String> loader) {
 		NodeList el;
 
 //		String url = root.getAttribute(XML_ATT_REF);

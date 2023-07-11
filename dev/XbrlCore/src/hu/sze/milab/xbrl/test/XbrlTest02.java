@@ -1,6 +1,7 @@
 package hu.sze.milab.xbrl.test;
 
 import java.io.File;
+import java.io.PrintStream;
 import java.util.Map;
 import java.util.TreeMap;
 
@@ -15,8 +16,10 @@ import org.w3c.dom.NodeList;
 import hu.sze.milab.dust.Dust;
 import hu.sze.milab.dust.brain.DustImpl;
 import hu.sze.milab.dust.stream.DustStreamUrlCache;
-import hu.sze.milab.dust.stream.xml.DustStreamXmlAgent;
-import hu.sze.milab.dust.stream.xml.DustStreamXmlLoader;
+import hu.sze.milab.dust.stream.json.DustStreamJsonAgentParser;
+import hu.sze.milab.dust.stream.json.DustStreamJsonAgentWriter;
+import hu.sze.milab.dust.stream.xml.DustStreamXmlAgentParser;
+import hu.sze.milab.dust.stream.xml.DustStreamXmlDocumentGraphLoader;
 import hu.sze.milab.xbrl.XbrlConsts;
 
 public class XbrlTest02 implements XbrlConsts {
@@ -40,10 +43,14 @@ public class XbrlTest02 implements XbrlConsts {
 		in.mkdirs();
 
 //		readReports(args);
-		readTaxonomy(new String[] { 
+//		readTaxonomy(new String[] { 
 //				"EFRAG-ESRS-2022-PoC-Taxonomy", 
 //				"IFRSAT-2022-03-24", 
-				"esef_taxonomy_2022",
+//				"esef_taxonomy_2022",
+//				});
+		
+		readJsons(new String[] { 
+				"jsonapi_01",
 				});
 		
 		Dust.dumpObs("Process complete in", System.currentTimeMillis() - ts, "msec.");
@@ -73,7 +80,7 @@ public class XbrlTest02 implements XbrlConsts {
 				uriRewrite.put(atts.getNamedItem("uriStartString").getNodeValue(), atts.getNamedItem("rewritePrefix").getNodeValue());
 			}
 			
-			DustStreamXmlLoader xmlLoader = new DustStreamXmlLoader(c);
+			DustStreamXmlDocumentGraphLoader xmlLoader = new DustStreamXmlDocumentGraphLoader(c);
 			
 			XbrlTaxonomyLoader taxonomyCollector = new XbrlTaxonomyLoader(fRoot, uriRewrite);
 			taxonomyCollector.setSeen(fCat, fTaxPack);
@@ -81,7 +88,7 @@ public class XbrlTest02 implements XbrlConsts {
 			nl = taxPack.getElementsByTagName("tp:entryPointDocument");
 			for (int ni = 0; ni < nl.getLength(); ++ni ) {
 				String url = nl.item(ni).getAttributes().getNamedItem("href").getNodeValue();
-				xmlLoader.loadNamespace(txMeta, url, taxonomyCollector, uriRewrite);
+				xmlLoader.loadDocument(txMeta, url, taxonomyCollector, uriRewrite);
 			}
 			
 			taxonomyCollector.dump();
@@ -90,8 +97,45 @@ public class XbrlTest02 implements XbrlConsts {
 		}
 	}
 
+	public static void readJsons(String[] args) throws Exception {
+		DustStreamJsonAgentParser aJson = new DustStreamJsonAgentParser();
+
+		aJson.agentExecAction(MindAction.Init);
+
+		MindHandle target = Dust.createHandle();
+		Dust.access(MIND_ATT_AGENT_SELF, MindAccess.Set, target, MISC_ATT_CONN_TARGET);
+
+//		DustDevAgentDump dump = new DustDevAgentDump();
+//		dump.prefix = "Commit dump";
+
+		DustStreamJsonAgentWriter dump = new DustStreamJsonAgentWriter();
+		dump.hTarget = target;
+		dump.ps = System.out;
+//		dump.ps = new PrintStream(new File(out, "jsonTest.json"));
+
+//		XbrlAgentReportToExcel dump = new XbrlAgentReportToExcel();
+
+		MindHandle listener = Dust.createHandle();
+		Dust.access(listener, MindAccess.Set, dump, BRAIN_ATT_ACTOR_INSTANCE);
+		Dust.access(target, MindAccess.Set, listener, MIND_ATT_KNOWLEDGE_LISTENERS);
+
+		for (String fn : args) {
+			File fIn = new File(in, fn + ".json");
+
+			Dust.access(MIND_ATT_AGENT_SELF, MindAccess.Set, fIn, STREAM_ATT_STREAM_FILE);
+			aJson.agentExecAction(MindAction.Process);
+		}
+
+		aJson.agentExecAction(MindAction.Release);
+
+//		dump.ps.flush();
+//		dump.ps.close();
+
+	}
+	
+	
 	public static void readReports(String[] args) throws Exception {
-		DustStreamXmlAgent aXml = new DustStreamXmlAgent();
+		DustStreamXmlAgentParser aXml = new DustStreamXmlAgentParser();
 
 		aXml.agentExecAction(MindAction.Init);
 

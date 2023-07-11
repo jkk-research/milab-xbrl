@@ -16,11 +16,11 @@ import org.w3c.dom.NodeList;
 
 import hu.sze.milab.dust.Dust;
 import hu.sze.milab.dust.stream.DustStreamUtils;
-import hu.sze.milab.dust.stream.xml.DustStreamXmlLoader;
+import hu.sze.milab.dust.stream.xml.DustStreamXmlDocumentGraphLoader;
 import hu.sze.milab.dust.utils.DustUtils;
 import hu.sze.milab.dust.utils.DustUtils.QueueContainer;
 
-class XbrlTaxonomyToExcel implements DustStreamXmlLoader.NamespaceProcessor {
+class XbrlTaxonomyToExcel implements DustStreamXmlDocumentGraphLoader.XmlDocumentProcessor {
 		DustUtils.Indexer<String> attCols = new DustUtils.Indexer<String>();
 		private static final String[] KNOWN_ATT_COLS = {"name", "id", "type", "substitutionGroup", "xbrli:periodType", "abstract"};
 
@@ -35,7 +35,7 @@ class XbrlTaxonomyToExcel implements DustStreamXmlLoader.NamespaceProcessor {
 		}
 
 		@Override
-		public void namespaceLoaded(Element root, QueueContainer<String> loader) {
+		public void documentLoaded(Element root, QueueContainer<String> loader) {
 			if ( null == wb ) {
 				wb = new XSSFWorkbook();
 				colCount = attCols.getSize();
