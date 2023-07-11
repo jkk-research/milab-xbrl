@@ -1,7 +1,6 @@
 package hu.sze.milab.xbrl.test;
 
 import java.io.File;
-import java.io.PrintStream;
 import java.util.Map;
 import java.util.TreeMap;
 
@@ -17,7 +16,7 @@ import hu.sze.milab.dust.Dust;
 import hu.sze.milab.dust.brain.DustImpl;
 import hu.sze.milab.dust.stream.DustStreamUrlCache;
 import hu.sze.milab.dust.stream.json.DustStreamJsonAgentParser;
-import hu.sze.milab.dust.stream.json.DustStreamJsonAgentWriter;
+import hu.sze.milab.dust.stream.json.DustStreamJsonApiAgentSerializer;
 import hu.sze.milab.dust.stream.xml.DustStreamXmlAgentParser;
 import hu.sze.milab.dust.stream.xml.DustStreamXmlDocumentGraphLoader;
 import hu.sze.milab.xbrl.XbrlConsts;
@@ -108,12 +107,12 @@ public class XbrlTest02 implements XbrlConsts {
 //		DustDevAgentDump dump = new DustDevAgentDump();
 //		dump.prefix = "Commit dump";
 
-		DustStreamJsonAgentWriter dump = new DustStreamJsonAgentWriter();
-		dump.hTarget = target;
-		dump.ps = System.out;
+//		DustStreamJsonAgentWriter dump = new DustStreamJsonAgentWriter();
+//		dump.hTarget = target;
+//		dump.ps = System.out;
 //		dump.ps = new PrintStream(new File(out, "jsonTest.json"));
 
-//		XbrlAgentReportToExcel dump = new XbrlAgentReportToExcel();
+		DustStreamJsonApiAgentSerializer dump = new DustStreamJsonApiAgentSerializer();
 
 		MindHandle listener = Dust.createHandle();
 		Dust.access(listener, MindAccess.Set, dump, BRAIN_ATT_ACTOR_INSTANCE);
