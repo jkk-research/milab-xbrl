@@ -13,7 +13,6 @@ import org.w3c.dom.NamedNodeMap;
 import org.w3c.dom.NodeList;
 
 import hu.sze.milab.dust.Dust;
-import hu.sze.milab.dust.brain.DustImpl;
 import hu.sze.milab.dust.stream.DustStreamUrlCache;
 import hu.sze.milab.dust.stream.json.DustStreamJsonAgentParser;
 import hu.sze.milab.dust.stream.json.DustStreamJsonApiAgentSerializer;
@@ -30,7 +29,7 @@ public class XbrlTest02 implements XbrlConsts {
 	public static void main(String[] args) throws Exception {
 		long ts = System.currentTimeMillis();
 		
-		DustImpl.main(args);
+		Dust.main(args);
 
 		String data = System.getProperty("user.home") + "/work/xbrl/data";
 		dataDir = new File(data);
@@ -115,7 +114,7 @@ public class XbrlTest02 implements XbrlConsts {
 		DustStreamJsonApiAgentSerializer dump = new DustStreamJsonApiAgentSerializer();
 
 		MindHandle listener = Dust.createHandle();
-		Dust.access(listener, MindAccess.Set, dump, BRAIN_ATT_ACTOR_INSTANCE);
+		Dust.access(listener, MindAccess.Set, dump, DUST_ATT_NATIVE_INSTANCE);
 		Dust.access(target, MindAccess.Set, listener, MIND_ATT_KNOWLEDGE_LISTENERS);
 
 		for (String fn : args) {
@@ -151,7 +150,7 @@ public class XbrlTest02 implements XbrlConsts {
 		XbrlAgentReportToExcel dump = new XbrlAgentReportToExcel();
 
 		MindHandle listener = Dust.createHandle();
-		Dust.access(listener, MindAccess.Set, dump, BRAIN_ATT_ACTOR_INSTANCE);
+		Dust.access(listener, MindAccess.Set, dump, DUST_ATT_NATIVE_INSTANCE);
 		Dust.access(target, MindAccess.Set, listener, MIND_ATT_KNOWLEDGE_LISTENERS);
 
 		for (String fn : args) {
