@@ -14,12 +14,13 @@ import org.w3c.dom.NodeList;
 
 import hu.sze.milab.dust.Dust;
 import hu.sze.milab.dust.dev.DustDevConsts;
+import hu.sze.milab.dust.net.DustNetConsts;
 import hu.sze.milab.dust.stream.DustStreamUrlCache;
 import hu.sze.milab.dust.stream.xml.DustStreamXmlAgentParser;
 import hu.sze.milab.dust.stream.xml.DustStreamXmlDocumentGraphLoader;
 import hu.sze.milab.xbrl.XbrlConsts;
 
-public class XbrlTest02 implements XbrlConsts, DustDevConsts {
+public class XbrlTest02 implements XbrlConsts, DustDevConsts, DustNetConsts {
 
 	private static File dataDir;
 	private static File out;
@@ -27,7 +28,7 @@ public class XbrlTest02 implements XbrlConsts, DustDevConsts {
 
 	public static void main(String[] args) throws Exception {
 		long ts = System.currentTimeMillis();
-		
+
 		Dust.main(args);
 
 		String data = System.getProperty("user.home") + "/work/xbrl/data";
@@ -45,13 +46,25 @@ public class XbrlTest02 implements XbrlConsts, DustDevConsts {
 //				"IFRSAT-2022-03-24", 
 //				"esef_taxonomy_2022",
 //				});
-		
-		readJsons(new String[] { 
+
+//		readJsons(new String[] { 
 //				"jsonapi_01",
-				"banks",
-				});
+//				"banks",
+//				});
+
+		startServer(args);
 		
 		Dust.dumpObs("Process complete in", System.currentTimeMillis() - ts, "msec.");
+	}
+
+	public static void startServer(String[] args) throws Exception {
+
+		MindHandle hSrv = Dust.createHandle();
+		Dust.access(hSrv, MindAccess.Set, NET_LOG_SRVJETTY, MIND_ATT_AGENT_LOGIC);
+		Dust.access(hSrv, MindAccess.Set, hSrv, MIND_ATT_KNOWLEDGE_LISTENERS);
+
+		Dust.access(hSrv, MindAccess.Commit, MindAction.Process);
+
 	}
 
 	public static void readTaxonomy(String[] args) throws Exception {
@@ -62,10 +75,10 @@ public class XbrlTest02 implements XbrlConsts, DustDevConsts {
 
 		for (String taxRoot : args) {
 			Dust.dumpObs("Reading taxonomy", taxRoot);
-			
+
 			File fRoot = new File(in, taxRoot);
 			File txMeta = new File(fRoot, "META-INF");
-			
+
 			File fCat = new File(txMeta, "catalog.xml");
 			Document catalog = db.parse(fCat);
 			File fTaxPack = new File(txMeta, "taxonomyPackage.xml");
@@ -77,18 +90,18 @@ public class XbrlTest02 implements XbrlConsts, DustDevConsts {
 				NamedNodeMap atts = nl.item(ni).getAttributes();
 				uriRewrite.put(atts.getNamedItem("uriStartString").getNodeValue(), atts.getNamedItem("rewritePrefix").getNodeValue());
 			}
-			
+
 			DustStreamXmlDocumentGraphLoader xmlLoader = new DustStreamXmlDocumentGraphLoader(c);
-			
+
 			XbrlTaxonomyLoader taxonomyCollector = new XbrlTaxonomyLoader(fRoot, uriRewrite);
 			taxonomyCollector.setSeen(fCat, fTaxPack);
 
 			nl = taxPack.getElementsByTagName("tp:entryPointDocument");
-			for (int ni = 0; ni < nl.getLength(); ++ni ) {
+			for (int ni = 0; ni < nl.getLength(); ++ni) {
 				String url = nl.item(ni).getAttributes().getNamedItem("href").getNodeValue();
 				xmlLoader.loadDocument(txMeta, url, taxonomyCollector, uriRewrite);
 			}
-			
+
 			taxonomyCollector.dump();
 
 			taxonomyCollector.save(out, taxRoot + "_refs");
@@ -96,7 +109,7 @@ public class XbrlTest02 implements XbrlConsts, DustDevConsts {
 	}
 
 	public static void readJsons(String[] args) throws Exception {
-		
+
 //		DustStreamJsonAgentParser aJson = new DustStreamJsonAgentParser();
 //
 //		aJson.agentExecAction(MindAction.Init);
@@ -119,7 +132,7 @@ public class XbrlTest02 implements XbrlConsts, DustDevConsts {
 //		Dust.access(target, MindAccess.Set, listener, MIND_ATT_KNOWLEDGE_LISTENERS);
 
 		Dust.dumpObs("Read JSON in XBRL");
-		
+
 		MindHandle hRead = Dust.createHandle();
 		Dust.access(hRead, MindAccess.Set, STREAM_LOG_JSONAPISERIALIZER, MIND_ATT_AGENT_LOGIC);
 		Dust.access(hRead, MindAccess.Set, hRead, MIND_ATT_KNOWLEDGE_LISTENERS);
@@ -133,7 +146,7 @@ public class XbrlTest02 implements XbrlConsts, DustDevConsts {
 
 		for (String fn : args) {
 			File fIn = new File(in, fn + ".json");
-			
+
 			Dust.access(hRead, MindAccess.Set, fIn, STREAM_ATT_STREAM_FILE);
 			Dust.access(hRead, MindAccess.Commit, MindAction.Process);
 
@@ -147,8 +160,7 @@ public class XbrlTest02 implements XbrlConsts, DustDevConsts {
 //		dump.ps.close();
 
 	}
-	
-	
+
 	public static void readReports(String[] args) throws Exception {
 		DustStreamXmlAgentParser aXml = new DustStreamXmlAgentParser();
 

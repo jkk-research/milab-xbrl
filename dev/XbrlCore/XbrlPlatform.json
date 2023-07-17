@@ -1,0 +1,47 @@
+{
+	"data": [
+		{
+			"type": "hu.sze.milab.MIND:ASP_UNIT",
+			"id": "hu.sze.milab.XBRL:Platform",
+			"relationships": {
+				"hu.sze.milab.MIND:ATT_UNIT_DIALOGS": {
+					"data": [
+						{
+							"type": "hu.sze.milab.MIND:DIALOG",
+							"id": "hu.sze.milab.XBRL:Main"
+						}
+					]
+				}
+			}
+		},
+		{
+			"type": "hu.sze.milab.MIND:ASP_DIALOG",
+			"id": "hu.sze.milab.XBRL:Main",
+			"relationships": {
+				"hu.sze.milab.MISC:ATT_CONN_MEMBERSET": {
+					"data": [
+						{
+							"type": "hu.sze.milab.NET:LOG_SRVJETTY",
+							"id": "hu.sze.milab.XBRL:HttpServer"
+						}
+					]
+				},
+				"hu.sze.milab.MIND:ATT_KNOWLEDGE_TAGS": {
+					"data": [
+						{
+							"type": "hu.sze.milab.MIND:ASP_TAG",
+							"id": "hu.sze.milab.MISC:TAG_GEN_ACTIVE"
+						}
+					]
+				}
+			}
+		},
+		{
+			"type": "hu.sze.milab.NET:LOG_SRVJETTY",
+			"id": "hu.sze.milab.XBRL:HttpServer",
+			"attributes": {
+				"hu.sze.milab.NET:ATT_HOST_PORT": 8080
+			}
+		}
+	]
+}

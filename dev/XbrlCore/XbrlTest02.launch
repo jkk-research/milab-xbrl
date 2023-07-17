@@ -13,6 +13,6 @@
     <booleanAttribute key="org.eclipse.jdt.launching.ATTR_USE_START_ON_FIRST_THREAD" value="true"/>
     <stringAttribute key="org.eclipse.jdt.launching.MAIN_TYPE" value="hu.sze.milab.xbrl.test.XbrlTest02"/>
     <stringAttribute key="org.eclipse.jdt.launching.MODULE_NAME" value="XbrlCore"/>
-    <stringAttribute key="org.eclipse.jdt.launching.PROGRAM_ARGUMENTS" value="in/jsonapi_01.json"/>
+    <stringAttribute key="org.eclipse.jdt.launching.PROGRAM_ARGUMENTS" value="XbrlPlatform.json"/>
     <stringAttribute key="org.eclipse.jdt.launching.PROJECT_ATTR" value="XbrlCore"/>
 </launchConfiguration>
