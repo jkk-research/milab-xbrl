@@ -52,14 +52,14 @@ public class XbrlTest02 implements XbrlConsts, DustDevConsts, DustNetConsts {
 //				"banks",
 //				});
 
-		startServer(args);
+//		startServer(args);
 		
 		Dust.dumpObs("Process complete in", System.currentTimeMillis() - ts, "msec.");
 	}
 
 	public static void startServer(String[] args) throws Exception {
 
-		MindHandle hSrv = Dust.createHandle();
+		MindHandle hSrv = Dust.resolveID(null, null);
 		Dust.access(hSrv, MindAccess.Set, NET_LOG_SRVJETTY, MIND_ATT_AGENT_LOGIC);
 		Dust.access(hSrv, MindAccess.Set, hSrv, MIND_ATT_KNOWLEDGE_LISTENERS);
 
@@ -133,14 +133,14 @@ public class XbrlTest02 implements XbrlConsts, DustDevConsts, DustNetConsts {
 
 		Dust.dumpObs("Read JSON in XBRL");
 
-		MindHandle hRead = Dust.createHandle();
+		MindHandle hRead = Dust.resolveID(null, null);
 		Dust.access(hRead, MindAccess.Set, STREAM_LOG_JSONAPISERIALIZER, MIND_ATT_AGENT_LOGIC);
 		Dust.access(hRead, MindAccess.Set, hRead, MIND_ATT_KNOWLEDGE_LISTENERS);
 
-		MindHandle target = Dust.createHandle();
+		MindHandle target = Dust.resolveID(null, null);
 		Dust.access(hRead, MindAccess.Set, target, MISC_ATT_CONN_TARGET);
 
-		MindHandle listener = Dust.createHandle();
+		MindHandle listener = Dust.resolveID(null, null);
 		Dust.access(listener, MindAccess.Set, DEV_LOG_DUMP, MIND_ATT_AGENT_LOGIC);
 		Dust.access(target, MindAccess.Set, listener, MIND_ATT_KNOWLEDGE_LISTENERS);
 
@@ -166,7 +166,7 @@ public class XbrlTest02 implements XbrlConsts, DustDevConsts, DustNetConsts {
 
 		aXml.agentExecAction(MindAction.Init);
 
-		MindHandle target = Dust.createHandle();
+		MindHandle target = Dust.resolveID(null, null);
 //		Dust.access(MIND_ATT_AGENT_SELF, MindAccess.Set, target, MISC_ATT_CONN_TARGET);
 
 //		DustDevAgentDump dump = new DustDevAgentDump();
@@ -178,7 +178,7 @@ public class XbrlTest02 implements XbrlConsts, DustDevConsts, DustNetConsts {
 
 		XbrlAgentReportToExcel dump = new XbrlAgentReportToExcel();
 
-		MindHandle listener = Dust.createHandle();
+		MindHandle listener = Dust.resolveID(null, null);
 		Dust.access(listener, MindAccess.Set, dump, DUST_ATT_NATIVE_INSTANCE);
 		Dust.access(target, MindAccess.Set, listener, MIND_ATT_KNOWLEDGE_LISTENERS);
 

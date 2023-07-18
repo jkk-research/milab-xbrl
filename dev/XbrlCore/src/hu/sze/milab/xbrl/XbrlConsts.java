@@ -10,10 +10,10 @@ public interface XbrlConsts extends DustMetaConsts, DustStreamXmlConsts {
 		Context, Unit, Fact
 	}
 	
-	public static MindHandle XBRL_UNIT = Dust.createHandle();
+	public static MindHandle XBRL_UNIT = Dust.resolveID(null, null);
 	
-	public static MindHandle XBRL_ASP_REPORT = Dust.createHandle();
-	public static MindHandle XBRL_ATT_REPORT_CONTEXTS = Dust.createHandle();
+	public static MindHandle XBRL_ASP_REPORT = Dust.resolveID(null, null);
+	public static MindHandle XBRL_ATT_REPORT_CONTEXTS = Dust.resolveID(null, null);
 
 
 }
