@@ -9,9 +9,20 @@
 						{
 							"type": "hu.sze.milab.MIND:DIALOG",
 							"id": "hu.sze.milab.XbrlPlatform:MainDialog"
+						},
+						{
+							"type": "hu.sze.milab.MIND:DIALOG",
+							"id": "hu.sze.milab.XbrlPlatform:ReadFilingsDialog"
 						}
 					]
 				}
+			}
+		},
+		{
+			"type": "hu.sze.milab.MIND:AGENT_LOGIC",
+			"id": "hu.sze.milab.XbrlPlatform:ReadFilingsXbrlOrg",
+			"attributes": {
+				"hu.sze.milab.DUST:NATIVE_IMPLEMENTATION": "hu.sze.milab.xbrl.XbrlSourceAgentFilingsXbrlOrg"
 			}
 		},
 		{
@@ -21,29 +32,15 @@
 				"hu.sze.milab.MISC:CONN_MEMBERSET": {
 					"data": [
 						{
-							"type": "hu.sze.milab.NET:SRVJETTY",
+							"type": "hu.sze.milab.MIND:AGENT",
 							"id": "hu.sze.milab.XbrlPlatform:HttpServer"
-						}
-					]
-				},
-				"hu.sze.milab.MIND:KNOWLEDGE_LISTENERS": {
-					"data": {
-						"type": "hu.sze.milab.NET:SRVJETTY",
-						"id": "hu.sze.milab.XbrlPlatform:HttpServer"
-					}
-				},
-				"hu.sze.milab.MIND:KNOWLEDGE_TAGS": {
-					"data": [
-						{
-							"type": "hu.sze.milab.MIND:TAG",
-							"id": "hu.sze.milab.MISC:GEN_ACTIVE"
 						}
 					]
 				}
 			}
 		},
 		{
-			"type": "hu.sze.milab.NET:SRVJETTY",
+			"type": "hu.sze.milab.MIND:AGENT",
 			"id": "hu.sze.milab.XbrlPlatform:HttpServer",
 			"attributes": {
 				"hu.sze.milab.NET:HOST_PORT": 8090
@@ -51,8 +48,84 @@
 			"relationships": {
 				"hu.sze.milab.MIND:AGENT_LOGIC": {
 					"data": {
-						"type": "hu.sze.milab.NET:SRVJETTY",
+						"type": "hu.sze.milab.MIND:LOGIC",
 						"id": "hu.sze.milab.NET:SRVJETTY"
+					}
+				}
+			}
+		},
+		{
+			"type": "hu.sze.milab.MIND:DIALOG",
+			"id": "hu.sze.milab.XbrlPlatform:ReadFilingsDialog",
+			"relationships": {
+				"hu.sze.milab.MISC:CONN_MEMBERSET": {
+					"data": [
+						{
+							"type": "hu.sze.milab.MIND:AGENT",
+							"id": "hu.sze.milab.XbrlPlatform:FilingParser"
+						},
+						{
+							"type": "hu.sze.milab.MIND:MESSAGE",
+							"id": "hu.sze.milab.XbrlPlatform:FilingItem"
+						},
+						{
+							"type": "hu.sze.milab.MIND:AGENT",
+							"id": "hu.sze.milab.XbrlPlatform:FilingItemReader"
+						}
+					]
+				},
+				"hu.sze.milab.MIND:KNOWLEDGE_LISTENERS": {
+					"data": {
+						"type": "hu.sze.milab.MIND:AGENT",
+						"id": "hu.sze.milab.XbrlPlatform:FilingParser"
+					}
+				}
+			}
+		},
+		{
+			"type": "hu.sze.milab.MIND:AGENT",
+			"id": "hu.sze.milab.XbrlPlatform:FilingParser",
+			"attributes": {
+				"hu.sze.milab.STREAM:STREAM_PATH": "in/banks.json"
+			},
+			"relationships": {
+				"hu.sze.milab.MIND:AGENT_LOGIC": {
+					"data": {
+						"type": "hu.sze.milab.MIND:LOGIC",
+						"id": "hu.sze.milab.STREAM:JSONAPISERIALIZER"
+					}
+				},
+				"hu.sze.milab.MISC:CONN_TARGET": {
+					"data": {
+						"type": "hu.sze.milab.MIND:MESSAGE",
+						"id": "hu.sze.milab.XbrlPlatform:FilingItem"
+					}
+				}
+			}
+		},
+		{
+			"type": "hu.sze.milab.MIND:MESSAGE",
+			"id": "hu.sze.milab.XbrlPlatform:FilingItem",
+			"relationships": {
+				"hu.sze.milab.MIND:KNOWLEDGE_LISTENERS": {
+					"data": {
+						"type": "hu.sze.milab.MIND:AGENT",
+						"id": "hu.sze.milab.XbrlPlatform:FilingItemReader"
+					}
+				}
+			}
+		},
+		{
+			"type": "hu.sze.milab.MIND:AGENT",
+			"id": "hu.sze.milab.XbrlPlatform:FilingItemReader",
+			"attributes": {
+				"hu.sze.milab.TEXT:PLAIN_TEXT": "Item read"
+			},
+			"relationships": {
+				"hu.sze.milab.MIND:AGENT_LOGIC": {
+					"data": {
+						"type": "hu.sze.milab.MIND:LOGIC",
+						"id": "hu.sze.milab.XbrlPlatform:ReadFilingsXbrlOrg"
 					}
 				}
 			}
