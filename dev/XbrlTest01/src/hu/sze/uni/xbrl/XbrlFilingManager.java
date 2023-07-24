@@ -75,7 +75,7 @@ public class XbrlFilingManager implements XbrlConsts {
 			loadReports(resp);
 		}
 
-//		if ( doUpdate ) 
+		if ( doUpdate ) 
 		{
 			File fPing = new File(srcRoot, "ping.json");
 
@@ -333,16 +333,13 @@ public class XbrlFilingManager implements XbrlConsts {
 		long t = System.currentTimeMillis();
 		String home = System.getProperty("user.home");
 		XbrlFilingManager fm = new XbrlFilingManager(home + "/work/xbrl/data", false);
+		
+		Map<String, Object> match = new HashMap<>();
 
-//		for (String s : fm.getEntityNames(null, "group")) {
-//			System.out.println(s);
-//		}
-
-//		Map<String, Object> match = new HashMap<>();
-
-//		match.put(ENTITY_NAME, "Budapesti Ingatlan Hasznos");
-//		match.put("country", "HU");
-//		List<Map> fl = fm.getFilings(match, null);
+//	match.put("country", "HU");
+		fm.downloadOnly = false;
+		match.put(ENTITY_NAME, "aviva");
+		List<Map> fl = fm.getFilings(match, null);
 
 //		Set<Map> fl = new HashSet<>();
 //
@@ -360,7 +357,7 @@ public class XbrlFilingManager implements XbrlConsts {
 //		}
 
 //		Set<Map> fl = fm.downloaded;
-		List<Map> fl = fm.getFilings(null, null);
+//		List<Map> fl = fm.getFilings(null, null);
 
 		if ( fl.isEmpty() ) {
 			return;
@@ -433,15 +430,18 @@ public class XbrlFilingManager implements XbrlConsts {
 			System.out.println("   " + f.getAbsolutePath());
 		}
 
-		XbrlTagCoverage listener = new XbrlTagCoverage();
-		listener.readTaxonomy("TaxonomyDefs.xlsx");
+//		XbrlTagExport listener = new XbrlTagExport();
+//		XbrlTagCoverage listener = new XbrlTagCoverage();
+//		listener.readTaxonomy("TaxonomyDefs.xlsx");
 
-		XbrlReportLoader loader = new XbrlReportLoader(listener);
+//		XbrlReportLoader loader = new XbrlReportLoader(listener);
+
+		XbrlReportLoaderDOM loader = new XbrlReportLoaderDOM();
 
 		for (Map.Entry<Map, File> ee : repToRead.entrySet()) {
-			Map key = ee.getKey();
+//			Map key = ee.getKey();
 			File f = ee.getValue();
-			listener.setCurrentFiling(key, f);
+//			listener.setCurrentFiling(key, f);
 			try {
 				loader.load(f);
 			} catch (Throwable e) {
@@ -449,11 +449,13 @@ public class XbrlFilingManager implements XbrlConsts {
 				e.printStackTrace(System.err);
 			}
 		}
+		
+		loader.dump();
 
 //		System.out.println("Dim keys" + listener.cntDimKeys);
 //	listener.writeExcel("TaxonomyCoverageHu.xlsx");
 //		listener.writeExcel("TaxonomyCoverageAll.xlsx");
-		listener.writeExcel("TaxonomyCoverageBanks.xlsx");
+//		listener.writeExcel("TaxonomyCoverageBanks.xlsx");
 
 		System.out.println("Process complete in " + (System.currentTimeMillis() - t) + " msec.");
 	}

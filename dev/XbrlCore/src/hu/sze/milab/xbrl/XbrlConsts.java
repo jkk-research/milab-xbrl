@@ -5,6 +5,9 @@ import hu.sze.milab.dust.DustMetaConsts;
 import hu.sze.milab.dust.stream.xml.DustStreamXmlConsts;
 
 public interface XbrlConsts extends DustMetaConsts, DustStreamXmlConsts {
+	
+	String PREFIX_XBRL = "hu.sze.milab.xbrl.";
+
 
 	enum XbrlInfoType {
 		Context, Unit, Fact

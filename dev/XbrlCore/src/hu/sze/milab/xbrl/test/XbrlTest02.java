@@ -19,6 +19,7 @@ import hu.sze.milab.dust.stream.DustStreamUrlCache;
 import hu.sze.milab.dust.stream.xml.DustStreamXmlAgentParser;
 import hu.sze.milab.dust.stream.xml.DustStreamXmlDocumentGraphLoader;
 import hu.sze.milab.xbrl.XbrlConsts;
+import hu.sze.milab.xbrl.XbrlReportAgentXhtmlReader;
 
 public class XbrlTest02 implements XbrlConsts, DustDevConsts, DustNetConsts {
 
@@ -40,7 +41,9 @@ public class XbrlTest02 implements XbrlConsts, DustDevConsts, DustNetConsts {
 		in = new File("in");
 		in.mkdirs();
 
-//		readReports(args);
+		readReports(new String[] { 
+			"in/volkswagenag/reports/VWAGAbschlussAnhang_IFRS_Konzern-2022-12-31-de.xhtml",
+			});
 //		readTaxonomy(new String[] { 
 //				"EFRAG-ESRS-2022-PoC-Taxonomy", 
 //				"IFRSAT-2022-03-24", 
@@ -164,50 +167,58 @@ public class XbrlTest02 implements XbrlConsts, DustDevConsts, DustNetConsts {
 	public static void readReports(String[] args) throws Exception {
 		DustStreamXmlAgentParser aXml = new DustStreamXmlAgentParser();
 
-		aXml.agentExecAction(MindAction.Init);
+		MindHandle parser = Dust.resolveID(null, null);
+		Dust.access(parser, MindAccess.Set, aXml, DUST_ATT_NATIVE_INSTANCE);
+		Dust.access(parser, MindAccess.Set, parser, MIND_ATT_KNOWLEDGE_LISTENERS);
+		Dust.access(parser, MindAccess.Commit, MindAction.Init);
+//		aXml.agentExecAction(MindAction.Init);
 
 		MindHandle target = Dust.resolveID(null, null);
-//		Dust.access(MIND_ATT_AGENT_SELF, MindAccess.Set, target, MISC_ATT_CONN_TARGET);
+		Dust.access(parser, MindAccess.Set, target, MISC_ATT_CONN_TARGET);
 
-//		DustDevAgentDump dump = new DustDevAgentDump();
-//		dump.prefix = "Commit dump";
+//		DustDevAgentDump processor = new DustDevAgentDump();
+//		processor.prefix = "Commit dump";
 
-//		DustDevAgentXmlWriter dump = new DustDevAgentXmlWriter();
-//		dump.hTarget = target;
-//		dump.ps = new PrintStream(new File(out, "xmlTest.txt"));
+//		DustDevAgentXmlWriter processor = new DustDevAgentXmlWriter();
+//		processor.hTarget = target;
+//		processor.ps = new PrintStream(new File(out, "xmlTest.txt"));
 
-		XbrlAgentReportToExcel dump = new XbrlAgentReportToExcel();
+//		XbrlAgentReportToExcel processor = new XbrlAgentReportToExcel();
+		XbrlReportAgentXhtmlReader processor = new XbrlReportAgentXhtmlReader();
 
 		MindHandle listener = Dust.resolveID(null, null);
-		Dust.access(listener, MindAccess.Set, dump, DUST_ATT_NATIVE_INSTANCE);
+		Dust.access(listener, MindAccess.Set, processor, DUST_ATT_NATIVE_INSTANCE);
+		Dust.access(listener, MindAccess.Set, "out/ReportExport", STREAM_ATT_STREAM_PATH);
 		Dust.access(target, MindAccess.Set, listener, MIND_ATT_KNOWLEDGE_LISTENERS);
 
 		for (String fn : args) {
-			long t = System.currentTimeMillis();
-			File fIn = new File(dataDir, fn);
+//			long t = System.currentTimeMillis();
+			File fIn = new File(fn);
 
-			String outName = fIn.getName();
-			int idx = outName.lastIndexOf(".");
-			outName = "out/" + outName.substring(0, idx + 1) + "xlsx";
+//			String outName = fIn.getName();
+//			int idx = outName.lastIndexOf(".");
+//			outName = "out/" + outName.substring(0, idx + 1) + "xlsx";
 
-			dump.init(target, outName);
+//			processor.init(target, outName);
 
-//			Dust.access(MIND_ATT_AGENT_SELF, MindAccess.Set, fIn, STREAM_ATT_STREAM_FILE);
-			aXml.agentExecAction(MindAction.Process);
+			Dust.access(parser, MindAccess.Set, fIn, STREAM_ATT_STREAM_FILE);
+			Dust.access(parser, MindAccess.Commit, MindAction.Process);
 
-			File f = dump.save();
+//			aXml.agentExecAction(MindAction.Process);
 
-			if ( null == f ) {
-				Dust.dump(" ", false, "No XBRL:", fn, "time:", System.currentTimeMillis() - t, "msec.");
-			} else {
-				Dust.dump(" ", false, "Result:", f.getName(), "input size:", fIn.length(), "bytes, time:", System.currentTimeMillis() - t, "msec.");
-			}
+//			File f = processor.save();
+//
+//			if ( null == f ) {
+//				Dust.processor(" ", false, "No XBRL:", fn, "time:", System.currentTimeMillis() - t, "msec.");
+//			} else {
+//				Dust.processor(" ", false, "Result:", f.getName(), "input size:", fIn.length(), "bytes, time:", System.currentTimeMillis() - t, "msec.");
+//			}
 		}
 
 		aXml.agentExecAction(MindAction.Release);
 
-//		dump.ps.flush();
-//		dump.ps.close();
+//		processor.ps.flush();
+//		processor.ps.close();
 
 	}
 
