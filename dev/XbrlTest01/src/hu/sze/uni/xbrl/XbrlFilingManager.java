@@ -436,7 +436,7 @@ public class XbrlFilingManager implements XbrlConsts {
 
 //		XbrlReportLoader loader = new XbrlReportLoader(listener);
 
-		XbrlReportLoaderDOM loader = new XbrlReportLoaderDOM();
+		XbrlReportLoaderDOM loader = new XbrlReportLoaderDOM("AVIVA");
 
 		for (Map.Entry<Map, File> ee : repToRead.entrySet()) {
 //			Map key = ee.getKey();

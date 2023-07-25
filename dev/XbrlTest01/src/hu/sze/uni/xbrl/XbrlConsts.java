@@ -2,7 +2,9 @@ package hu.sze.uni.xbrl;
 
 import java.io.File;
 
-public interface XbrlConsts {
+import hu.sze.milab.dust.DustConsts;
+
+public interface XbrlConsts extends DustConsts {
 	enum ContainerType {
 		Arr, Map,
 	}
