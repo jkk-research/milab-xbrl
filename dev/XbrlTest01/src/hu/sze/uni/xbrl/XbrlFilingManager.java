@@ -334,12 +334,13 @@ public class XbrlFilingManager implements XbrlConsts {
 		String home = System.getProperty("user.home");
 		XbrlFilingManager fm = new XbrlFilingManager(home + "/work/xbrl/data", false);
 		
-		Map<String, Object> match = new HashMap<>();
-
-//	match.put("country", "HU");
-		fm.downloadOnly = false;
-		match.put(ENTITY_NAME, "aviva");
-		List<Map> fl = fm.getFilings(match, null);
+		
+	Set<Map> fl = fm.downloaded;
+		
+//		fm.downloadOnly = false;
+//		Map<String, Object> match = new HashMap<>();
+//		match.put(ENTITY_NAME, "aviva");
+//		List<Map> fl = fm.getFilings(match, null);
 
 //		Set<Map> fl = new HashSet<>();
 //
@@ -356,7 +357,6 @@ public class XbrlFilingManager implements XbrlConsts {
 //			fl.add(lm);
 //		}
 
-//		Set<Map> fl = fm.downloaded;
 //		List<Map> fl = fm.getFilings(null, null);
 
 		if ( fl.isEmpty() ) {
@@ -436,7 +436,8 @@ public class XbrlFilingManager implements XbrlConsts {
 
 //		XbrlReportLoader loader = new XbrlReportLoader(listener);
 
-		XbrlReportLoaderDOM loader = new XbrlReportLoaderDOM("AVIVA");
+		XbrlReportLoaderDOMOpt loader = new XbrlReportLoaderDOMOpt(4, "1000");
+//		XbrlReportLoaderDOMOpt loader = new XbrlReportLoaderDOMOpt(2, "AVIVA_new");
 
 		for (Map.Entry<Map, File> ee : repToRead.entrySet()) {
 //			Map key = ee.getKey();
