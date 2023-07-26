@@ -43,6 +43,9 @@ public class XbrlReportLoaderDOMOpt implements XbrlConsts {
 	int maxDimNum = 0;
 
 	int dimCount;
+	
+	long cntNum = 0;
+	long cntTxt = 0;
 
 	public XbrlReportLoaderDOMOpt(int dimCount, String name) throws Exception {
 		this.dimCount = dimCount;
@@ -249,6 +252,7 @@ public class XbrlReportLoaderDOMOpt implements XbrlConsts {
 					}
 
 					w.println("\"");
+					++cntTxt;
 					text = true;
 				} else {
 					w = wData;
@@ -303,6 +307,7 @@ public class XbrlReportLoaderDOMOpt implements XbrlConsts {
 
 					StringBuilder sbData = DustUtils.sbAppend(null, ",", true, unit, origVal, fmt, sign, dec, scale, val);
 					w.println(sbLine + "," + sbData);
+					++cntNum;
 				}
 
 				w.flush();
@@ -358,7 +363,7 @@ public class XbrlReportLoaderDOMOpt implements XbrlConsts {
 		if ( 0 < nl.getLength() ) {
 			String val = nl.item(0).getTextContent();
 			if ( !DustUtils.isEmpty(val) ) {
-				return val;
+				return val.trim();
 			}
 		}
 		return null;
@@ -374,12 +379,13 @@ public class XbrlReportLoaderDOMOpt implements XbrlConsts {
 	}
 
 	public void dump() {
-		Dust.dumpObs("COMPLETE", count, "max dim num in context", maxDimNum, "size", totSize, "speed", totSize / (System.currentTimeMillis() - startTS));
 		wData.close();
 		wText.close();
 
 		cntTags.dump("Tags");
 		cntFormats.dump("Formats");
 		cntLang.dump("Languages");
+		
+		Dust.dumpObs("COMPLETE files", count, "numRows", cntNum, "txtRows", cntTxt, "maxCtxDim", maxDimNum, "size", totSize, "speed", totSize / (System.currentTimeMillis() - startTS));
 	}
 }
