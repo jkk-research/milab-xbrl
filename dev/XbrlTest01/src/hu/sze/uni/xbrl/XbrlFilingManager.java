@@ -58,7 +58,11 @@ public class XbrlFilingManager implements XbrlConsts {
 	Pattern PT_FXO = Pattern.compile("(?<eid>\\w+)-(?<date>\\d+-\\d+-\\d+)-(?<extra>.*)");
 
 	public XbrlFilingManager(String repoPath, boolean doUpdate) throws Exception {
-		repoRoot = new File(repoPath);
+		this( new File(repoPath), doUpdate);
+	}
+	
+	public XbrlFilingManager(File repoRoot, boolean doUpdate) throws Exception {
+		this.repoRoot = repoRoot;
 
 		File srcRoot = new File(repoRoot, "sources/xbrl.org");
 

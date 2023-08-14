@@ -21,6 +21,7 @@ import org.w3c.dom.NodeList;
 
 import hu.sze.milab.dust.Dust;
 import hu.sze.milab.dust.utils.DustUtils;
+import hu.sze.milab.xbrl.XbrlCoreUtils;
 
 @SuppressWarnings({ "rawtypes", "unchecked" })
 public class XbrlReportLoaderDOMOpt implements XbrlConsts {
@@ -56,20 +57,20 @@ public class XbrlReportLoaderDOMOpt implements XbrlConsts {
 		wData = new PrintWriter("work/" + name + "_" + ts + "_Data.csv");
 		wText = new PrintWriter("work/" + name + "_" + ts + "_Text.csv");
 
-		String colCommon = "File,EntityId,TagNamespace,TagId,StartDate,EndDate,Instant";
+		String colCommon = "File\tEntityId\tTagNamespace\tTagId\tStartDate\tEndDate\tInstant";
 
 		wData.print(colCommon);
 		wText.print(colCommon);
 
 		for (int i = 1; i <= dimCount; ++i) {
-			String colDim = ",DimName_" + i + ",DimValue_" + i;
+			String colDim = "\tDimName_" + i + "\tDimValue_" + i;
 
 			wData.print(colDim);
 			wText.print(colDim);
 		}
 
-		wData.println(",Unit,OrigValue,Format,Sign,Dec,Scale,RealValue");
-		wText.println(",Language,Format,Value");
+		wData.println("\tUnit\tOrigValue\tFormat\tSign\tDec\tScale\tRealValue");
+		wText.println("\tLanguage\tFormat\tValue");
 
 		wData.flush();
 		wText.flush();
@@ -230,9 +231,9 @@ public class XbrlReportLoaderDOMOpt implements XbrlConsts {
 				PrintWriter w;
 
 				String[] tt = tag.split(":");
-				StringBuilder sbLine = DustUtils.sbAppend(null, ",", true, fName, ctx.get("xbrli:entity"), tt[0], tt[1], ctx.get("xbrli:startDate"), ctx.get("xbrli:endDate"), ctx.get("xbrli:instant"));
+				StringBuilder sbLine = DustUtils.sbAppend(null, "\t", true, fName, ctx.get("xbrli:entity"), tt[0], tt[1], ctx.get("xbrli:startDate"), ctx.get("xbrli:endDate"), ctx.get("xbrli:instant"));
 				for (int i = 1; i <= dimCount; ++i) {
-					DustUtils.sbAppend(sbLine, ",", true, ctx.get("DimName_" + i), ctx.get("DimValue_" + i));
+					DustUtils.sbAppend(sbLine, "\t", true, ctx.get("DimName_" + i), ctx.get("DimValue_" + i));
 				}
 
 				if ( tagName.contains("nonNumeric") ) {
@@ -243,12 +244,12 @@ public class XbrlReportLoaderDOMOpt implements XbrlConsts {
 						cntLang.add(lang);
 					}
 
-					w.print(sbLine + "," + lang + "," + fmt + ",\"" + val.replace("\"", "\"\"").replace("\n", " "));
+					w.print(sbLine + "\t" + lang + "\t" + fmt + "\t\"" + val.replace("\"", "\"\"").replaceAll("\\s+", " "));
 
 					Element txtFrag = e;
 					for (String contID = txtFrag.getAttribute("continuedAt"); !DustUtils.isEmpty(contID); contID = txtFrag.getAttribute("continuedAt")) {
 						txtFrag = continuation.get(contID);
-						w.print(" " + txtFrag.getTextContent().trim().replace("\"", "\"\"").replace("\n", " "));
+						w.print(" " + txtFrag.getTextContent().trim().replace("\"", "\"\"").replaceAll("\\s+", " "));
 					}
 
 					w.println("\"");
@@ -256,46 +257,12 @@ public class XbrlReportLoaderDOMOpt implements XbrlConsts {
 					text = true;
 				} else {
 					w = wData;
-					char decSep = '.';
-					Double dVal = 0.0;
 
 					String scale = e.getAttribute("scale");
 					String dec = e.getAttribute("decimals");
 					String sign = e.getAttribute("sign");
 
-					if ( fmt.contains("zero") ) {
-						dVal = 0.0;
-					} else {
-						if ( !DustUtils.isEmpty(val) ) {
-							if ( fmt.contains("comma") ) {
-								decSep = ',';
-							}
-
-							StringBuilder sbVal = new StringBuilder();
-
-							for (int i = 0; i < val.length(); ++i) {
-								char c = val.charAt(i);
-
-								if ( Character.isDigit(c) || (('-' == c) && (0 == i)) || (c == decSep) ) {
-									sbVal.append((c == decSep) ? '.' : c);
-								}
-							}
-
-							try {
-								dVal = Double.valueOf(sbVal.toString());
-							} catch (Throwable ttt) {
-								Dust.dumpObs("ERROR parsing number from", val, "format", fmt, "converted to", sbVal);
-							}
-
-							if ( !DustUtils.isEmpty(scale) ) {
-								dVal *= Math.pow(10, Double.valueOf(scale));
-							}
-
-							if ( "-".equals(sign) ) {
-								dVal = -dVal;
-							}
-						}
-					}
+					Double dVal = XbrlCoreUtils.convertToDouble(val, fmt, scale, sign);
 
 					String origVal = "\"" + val + "\"";
 					val = df.format(dVal);
@@ -305,7 +272,7 @@ public class XbrlReportLoaderDOMOpt implements XbrlConsts {
 						val = val.replace("-.", "-0.");
 					}
 
-					StringBuilder sbData = DustUtils.sbAppend(null, ",", true, unit, origVal, fmt, sign, dec, scale, val);
+					StringBuilder sbData = DustUtils.sbAppend(null, "\t", true, unit, origVal, fmt, sign, dec, scale, val);
 					w.println(sbLine + "," + sbData);
 					++cntNum;
 				}
@@ -345,6 +312,8 @@ public class XbrlReportLoaderDOMOpt implements XbrlConsts {
 
 		Dust.dumpObs("  All ix content", fc, "formats", fmtCnt, "process time", System.currentTimeMillis() - ts1);
 	}
+
+
 
 	public void testMatch(Map tf, String factId, String attId, String val) {
 		if ( DustUtils.isEmpty(attId) || DustUtils.isEmpty(val) ) {

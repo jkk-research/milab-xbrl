@@ -1,13 +1,10 @@
 package hu.sze.uni.http;
 
-import java.io.IOException;
 import java.io.PrintWriter;
+import java.util.Map;
 import java.util.Properties;
 
-import javax.servlet.ServletException;
 import javax.servlet.http.HttpServlet;
-import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpServletResponse;
 
 import org.eclipse.jetty.server.HttpConfiguration;
 import org.eclipse.jetty.server.HttpConnectionFactory;
@@ -20,6 +17,10 @@ import org.eclipse.jetty.servlet.ServletContextHandler;
 import org.eclipse.jetty.servlet.ServletHolder;
 import org.eclipse.jetty.util.ssl.SslContextFactory;
 
+import hu.sze.milab.dust.Dust;
+import hu.sze.milab.dust.DustConsts.MindAccess;
+
+@SuppressWarnings("rawtypes") 
 public class DustHttpServerJetty extends DustHttpServerBase {
 	enum Commands {
 		stop, info,
@@ -100,28 +101,14 @@ public class DustHttpServerJetty extends DustHttpServerBase {
 	}
 
 	protected void initHandlers() {
-		addServlet("/admin/*", new ProcessorWrapperServlet() {
+		addServlet("/admin/*", new DustHttpServlet() {
 			private static final long serialVersionUID = 1L;
 
 			@Override
-			protected void service(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
-				super.service(request, response);
-				String str;
-//    			str = request.getQueryString();
-//    			str = request.getContextPath();
-//    			str = request.getPathTranslated();
-//    			str = request.getRequestURI();
-//    			str = request.getServletPath();
-//    			str = request.getRequestURL().toString();
-				str = request.getPathInfo();
-				if ( null != str ) {
-					int idx = str.lastIndexOf("/");
-					if ( -1 != idx ) {
-						str = str.substring(idx+1).toLowerCase();
-					}
-				}
+			protected void processRequest(Map data) {
 
 				Commands cmd;
+				String str = Dust.access(data, MindAccess.Peek, Commands.info.name(), ServletData.Command);
 				try {
 					cmd = Commands.valueOf(str);
 				} catch (Throwable e) {
@@ -166,8 +153,7 @@ public class DustHttpServerJetty extends DustHttpServerBase {
 					}
 					sb.append("</ul>");
 
-					PrintWriter out = response.getWriter();
-
+					PrintWriter out = Dust.access(data, MindAccess.Peek, null, ServletData.Writer);
 					out.println(sb.toString());
 
 					break;
@@ -176,21 +162,10 @@ public class DustHttpServerJetty extends DustHttpServerBase {
 
 			}
 		});
-
-		addServlet("/*", new ProcessorWrapperServlet() {
-			private static final long serialVersionUID = 1L;
-
-			@Override
-			protected void service(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
-				super.service(request, response);
-
-				response.getOutputStream();
-			}
-		});
 	}
 
 	@Override
-	protected void addServlet(String path, HttpServlet servlet) {
+	public void addServlet(String path, HttpServlet servlet) {
 		if ( null == ctxHandler ) {
 			ctxHandler = new ServletContextHandler();
 			ctxHandler.setContextPath("/*");
@@ -204,50 +179,5 @@ public class DustHttpServerJetty extends DustHttpServerBase {
 		DustHttpServerJetty srv = new DustHttpServerJetty();
 		srv.activeInit();
 	}
-
-	// private HashSessionIdManager getSessionIdManager() {
-	// if (null == sessionIdManager) {
-	// sessionIdManager = new HashSessionIdManager();
-	// jetty.setSessionIdManager(sessionIdManager);
-	// }
-	//
-	// return sessionIdManager;
-	// }
-
-	// public void initHandlers() throws Exception {
-	// AbstractHandler h = new AbstractHandler() {
-	// public void handle(String target, Request baseRequest, HttpServletRequest
-	// request, HttpServletResponse response)
-	// throws IOException, ServletException {
-	//
-	// response.setCharacterEncoding(CHARSET_UTF8);
-	// response.setContentType(CONTENT_JSON);
-	//
-	// response.setStatus(HttpServletResponse.SC_OK);
-	// baseRequest.setHandled(true);
-	//
-	// DustPersistentStorageJsonSingle st = new
-	// DustPersistentStorageJsonSingle(null);
-	//
-	// st.writer = response.getWriter();
-	//
-	// DustPersistence.commit(st);
-	//
-	//// InputStream is = new FileInputStream("output/temp/TestSingle.json");
-	////
-	//// OutputStream outStream = response.getwOutputStream();
-	////
-	//// byte[] buffer = new byte[8 * 1024];
-	//// int bytesRead;
-	//// while ((bytesRead = is.read(buffer)) != -1) {
-	//// outStream.write(buffer, 0, bytesRead);
-	//// }
-	////
-	//// is.close();
-	// }
-	// };
-	//
-	// handlers.addHandler(h);
-	// }
 
 }
