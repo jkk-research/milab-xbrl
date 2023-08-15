@@ -273,7 +273,7 @@ public class XbrlReportLoaderDOMOpt implements XbrlConsts {
 					}
 
 					StringBuilder sbData = DustUtils.sbAppend(null, "\t", true, unit, origVal, fmt, sign, dec, scale, val);
-					w.println(sbLine + "," + sbData);
+					w.println(sbLine + "\t" + sbData);
 					++cntNum;
 				}
 

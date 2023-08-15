@@ -105,7 +105,7 @@ public class DustHttpServerJetty extends DustHttpServerBase {
 			private static final long serialVersionUID = 1L;
 
 			@Override
-			protected void processRequest(Map data) {
+			protected void processRequest(Map data) throws Exception {
 
 				Commands cmd;
 				String str = Dust.access(data, MindAccess.Peek, Commands.info.name(), ServletData.Command);
@@ -153,7 +153,7 @@ public class DustHttpServerJetty extends DustHttpServerBase {
 					}
 					sb.append("</ul>");
 
-					PrintWriter out = Dust.access(data, MindAccess.Peek, null, ServletData.Writer);
+					PrintWriter out = getWriter(data);
 					out.println(sb.toString());
 
 					break;
