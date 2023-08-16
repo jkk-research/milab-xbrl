@@ -56,7 +56,7 @@ public class XbrlFilingManager implements XbrlConsts {
 	JSONParser parser = new JSONParser();
 
 	Map<String, Map> entities;
-	Map<String, Map> reports = new TreeMap<>();
+//	Map<String, Map> reports = new TreeMap<>();
 	Map<String, Map> reportData = new TreeMap<>();
 
 	Set<Map> downloaded = new HashSet<>();
@@ -78,6 +78,8 @@ public class XbrlFilingManager implements XbrlConsts {
 		if ( !srcRoot.exists() ) {
 			srcRoot.mkdirs();
 		}
+		
+		System.out.println("Starting filing manager in folder " + srcRoot.getCanonicalPath());
 
 		File updates = new File(srcRoot, "updates");
 		if ( !updates.exists() ) {
@@ -87,6 +89,8 @@ public class XbrlFilingManager implements XbrlConsts {
 		allReports = new File(srcRoot, ALL_REPORTS);
 
 		if ( allReports.exists() ) {
+			System.out.println("Reading all reports from " + allReports.getCanonicalPath());
+
 			reportData = (Map<String, Map>) parser.parse(new FileReader(allReports));
 
 			if ( null == entities ) {
@@ -107,7 +111,6 @@ public class XbrlFilingManager implements XbrlConsts {
 					entities.put(eid, mapE);
 				}
 			}
-
 		} else {
 			for (File resp : updates.listFiles(FF_JSON)) {
 				loadReports(resp);
@@ -124,17 +127,23 @@ public class XbrlFilingManager implements XbrlConsts {
 
 			if ( 0 < (dNow - dPing) ) {
 				String url = MessageFormat.format(FMT_API, 1);
+				
+				System.out.println("Ping for new data URL: " + url);
+
 				XbrlUtils.download(url, fPing);
 
 				Object ret = parser.parse(new FileReader(fPing));
 				long count = XbrlUtils.access(ret, AccessCmd.Peek, 0L, "meta", "count");
-				long diff = count - reports.size();
+				long diff = count - reportData.size();
 
 				if ( 0 < diff ) {
 					SimpleDateFormat fmt = new SimpleDateFormat("YYYY-MM-dd");
 					String fName = fmt.format(new Date(System.currentTimeMillis())) + ".json";
 					File f = new File(updates, fName);
 					String u2 = MessageFormat.format(FMT_API, diff + 1);
+					
+					System.out.println("Get update URL: " + u2);
+
 					XbrlUtils.download(u2, f);
 					loadReports(f);
 					saveFile = true;
@@ -142,6 +151,7 @@ public class XbrlFilingManager implements XbrlConsts {
 			}
 
 			if ( saveFile ) {
+				System.out.println("Updating all data: " + allReports.getCanonicalPath());
 				FileWriter fw = new FileWriter(allReports);
 				JSONValue.writeJSONString(reportData, fw);
 				fw.flush();
@@ -191,25 +201,25 @@ public class XbrlFilingManager implements XbrlConsts {
 				XbrlUtils.access(fAtts, AccessCmd.Set, localDir, LOCAL_DIR);
 				if ( new File(repoRoot, localDir).exists() ) {
 //					System.out.println("Downloaded: " + localDir);
-					downloaded.add(filing);
+					downloaded.add(fAtts);
 				}
 
 				sb = XbrlUtils.sbAppend(null, IDSEP, true, XBRL_ENTITYID_LEI, eid, date, XBRL_SOURCE_FILINGS, extra);
 				String internalId = sb.toString();
 				XbrlUtils.access(fAtts, AccessCmd.Set, internalId, REPORT_ID);
 
-				Map old = reports.get(internalId);
-				if ( null != old ) {
-					System.out.println(old.get("id") + "\t" + XbrlUtils.access(old, AccessCmd.Peek, null, "attributes", "fxo_id") + "\t" + filing.get("id") + "\t" + xoid);
-				} else {
-					reports.put(internalId, filing);
-				}
+//				Map old = reports.get(internalId);
+//				if ( null != old ) {
+//					System.out.println(old.get("id") + "\t" + XbrlUtils.access(old, AccessCmd.Peek, null, "attributes", "fxo_id") + "\t" + filing.get("id") + "\t" + xoid);
+//				} else {
+//					reports.put(internalId, filing);
+//				}
 
 				reportData.put(internalId, fAtts);
 			}
 		}
 
-		System.out.println("Returned count: " + count + ", size of filings: " + filings.size() + ", local report count: " + reports.size() + ", downloaded: " + downloaded.size());
+		System.out.println("Returned count: " + count + ", size of filings: " + filings.size() + ", local report count: " + reportData.size() + ", downloaded: " + downloaded.size());
 	}
 
 	public Map<String, String> getAllEntities(Map<String, String> target, String filter) {
@@ -249,16 +259,14 @@ public class XbrlFilingManager implements XbrlConsts {
 		return target;
 	}
 
-	public ArrayList<Map> getFilings(Map<String, Object> match, ArrayList<Map> target) {
+	public ArrayList<Map> getReports(Map<String, Object> match, ArrayList<Map> target) {
 		if ( null == target ) {
 			target = new ArrayList<>();
 		} else {
 			target.clear();
 		}
 
-		for (Map f : reports.values()) {
-			Map atts = XbrlUtils.access(f, AccessCmd.Peek, null, "attributes");
-
+		for (Map atts : reportData.values()) {
 			if ( null != match ) {
 				for (Map.Entry<String, Object> me : match.entrySet()) {
 					Object cond = me.getValue();
@@ -281,7 +289,7 @@ public class XbrlFilingManager implements XbrlConsts {
 			}
 
 			if ( null != atts ) {
-				target.add(f);
+				target.add(atts);
 			}
 		}
 
@@ -297,9 +305,9 @@ public class XbrlFilingManager implements XbrlConsts {
 	long sizeSeg = 0;
 
 	public File getReport(Map filing, XbrlReportType repType) throws Exception {
-		String repUrl = XbrlUtils.access(filing, AccessCmd.Peek, null, "attributes", (repType == XbrlReportType.Json) ? "json_url" : "package_url");
+		String repUrl = XbrlUtils.access(filing, AccessCmd.Peek, null, (repType == XbrlReportType.Json) ? "json_url" : "package_url");
 
-		return (null == repUrl) ? null : getReport(repUrl, XbrlUtils.access(filing, AccessCmd.Peek, null, "attributes", LOCAL_DIR), repType);
+		return (null == repUrl) ? null : getReport(repUrl, XbrlUtils.access(filing, AccessCmd.Peek, null, LOCAL_DIR), repType);
 	}
 
 	File findReportToLoad(File ff) {

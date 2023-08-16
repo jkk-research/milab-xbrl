@@ -19,7 +19,6 @@ import hu.sze.milab.dust.Dust;
 import hu.sze.milab.dust.utils.DustUtils;
 import hu.sze.milab.xbrl.XbrlCoreUtils;
 
-@SuppressWarnings({ "rawtypes", "unchecked" })
 public class XbrlReportLoaderToJson implements XbrlConsts {
 
 	DocumentBuilderFactory dbf;
@@ -31,15 +30,7 @@ public class XbrlReportLoaderToJson implements XbrlConsts {
 	public void load(File f, PrintStream w) throws Exception {
 		df.setMaximumFractionDigits(8);
 
-		String fName = f.getName();
-		Dust.dumpObs("Reading", fName);
-
-//		Map<String, Map> facts = null;
-//		File fTest = new File("work/" + DustUtils.replacePostfix(fName, ".", "json"));
-//		if ( fTest.exists() ) {
-//			Map root = (Map) new JSONParser().parse(new FileReader(fTest));
-//			facts = (Map<String, Map>) root.get("facts");
-//		}
+		Dust.dumpObs("Reading", f.getCanonicalPath());
 
 		if ( null == dbf ) {
 			dbf = DocumentBuilderFactory.newInstance();
@@ -47,6 +38,8 @@ public class XbrlReportLoaderToJson implements XbrlConsts {
 
 		DocumentBuilder db = dbf.newDocumentBuilder();
 		Document doc = db.parse(f);
+		
+		int dimCount = 0;
 
 		Element eHtml = doc.getDocumentElement();
 
@@ -90,6 +83,10 @@ public class XbrlReportLoaderToJson implements XbrlConsts {
 							++dimIdx;
 							cd.put("DimName_" + dimIdx, dim);
 							cd.put("DimValue_" + dimIdx, dVal);
+							
+							if ( dimIdx > dimCount ) {
+								dimCount = dimIdx;
+							}
 						}
 					}
 				}
@@ -121,18 +118,15 @@ public class XbrlReportLoaderToJson implements XbrlConsts {
 			Dust.dumpObs("  EMPTY units???");
 		}
 
-		int fc = 0;
-		int fmtCnt = 0;
 		for (int idx = 0; idx < nodeCount; ++idx) {
 			Element e = (Element) nl.item(idx);
 			String tag = e.getAttribute("name");
 
-			String factId = e.getAttribute("id");
+//			String factId = e.getAttribute("id");
 			String ctxId = e.getAttribute("contextRef");
 
 			if ( !DustUtils.isEmpty(ctxId) ) {
 				String tagName = e.getTagName();
-				++fc;
 
 				Map<String, String> ctx = contexts.get(ctxId.trim());
 				if ( null == ctx ) {
@@ -151,28 +145,19 @@ public class XbrlReportLoaderToJson implements XbrlConsts {
 				}
 
 				String fmt = e.getAttribute("format");
-				if ( !DustUtils.isEmpty(fmt) ) {
-					++fmtCnt;
-				}
 
 				String val = e.getTextContent().trim();
-				boolean text = false;
 
 				String[] tt = tag.split(":");
-				StringBuilder sbLine = DustUtils.sbAppend(null, "\t", true, fName, ctx.get("xbrli:entity"), tt[0], tt[1], ctx.get("xbrli:startDate"), ctx.get("xbrli:endDate"), ctx.get("xbrli:instant"));
-//				for (int i = 1; i <= dimCount; ++i) {
-//					DustUtils.sbAppend(sbLine, "\t", true, ctx.get("DimName_" + i), ctx.get("DimValue_" + i));
-//				}
+				StringBuilder sbLine = DustUtils.sbAppend(null, "\t", true, ctx.get("xbrli:entity"), tt[0], tt[1], ctx.get("xbrli:startDate"), ctx.get("xbrli:endDate"), ctx.get("xbrli:instant"));
+				for (int i = 1; i <= dimCount; ++i) {
+					DustUtils.sbAppend(sbLine, "\t", true, ctx.get("DimName_" + i), ctx.get("DimValue_" + i));
+				}
 
 				if ( tagName.contains("nonNumeric") ) {
-//					w = wText;
-
 					String lang = e.getAttribute("xml:lang");
-//					if ( !DustUtils.isEmpty(lang) ) {
-//						cntLang.add(lang);
-//					}
 
-					w.print(sbLine + "\t" + lang + "\t" + fmt + "\t\"" + val.replace("\"", "\"\"").replaceAll("\\s+", " "));
+					w.print("txt\t" + sbLine + "\t" + lang + "\t" + fmt + "\t\"" + val.replace("\"", "\"\"").replaceAll("\\s+", " "));
 
 					Element txtFrag = e;
 					for (String contID = txtFrag.getAttribute("continuedAt"); !DustUtils.isEmpty(contID); contID = txtFrag.getAttribute("continuedAt")) {
@@ -181,10 +166,7 @@ public class XbrlReportLoaderToJson implements XbrlConsts {
 					}
 
 					w.println("\"");
-					text = true;
 				} else {
-//					w = wData;
-
 					String scale = e.getAttribute("scale");
 					String dec = e.getAttribute("decimals");
 					String sign = e.getAttribute("sign");
@@ -200,32 +182,15 @@ public class XbrlReportLoaderToJson implements XbrlConsts {
 					}
 
 					StringBuilder sbData = DustUtils.sbAppend(null, "\t", true, unit, origVal, fmt, sign, dec, scale, val);
-					w.println(sbLine + "\t" + sbData);
+					w.println("num\t" + sbLine + "\t" + sbData);
 				}
 
 				w.flush();
-
 			}
 		}
-
-
 	}
 
-
-
-	public void testMatch(Map tf, String factId, String attId, String val) {
-		if ( DustUtils.isEmpty(attId) || DustUtils.isEmpty(val) ) {
-			return;
-		}
-
-		Object testVal = tf.get(attId);
-
-		if ( !DustUtils.isEqual(val, testVal) ) {
-			Dust.dumpObs("  Test mismatch", factId, attId, "local", val, "json", testVal);
-		}
-	}
-
-	public String getInfo(Element e, String tagName) {
+	private String getInfo(Element e, String tagName) {
 		NodeList nl = e.getElementsByTagName(tagName);
 		if ( 0 < nl.getLength() ) {
 			String val = nl.item(0).getTextContent();
@@ -236,7 +201,7 @@ public class XbrlReportLoaderToJson implements XbrlConsts {
 		return null;
 	}
 
-	public boolean getInfo(Map<String, String> cd, Element e, String tagName) {
+	private boolean getInfo(Map<String, String> cd, Element e, String tagName) {
 		String val = getInfo(e, tagName);
 		if ( !DustUtils.isEmpty(val) ) {
 			cd.put(tagName, val);

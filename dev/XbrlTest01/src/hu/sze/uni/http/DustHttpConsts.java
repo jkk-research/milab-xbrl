@@ -9,6 +9,7 @@ public interface DustHttpConsts {
 	String CONTENT_ZIP = "application/zip";
 	String CONTENT_TEXT = "text/plain";
 	String CONTENT_HTML = "text/html";
+	String CONTENT_CSV = "text/csv";
 
 	int NO_PORT_SET = -1;
 
