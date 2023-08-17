@@ -6,7 +6,6 @@ import java.io.FileReader;
 import java.io.OutputStream;
 import java.io.PrintWriter;
 import java.nio.file.Files;
-import java.util.ArrayList;
 import java.util.Map;
 import java.util.Map.Entry;
 import java.util.regex.Matcher;
@@ -138,140 +137,107 @@ public class XbrlTestPortal implements XbrlConsts {
 			String lDir = Dust.access(rep, MindAccess.Peek, null, XbrlFilingManager.LOCAL_DIR);
 			String url = Dust.access(rep, MindAccess.Peek, null, "package_url");
 
-			File f = filings.getReport(url, lDir, XbrlReportType.Data);
-
 			HttpServletResponse resp = Dust.access(data, MindAccess.Peek, null, ServletData.Response);
-
 			resp.setContentType(CONTENT_HTML);
-						
-			try (BufferedReader br = new BufferedReader(new FileReader(f))) {
-				
-				ArrayList<String> nums = new ArrayList<>();
-				ArrayList<String> txts = new ArrayList<>();
-
-				for (String line; (line = br.readLine()) != null;) {
-					int ti = line.indexOf("\t");
-					if ( -1 != ti ) {
-						ArrayList<String> t = line.startsWith("num") ? nums : txts;
-						t.add(line.substring(ti +1));
-					}
-				}
-				
-				PrintWriter w = getWriter(data);
-				
-				w.print("<html lang=\"en-US\">\n"
-						+ "<head>\n"
-						+ "<title>Data content of report " + rep.get("fxo_id") + "</title>\n"
-						+ "\n"
-						+ "<style>\n"
-						+ "table, th, td {\n"
-						+ "  border: 1px solid black;\n"
-						+ "}"
-						+ "</style>\n"
-						+ "</head>\n"
-						+ "<body>");
-				
-				w.println("<h1>Report info</h1> <table >\n" 
-						+ "	<thead>\n" 
-						+ "		<tr>\n" 
-						+ "			<th>Key</th>\n" 
-						+ "			<th>Value</th>\n"
-						+ "		</tr>\n" 
-						+ "	</thead>\n" 
-						+ "	<tbody>");
-				
-				for ( Object ri : rep.entrySet() ) {
-					Map.Entry re = (Entry) ri;
-					w.println("<tr><td>" + re.getKey() + "</td><td>" + re.getValue() + "</td></tr>");
-				}
-				
-				w.println(
-						"	</tbody>\n" 
-					+ "</table>");
 			
+			PrintWriter w = getWriter(data);
+			
+			w.print("<html lang=\"en-US\">\n"
+					+ "<head>\n"
+					+ "<title>Data content of report " + rep.get("fxo_id") + "</title>\n"
+					+ "\n"
+					+ "<style>\n"
+					+ "table, th, td {\n"
+					+ "  border: 1px solid black;\n"
+					+ "}"
+					+ "</style>\n"
+					+ "</head>\n"
+					+ "<body>");
+			
+			w.println("<h1>Report info</h1> <table >\n" 
+					+ "	<thead>\n" 
+					+ "		<tr>\n" 
+					+ "			<th>Key</th>\n" 
+					+ "			<th>Value</th>\n"
+					+ "		</tr>\n" 
+					+ "	</thead>\n" 
+					+ "	<tbody>");
+			
+			for ( Object ri : rep.entrySet() ) {
+				Map.Entry re = (Entry) ri;
+				w.println("<tr><td>" + re.getKey() + "</td><td>" + re.getValue() + "</td></tr>");
+			}
+			
+			w.println(
+					"	</tbody>\n" 
+				+ "</table>");
+		
+						
+			File f;
+			
+			f = filings.getReport(url, lDir, XbrlReportType.ContentVal);
 
-				if ( !nums.isEmpty() ) {
-					int dc = ( nums.get(0).split("\t").length - 13 ) /2;
-					
-					w.println("<h1>Numeric values</h1> <table style=\"width:100%\">\n" 
-							+ "	<thead>\n" 
-							+ "		<tr>\n" 
-							+ "			<th>Entity</th>\n" 
-							+ "			<th>Taxonomy</th>\n" 
-							+ "			<th>Concept</th>\n" 
-							+ "			<th>Period Start</th>\n"
-							+ "			<th>Period End</th>\n" 
-							+ "			<th>Instant</th>\n"); 
-					
-					for ( int i = 1; i <= dc; ++i ) {
-						w.println(
-									"			<th>Axis " + i + "</th>\n" 
-								+ "			<th>Dim " + i + "</th>\n"); 
-					}
-					
-					w.println("	<th>Unit</th>\n" 
-							+ "			<th>Orig Value</th>\n"
-							+ "			<th>Format</th>\n" 
-							+ "			<th>Sign</th>\n" 
-							+ "			<th>Decimals</th>\n" 
-							+ "			<th>Scale</th>\n" 
-							+ "			<th>Value</th>\n" 
-							+ "		</tr>\n" 
-							+ "	</thead>\n" 
-							+ "	<tbody>");
-					
-					for ( String l : nums ) {
-						String tl = l.replaceAll("\t", "</td><td>");
+			try (BufferedReader br = new BufferedReader(new FileReader(f))) {
+				boolean first = true;
+				
+				for (String line; (line = br.readLine()) != null;) {
+					if ( first ) {
+						first = false;
+						
+						String tl = line.replaceAll("\t", "</th><th>");
+						
+						w.println("<h1>All values</h1> <table style=\"width:100%\">\n	<thead>\n"); 
+						
+						w.println("<tr><th>" + tl + "</th></tr>");
+						
+						w.println("</thead>\n	<tbody>");
+
+					} else {
+						String tl = line.replaceAll("\t", "</td><td>");
 						w.println("<tr><td>" + tl + "</td></tr>");
 					}
-					
+				}
+				if ( !first ) {
 					w.println(
 							"	</tbody>\n" 
 						+ "</table>");
+				}
+			}
+					
+			f = filings.getReport(url, lDir, XbrlReportType.ContentTxt);
+
+			try (BufferedReader br = new BufferedReader(new FileReader(f))) {
+				boolean first = true;
+				
+				for (String line; (line = br.readLine()) != null;) {
+					if ( first ) {
+						first = false;
+						String tl = line.replaceAll("\t", "</th><th>");
+											
+						w.println("<h1>Text values</h1> <table style=\"width:100%\">\n	<thead>\n"); 
+						
+						w.println("<tr><th>" + tl + "</th></tr>");
+						
+						w.println("</thead>\n	<tbody>");
+					} else {
+						String tl = line.replaceAll("\t", "</td><td>");
+						w.println("<tr><td>" + tl + "</td></tr>");
+					}
 				}
 				
-				if ( !txts.isEmpty() ) {
-					int dc = ( txts.get(0).split("\t").length - 9 ) /2;
-					
-					w.println("<h1>Text values</h1> <table style=\"width:100%\">\n" 
-							+ "	<thead>\n" 
-							+ "		<tr>\n" 
-							+ "			<th>Entity</th>\n" 
-							+ "			<th>Taxonomy</th>\n" 
-							+ "			<th>Concept</th>\n" 
-							+ "			<th>Period Start</th>\n"
-							+ "			<th>Period End</th>\n" 
-							+ "			<th>Instant</th>\n"); 
-					
-					for ( int i = 1; i <= dc; ++i ) {
-						w.println(
-									"			<th>Axis " + i + "</th>\n" 
-								+ "			<th>Dim " + i + "</th>\n"); 
-					}
-					
-					w.println("	<th>Language</th>\n"
-							+ "			<th>Format</th>\n" 
-							+ "			<th style=\"width:100%\">Value</th>\n" 
-							+ "		</tr>\n" 
-							+ "	</thead>\n" 
-							+ "	<tbody>");
-					
-					for ( String l : txts ) {
-						String tl = l.replaceAll("\t", "</td><td>");
-						w.println("<tr><td>" + tl + "</td></tr>");
-					}
-					
+				if ( !first ) {
 					w.println(
 							"	</tbody>\n" 
 						+ "</table>");
 				}
-
-				w.println(
-						"	</body>\n" 
-					+ "</html>");
-
-				w.flush();
 			}
+			
+			w.println(
+					"	</body>\n" 
+				+ "</html>");
+
+			w.flush();
+			
 		}
 	};
 
@@ -312,21 +278,24 @@ public class XbrlTestPortal implements XbrlConsts {
 				fn += ("_" + ct + ".csv");
 				resp.setHeader("Content-Disposition", "attachment; filename=" + fn);
 				cType = CONTENT_CSV + "; filename=" + fn;
+				
+				repType = "txt".equals(ct) ? XbrlReportType.ContentTxt : XbrlReportType.ContentVal;
 
 				url = Dust.access(rep, MindAccess.Peek, null, "package_url");
-				File f = filings.getReport(url, lDir, XbrlReportType.Data);
-				try (BufferedReader br = new BufferedReader(new FileReader(f))) {
-					PrintWriter w = getWriter(data);
-
-					for (String line; (line = br.readLine()) != null;) {
-						if ( line.startsWith(ct) ) {
-							w.println(line.substring(line.indexOf("\t") + 1));
-						}
-					}
-
-					w.flush();
-				}
-				return;
+//				File f = filings.getReport(url, lDir, XbrlReportType.Data);
+//				try (BufferedReader br = new BufferedReader(new FileReader(f))) {
+//					PrintWriter w = getWriter(data);
+//
+//					for (String line; (line = br.readLine()) != null;) {
+//						if ( line.startsWith(ct) ) {
+//							w.println(line.substring(line.indexOf("\t") + 1));
+//						}
+//					}
+//
+//					w.flush();
+//				}
+				break;
+//				return;
 			}
 
 			if ( null != repType ) {

@@ -1,10 +1,9 @@
 package hu.sze.milab.xbrl;
 
-import hu.sze.milab.dust.Dust;
 import hu.sze.milab.dust.utils.DustUtils;
 
 public class XbrlCoreUtils implements XbrlConsts {
-	
+
 	public static Double convertToDouble(String val, String fmt, String scale, String sign) {
 		char decSep = '.';
 		Double dVal = 0.0;
@@ -28,17 +27,13 @@ public class XbrlCoreUtils implements XbrlConsts {
 
 					if ( Character.isDigit(c) || (('-' == c) && (0 == i)) || (c == decSep) ) {
 						sbVal.append((c == decSep) ? '.' : c);
-					} else if ( unitSep && Character.isLetter(c)) {
+					} else if ( unitSep && Character.isLetter(c) ) {
 						sbVal.append('.');
 						unitSep = false;
 					}
 				}
 
-				try {
-					dVal = Double.valueOf(sbVal.toString());
-				} catch (Throwable ttt) {
-					Dust.dumpObs("ERROR parsing number from", val, "format", fmt, "converted to", sbVal);
-				}
+				dVal = Double.valueOf(sbVal.toString());
 
 				if ( !DustUtils.isEmpty(scale) ) {
 					dVal *= Math.pow(10, Double.valueOf(scale));

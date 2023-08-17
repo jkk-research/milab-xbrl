@@ -3,7 +3,6 @@ package hu.sze.uni.xbrl;
 import java.io.File;
 import java.io.PrintStream;
 import java.text.DecimalFormat;
-import java.text.SimpleDateFormat;
 import java.util.Map;
 import java.util.TreeMap;
 
@@ -23,11 +22,11 @@ public class XbrlReportLoaderToJson implements XbrlConsts {
 
 	DocumentBuilderFactory dbf;
 
-	DecimalFormat df = new DecimalFormat("#");
-	SimpleDateFormat fmtTimestamp = new SimpleDateFormat(FMT_TIMESTAMP);
+//	SimpleDateFormat fmtTimestamp = new SimpleDateFormat(FMT_TIMESTAMP);
 
 
 	public void load(File f, PrintStream w) throws Exception {
+		DecimalFormat df = new DecimalFormat("#");
 		df.setMaximumFractionDigits(8);
 
 		Dust.dumpObs("Reading", f.getCanonicalPath());

@@ -6,7 +6,6 @@ import java.io.FileReader;
 import java.io.FileWriter;
 import java.io.FilenameFilter;
 import java.io.IOException;
-import java.io.PrintStream;
 import java.text.MessageFormat;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
@@ -64,8 +63,8 @@ public class XbrlFilingManager implements XbrlConsts {
 
 	Pattern PT_FXO = Pattern.compile("(?<eid>\\w+)-(?<date>\\d+-\\d+-\\d+)-(?<extra>.*)");
 
-	XbrlReportLoaderToJson xhtmlLoader;
-	
+//	XbrlReportLoaderToJson xhtmlLoader;
+
 	public XbrlFilingManager(String repoPath, boolean doUpdate) throws Exception {
 		this(new File(repoPath), doUpdate);
 	}
@@ -78,7 +77,7 @@ public class XbrlFilingManager implements XbrlConsts {
 		if ( !srcRoot.exists() ) {
 			srcRoot.mkdirs();
 		}
-		
+
 		System.out.println("Starting filing manager in folder " + srcRoot.getCanonicalPath());
 
 		File updates = new File(srcRoot, "updates");
@@ -127,7 +126,7 @@ public class XbrlFilingManager implements XbrlConsts {
 
 			if ( 0 < (dNow - dPing) ) {
 				String url = MessageFormat.format(FMT_API, 1);
-				
+
 				System.out.println("Ping for new data URL: " + url);
 
 				XbrlUtils.download(url, fPing);
@@ -141,7 +140,7 @@ public class XbrlFilingManager implements XbrlConsts {
 					String fName = fmt.format(new Date(System.currentTimeMillis())) + ".json";
 					File f = new File(updates, fName);
 					String u2 = MessageFormat.format(FMT_API, diff + 1);
-					
+
 					System.out.println("Get update URL: " + u2);
 
 					XbrlUtils.download(u2, f);
@@ -343,15 +342,28 @@ public class XbrlFilingManager implements XbrlConsts {
 //		String repDir = XbrlUtils.access(filing, AccessCmd.Peek, null, "attributes", LOCAL_DIR);
 		File dir = new File(repoRoot, repDir);
 		dir.mkdirs();
-		
-		File fLoaded = null;
 
-		if ( repType == XbrlReportType.Data ) {
-			fLoaded = new File(dir, "ReportData.txt");
+		File fLoaded = null;
+		String pf;
+
+		switch ( repType ) {
+		case ContentVal:
+			pf = XbrlReportLoaderDomBase.POSTFIX_VAL;
+			break;
+		case ContentTxt:
+			pf = XbrlReportLoaderDomBase.POSTFIX_TXT;
+			break;
+		default:
+			pf = null;
+			break;
+		}
+
+		if ( null != pf ) {
+			fLoaded = new File(dir, "Report" + pf);
 			if ( fLoaded.isFile() ) {
 				return fLoaded;
 			}
-			
+
 			repType = XbrlReportType.Package;
 		}
 
@@ -410,7 +422,7 @@ public class XbrlFilingManager implements XbrlConsts {
 					System.err.println("Unzip error with file " + remoteFile);
 					e.printStackTrace(System.err);
 				}
-				
+
 			} else {
 				ret = remoteFile;
 			}
@@ -420,19 +432,9 @@ public class XbrlFilingManager implements XbrlConsts {
 
 		if ( null != fLoaded ) {
 			File fRep = findReportToLoad(ret);
-			
+
 			if ( null != fRep ) {
-				if ( null == xhtmlLoader ) {
-					xhtmlLoader = new XbrlReportLoaderToJson();
-				}
-				
-				PrintStream ps = new PrintStream(fLoaded);
-				
-				xhtmlLoader.load(fRep, ps);
-				
-				ps.flush();
-				ps.close();		
-				
+				XbrlReportLoaderDomBase.createSplitCsv(fRep, dir, "Report", 200);
 				ret = fLoaded;
 			}
 		}

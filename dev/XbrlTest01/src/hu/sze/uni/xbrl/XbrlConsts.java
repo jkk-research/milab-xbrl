@@ -18,7 +18,7 @@ public interface XbrlConsts extends DustConsts {
 	}
 
 	enum XbrlReportType {
-		Json, Package, Zip, Data,
+		Json, Package, Zip, ContentVal, ContentTxt,
 	}
 
 	enum XbrlReportFormat {
