@@ -63,6 +63,17 @@ public abstract class DustHttpServlet extends HttpServlet implements DustHttpCon
 			
 			response.setStatus(HttpServletResponse.SC_OK);
 		} catch (Throwable t) {
+			try {
+				getWriter(data).close();
+			} catch (Throwable e) {
+				e.printStackTrace();
+			}
+			try {
+				getOutStream(data).close();
+			} catch (Throwable e) {
+				e.printStackTrace();
+			}
+			
 			throw new ServletException("Quick and dirty exception handling", t);
 		}
 	}

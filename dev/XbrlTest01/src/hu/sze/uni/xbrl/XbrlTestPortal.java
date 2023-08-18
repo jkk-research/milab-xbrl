@@ -8,26 +8,75 @@ import java.io.PrintWriter;
 import java.nio.file.Files;
 import java.util.Map;
 import java.util.Map.Entry;
+import java.util.TreeMap;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 import javax.servlet.http.HttpServletResponse;
+
+import org.mvel2.MVEL;
 
 import hu.sze.milab.dust.Dust;
 import hu.sze.milab.dust.utils.DustUtils;
 import hu.sze.uni.http.DustHttpServerJetty;
 import hu.sze.uni.http.DustHttpServlet;
 
-@SuppressWarnings("rawtypes")
+@SuppressWarnings({ "rawtypes", "unchecked" })
 public class XbrlTestPortal implements XbrlConsts {
+
+	private static final Pattern PT_DATE_ONLY = Pattern.compile("(\\d+-\\d+-\\d+).*");
+
+	enum ListColumns {
+		Country("country"), PeriodEnd("period_end"), Entity(XbrlFilingManager.ENTITY_NAME), DateAdded("date_added"), Report(XbrlFilingManager.REPORT_ID), CsvVal(XbrlFilingManager.REPORT_ID),
+		CsvTxt(XbrlFilingManager.REPORT_ID), Zip("package_url"), Json("json_url"), ChkErr("error_count"), ChkWarn("warning_count"), ChkInc("inconsistency_count");
+
+		public final String colName;
+
+		private ListColumns(String colName) {
+			this.colName = colName;
+		}
+
+		static Map load(Map from, Map to) {
+			if ( null == to ) {
+				to = new TreeMap();
+			} else {
+				to.clear();
+			}
+
+			Object repId = from.get(XbrlFilingManager.REPORT_ID);
+
+			for (ListColumns lc : values()) {
+				Object val = from.get(lc.colName);
+
+				switch ( lc ) {
+				case DateAdded:
+					Matcher m = PT_DATE_ONLY.matcher((String) val);
+					if ( m.matches() ) {
+						val = m.group(1);
+					}
+					break;
+				case CsvVal:
+				case CsvTxt:
+					val = "<a href=\"/bin?type=csv&ct=" + lc + "&id=" + val + "\">" + lc + "</a>";
+					break;
+				case Zip:
+				case Json:
+					val = DustUtils.isEmpty((String)val) ? " - " : "<a href=\"/bin?type=" + lc.colName + "&id=" + repId + "\">" + lc + "</a>";
+					break;
+				default:
+					break;
+				}
+
+				to.put(lc.name(), val);
+			}
+
+			return to;
+		}
+
+	}
 
 	private File dataRoot;
 	private XbrlFilingManager filings;
-
-//	private static final String[] URL_NAMES = { 
-//			"package_url",
-////			"report_url", 
-//			"json_url", };
 
 	private DustHttpServlet srvReportList = new DustHttpServlet() {
 		private static final long serialVersionUID = 1L;
@@ -50,75 +99,48 @@ public class XbrlTestPortal implements XbrlConsts {
 					+ "</style>\n"
 					+ "</head>\n"
 					+ "<body>");
+			//@formatter:on
 
-			out.println("<table>\n" 
-					+ "	<thead>\n" 
-					+ "		<tr>\n" 
-					+ "			<th>Country</th>\n" 
-					+ "			<th>Period Ending</th>\n" 
-					+ "			<th>Entity</th>\n" 
-					+ "			<th>Date Added</th>\n"
-					+ "			<th>Content</th>\n" 
-					+ "			<th>CSV Num</th>\n" 
-					+ "			<th>CSV Txt</th>\n" 
-					+ "			<th>Zip</th>\n"
-					+ "			<th>Json</th>\n" 
-					+ "			<th>E</th>\n" 
-					+ "			<th>W</th>\n" 
-					+ "			<th>I</th>\n" 
-					+ "		</tr>\n" 
-					+ "	</thead>\n" 
-					+ "	<tbody>");
-		//@formatter:on
+			out.println("<table>\n	<thead>\n	<tr>\n");
+			for (ListColumns lc : ListColumns.values()) {
+				out.println("			<th>" + lc + "</th>\n");
+			}
+			out.println(" </tr>\n	</thead>\n <tbody>");
+			
+			Map rep = null;
+			
+			Object expr = MVEL.compileExpression("Country.equalsIgnoreCase(\"hu\") ");
+			
+			for (Map repSrc : filings.reportData.values()) {
+				rep = ListColumns.load(repSrc, rep);
+				
+//				Boolean test = (Boolean) MVEL.executeExpression(expr, rep);
+//				
+//				if ( !test ) {
+//					continue;
+//				}
 
-			Pattern ptDateOnly = Pattern.compile("(\\d+-\\d+-\\d+).*");
+				
+				out.println("<tr>\n");
 
-			for (Map rep : filings.reportData.values()) {
-				Object repId = rep.get(XbrlFilingManager.REPORT_ID);
-
-				String da = (String) rep.get("date_added");
-
-				Matcher m = ptDateOnly.matcher(da);
-				if ( m.matches() ) {
-					da = m.group(1);
+				for (ListColumns lc : ListColumns.values()) {
+					Object val = rep.get(lc.name());
+					
+					switch ( lc ) {
+					case Report:
+						val = "<a href=\"/report/" + val + "\">" + val + "</a>";
+						break;
+						default:
+							break;
+					}
+					
+					out.println("			<td>" + val + "</td>\n");
 				}
 
-			//@formatter:off
-				out.println(
-							"		<tr>\n" 
-						+ "			<td >" + rep.get("country") + "</td>\n" 
-						+ "			<td >" + rep.get("period_end") + "</td>\n" 
-						+ "			<td >" + rep.get(XbrlFilingManager.ENTITY_NAME) + "</td>\n"
-						+ "			<td >" + da + "</td>\n" 
-						+ "			<td ><a href=\"/report/" + repId + "\">" + repId + "</a></td>\n"
-						+ "			<td ><a href=\"/bin?type=csv&ct=num&id=" + repId + "\">CSV Num</a></td>\n"
-						+ "			<td ><a href=\"/bin?type=csv&ct=txt&id=" + repId + "\">CSV Txt</a></td>\n");
-			//@formatter:on
-
-				String addr;
-				addr = (String) rep.get("package_url");
-				out.println("			<td >" + (DustUtils.isEmpty(addr) ? " - " : "<a href=\"/bin?type=package_url&id=" + repId + "\">Zip</a>") + "</td>\n");
-				addr = (String) rep.get("json_url");
-				out.println("			<td >" + (DustUtils.isEmpty(addr) ? " - " : "<a href=\"/bin?type=json_url&id=" + repId + "\">JSON</a>") + "</td>\n");
-
-				//@formatter:off
-
-				out.println(
-							"			<td >" + rep.get("error_count") + "</td>\n" 
-						+ "			<td >" + rep.get("warning_count") + "</td>\n" 
-						+ "			<td >" + rep.get("inconsistency_count") + "</td>\n" 
-						+ "		</tr>");
-			//@formatter:on
-
+				out.println(" </tr>\n");
 			}
 
-		//@formatter:off
-			out.println(
-					"	</tbody>\n" 
-				+ "</table>"
-				+	"	</body>\n" 
-				+ "</html>");
-		//@formatter:on
+			out.println("	</tbody>\n</table>\n</body>\n</html>");
 
 			Dust.access(data, MindAccess.Set, CONTENT_HTML, ServletData.ContentType);
 		}
@@ -139,57 +161,38 @@ public class XbrlTestPortal implements XbrlConsts {
 
 			HttpServletResponse resp = Dust.access(data, MindAccess.Peek, null, ServletData.Response);
 			resp.setContentType(CONTENT_HTML);
-			
+
 			PrintWriter w = getWriter(data);
-			
-			w.print("<html lang=\"en-US\">\n"
-					+ "<head>\n"
-					+ "<title>Data content of report " + rep.get("fxo_id") + "</title>\n"
-					+ "\n"
-					+ "<style>\n"
-					+ "table, th, td {\n"
-					+ "  border: 1px solid black;\n"
-					+ "}"
-					+ "</style>\n"
-					+ "</head>\n"
-					+ "<body>");
-			
-			w.println("<h1>Report info</h1> <table >\n" 
-					+ "	<thead>\n" 
-					+ "		<tr>\n" 
-					+ "			<th>Key</th>\n" 
-					+ "			<th>Value</th>\n"
-					+ "		</tr>\n" 
-					+ "	</thead>\n" 
-					+ "	<tbody>");
-			
-			for ( Object ri : rep.entrySet() ) {
+
+			w.print("<html lang=\"en-US\">\n" + "<head>\n" + "<title>Data content of report " + rep.get("fxo_id") + "</title>\n"
+					+ "<style>\n" + "table, th, td {\n" + "  border: 1px solid black;\n"
+					+ "}" + "</style>\n" + "</head>\n" + "<body>");
+
+			w.println("<h1>Report info</h1> <table >\n	<thead>\n		<tr>\n			<th>Key</th>\n			<th>Value</th>\n		</tr>\n	</thead>\n	<tbody>");
+
+			for (Object ri : rep.entrySet()) {
 				Map.Entry re = (Entry) ri;
 				w.println("<tr><td>" + re.getKey() + "</td><td>" + re.getValue() + "</td></tr>");
 			}
-			
-			w.println(
-					"	</tbody>\n" 
-				+ "</table>");
-		
-						
+
+			w.println("	</tbody>\n" + "</table>");
+
 			File f;
-			
+
 			f = filings.getReport(url, lDir, XbrlReportType.ContentVal);
 
 			try (BufferedReader br = new BufferedReader(new FileReader(f))) {
 				boolean first = true;
-				
+
 				for (String line; (line = br.readLine()) != null;) {
 					if ( first ) {
 						first = false;
-						
+
+						w.println("<h1>All values</h1> <table style=\"width:100%\">\n	<thead>\n");
+
 						String tl = line.replaceAll("\t", "</th><th>");
-						
-						w.println("<h1>All values</h1> <table style=\"width:100%\">\n	<thead>\n"); 
-						
 						w.println("<tr><th>" + tl + "</th></tr>");
-						
+
 						w.println("</thead>\n	<tbody>");
 
 					} else {
@@ -198,46 +201,40 @@ public class XbrlTestPortal implements XbrlConsts {
 					}
 				}
 				if ( !first ) {
-					w.println(
-							"	</tbody>\n" 
-						+ "</table>");
+					w.println("	</tbody>\n" + "</table>");
 				}
 			}
-					
+
 			f = filings.getReport(url, lDir, XbrlReportType.ContentTxt);
 
 			try (BufferedReader br = new BufferedReader(new FileReader(f))) {
 				boolean first = true;
-				
+
 				for (String line; (line = br.readLine()) != null;) {
 					if ( first ) {
 						first = false;
+
+						w.println("<h1>Text values</h1> <table style=\"width:100%\">\n	<thead>\n");
+
 						String tl = line.replaceAll("\t", "</th><th>");
-											
-						w.println("<h1>Text values</h1> <table style=\"width:100%\">\n	<thead>\n"); 
-						
 						w.println("<tr><th>" + tl + "</th></tr>");
-						
+
 						w.println("</thead>\n	<tbody>");
 					} else {
 						String tl = line.replaceAll("\t", "</td><td>");
 						w.println("<tr><td>" + tl + "</td></tr>");
 					}
 				}
-				
+
 				if ( !first ) {
-					w.println(
-							"	</tbody>\n" 
-						+ "</table>");
+					w.println("	</tbody>\n" + "</table>");
 				}
 			}
-			
-			w.println(
-					"	</body>\n" 
-				+ "</html>");
+
+			w.println("	</body>\n" + "</html>");
 
 			w.flush();
-			
+
 		}
 	};
 
@@ -278,24 +275,11 @@ public class XbrlTestPortal implements XbrlConsts {
 				fn += ("_" + ct + ".csv");
 				resp.setHeader("Content-Disposition", "attachment; filename=" + fn);
 				cType = CONTENT_CSV + "; filename=" + fn;
-				
-				repType = "txt".equals(ct) ? XbrlReportType.ContentTxt : XbrlReportType.ContentVal;
+
+				repType = ListColumns.CsvTxt.name().equals(ct) ? XbrlReportType.ContentTxt : XbrlReportType.ContentVal;
 
 				url = Dust.access(rep, MindAccess.Peek, null, "package_url");
-//				File f = filings.getReport(url, lDir, XbrlReportType.Data);
-//				try (BufferedReader br = new BufferedReader(new FileReader(f))) {
-//					PrintWriter w = getWriter(data);
-//
-//					for (String line; (line = br.readLine()) != null;) {
-//						if ( line.startsWith(ct) ) {
-//							w.println(line.substring(line.indexOf("\t") + 1));
-//						}
-//					}
-//
-//					w.flush();
-//				}
 				break;
-//				return;
 			}
 
 			if ( null != repType ) {
