@@ -247,6 +247,10 @@ public abstract class XbrlReportLoaderDomBase implements XbrlConsts {
 			loadErr = tl;
 		} finally {
 			loadComplete(xbrlElements, loadErr);
+			
+			if ( null != loadErr ) {
+				throw (Exception) loadErr;
+			}
 		}
 	}
 

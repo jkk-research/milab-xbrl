@@ -96,7 +96,7 @@ public class XbrlFilingManager implements XbrlConsts {
 				entities = new TreeMap<>();
 			}
 
-			for (Map.Entry<String, Map> ee : reportData.entrySet()) {
+			for (Map.Entry<String, Map> ee : getReportData().entrySet()) {
 				Map ea = ee.getValue();
 
 				String en = (String) ea.get(ENTITY_NAME);
@@ -133,7 +133,7 @@ public class XbrlFilingManager implements XbrlConsts {
 
 				Object ret = parser.parse(new FileReader(fPing));
 				long count = XbrlUtils.access(ret, AccessCmd.Peek, 0L, "meta", "count");
-				long diff = count - reportData.size();
+				long diff = count - getReportData().size();
 
 				if ( 0 < diff ) {
 					SimpleDateFormat fmt = new SimpleDateFormat("YYYY-MM-dd");
@@ -152,13 +152,17 @@ public class XbrlFilingManager implements XbrlConsts {
 			if ( saveFile ) {
 				System.out.println("Updating all data: " + allReports.getCanonicalPath());
 				FileWriter fw = new FileWriter(allReports);
-				JSONValue.writeJSONString(reportData, fw);
+				JSONValue.writeJSONString(getReportData(), fw);
 				fw.flush();
 				fw.close();
 			}
 		}
 	}
 
+	public void setDownloadOnly(boolean downloadOnly) {
+		this.downloadOnly = downloadOnly;
+	}
+	
 	public void loadReports(File fAll) throws IOException, ParseException, FileNotFoundException {
 		Object allFilings = parser.parse(new FileReader(fAll));
 
@@ -198,7 +202,7 @@ public class XbrlFilingManager implements XbrlConsts {
 				StringBuilder sb = XbrlUtils.sbAppend(null, File.separator, true, "reports", date.substring(0, 4), XBRL_SOURCE_FILINGS, XbrlUtils.getHashName(eid), extra);
 				String localDir = sb.toString();
 				XbrlUtils.access(fAtts, AccessCmd.Set, localDir, LOCAL_DIR);
-				if ( new File(repoRoot, localDir).exists() ) {
+				if ( new File(getRepoRoot(), localDir).exists() ) {
 //					System.out.println("Downloaded: " + localDir);
 					downloaded.add(fAtts);
 				}
@@ -214,11 +218,11 @@ public class XbrlFilingManager implements XbrlConsts {
 //					reports.put(internalId, filing);
 //				}
 
-				reportData.put(internalId, fAtts);
+				getReportData().put(internalId, fAtts);
 			}
 		}
 
-		System.out.println("Returned count: " + count + ", size of filings: " + filings.size() + ", local report count: " + reportData.size() + ", downloaded: " + downloaded.size());
+		System.out.println("Returned count: " + count + ", size of filings: " + filings.size() + ", local report count: " + getReportData().size() + ", downloaded: " + downloaded.size());
 	}
 
 	public Map<String, String> getAllEntities(Map<String, String> target, String filter) {
@@ -265,7 +269,7 @@ public class XbrlFilingManager implements XbrlConsts {
 			target.clear();
 		}
 
-		for (Map atts : reportData.values()) {
+		for (Map atts : getReportData().values()) {
 			if ( null != match ) {
 				for (Map.Entry<String, Object> me : match.entrySet()) {
 					Object cond = me.getValue();
@@ -309,7 +313,7 @@ public class XbrlFilingManager implements XbrlConsts {
 		return (null == repUrl) ? null : getReport(repUrl, XbrlUtils.access(filing, AccessCmd.Peek, null, LOCAL_DIR), repType);
 	}
 
-	File findReportToLoad(File ff) {
+	public File findReportToLoad(File ff) {
 		File repDir = XbrlUtils.searchByName(ff, "reports");
 
 		if ( null == repDir ) {
@@ -324,7 +328,7 @@ public class XbrlFilingManager implements XbrlConsts {
 					int d = fn.lastIndexOf('.');
 					String type = fn.substring(d + 1).toUpperCase();
 
-					if ( "XHTML".equals(type) ) {
+					if ( "XHTML".equals(type) || "HTML".equals(type) ) {
 						return fRep;
 					}
 				}
@@ -340,7 +344,7 @@ public class XbrlFilingManager implements XbrlConsts {
 //		String eId = XbrlUtils.access(filing, AccessCmd.Peek, null, "attributes", ENTITY_ID);
 //		File dir = XbrlUtils.getHashDir(repoRoot, eId);
 //		String repDir = XbrlUtils.access(filing, AccessCmd.Peek, null, "attributes", LOCAL_DIR);
-		File dir = new File(repoRoot, repDir);
+		File dir = new File(getRepoRoot(), repDir);
 		dir.mkdirs();
 
 		File fLoaded = null;
@@ -571,5 +575,13 @@ public class XbrlFilingManager implements XbrlConsts {
 //		listener.writeExcel("TaxonomyCoverageBanks.xlsx");
 
 		System.out.println("Process complete in " + (System.currentTimeMillis() - t) + " msec.");
+	}
+
+	public Map<String, Map> getReportData() {
+		return reportData;
+	}
+
+	public File getRepoRoot() {
+		return repoRoot;
 	}
 }

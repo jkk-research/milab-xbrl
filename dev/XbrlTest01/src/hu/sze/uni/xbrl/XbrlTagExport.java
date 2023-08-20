@@ -21,6 +21,7 @@ public class XbrlTagExport implements XbrlConsts, XbrlListener {
 		System.out.println("Reading file: " + fRep.getAbsolutePath());
 	}
 
+	@SuppressWarnings("unused")
 	@Override
 	public void handleXbrlInfo(XbrlInfoType type, Map info) {
 		switch ( type ) {

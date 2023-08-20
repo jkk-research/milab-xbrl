@@ -1,3 +1,312 @@
+=== 20230820 ====
+
+Total count, 7414, errors, 0, space to free, 145583978099
+
+=== 20230819 ====
+
+Accessing file 529900BT3M81VV58P678-2022-06-30-da.zip from URL: https://filings.xbrl.org/529900BT3M81VV58P678/2022-06-30/ESEF/DK/0/529900BT3M81VV58P678-2022-06-30-da.zip
+lei:259400D5JPHRNVRJU361:2021-12-31:xbrl.org:ESEF-PL-0, /259400D5JPHRNVRJU361/2021-12-31/ESEF/PL/0/259400D5JPHRNVRJU361-2021-12-31.zip, Missing report url (and could not guess), /Users/lkedves/work/xbrl/data/reports/2021/xbrl.org/18/2e/259400D5JPHRNVRJU361/ESEF-PL-0
+lei:2594003L11V38ZCVKZ09:2020-12-31:xbrl.org:ESEF-PL-0, /2594003L11V38ZCVKZ09/2020-12-31/ESEF/PL/0/2594003L11V38ZCVKZ09-2020-12-31.zip, Missing report url (and could not guess), /Users/lkedves/work/xbrl/data/reports/2020/xbrl.org/a1/d3/2594003L11V38ZCVKZ09/ESEF-PL-0
+lei:259400XUHAB4BLDYGH28:2020-12-31:xbrl.org:ESEF-PL-0, /259400XUHAB4BLDYGH28/2020-12-31/ESEF/PL/0/259400XUHAB4BLDYGH28-2020-12-31.zip, Missing report url (and could not guess), /Users/lkedves/work/xbrl/data/reports/2020/xbrl.org/cc/5f/259400XUHAB4BLDYGH28/ESEF-PL-0
+lei:5299002QLUYKK2WBMB18:2021-12-31:xbrl.org:ESEF-LU-0, /5299002QLUYKK2WBMB18/2021-12-31/ESEF/LU/0/ESEF_grandcityproperties20211231.zip, Missing report url (and could not guess), /Users/lkedves/work/xbrl/data/reports/2021/xbrl.org/85/e5/5299002QLUYKK2WBMB18/ESEF-LU-0
+lei:529900H4DWG3KWMBMQ39:2021-12-31:xbrl.org:ESEF-LU-0, /529900H4DWG3KWMBMQ39/2021-12-31/ESEF/LU/0/529900H4DWG3KWMBMQ39-2021-12-31-en.zip, Missing report url (and could not guess), /Users/lkedves/work/xbrl/data/reports/2021/xbrl.org/93/ad/529900H4DWG3KWMBMQ39/ESEF-LU-0
+lei:213800YOAXIKBNG58N18:2022-03-31:xbrl.org:ESEF-LU-1, /213800YOAXIKBNG58N18/2022-03-31/ESEF/LU/1/213800YOAXIKBNG58N18-2022-03-31.zip, Missing report url (and could not guess), /Users/lkedves/work/xbrl/data/reports/2022/xbrl.org/6a/38/213800YOAXIKBNG58N18/ESEF-LU-1
+lei:25940046GV7I3I2ZN618:2020-12-31:xbrl.org:ESEF-PL-0, /25940046GV7I3I2ZN618/2020-12-31/ESEF/PL/0/25940046GV7I3I2ZN618-2020-12-31.zip, Missing report url (and could not guess), /Users/lkedves/work/xbrl/data/reports/2020/xbrl.org/6e/f3/25940046GV7I3I2ZN618/ESEF-PL-0
+lei:549300UM6IMVRYXSZB11:2021-12-31:xbrl.org:ESEF-HU-0, /549300UM6IMVRYXSZB11/2021-12-31/ESEF/HU/0/549300UM6IMVRYXSZB11-2021-12-31.zip, Missing report url (and could not guess), /Users/lkedves/work/xbrl/data/reports/2021/xbrl.org/17/5e/549300UM6IMVRYXSZB11/ESEF-HU-0
+lei:222100QODTKPVWYYPW16:2021-12-31:xbrl.org:ESEF-LU-0, /222100QODTKPVWYYPW16/2021-12-31/ESEF/LU/0/2021_SEO.zip, Missing report url (and could not guess), /Users/lkedves/work/xbrl/data/reports/2021/xbrl.org/1f/b6/222100QODTKPVWYYPW16/ESEF-LU-0
+lei:222100QODTKPVWYYPW16:2022-12-31:xbrl.org:ESEF-LU-0, /222100QODTKPVWYYPW16/2022-12-31/ESEF/LU/0/2022_SEO.zip, Missing report url (and could not guess), /Users/lkedves/work/xbrl/data/reports/2022/xbrl.org/1f/b6/222100QODTKPVWYYPW16/ESEF-LU-0
+lei:2594003WC65THEMYJH09:2020-12-31:xbrl.org:ESEF-PL-0, /2594003WC65THEMYJH09/2020-12-31/ESEF/PL/0/2594003WC65THEMYJH09-2020-12-31.zip, Missing report url (and could not guess), /Users/lkedves/work/xbrl/data/reports/2020/xbrl.org/24/ea/2594003WC65THEMYJH09/ESEF-PL-0
+lei:529900ZJTFAIEDHW9U42:2021-12-31:xbrl.org:ESEF-HU-0, /529900ZJTFAIEDHW9U42/2021-12-31/ESEF/HU/0/529900ZJTFAIEDHW9U42-2021-12-31.zip, Missing report url (and could not guess), /Users/lkedves/work/xbrl/data/reports/2021/xbrl.org/6f/fb/529900ZJTFAIEDHW9U42/ESEF-HU-0
+lei:529900ZJTFAIEDHW9U42:2021-12-31:xbrl.org:ESEF-HU-2, /529900ZJTFAIEDHW9U42/2021-12-31/ESEF/HU/2/529900ZJTFAIEDHW9U42-2021-12-31.zip, Missing report url (and could not guess), /Users/lkedves/work/xbrl/data/reports/2021/xbrl.org/6f/fb/529900ZJTFAIEDHW9U42/ESEF-HU-2
+lei:529900ZJTFAIEDHW9U42:2021-12-31:xbrl.org:ESEF-HU-1, /529900ZJTFAIEDHW9U42/2021-12-31/ESEF/HU/1/529900ZJTFAIEDHW9U42-2021-12-31.zip, Missing report url (and could not guess), /Users/lkedves/work/xbrl/data/reports/2021/xbrl.org/6f/fb/529900ZJTFAIEDHW9U42/ESEF-HU-1
+Count 5100
+
+
+lei:259400DZXF7UJKK2AY35:2021-12-31:xbrl.org:ESEF-PL-0, mBank-SSF-2021-12-31-pl.zip, org.apache.commons.compress.archivers.zip.UnsupportedZipFeatureException: Unsupported feature data descriptor used in entry mBank-SSF-2021-12-31-pl/
+lei:213800LS272L4FIDOH92:2021-12-31:xbrl.org:ESEF-GB-0, 213800LS272L4FIDOH92-2021-12-31.zip, Missing report url
+lei:743700205JAMGM80QD88:2020-12-31:xbrl.org:ESEF-FI-0, 743700205JAMGM80QD88-2020-12-31.zip, Missing report url
+lei:743700205JAMGM80QD88:2020-12-31:xbrl.org:ESEF-FI-1, 743700205JAMGM80QD88-2020-12-31.zip, Missing report url
+lei:724500I77C30W2LZZJ03:2021-12-31:xbrl.org:ESEF-NL-0, 724500I77C30W2LZZJ03-2021-12-31-en.zip, Missing report url
+lei:213800OR6IIJPG98AG39:2021-12-31:xbrl.org:ESEF-GB-0, 213800OR6IIJPG98AG39-2021-12-31.zip, Missing report url
+lei:259400Q2BUT499PKRE25:2021-12-31:xbrl.org:ESEF-PL-0, rfk_2021-12-31_pl.zip, Missing report url
+lei:2594006UP7JO0QGZ0H25:2020-12-31:xbrl.org:ESEF-PL-0, 2594006UP7JO0QGZ0H25-2020-12-31.zip, Missing report url
+lei:259400U016S2C1PLSL25:2021-12-31:xbrl.org:ESEF-PL-0, cnt_2021-12-31_pl.zip, Missing report url
+lei:259400KD8XU1C4ID1N32:2020-12-31:xbrl.org:ESEF-PL-0, 259400KD8XU1C4ID1N32-2020-12-31.zip, Missing report url
+lei:259400DAALR7MHOEVA74:2021-12-31:xbrl.org:ESEF-PL-0, relpol_2021-12-31_pl.zip, Missing report url
+lei:743700PEMBIJ4GPCYX48:2021-12-31:xbrl.org:ESEF-FI-1, 743700PEMBIJ4GPCYX48-2021-12-31-fi.zip, Missing report url
+lei:549300TM45EIWBPD7W54:2021-12-31:xbrl.org:ESEF-NO-0, 549300TM45EIWBPD7W54-2021-12-31.zip, Missing report url
+lei:259400AAH4FSBPE9CN79:2020-12-31:xbrl.org:ESEF-PL-0, 259400AAH4FSBPE9CN79-2020-12-31.zip, Missing report url
+lei:969500TPU5T3HA5D1F11:2022-12-31:xbrl.org:ESEF-FR-0, bvi-2022-12-31-fr.zip, org.apache.commons.compress.archivers.zip.UnsupportedZipFeatureException: Unsupported feature data descriptor used in entry bvi-2022-12-31-fr/reports/
+lei:213800VGJC18MRKMZC33:2021-12-31:xbrl.org:ESEF-DK-0, 213800VGJC18MRKMZC33-2021-12-31-en.zip, Missing report url
+lei:25940009X7VZW3QCSY86:2020-12-31:xbrl.org:ESEF-PL-0, 25940009X7VZW3QCSY86-2020-12-31.zip, Missing report url
+lei:959800R7U7E76YMJG243:2021-12-31:xbrl.org:ESEF-ES-0, 959800R7U7E76YMJG243-2021-12-31-es.zip, Missing report url
+lei:549300CSLHPO6Y1AZN37:2021-12-31:xbrl.org:ESEF-SE-1, 549300CSLHPO6Y1AZN37-2021-12-31.zip, Missing report url
+lei:259400N4ZI3S2J1QYJ60:2021-12-31:xbrl.org:ESEF-PL-0, fer_2021-12-31_pl.zip, Missing report url
+lei:259400EUBZIKJFDHSZ93:2020-12-31:xbrl.org:ESEF-PL-0, 259400EUBZIKJFDHSZ93-2020-12-31.zip, Missing report url
+lei:529900BT3M81VV58P678:2022-06-30:xbrl.org:ESEF-DK-0, 529900BT3M81VV58P678-2022-06-30-da.zip, java.io.IOException: Truncated ZIP file
+lei:213800WFVZQMHOZP2W17:2021-12-31:xbrl.org:ESEF-GB-0, 213800WFVZQMHOZP2W17-2021-12-31.zip, Missing report url
+lei:7437006ZZI1F7CUA5518:2020-12-31:xbrl.org:ESEF-FI-0, 7437006ZZI1F7CUA5518-2020-12-31.zip, Missing report url
+lei:549300D8P364LFKJWN88:2021-12-31:xbrl.org:ESEF-BE-0, 549300D8P364LFKJWN88-2021-12-31-nl.zip, Missing report url
+lei:259400PAFSEQGHKO2Q38:2021-12-31:xbrl.org:ESEF-PL-0, 259400PAFSEQGHKO2Q38-2021-12-31-pl.zip, Missing report url
+lei:259400D5JPHRNVRJU361:2021-12-31:xbrl.org:ESEF-PL-0, 259400D5JPHRNVRJU361-2021-12-31.zip, Missing report url
+lei:529900N96EOVRB114D28:2021-12-31:xbrl.org:ESEF-DK-0, 529900N96EOVRB114D28-2021-12-31-en.zip, Missing report url
+lei:815600E787F3B6565561:2022-12-31:xbrl.org:ESEF-IT-0, 815600E787F3B6565561-2022-12-31.zip, Missing report url
+lei:259400O6XNB3600CYB37:2020-12-31:xbrl.org:ESEF-PL-0, 259400O6XNB3600CYB37-2020-12-31.zip, Missing report url
+lei:529900GGYMNGRQTDOO93:2021-12-31:xbrl.org:ESEF-NL-0, BNGB-2021-12-31.zip, Missing report url
+lei:0W5QHUNYV4W7GJO62R27:2020-12-31:xbrl.org:ESEF-AT-0, 0W5QHUNYV4W7GJO62R27-2020-12-31.zip, Missing report url
+lei:259400SF7M4PJCF1PN49:2020-12-31:xbrl.org:ESEF-PL-0, 259400SF7M4PJCF1PN49-2020-12-31.zip, Missing report url
+lei:259400WQUGWQ7KBPQB74:2021-12-31:xbrl.org:ESEF-PL-0, 259400WQUGWQ7KBPQB74-2021-12-31-pl.zip, Missing report url
+lei:743700XLYONPSKO15Z91:2020-12-31:xbrl.org:ESEF-FI-0, 743700XLYONPSKO15Z91-2020-12-31.zip, Missing report url
+lei:2594003L11V38ZCVKZ09:2020-12-31:xbrl.org:ESEF-PL-0, 2594003L11V38ZCVKZ09-2020-12-31.zip, Missing report url
+lei:259400Y049RUPUFT3G15:2021-12-31:xbrl.org:ESEF-PL-0, 259400Y049RUPUFT3G15-2021-12-31-pl.zip, Missing report url
+lei:P4GTT6GF1W40CVIMFR43:2020-12-31:xbrl.org:ESEF-PL-0, ESEF_Skonsolidowane_sprawozdanie_finansowe_GK_PKOBPSA_31.12.2020.zip, org.apache.commons.compress.archivers.zip.UnsupportedZipFeatureException: Unsupported feature data descriptor used in entry ESEF_Skonsolidowane_sprawozdanie_finansowe_GK_PKOBPSA_31.12.2020/
+lei:2594000SEGUR418W2G08:2020-12-31:xbrl.org:ESEF-PL-0, 2594000SEGUR418W2G08-2020-12-31.zip, Missing report url
+lei:25940082U6IJ0K29FS45:2021-12-31:xbrl.org:ESEF-PL-0, alg_2021-12-31_pl.zip, Missing report url
+lei:259400O79EWIK4XZPL40:2020-12-31:xbrl.org:ESEF-PL-1, 259400O79EWIK4XZPL40-2020-12-31.zip, org.apache.commons.compress.archivers.zip.UnsupportedZipFeatureException: Unsupported feature data descriptor used in entry GrupaASEE-2020-12-31/
+lei:259400O79EWIK4XZPL40:2020-12-31:xbrl.org:ESEF-PL-0, GrupaACP-2020-12-31.zip, org.apache.commons.compress.archivers.zip.UnsupportedZipFeatureException: Unsupported feature data descriptor used in entry GrupaACP-2020-12-31/
+lei:2138001CNF45JP5XZK38:2021-12-31:xbrl.org:ESEF-FI-1, 2138001CNF45JP5XZK38-2021-12-31-FI.zip, org.apache.commons.compress.archivers.zip.UnsupportedZipFeatureException: Unsupported feature data descriptor used in entry 2138001CNF45JP5XZK38-2021-12-31-FI/2021-12-31/kone-2021-12-31.xsd
+lei:315700YHFON9RJOPCK19:2021-12-31:xbrl.org:ESEF-NL-0, PhotonEnergy-2021-12-31-en.zip, Missing report url
+lei:2138007VWEP4MM3J8B29:2021-12-31:xbrl.org:ESEF-GB-0, 2138007VWEP4MM3J8B29-2021-12-31.zip, Missing report url
+lei:7437007ECQWVPCJIS695:2020-12-31:xbrl.org:ESEF-FI-1, 7437007ECQWVPCJIS695-2020-12-31.zip, Missing report url
+lei:7437007ECQWVPCJIS695:2020-12-31:xbrl.org:ESEF-FI-0, 7437007ECQWVPCJIS695-2020-12-31.zip, Missing report url
+lei:5967007LIEEXZXHW3S18:2021-12-31:xbrl.org:ESEF-NO-0, 5967007LIEEXZXHW3S18-2021-12-31.zip, Missing report url
+lei:549300L2VDVI7KPEL330:2021-12-31:xbrl.org:ESEF-DK-0, FRTMGP-2021-12-31-en.zip, Missing report url
+lei:54930075MZSSIB2TGC64:2020-12-31:xbrl.org:ESEF-FR-0, 54930075MZSSIB2TGC64-2020-12-31.zip, Missing report url
+lei:21380066N3SV9O8IDP37:2021-12-31:xbrl.org:ESEF-GB-0, 21380066N3SV9O8IDP37-2021-12-31.zip, Missing report url
+lei:259400ICV5B4DJQK8377:2020-12-31:xbrl.org:ESEF-PL-0, 259400ICV5B4DJQK8377-2020-12-31.zip, Missing report url
+lei:259400NFU8A8SBP6VC21:2020-12-31:xbrl.org:ESEF-PL-0, 259400NFU8A8SBP6VC21-2020-12-31.zip, Missing report url
+lei:549300CVBE06T0SH6T76:2022-12-31:xbrl.org:ESEF-NO-0, 549300CVBE06T0SH6T76-2022-12-31-en.zip, org.apache.commons.compress.archivers.zip.UnsupportedZipFeatureException: Unsupported feature data descriptor used in entry 549300CVBE06T0SH6T76-2022-12-31-en/META-INF/catalog.xml
+lei:259400CSG9BYRIFPJ169:2020-12-31:xbrl.org:ESEF-PL-0, 259400CSG9BYRIFPJ169-2020-12-31.zip, Missing report url
+lei:959800TVV5HTKGAPCW40:2021-12-31:xbrl.org:ESEF-ES-0, 959800TVV5HTKGAPCW40-2021-12-31-es.zip, Missing report url
+lei:259400D5JPHRNVRJU361:2020-12-31:xbrl.org:ESEF-PL-0, 259400D5JPHRNVRJU361-2020-12-31.zip, Missing report url
+lei:21380092Z2CWL9KOOM34:2021-12-31:xbrl.org:ESEF-NL-0, 21380092Z2CWL9KOOM34-2021-12-31-en.zip, Missing report url
+lei:259400IOOIKYL8YGCN30:2021-12-31:xbrl.org:ESEF-PL-0, esef_dpl_2021-12-31_pl.zip, Missing report url
+lei:5493001BABFV7P27OW30:2020-12-31:xbrl.org:ESEF-SI-0, 5493001BABFV7P27OW30-2020-12-31.zip, Missing report url
+lei:5493001BABFV7P27OW30:2020-12-31:xbrl.org:ESEF-SI-1, 5493001BABFV7P27OW30-2020-12-31.zip, Missing report url
+lei:5493002HQHWN5JQHKQ51:2021-12-31:xbrl.org:ESEF-GB-0, 5493002HQHWN5JQHKQ51-2021-12-31.zip, Missing report url
+lei:549300KGI78MKHO38N42:2020-12-31:xbrl.org:ESEF-SI-0, 549300KGI78MKHO38N42-2020-12-31.zip, Missing report url
+lei:549300KGI78MKHO38N42:2020-12-31:xbrl.org:ESEF-SI-1, 549300KGI78MKHO38N42-2020-12-31.zip, Missing report url
+lei:2594002H3ZAFID0MP378:2020-12-31:xbrl.org:ESEF-PL-0, 2594002H3ZAFID0MP378-2020-12-31.zip, Missing report url
+lei:315700GZJC0X5GELP252:2020-12-31:xbrl.org:ESEF-CZ-0, FIDUROCK_Nemovitosti_a.s._FINAL.zip, Missing report url
+lei:259400XUHAB4BLDYGH28:2020-12-31:xbrl.org:ESEF-PL-0, 259400XUHAB4BLDYGH28-2020-12-31.zip, Missing report url
+lei:XLEZHWWOI4HFQDGL4793:2020-12-31:xbrl.org:ESEF-PL-0, 3 skons_sprawozdanie finansowe_2020.zip, org.apache.commons.compress.archivers.zip.UnsupportedZipFeatureException: Unsupported feature data descriptor used in entry 3 skons_sprawozdanie finansowe_2020/
+lei:259400JDPH8TEPBTA021:2020-12-31:xbrl.org:ESEF-PL-0, 259400JDPH8TEPBTA021-2020-12-31.zip, Missing report url
+lei:2138009GSW8ZDUU33943:2021-12-31:xbrl.org:ESEF-DK-0, copenhagencapital-2021-12-31-da.zip, Missing report url
+lei:213800U8GOU4PCQKDX03:2021-12-31:xbrl.org:ESEF-DK-0, tivoli-2021-12-31-da.zip, Missing report url
+lei:724500SABXCV6OPXR277:2021-12-31:xbrl.org:ESEF-NL-0, 724500SABXCV6OPXR277-2021-12-31-en.zip, Missing report url
+lei:2594007GAALFMXP4YB89:2021-12-31:xbrl.org:ESEF-PL-0, esef_bmx_2021-12-31_pl.zip, Missing report url
+lei:5299002QLUYKK2WBMB18:2021-12-31:xbrl.org:ESEF-LU-0, ESEF_grandcityproperties20211231.zip, Missing report url
+lei:213800D1NZB5CR91KK02:2021-12-31:xbrl.org:ESEF-DK-0, NSH-2021-12-31-en.zip, Missing report url
+lei:2594002C0DGL8KBA5491:2020-12-31:xbrl.org:ESEF-PL-0, 2594002C0DGL8KBA5491-2020-12-31.zip, Missing report url
+lei:259400B2YUOXNE1TPY77:2020-12-31:xbrl.org:ESEF-PL-0, 259400B2YUOXNE1TPY77-2020-12-31.zip, Missing report url
+lei:2138006JCDVYIN6INP51:2021-12-31:xbrl.org:ESEF-DK-0, bava-2021-12-31-en.zip, Missing report url
+lei:95980020140005945792:2021-12-31:xbrl.org:ESEF-ES-0, 95980020140005945792-2021-12-31-es.zip, Missing report url
+lei:5299007DB25VT6SHIH34:2021-12-31:xbrl.org:ESEF-DK-0, hartmann-2021-12-31-da.zip, Missing report url
+lei:259400SO1WQPETY92977:2021-12-31:xbrl.org:ESEF-PL-0, shg_2021-12-31_pl.zip, Missing report url
+lei:259400Q2BUT499PKRE25:2020-12-31:xbrl.org:ESEF-PL-0, 259400Q2BUT499PKRE25-2020-12-31.zip, Missing report url
+lei:5299008IKT93E4SA0G49:2020-12-31:xbrl.org:ESEF-EE-2, 5299008IKT93E4SA0G49-2020-12-31.zip, Missing report url
+lei:5299008IKT93E4SA0G49:2020-12-31:xbrl.org:ESEF-EE-1, 5299008IKT93E4SA0G49-2020-12-31.zip, Missing report url
+lei:529900H4DWG3KWMBMQ39:2021-12-31:xbrl.org:ESEF-LU-0, 529900H4DWG3KWMBMQ39-2021-12-31-en.zip, Missing report url
+lei:259400CGAUC6477JOX48:2021-12-31:xbrl.org:ESEF-PL-0, pmpg_2021-12-31_pl.zip, Missing report url
+lei:959800M75M81U0Y2UX24:2021-12-31:xbrl.org:ESEF-ES-0, 959800M75M81U0Y2UX24-2021-12-31-es.zip, Missing report url
+lei:259400H1EO50UI8PF623:2021-12-31:xbrl.org:ESEF-PL-0, esef_i2d_2021-12-31_pl.zip, Missing report url
+lei:549300JNPI46XNH0PM97:2022-12-31:xbrl.org:ESEF-SE-0, 549300JNPI46XNH0PM97-2022-12-31.zip, Missing report url
+lei:2138001KOWN7CG9SLK53:2021-12-31:xbrl.org:ESEF-GB-0, 2138001KOWN7CG9SLK53-2021-12-31.zip, Missing report url
+lei:2594009C5G6JSN4HE060:2021-03-31:xbrl.org:ESEF-PL-0, 2594009C5G6JSN4HE060-2021-03-31.zip, Missing report url
+lei:2594008ZF17JSW0OV865:2021-12-31:xbrl.org:ESEF-PL-0, 2594008ZF17JSW0OV865-2021-12-31-pl.zip, Missing report url
+lei:259400ULCBECVZ47LY60:2021-12-31:xbrl.org:ESEF-PL-0, dig_2021-12-31_pl.zip, Missing report url
+lei:G30CO71KTT9JDYJESN22:2020-12-31:xbrl.org:ESEF-PL-0, G30CO71KTT9JDYJESN22-2020-12-31.zip, Missing report url
+lei:213800YOAXIKBNG58N18:2022-03-31:xbrl.org:ESEF-LU-1, 213800YOAXIKBNG58N18-2022-03-31.zip, Missing report url
+lei:25940046GV7I3I2ZN618:2020-12-31:xbrl.org:ESEF-PL-0, 25940046GV7I3I2ZN618-2020-12-31.zip, Missing report url
+lei:549300UM6IMVRYXSZB11:2021-12-31:xbrl.org:ESEF-HU-0, 549300UM6IMVRYXSZB11-2021-12-31.zip, Missing report url
+lei:549300SH2G3R15Y3FX20:2021-12-31:xbrl.org:ESEF-DK-0, 549300SH2G3R15Y3FX20-2021-12-31-en.zip, Missing report url
+lei:259400YL67XC455VOK03:2021-12-31:xbrl.org:ESEF-PL-0, opm_2021-12-31_pl.zip, Missing report url
+lei:7245007RB3M5PMWY6N86:2021-12-31:xbrl.org:ESEF-NL-0, 7245007RB3M5PMWY6N86-2021-12-31-en.zip, Missing report url
+lei:25940010K4EYCRO4OJ32:2020-12-31:xbrl.org:ESEF-PL-0, 25940010K4EYCRO4OJ32-2020-12-31.zip, Missing report url
+lei:259400UKCY6KD89PTF94:2020-12-31:xbrl.org:ESEF-PL-0, 259400UKCY6KD89PTF94-2020-12-31.zip, Missing report url
+lei:1VUV7VQFKUOQSJ21A208:2021-12-31:xbrl.org:ESEF-GB-0, 1VUV7VQFKUOQSJ21A208-2021-12-31.zip, Missing report url
+lei:213800IEX9ZXJRAOL133:2022-01-01:xbrl.org:ESEF-GB-0, 213800IEX9ZXJRAOL133-2022-01-01.zip, Missing report url
+lei:259400O65SLJ2CVTSP22:2021-12-31:xbrl.org:ESEF-PL-0, medicalgorithmics_2021-12-31_pl.zip, Missing report url
+lei:529900JG015JC10LED24:2020-12-31:xbrl.org:ESEF-EE-0, 529900JG015JC10LED24-2020-12-31.zip, Missing report url
+lei:529900JG015JC10LED24:2020-12-31:xbrl.org:ESEF-EE-1, 529900JG015JC10LED24-2020-12-31.zip, Missing report url
+lei:549300FMWM53K9ULYT15:2021-12-31:xbrl.org:ESEF-NL-0, nepi-2021-12-31-en.zip, Missing report url
+lei:25940084IGXPXIQW2F80:2020-12-31:xbrl.org:ESEF-PL-0, 25940084IGXPXIQW2F80-2020-12-31.zip, Missing report url
+lei:213800L7HZMXLTISFT69:2021-12-31:xbrl.org:ESEF-GB-0, 213800L7HZMXLTISFT69-2021-12-31.zip, Missing report url
+lei:549300CN568MD1JD3E40:2021-12-31:xbrl.org:ESEF-SE-0, 549300CN568MD1JD3E40-2021-12-31.zip, Missing report url
+lei:2594001SXSZ4ZPO6I014:2020-12-31:xbrl.org:ESEF-PL-0, 2594001SXSZ4ZPO6I014-2020-12-31.zip, Missing report url
+lei:259400NYD0RGQ3Q2EM07:2021-12-31:xbrl.org:ESEF-PL-0, rnk_2021-12-31_pl.zip, Missing report url
+lei:213800SJHIABLO5U1413:2021-12-31:xbrl.org:ESEF-DK-0, NewCap-2021-12-31-da.zip, Missing report url
+lei:2138007DFVFLUCCSX925:2021-12-31:xbrl.org:ESEF-DK-0, firstfarm-2021-12-31-da.zip, Missing report url
+lei:743700G7A9J1PHM3X223:2020-12-31:xbrl.org:ESEF-FI-1, 743700G7A9J1PHM3X223-2020-12-31.zip, Missing report url
+lei:743700G7A9J1PHM3X223:2020-12-31:xbrl.org:ESEF-FI-0, 743700G7A9J1PHM3X223-2020-12-31.zip, Missing report url
+lei:2594002WDKDFKCRLBY62:2020-12-31:xbrl.org:ESEF-PL-0, 2594002WDKDFKCRLBY62-2020-12-31.zip, Missing report url
+lei:7437006WYM821IJ3MN73:2021-12-31:xbrl.org:ESEF-GB-0, 7437006WYM821IJ3MN73-2021-12-31.zip, Missing report url
+lei:259400C5JYL4HM1TNC95:2020-12-31:xbrl.org:ESEF-PL-0, 259400C5JYL4HM1TNC95-2020-12-31.zip, Missing report url
+lei:25940076LJ6IYZDLCY47:2020-12-31:xbrl.org:ESEF-PL-0, 25940076LJ6IYZDLCY47-2020-12-31.zip, Missing report url
+lei:213800A357TKB2TD9U78:2021-12-31:xbrl.org:ESEF-GB-0, CLI-2021-12-31-en.zip, Missing report url
+lei:222100QODTKPVWYYPW16:2021-12-31:xbrl.org:ESEF-LU-0, 2021_SEO.zip, Missing report url
+lei:25940039TMMYH4AH0B81:2021-12-31:xbrl.org:ESEF-PL-0, magnapolonia_2021-12-31_pl.zip, Missing report url
+lei:259400MHSST6C1A8M066:2020-12-31:xbrl.org:ESEF-PL-0, 259400MHSST6C1A8M066-2020-12-31.zip, Missing report url
+lei:5493001EZOOA66PTBR68:2022-12-31:xbrl.org:ESEF-FR-0, atos-2022-12-31-fr.zip, org.apache.commons.compress.archivers.zip.UnsupportedZipFeatureException: Unsupported feature data descriptor used in entry atos-2022-12-31-fr/
+lei:222100QODTKPVWYYPW16:2022-12-31:xbrl.org:ESEF-LU-0, 2022_SEO.zip, Missing report url
+lei:259400HL8RQZY7JE2565:2021-12-31:xbrl.org:ESEF-PL-0, 259400HL8RQZY7JE2565-2021-12-31-pl.zip, Missing report url
+lei:549300IK1L5VA3B6XF18:2021-12-31:xbrl.org:ESEF-BE-1, 549300IK1L5VA3B6XF18-2021-12-31-fr.zip, Missing report url
+lei:25940003WORCIZ1P1D63:2021-12-31:xbrl.org:ESEF-PL-0, 25940003WORCIZ1P1D63-2021-12-31-pl.zip, Missing report url
+lei:213800T4VM5VR3C7S706:2021-12-31:xbrl.org:ESEF-GB-0, 213800T4VM5VR3C7S706-2021-12-31.zip, Missing report url
+lei:2594003GVVF9U3PSDS82:2020-12-31:xbrl.org:ESEF-PL-0, 2594003GVVF9U3PSDS82-2020-12-31.zip, Missing report url
+lei:213800MXEC3KAOBBPO57:2021-12-31:xbrl.org:ESEF-GB-0, 213800MXEC3KAOBBPO57-2021-12-31.zip, Missing report url
+lei:259400YONW18M3H4WX66:2020-12-31:xbrl.org:ESEF-PL-0, 259400YONW18M3H4WX66-2020-12-31.zip, Missing report url
+lei:96950025N07LTJYFSN57:2022-12-31:xbrl.org:ESEF-FR-0, coface-2022-12-31-fr.zip, org.apache.commons.compress.archivers.zip.UnsupportedZipFeatureException: Unsupported feature data descriptor used in entry coface-2022-12-31-fr/
+lei:7437001BISR7R2A9KX89:2020-12-31:xbrl.org:ESEF-FI-0, 7437001BISR7R2A9KX89-2020-12-31.zip, Missing report url
+lei:549300M5XVDYG4I7CC28:2021-12-31:xbrl.org:ESEF-DK-0, SGL-2021-12-31-en.zip, Missing report url
+lei:2594003WC65THEMYJH09:2020-12-31:xbrl.org:ESEF-PL-0, 2594003WC65THEMYJH09-2020-12-31.zip, Missing report url
+lei:529900T6WNZXD2R3JW38:2021-12-31:xbrl.org:ESEF-DK-0, NOVOZYMES-2021-12-31.zip, Missing report url
+lei:549300G2HM6U42VN0T53:2021-12-31:xbrl.org:ESEF-DK-0, 549300G2HM6U42VN0T53-2021-12-31-da.zip, Missing report url
+lei:549300JUGBT2EH17X827:2021-12-31:xbrl.org:ESEF-DK-0, 549300JUGBT2EH17X827-2021-12-31-da.zip, Missing report url
+lei:259400CX8FWYE71YLE07:2020-12-31:xbrl.org:ESEF-PL-0, 259400CX8FWYE71YLE07-2020-12-31.zip, Missing report url
+lei:259400BCOV9JJIGLYF05:2020-12-31:xbrl.org:ESEF-PL-0, 259400BCOV9JJIGLYF05-2020-12-31.zip, Missing report url
+lei:5299004B6ZEGVCR9ZR75:2021-12-31:xbrl.org:ESEF-DK-0, 5299004B6ZEGVCR9ZR75-2021-12-31-da.zip, Missing report url
+lei:969500P4HYOPYINEPE06:2022-12-31:xbrl.org:ESEF-FR-0, groupama-2022-12-31-fr.zip, org.apache.commons.compress.archivers.zip.UnsupportedZipFeatureException: Unsupported feature data descriptor used in entry groupama-2022-12-31-fr/
+lei:2594005Q9DIECHVXBO95:2020-12-31:xbrl.org:ESEF-PL-0, 2594005Q9DIECHVXBO95-2020-12-31.zip, Missing report url
+lei:21380072EMKFDZSTLD28:2021-12-31:xbrl.org:ESEF-GB-0, 21380072EMKFDZSTLD28-2021-12-31.zip, Missing report url
+lei:E58DKGMJYYYJLN8C3868:2021-12-31:xbrl.org:ESEF-LU-0, E58DKGMJYYYJLN8C3868-2021-12-31.zip, Missing report url
+lei:259400J8JJKET03PCT44:2020-12-31:xbrl.org:ESEF-PL-0, 259400J8JJKET03PCT44-2020-12-31.zip, Missing report url
+lei:213800QTAQOSSTNTPO15:2021-12-31:xbrl.org:ESEF-GB-0, 213800QTAQOSSTNTPO15-2021-12-31.zip, Missing report url
+lei:259400WFYCIXXW3GW414:2020-12-31:xbrl.org:ESEF-PL-0, 259400WFYCIXXW3GW414-2020-12-31.zip, Missing report url
+lei:259400N95YGU76EEYD38:2020-12-31:xbrl.org:ESEF-PL-0, 259400N95YGU76EEYD38-2020-12-31.zip, Missing report url
+lei:259400RPKPMJK94SJA60:2020-12-31:xbrl.org:ESEF-PL-0, 259400RPKPMJK94SJA60-2020-12-31.zip, Missing report url
+lei:213800VZX4LWJSGRLR94:2021-11-30:xbrl.org:ESEF-NO-0, 213800VZX4LWJSGRLR94-2021-11-30.zip, Missing report url
+lei:213800TBL26T6GO88M13:2021-12-31:xbrl.org:ESEF-GB-0, 213800TBL26T6GO88M13-2021-12-31.zip, Missing report url
+lei:529900ZJTFAIEDHW9U42:2021-12-31:xbrl.org:ESEF-HU-0, 529900ZJTFAIEDHW9U42-2021-12-31.zip, Missing report url
+lei:529900ZJTFAIEDHW9U42:2021-12-31:xbrl.org:ESEF-HU-2, 529900ZJTFAIEDHW9U42-2021-12-31.zip, Missing report url
+lei:529900ZJTFAIEDHW9U42:2021-12-31:xbrl.org:ESEF-HU-1, 529900ZJTFAIEDHW9U42-2021-12-31.zip, Missing report url
+lei:259400FVIQJS5VD8JO79:2020-12-31:xbrl.org:ESEF-PL-0, 259400FVIQJS5VD8JO79-2020-12-31.zip, Missing report url
+lei:9845007A2CC4C8BFSB80:2021-12-31:xbrl.org:ESEF-NL-0, 9845007A2CC4C8BFSB80-2021-12-31-en.zip, Missing report url
+lei:259400OT63WADN2FBI37:2020-12-31:xbrl.org:ESEF-PL-0, 259400OT63WADN2FBI37-2020-12-31.zip, Missing report url
+lei:213800YXL94R94RYG150:2021-12-31:xbrl.org:ESEF-GB-0, 213800YXL94R94RYG150-2021-12-31.zip, Missing report url
+lei:724500S2QABOWHX6MM18:2021-12-31:xbrl.org:ESEF-NL-0, Almunda_Professional-2021-12-31.zip, Missing report url
+lei:259400L5JZZHMLGBGT65:2021-12-31:xbrl.org:ESEF-PL-0, NTT_2021-12-31_pl.zip, Missing report url
+lei:213800WP2W676G7HLJ94:2021-12-31:xbrl.org:ESEF-DK-0, COLUMBUS-2021-12-31.zip, Missing report url
+lei:31570010000000004460:2020-12-31:xbrl.org:ESEF-CZ-0, 31570010000000004460-2020-12-31.zip, Missing report url
+lei:31570010000000004460:2020-12-31:xbrl.org:ESEF-CZ-1, 31570010000000004460-2020-12-31.zip, Missing report url
+lei:259400HB4PFX2PA4BT83:2020-12-31:xbrl.org:ESEF-PL-0, 259400HB4PFX2PA4BT83-2020-12-31.zip, Missing report url
+lei:7437007N96FK4N3WHT09:2022-12-31:xbrl.org:ESEF-FI-0, 7437007N96FK4N3WHT09-2022-12-31.zip, Missing report url
+lei:5299000DUMZ99SBBX121:2021-12-31:xbrl.org:ESEF-AT-1, 5299000DUMZ99SBBX121-2021-12-31.zip, Missing report url
+lei:2594005719IKYHOINE82:2020-12-31:xbrl.org:ESEF-PL-0, 2594005719IKYHOINE82-2020-12-31.zip, Missing report url
+lei:5299000DUMZ99SBBX121:2021-12-31:xbrl.org:ESEF-AT-0, 5299000DUMZ99SBBX121-2021-12-31.zip, Missing report url
+lei:259400XA4DG2MSRVNL21:2020-12-31:xbrl.org:ESEF-PL-0, 259400XA4DG2MSRVNL21-2020-12-31.zip, Missing report url
+lei:2594007NJKT8BOIW2107:2020-12-31:xbrl.org:ESEF-PL-0, 2594007NJKT8BOIW2107-2020-12-31.zip, Missing report url
+lei:259400UKCY6KD89PTF94:2021-12-31:xbrl.org:ESEF-PL-0, esef_Lubawa_2021-12-31_pl.zip, Missing report url
+lei:529900W3MOO00A18X956:2021-12-31:xbrl.org:ESEF-HU-1, 529900W3MOO00A18X956-2021-12-31.zip, Missing report url
+lei:529900W3MOO00A18X956:2021-12-31:xbrl.org:ESEF-HU-0, 529900W3MOO00A18X956-2021-12-31.zip, Missing report url
+lei:9695000H29HRRE478O62:2022-12-31:xbrl.org:ESEF-FR-0, inea-2022-12-31.zip, org.apache.commons.compress.archivers.zip.UnsupportedZipFeatureException: Unsupported feature data descriptor used in entry inea-2022-12-31/reports/
+lei:25940093SDJZW2C1V355:2020-12-31:xbrl.org:ESEF-PL-0, 25940093SDJZW2C1V355-2020-12-31.zip, Missing report url
+lei:549300ITBB1ULBL4CZ12:2021-12-31:xbrl.org:ESEF-DK-0, 549300ITBB1ULBL4CZ12-2021-12-31-en.zip, Missing report url
+lei:259400IDXT24AP4TSI61:2021-12-31:xbrl.org:ESEF-PL-0, lsisoft-2021-12-31-pl.zip, Missing report url
+lei:MKP1B7E76TN04CD85Z79:2020-12-31:xbrl.org:ESEF-PL-0, SF_GRUPA BOS_31_12_2020.zip, org.apache.commons.compress.archivers.zip.UnsupportedZipFeatureException: Unsupported feature data descriptor used in entry SF_GRUPA BOS_31_12_2020/
+lei:259400A803VVMK5TTW96:2020-12-31:xbrl.org:ESEF-PL-0, 259400A803VVMK5TTW96-2020-12-31.zip, Missing report url
+lei:259400J31RGGKDTDWH80:2021-12-31:xbrl.org:ESEF-PL-0, woj_2021-12-31_pl.zip, Missing report url
+lei:259400DZXF7UJKK2AY35:2020-12-31:xbrl.org:ESEF-PL-0, 259400DZXF7UJKK2AY35-2020-12-31.zip, org.apache.commons.compress.archivers.zip.UnsupportedZipFeatureException: Unsupported feature data descriptor used in entry Skonsolidowane Sprawozdanie Finansowe Grupy mBanku S.A. za 2020 rok/
+lei:724500G36285VC273D97:2021-12-31:xbrl.org:ESEF-NL-0, 724500G36285VC273D97-2021-12-31-en.zip, Missing report url
+lei:259400DAALR7MHOEVA74:2020-12-31:xbrl.org:ESEF-PL-0, 259400DAALR7MHOEVA74-2020-12-31.zip, Missing report url
+lei:259400KNZOKYOY658A64:2020-12-31:xbrl.org:ESEF-PL-0, 259400KNZOKYOY658A64-2020-12-31.zip, Missing report url
+lei:98450041D8BBCFDFT410:2021-12-31:xbrl.org:ESEF-NL-0, 98450041D8BBCFDFT410-2021-12-31-en.zip, Missing report url
+lei:969500SSIGMAGT008F11:2022-12-31:xbrl.org:ESEF-FR-0, 969500SSIGMAGT008F11-2022-12-31.zip, Missing report url
+lei:259400XAZHCG0XWR2130:2020-12-31:xbrl.org:ESEF-PL-0, 259400XAZHCG0XWR2130-2020-12-31.zip, Missing report url
+lei:259400Q26AYHUOTZL108:2020-12-31:xbrl.org:ESEF-PL-0, 259400Q26AYHUOTZL108-2020-12-31.zip, Missing report url
+lei:894500AW5ZWMYUZN1V70:2021-12-31:xbrl.org:ESEF-DK-0, 894500AW5ZWMYUZN1V70-2021-12-31-en.zip, Missing report url
+lei:259400AVUPSABLEXNT19:2020-12-31:xbrl.org:ESEF-PL-0, 259400AVUPSABLEXNT19-2020-12-31.zip, Missing report url
+lei:529900925TK5QIGTBH86:2021-12-31:xbrl.org:ESEF-HU-1, 529900925TK5QIGTBH86-2021-12-31.zip, Missing report url
+lei:529900925TK5QIGTBH86:2021-12-31:xbrl.org:ESEF-HU-0, 529900925TK5QIGTBH86-2021-12-31.zip, Missing report url
+lei:2138003NEBX5VRP3EX50:2022-11-30:xbrl.org:ESEF-GB-0, 2138003NEBX5VRP3EX50-2022-11-30.zip, java.io.IOException: Truncated ZIP file
+lei:9695003OIX0T7NX72N26:2021-12-31:xbrl.org:ESEF-FR-0, poxel-2021-12-31-en.zip, Missing report url
+lei:259400KUBXNVCIG5DQ39:2020-12-31:xbrl.org:ESEF-PL-0, 259400KUBXNVCIG5DQ39-2020-12-31.zip, Missing report url
+lei:549300Z2TSITEGO6PC06:2021-12-31:xbrl.org:ESEF-DK-0, 549300Z2TSITEGO6PC06-2021-12-31-en.zip, Missing report url
+lei:5299003ATVTQVPTW4735:2020-12-31:xbrl.org:ESEF-AT-1, 5299003ATVTQVPTW4735-2020-12-31.zip, Missing report url
+lei:259400ZRVNOHUDDPM098:2021-12-31:xbrl.org:ESEF-PL-0, gnc_2021-12-31_pl.zip, Missing report url
+lei:529900DQKWXN4TVCYP11:2021-12-31:xbrl.org:ESEF-DK-0, 529900DQKWXN4TVCYP11-2021-12-31-en.zip, Missing report url
+lei:549300X34UUBDEUL1Z91:2021-12-31:xbrl.org:ESEF-MT-0, 549300X34UUBDEUL1Z91-2021-12-31.zip, Missing report url
+lei:2594007NJKT8BOIW2107:2021-12-31:xbrl.org:ESEF-PL-0, atg_2021-12-31_pl.zip, Missing report url
+lei:5493003B50SM3XIJDQ79:2021-12-31:xbrl.org:ESEF-DK-0, 5493003B50SM3XIJDQ79-2021-12-31-en.zip, Missing report url
+lei:213800ZRY1MCTFK8PQ94:2021-12-31:xbrl.org:ESEF-DK-0, parken-2021-12-31-da.zip, Missing report url
+lei:2594003GVVF9U3PSDS82:2021-12-31:xbrl.org:ESEF-PL-0, 2594003GVVF9U3PSDS82-2021-12-31.zip, Missing report url
+lei:259400OJMUNLRRPNZK55:2021-12-31:xbrl.org:ESEF-PL-0, GKFASING-SprFinan-2021-12-31-pl.zip, Missing report url
+lei:2594008KNDCPLHVHMX88:2020-12-31:xbrl.org:ESEF-PL-0, 2594008KNDCPLHVHMX88-2020-12-31.zip, Missing report url
+lei:743700OD4QRWKZ4ODC98:2021-12-31:xbrl.org:ESEF-FI-1, Boreo-2021-12-13-fi.zip, Missing report url
+lei:743700OD4QRWKZ4ODC98:2021-12-31:xbrl.org:ESEF-FI-0, 743700OD4QRWKZ4ODC98-2021-12-31.zip, Missing report url
+lei:259400NAPDFBOTNCRL54:2020-12-31:xbrl.org:ESEF-PL-0, esef_GKTPE_SprawozdanieFinansowe2020.zip, org.apache.commons.compress.archivers.zip.UnsupportedZipFeatureException: Unsupported feature data descriptor used in entry esef_GKTPE_SprawozdanieFinansowe2020/
+lei:529900DS2PAVS3K9RV51:2021-12-31:xbrl.org:ESEF-AT-0, Jahresfinanzbericht_2021_ESEF.zip, Missing report url
+lei:635400HM7V74SUB9OG75:2021-12-31:xbrl.org:ESEF-GB-0, 635400HM7V74SUB9OG75-2021-12-31.zip, Missing report url
+lei:259400KX7WRD7O7P8637:2021-12-31:xbrl.org:ESEF-PL-0, rnc_2021-12-31_pl.zip, Missing report url
+lei:P4GTT6GF1W40CVIMFR43:2021-12-31:xbrl.org:ESEF-PL-0, ESEF_Skonsolidowane_sprawozdanie_finansowe_GK_PKOBP_SA_31.12.2021.zip, org.apache.commons.compress.archivers.zip.UnsupportedZipFeatureException: Unsupported feature data descriptor used in entry ESEF_Skonsolidowane_sprawozdanie_finansowe_GK_PKOBP_SA_31.12.2021/
+lei:259400RAB30GC3EU1Y11:2020-12-31:xbrl.org:ESEF-PL-0, 259400RAB30GC3EU1Y11-2020-12-31.zip, Missing report url
+lei:259400E95FYJSCEM5973:2020-12-31:xbrl.org:ESEF-PL-0, 259400E95FYJSCEM5973-2020-12-31.zip, Missing report url
+lei:969500UR00DF63I0VH67:2022-12-31:xbrl.org:ESEF-FR-0, bic-2022-12-31-fr.zip, org.apache.commons.compress.archivers.zip.UnsupportedZipFeatureException: Unsupported feature data descriptor used in entry bic-2022-12-31-fr/
+lei:2549001EPXH6NK7I2R78:2021-12-31:xbrl.org:ESEF-DK-0, bettercollective-2021-12-31-en.zip, Missing report url
+lei:984500C784DD41E4AC47:2021-12-31:xbrl.org:ESEF-NL-0, 984500C784DD41E4AC47-2021-12-31-en.zip, Missing report url
+lei:259400HHPUDSWFR70D07:2020-12-31:xbrl.org:ESEF-PL-0, 259400HHPUDSWFR70D07-2020-12-31.zip, Missing report url
+lei:969500BY8TEU16U3SJ94:2022-12-31:xbrl.org:ESEF-FR-0, tikehau-2022-12-31-fr.zip, org.apache.commons.compress.archivers.zip.UnsupportedZipFeatureException: Unsupported feature data descriptor used in entry tikehau-2022-12-31-fr/
+lei:8156009F95C37526C483:2021-12-31:xbrl.org:ESEF-IT-0, 8156009F95C37526C483-2021-12-31.zip, Missing report url
+lei:259400LGXW3K0GDAG361:2020-12-31:xbrl.org:ESEF-PL-0, 259400LGXW3K0GDAG361-2020-12-31.zip, Missing report url
+lei:96950065LBWY0APQIM86:2020-12-31:xbrl.org:ESEF-FR-0, 96950065LBWY0APQIM86-2020-12-31.zip, Missing report url
+lei:5493000EHCBQ7QQBGX32:2021-12-31:xbrl.org:ESEF-SE-0, 5493000EHCBQ7QQBGX32-2021-12-31.zip, Missing report url
+lei:2594009CXYWKREHIBZ14:2020-12-31:xbrl.org:ESEF-PL-0, 2594009CXYWKREHIBZ14-2020-12-31.zip, Missing report url
+lei:8156004604684CA44A90:2022-12-31:xbrl.org:ESEF-IT-0, 8156004604684CA44A90-2022-12-31-it.zip, Missing report url
+lei:2138001CNF45JP5XZK38:2020-12-31:xbrl.org:ESEF-FI-1, 2138001CNF45JP5XZK38-2020-12-31.zip, Missing report url
+lei:2138001CNF45JP5XZK38:2020-12-31:xbrl.org:ESEF-FI-0, 2138001CNF45JP5XZK38-2020-12-31.zip, Missing report url
+lei:969500RU6K8AVTCX7818:2021-12-31:xbrl.org:ESEF-FR-0, PRECIA-2021-12-31-fr.zip, Missing report url
+lei:5493002O1ESKZ18OXR80:2021-12-31:xbrl.org:ESEF-BE-0, 5493002O1ESKZ18OXR80-2021-12-31.zip, Missing report url
+lei:213800ATZVDWWKJ8NI47:2021-12-31:xbrl.org:ESEF-DK-0, asetek-2021-12-31-en.zip, Missing report url
+lei:259400GG96T088V4UG60:2021-12-31:xbrl.org:ESEF-PL-0, dekpol_2021-12-31_pl.zip, Missing report url
+lei:549300DL001YAEQZA069:2021-12-31:xbrl.org:ESEF-BE-0, 549300DL001YAEQZA069-2021-12-31-fr.zip, Missing report url
+lei:259400CBBLICU7Q86X02:2020-12-31:xbrl.org:ESEF-PL-0, 259400CBBLICU7Q86X02-2020-12-31.zip, Missing report url
+lei:213800CEDKSNUTPAQZ41:2021-12-31:xbrl.org:ESEF-GB-0, 213800CEDKSNUTPAQZ41-2021-12-31.zip, Missing report url
+lei:259400N4ZI3S2J1QYJ60:2020-12-31:xbrl.org:ESEF-PL-0, 259400N4ZI3S2J1QYJ60-2020-12-31.zip, Missing report url
+lei:259400CXBGPCDXIXSM81:2020-12-31:xbrl.org:ESEF-PL-0, 259400CXBGPCDXIXSM81-2020-12-31.zip, Missing report url
+lei:259400G1XM5GQU4K4G26:2020-12-31:xbrl.org:ESEF-PL-0, 259400G1XM5GQU4K4G26-2020-12-31.zip, Missing report url
+
+Total count, 7414, errors, 20
+
+
+Java unzip errors
+
+mBank-SSF-2021-12-31-pl.zip, java.util.zip.ZipException: only DEFLATED entries can have EXT descriptor
+bvi-2022-12-31-fr.zip, java.util.zip.ZipException: only DEFLATED entries can have EXT descriptor
+529900BT3M81VV58P678-2022-06-30-da.zip, java.io.EOFException: Unexpected end of ZLIB input stream
+ESEF_Skonsolidowane_sprawozdanie_finansowe_GK_PKOBPSA_31.12.2020.zip, java.util.zip.ZipException: only DEFLATED entries can have EXT descriptor
+259400O79EWIK4XZPL40-2020-12-31.zip, java.util.zip.ZipException: only DEFLATED entries can have EXT descriptor
+GrupaACP-2020-12-31.zip, java.util.zip.ZipException: only DEFLATED entries can have EXT descriptor
+2138001CNF45JP5XZK38-2021-12-31-FI.zip, java.util.zip.ZipException: only DEFLATED entries can have EXT descriptor
+7437000I5X6LNQOW6U59-2020-12-31.zip, java.lang.IllegalArgumentException: MALFORMED
+5967007LIEEXZXHW3S18-2021-12-31.zip, java.util.zip.ZipException: only DEFLATED entries can have EXT descriptor
+549300CVBE06T0SH6T76-2022-12-31-en.zip, java.util.zip.ZipException: only DEFLATED entries can have EXT descriptor
+3 skons_sprawozdanie finansowe_2020.zip, java.util.zip.ZipException: only DEFLATED entries can have EXT descriptor
+549300UM6IMVRYXSZB11-2021-12-31.zip, java.lang.IllegalArgumentException: MALFORMED
+5493000SDCOXVGZDWK18-2022-12-31-fi.zip, java.lang.IllegalArgumentException: MALFORMED
+31570010000000102818-2020-12-31-3.zip, java.lang.IllegalArgumentException: MALFORMED
+atos-2022-12-31-fr.zip, java.util.zip.ZipException: only DEFLATED entries can have EXT descriptor
+2021-04-30 08-58-08 - RLB_KA_IFRS_2020_Final für Veröffentlichung.zip, java.lang.IllegalArgumentException: MALFORMED
+coface-2022-12-31-fr.zip, java.util.zip.ZipException: only DEFLATED entries can have EXT descriptor
+7437001BISR7R2A9KX89-2020-12-31.zip, java.lang.IllegalArgumentException: MALFORMED
+N747OI7JINV7RUUH6190-2021-12-31-it.zip, java.util.zip.ZipException: invalid entry size (expected 0 but got 128863 bytes)
+groupama-2022-12-31-fr.zip, java.util.zip.ZipException: only DEFLATED entries can have EXT descriptor
+inea-2022-12-31.zip, java.util.zip.ZipException: only DEFLATED entries can have EXT descriptor
+ESEF_SantanderBankPolska.zip, java.lang.IllegalArgumentException: MALFORMED
+indu-2022-12-31-sv.zip, java.lang.IllegalArgumentException: MALFORMED
+SF_GRUPA BOS_31_12_2020.zip, java.util.zip.ZipException: only DEFLATED entries can have EXT descriptor
+259400DZXF7UJKK2AY35-2020-12-31.zip, java.util.zip.ZipException: only DEFLATED entries can have EXT descriptor
+529900925TK5QIGTBH86-2021-12-31.zip, java.lang.IllegalArgumentException: MALFORMED
+2138003NEBX5VRP3EX50-2022-11-30.zip, java.io.EOFException: Unexpected end of ZLIB input stream
+esef_GKTPE_SprawozdanieFinansowe2020.zip, java.util.zip.ZipException: only DEFLATED entries can have EXT descriptor
+ESEF_Skonsolidowane_sprawozdanie_finansowe_GK_PKOBP_SA_31.12.2021.zip, java.util.zip.ZipException: only DEFLATED entries can have EXT descriptor
+ciscatering-2021-12-31-fr.zip, java.lang.IllegalArgumentException: MALFORMED
+
+
+=================
+
+
+
+
 Unique identification
  IdentifierType:EntityID:Year:ProviderID:ProviderExtra
  
@@ -25,3 +334,5 @@ File count: 699
 Fail count: 1
 Report dir fail 
    /Users/lkedves/work/xbrl/data/reports/2020/xbrl.org/6c/d2/315700GZJC0X5GELP252/ESEF-CZ-0/FIDUROCK_Nemovitosti_a.s._FINAL
+
+   
