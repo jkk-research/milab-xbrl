@@ -9,11 +9,11 @@ public class XbrlCoreUtils implements XbrlConsts {
 		Double dVal = 0.0;
 		boolean unitSep = false;
 
-		if ( fmt.contains("zero") ) {
+		if ( fmt.contains("zero") || fmt.contains("numdash") ) {
 			dVal = 0.0;
 		} else {
 			if ( !DustUtils.isEmpty(val) ) {
-				if ( fmt.contains("comma") ) {
+				if ( fmt.contains("comma") && !fmt.contains("numcommadot") ) {
 					decSep = ',';
 				} else if ( fmt.contains("unit") ) {
 					unitSep = true;

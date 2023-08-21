@@ -1,10 +1,15 @@
 package hu.sze.uni.xbrl.portal;
 
+import java.io.BufferedReader;
 import java.io.File;
-import java.nio.file.Files;
-import java.util.Map;
-
 import java.io.FileFilter;
+import java.io.FileReader;
+import java.nio.file.Files;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.HashSet;
+import java.util.Map;
+import java.util.Set;
 
 import hu.sze.milab.dust.Dust;
 import hu.sze.milab.dust.utils.DustUtils;
@@ -18,6 +23,10 @@ public class XbrlTestPortal implements XbrlTestPortalConsts {
 
 	private File dataRoot;
 	private XbrlFilingManager filings;
+	
+//	ArrayList<String[]> allFacts = new ArrayList<>();
+//	ArrayList<Map> allFacts = new ArrayList<>(); TOO BIG!
+	Map<String, ArrayList<String[]>> allFactsByRep = new HashMap<>();
 
 	private long spaceToFree;
 
@@ -32,18 +41,27 @@ public class XbrlTestPortal implements XbrlTestPortalConsts {
 
 		getAllZips();
 
-//		initJetty();
+		initJetty();
 
 	}
 
+//	@SuppressWarnings("unchecked")
 	void getAllZips() throws Exception {
 		boolean extract = true;
-		
+
 		spaceToFree = 0;
 		int errCount = 0;
 		Map<String, Map> reportData = filings.getReportData();
 
 		int count = 0;
+
+		int parsedRepCount = 0;
+		int totalValCount = 0;
+		int totalTxtCount = 0;
+		ArrayList<String> errFactLines = new ArrayList<>();
+		
+		@SuppressWarnings("unused")
+		Set<File> csvUpdate = new HashSet<>();
 
 		FileFilter ffIsDir = new FileFilter() {
 			@Override
@@ -51,15 +69,14 @@ public class XbrlTestPortal implements XbrlTestPortalConsts {
 				return f.isDirectory();
 			}
 		};
-
-//		File dir = new File("work");
+//		SimpleDateFormat dfmt = new SimpleDateFormat("yyyy-MM-dd");
 
 		for (Map.Entry<String, Map> e : reportData.entrySet()) {
 			String id = e.getKey();
 			Map repSrc = e.getValue();
 
 			if ( 0 == (++count % 100) ) {
-//				System.out.println("Count " + count);
+				System.out.println("Count " + count);
 			}
 
 			String pkgUrl = XbrlUtils.access(repSrc, AccessCmd.Peek, null, "package_url");
@@ -69,56 +86,114 @@ public class XbrlTestPortal implements XbrlTestPortalConsts {
 			File repDir = new File(filings.getRepoRoot(), repDirName);
 
 			File repFile = new File(repDir, "extractedReport.xhtml");
+			File csvVal = new File(repDir, "Report_Val.csv");
 			boolean repFileExists = repFile.isFile();
 
 			try {
-				if ( repDir.isDirectory() ) {
-					File csvVal = new File(repDir, "Report_Val.csv");
-					if ( csvVal.isFile() ) {
-
-						if ( repFileExists ) {
-							removeRepFile(repFile);
-						}
-
-						continue;
+				if ( !csvVal.isFile() ) {
+					if ( !repDir.isDirectory() ) {
+						repDir.mkdirs();
 					}
-				} else {
-					repDir.mkdirs();
-				}
 
-				if ( extract ) {
+					if ( extract ) {
+						if ( !repFileExists ) {
+							File repZip = filings.getReport(repSrc, XbrlReportType.Zip);
 
-					if ( !repFileExists ) {
-						File repZip = filings.getReport(repSrc, XbrlReportType.Zip);
+							if ( DustUtils.isEmpty(repUrl) ) {
+								if ( 0 == repDir.listFiles(ffIsDir).length ) {
+									File unzipDir = new File(repDir, DustUtils.cutPostfix(repZip.getName(), "."));
+									XbrlTestPortalUtils.extractWithApacheZipFile(null, repZip, unzipDir);
+								}
 
-						if ( DustUtils.isEmpty(repUrl) ) {
-							if ( 0 == repDir.listFiles(ffIsDir).length ) {
-								File unzipDir = new File(repDir, DustUtils.cutPostfix(repZip.getName(), "."));
-								XbrlTestPortalUtils.extractWithApacheZipFile(null, repZip, unzipDir);
-							}
+								File rf = filings.findReportToLoad(repDir);
 
-							File rf = filings.findReportToLoad(repDir);
-
-							if ( null != rf ) {
-								Files.copy(rf.toPath(), repFile.toPath());
-								repFileExists = true;
+								if ( null != rf ) {
+									Files.copy(rf.toPath(), repFile.toPath());
+									repFileExists = true;
+								} else {
+									Dust.dumpObs(id, pkgUrl, "Missing report url (and could not guess)", repDir.getCanonicalPath());
+									continue;
+								}
 							} else {
-								Dust.dumpObs(id, pkgUrl, "Missing report url (and could not guess)", repDir.getCanonicalPath());
-								continue;
-							}
-						} else {
-							int sep = pkgUrl.lastIndexOf("/");
-							String repName = repUrl.substring(sep + 1);
+								int sep = pkgUrl.lastIndexOf("/");
+								String repName = repUrl.substring(sep + 1);
 
-							XbrlTestPortalUtils.extractWithApacheZipFile(repName, repZip, repFile);
-							repFileExists = repFile.exists();
+								XbrlTestPortalUtils.extractWithApacheZipFile(repName, repZip, repFile);
+								repFileExists = repFile.exists();
+							}
 						}
+					}
+
+					if ( repFileExists ) {
+						XbrlReportLoaderDomBase.createSplitCsv(repFile, repDir, "Report", 200);
 					}
 				}
 
-				if ( repFileExists ) {
-					XbrlReportLoaderDomBase.createSplitCsv(repFile, repDir, "Report", 200);
-					removeRepFile(repFile);
+				if ( repFile.isFile() ) {
+					Dust.dumpObs("Delete", repFile);
+					spaceToFree += repFile.length();
+					repFile.delete();
+				}
+
+				if ( csvVal.isFile() ) {
+					
+					ArrayList<String[]> allFacts = new ArrayList<>();
+					allFactsByRep.put(id, allFacts);
+
+					++parsedRepCount;
+					String fPref = csvVal.getName() + "\t";
+					try (BufferedReader br = new BufferedReader(new FileReader(csvVal))) {
+						DustUtils.TableReader tr = null;
+
+						for (String line; (line = br.readLine()) != null;) {
+							if ( !DustUtils.isEmpty(line) ) {
+								String[] data = line.split("\t");
+
+								if ( null == tr ) {
+									tr = new DustUtils.TableReader(data) {
+//										@Override
+//										protected Object optConvert(String col, Object val) {
+//											switch ( col ) {
+//											case "StartDate":
+//											case "EndDate":
+//											case "Instant":
+//												try {
+//													val = dfmt.parse((String) val);
+//												} catch (ParseException e) {
+//													// do nothing for now;
+//												}
+//												break;
+//											}
+//											return val;
+//										}
+									};
+									
+								} else {
+									String strVal = tr.get(data, "Value");
+									if ( strVal.startsWith("Txt len") ) {
+										totalTxtCount++;
+									} else {
+										totalValCount++;
+										String err = tr.get(data, "Err");
+										if ( DustUtils.isEmpty(err) ) {
+											allFacts.add(data);
+//											Map fact = tr.get(data, null, "Unit", "Format", "Value");
+//											tr.getUntil(data, fact, "OrigValue");
+//											fact.put("repId", id);
+//											
+//											allFacts.add(fact);
+										} else {
+//											if ( !err.contains("monthname") ) 
+											{
+												errFactLines.add(fPref + line);
+//												csvUpdate.add(csvVal);
+											}
+										}
+									}
+								}
+							}
+						}
+					}
 				}
 			} catch (Throwable t) {
 				Dust.dumpObs(id, pkgUrl, t);
@@ -128,12 +203,16 @@ public class XbrlTestPortal implements XbrlTestPortalConsts {
 		}
 
 		Dust.dumpObs("Total count", reportData.size(), "errors", errCount, "space to free", spaceToFree);
-	}
 
-	public void removeRepFile(File repFile) {
-		Dust.dumpObs("Delete", repFile);
-		spaceToFree += repFile.length();
-		repFile.delete();
+		for (String e : errFactLines) {
+			Dust.dumpObs(e);
+		}
+
+		Dust.dumpObs("Parsed files", parsedRepCount, "Val", totalValCount, "Txt", totalTxtCount, "Err", errFactLines.size());
+		
+//		for ( File f : csvUpdate ) {
+//			f.delete();
+//		}
 	}
 
 	void initJetty() throws Exception {
@@ -143,7 +222,7 @@ public class XbrlTestPortal implements XbrlTestPortalConsts {
 			protected void initHandlers() {
 				super.initHandlers();
 
-				addServlet("/list/*", new XbrlTestServletReportList(filings));
+				addServlet("/list/*", new XbrlTestServletReportList(filings, allFactsByRep));
 				addServlet("/report/*", new XbrlTestServletReportData(filings));
 				addServlet("/bin/*", new XbrlTestServletReportBinary(filings));
 			}
