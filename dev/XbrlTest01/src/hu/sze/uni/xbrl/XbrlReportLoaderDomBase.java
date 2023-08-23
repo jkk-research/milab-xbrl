@@ -178,7 +178,7 @@ public abstract class XbrlReportLoaderDomBase implements XbrlConsts {
 							valStr = "0";
 							break;
 						case "empty":
-							valObj = null;
+							valObj = "";
 							valStr = "";
 							break;
 						case "false":

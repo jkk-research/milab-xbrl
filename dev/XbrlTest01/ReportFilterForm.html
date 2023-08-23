@@ -1,0 +1,46 @@
+<html lang="en-US">
+
+<head>
+<title>Report list</title>
+<style>
+table, th, td {
+	border: 1px solid black;
+}
+</style>
+</head>
+
+<body>
+
+	<h1>Search conditions</h1>
+	<form method="GET">
+		<table border="1">
+			<thead>
+				<tr>
+					<th width="50%"><label for="exprHead">Header filter</label></th>
+					<th width="50%"><label for="exprFact">Fact filter</label></th>
+				</tr>
+			</thead>
+			<tbody>
+				<tr>
+					<td><textarea id="exprHead" rows="5" cols="50" placeholder="Filter expression by report header columns"
+							name="exprHead"></textarea></td>
+					<td><textarea id="exprFact" rows="5" cols="50"
+							placeholder="Filter expression by fact columns (include if any fact matches)" name="exprFact"></textarea></td>
+				</tr>
+				<tr>
+					<td ><label for="sort">Sort by</label><input id="sort" name="sort" />
+						<input type="submit" name="mode" value="ShowList" />  </td>
+					<td>
+						<label for="fName">File Name</label><input id="fName" name="fName" />
+						<input type="submit" name="mode" value="All" />
+						<input type="submit" name="mode" value="Filtered" />
+						</td>
+				</tr>
+			</tbody>
+		</table>
+	</form>
+	
+<!-- CUT -->
+
+</body>
+</html>

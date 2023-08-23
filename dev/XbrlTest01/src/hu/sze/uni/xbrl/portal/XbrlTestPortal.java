@@ -22,11 +22,13 @@ import hu.sze.uni.xbrl.XbrlUtils;
 public class XbrlTestPortal implements XbrlTestPortalConsts {
 
 	private File dataRoot;
-	private XbrlFilingManager filings;
-	
+	XbrlFilingManager filings;
+
 //	ArrayList<String[]> allFacts = new ArrayList<>();
 //	ArrayList<Map> allFacts = new ArrayList<>(); TOO BIG!
 	Map<String, ArrayList<String[]>> allFactsByRep = new HashMap<>();
+	Map<String, DustUtils.TableReader> contentReaders = new HashMap<>();
+	Map<String, DustUtils.TableReader> headers = new HashMap<>();
 
 	private long spaceToFree;
 
@@ -59,7 +61,7 @@ public class XbrlTestPortal implements XbrlTestPortalConsts {
 		int totalValCount = 0;
 		int totalTxtCount = 0;
 		ArrayList<String> errFactLines = new ArrayList<>();
-		
+
 		@SuppressWarnings("unused")
 		Set<File> csvUpdate = new HashSet<>();
 
@@ -136,12 +138,12 @@ public class XbrlTestPortal implements XbrlTestPortalConsts {
 				}
 
 				if ( csvVal.isFile() ) {
-					
+
 					ArrayList<String[]> allFacts = new ArrayList<>();
 					allFactsByRep.put(id, allFacts);
 
 					++parsedRepCount;
-					String fPref = csvVal.getName() + "\t";
+//					String fPref = csvVal.getName() + "\t";
 					try (BufferedReader br = new BufferedReader(new FileReader(csvVal))) {
 						DustUtils.TableReader tr = null;
 
@@ -150,44 +152,38 @@ public class XbrlTestPortal implements XbrlTestPortalConsts {
 								String[] data = line.split("\t");
 
 								if ( null == tr ) {
-									tr = new DustUtils.TableReader(data) {
-//										@Override
-//										protected Object optConvert(String col, Object val) {
-//											switch ( col ) {
-//											case "StartDate":
-//											case "EndDate":
-//											case "Instant":
-//												try {
-//													val = dfmt.parse((String) val);
-//												} catch (ParseException e) {
-//													// do nothing for now;
-//												}
-//												break;
-//											}
-//											return val;
-//										}
-									};
-									
+									tr = contentReaders.get(line);
+									if ( null == tr ) {
+										tr = new DustUtils.TableReader(data);
+										contentReaders.put(line, tr);
+									}
+									headers.put(id, tr);
 								} else {
 									String strVal = tr.get(data, "Value");
+									if ( null == strVal ) {
+										Dust.dumpObs("seems to be: fixed-empty text in val?", line);
+//										csvUpdate.add(csvVal);
+										continue;
+									}
 									if ( strVal.startsWith("Txt len") ) {
 										totalTxtCount++;
 									} else {
 										totalValCount++;
-										String err = tr.get(data, "Err");
-										if ( DustUtils.isEmpty(err) ) {
+//										String err = tr.get(data, "Err");
+//										if ( DustUtils.isEmpty(err) ) 
+										{
 											allFacts.add(data);
 //											Map fact = tr.get(data, null, "Unit", "Format", "Value");
 //											tr.getUntil(data, fact, "OrigValue");
 //											fact.put("repId", id);
 //											
 //											allFacts.add(fact);
-										} else {
-//											if ( !err.contains("monthname") ) 
-											{
-												errFactLines.add(fPref + line);
-//												csvUpdate.add(csvVal);
-											}
+//										} else {
+////											if ( !err.contains("monthname") ) 
+//											{
+//												errFactLines.add(fPref + line);
+////												csvUpdate.add(csvVal);
+//											}
 										}
 									}
 								}
@@ -209,7 +205,7 @@ public class XbrlTestPortal implements XbrlTestPortalConsts {
 		}
 
 		Dust.dumpObs("Parsed files", parsedRepCount, "Val", totalValCount, "Txt", totalTxtCount, "Err", errFactLines.size());
-		
+
 //		for ( File f : csvUpdate ) {
 //			f.delete();
 //		}
@@ -222,7 +218,7 @@ public class XbrlTestPortal implements XbrlTestPortalConsts {
 			protected void initHandlers() {
 				super.initHandlers();
 
-				addServlet("/list/*", new XbrlTestServletReportList(filings, allFactsByRep));
+				addServlet("/list/*", new XbrlTestServletReportList(XbrlTestPortal.this));
 				addServlet("/report/*", new XbrlTestServletReportData(filings));
 				addServlet("/bin/*", new XbrlTestServletReportBinary(filings));
 			}
