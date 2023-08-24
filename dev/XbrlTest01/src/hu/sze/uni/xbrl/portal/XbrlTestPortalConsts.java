@@ -14,7 +14,7 @@ public interface XbrlTestPortalConsts extends XbrlConsts {
 	Pattern PT_DATE_ONLY = Pattern.compile("(\\d+-\\d+-\\d+).*");
 
 	enum ListColumns {
-		Country("country"), PeriodEnd("period_end"), Entity(XbrlFilingManager.ENTITY_NAME), DateAdded("date_added"), Report(XbrlFilingManager.REPORT_ID), CsvVal(XbrlFilingManager.REPORT_ID),
+		Country("country"), PeriodEnd("period_end"), Publisher(XbrlFilingManager.ENTITY_NAME), DateAdded("date_added"), Report(XbrlFilingManager.REPORT_ID), CsvVal(XbrlFilingManager.REPORT_ID),
 		CsvTxt(XbrlFilingManager.REPORT_ID), Zip("package_url"), Json("json_url"), ChkErr("error_count"), ChkWarn("warning_count"), ChkInc("inconsistency_count");
 
 		public final String colName;

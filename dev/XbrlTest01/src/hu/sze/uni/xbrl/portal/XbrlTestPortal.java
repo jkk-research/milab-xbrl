@@ -1,12 +1,9 @@
 package hu.sze.uni.xbrl.portal;
 
-import java.io.BufferedReader;
 import java.io.File;
 import java.io.FileFilter;
-import java.io.FileReader;
 import java.nio.file.Files;
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Map;
 import java.util.Set;
@@ -26,9 +23,6 @@ public class XbrlTestPortal implements XbrlTestPortalConsts {
 
 //	ArrayList<String[]> allFacts = new ArrayList<>();
 //	ArrayList<Map> allFacts = new ArrayList<>(); TOO BIG!
-	Map<String, ArrayList<String[]>> allFactsByRep = new HashMap<>();
-	Map<String, DustUtils.TableReader> contentReaders = new HashMap<>();
-	Map<String, DustUtils.TableReader> headers = new HashMap<>();
 
 	private long spaceToFree;
 
@@ -138,58 +132,58 @@ public class XbrlTestPortal implements XbrlTestPortalConsts {
 				}
 
 				if ( csvVal.isFile() ) {
-
-					ArrayList<String[]> allFacts = new ArrayList<>();
-					allFactsByRep.put(id, allFacts);
-
-					++parsedRepCount;
-//					String fPref = csvVal.getName() + "\t";
-					try (BufferedReader br = new BufferedReader(new FileReader(csvVal))) {
-						DustUtils.TableReader tr = null;
-
-						for (String line; (line = br.readLine()) != null;) {
-							if ( !DustUtils.isEmpty(line) ) {
-								String[] data = line.split("\t");
-
-								if ( null == tr ) {
-									tr = contentReaders.get(line);
-									if ( null == tr ) {
-										tr = new DustUtils.TableReader(data);
-										contentReaders.put(line, tr);
-									}
-									headers.put(id, tr);
-								} else {
-									String strVal = tr.get(data, "Value");
-									if ( null == strVal ) {
-										Dust.dumpObs("seems to be: fixed-empty text in val?", line);
-//										csvUpdate.add(csvVal);
-										continue;
-									}
-									if ( strVal.startsWith("Txt len") ) {
-										totalTxtCount++;
-									} else {
-										totalValCount++;
-//										String err = tr.get(data, "Err");
-//										if ( DustUtils.isEmpty(err) ) 
-										{
-											allFacts.add(data);
-//											Map fact = tr.get(data, null, "Unit", "Format", "Value");
-//											tr.getUntil(data, fact, "OrigValue");
-//											fact.put("repId", id);
-//											
-//											allFacts.add(fact);
-//										} else {
-////											if ( !err.contains("monthname") ) 
-//											{
-//												errFactLines.add(fPref + line);
-////												csvUpdate.add(csvVal);
-//											}
-										}
-									}
-								}
-							}
-						}
-					}
+					filings.optLoadFacts(id);
+//					ArrayList<String[]> allFacts = new ArrayList<>();
+//					allFactsByRep.put(id, allFacts);
+//
+//					++parsedRepCount;
+////					String fPref = csvVal.getName() + "\t";
+//					try (BufferedReader br = new BufferedReader(new FileReader(csvVal))) {
+//						DustUtils.TableReader tr = null;
+//
+//						for (String line; (line = br.readLine()) != null;) {
+//							if ( !DustUtils.isEmpty(line) ) {
+//								String[] data = line.split("\t");
+//
+//								if ( null == tr ) {
+//									tr = contentReaders.get(line);
+//									if ( null == tr ) {
+//										tr = new DustUtils.TableReader(data);
+//										contentReaders.put(line, tr);
+//									}
+//									headers.put(id, tr);
+//								} else {
+//									String strVal = tr.get(data, "Value");
+//									if ( null == strVal ) {
+//										Dust.dumpObs("seems to be: fixed-empty text in val?", line);
+////										csvUpdate.add(csvVal);
+//										continue;
+//									}
+//									if ( strVal.startsWith("Txt len") ) {
+//										totalTxtCount++;
+//									} else {
+//										totalValCount++;
+////										String err = tr.get(data, "Err");
+////										if ( DustUtils.isEmpty(err) ) 
+//										{
+//											allFacts.add(data);
+////											Map fact = tr.get(data, null, "Unit", "Format", "Value");
+////											tr.getUntil(data, fact, "OrigValue");
+////											fact.put("repId", id);
+////											
+////											allFacts.add(fact);
+////										} else {
+//////											if ( !err.contains("monthname") ) 
+////											{
+////												errFactLines.add(fPref + line);
+//////												csvUpdate.add(csvVal);
+////											}
+//										}
+//									}
+//								}
+//							}
+//						}
+//					}
 				}
 			} catch (Throwable t) {
 				Dust.dumpObs(id, pkgUrl, t);

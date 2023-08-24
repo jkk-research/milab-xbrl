@@ -4,23 +4,28 @@ import java.io.BufferedReader;
 import java.io.File;
 import java.io.FileReader;
 import java.io.PrintWriter;
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Comparator;
+import java.util.Date;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.Map;
+import java.util.Set;
 
 import javax.servlet.http.HttpServletResponse;
 
 import org.mvel2.MVEL;
 
 import hu.sze.milab.dust.Dust;
+import hu.sze.milab.dust.DustConsts;
 import hu.sze.milab.dust.DustConsts.MindAccess;
 import hu.sze.milab.dust.utils.DustUtils;
 import hu.sze.uni.http.DustHttpServlet;
 import hu.sze.uni.xbrl.XbrlFilingManager;
 import hu.sze.uni.xbrl.portal.XbrlTestPortalConsts.ListColumns;
 
-@SuppressWarnings("rawtypes")
+@SuppressWarnings({"rawtypes"})
 class XbrlTestServletReportList extends DustHttpServlet {
 	private static final long serialVersionUID = 1L;
 
@@ -37,7 +42,7 @@ class XbrlTestServletReportList extends DustHttpServlet {
 			factExpr = DustUtils.isEmpty(strFactExpr) ? null : MVEL.compileExpression(strFactExpr);
 		}
 
-		public boolean test(Map currRep) {
+		public boolean test(Map currRep, DustUtils.TableReader tr, Iterable<String[]> repFacts) {
 			if ( (null == headExpr) && (null == factExpr) ) {
 				return true;
 			}
@@ -45,44 +50,9 @@ class XbrlTestServletReportList extends DustHttpServlet {
 			boolean match = (null == headExpr) ? true : (boolean) MVEL.executeExpression(headExpr, this, currRep);
 
 			if ( match && (null != factExpr) ) {
-				String id = (String) currRep.get("Report");
-
 				match = false;
 
-//				Map mapFiling = filings.getReportData().get(id);
-//				String lDir = Dust.access(mapFiling, MindAccess.Peek, null, XbrlFilingManager.LOCAL_DIR);
-//				File f = new File(repoRoot, lDir + "/Report_Val.csv");
-//
-//				if ( (null != f ) && f.isFile() ) {
-//					try (BufferedReader br = new BufferedReader(new FileReader(f))) {
-//						DustUtils.TableReader tr = null;
-//						Map currFact = new HashMap<>();
-//
-//						for (String line; (line = br.readLine()) != null;) {
-//							if ( !DustUtils.isEmpty(line) ) {
-//								String[] data = line.split("\t");
-//
-//								if ( null == tr ) {
-//									tr = new DustUtils.TableReader(data);
-//								} else {
-//									tr.getUntil(data, currFact, null);
-//									match = (boolean) MVEL.executeExpression(factExpr, this, currFact);
-//
-//									if ( match ) {
-//										return true;
-//									}
-//
-//									currFact.clear();
-//								}
-//							}
-//						}
-//					}
-//				}
-
-				ArrayList<String[]> repFacts = repList.allFactsByRep.get(id);
-
 				if ( null != repFacts ) {
-					DustUtils.TableReader tr = repList.headers.get(id);
 					Map currFact = new HashMap<>();
 
 					for (String[] rf : repFacts) {
@@ -112,13 +82,13 @@ class XbrlTestServletReportList extends DustHttpServlet {
 
 	private XbrlFilingManager filings;
 //		ArrayList<String[]> allFacts = new ArrayList<>();
-	Map<String, ArrayList<String[]>> allFactsByRep = new HashMap<>();
-	Map<String, DustUtils.TableReader> headers = new HashMap<>();
+//	Map<String, ArrayList<String[]>> allFactsByRep = new HashMap<>();
+//	Map<String, DustUtils.TableReader> headers = new HashMap<>();
 
 	public XbrlTestServletReportList(XbrlTestPortal portal) {
 		this.filings = portal.filings;
-		this.allFactsByRep = portal.allFactsByRep;
-		this.headers = portal.headers;
+//		this.allFactsByRep = portal.allFactsByRep;
+//		this.headers = portal.headers;
 	}
 
 	String insert(String line, int at, String str) {
@@ -145,8 +115,11 @@ class XbrlTestServletReportList extends DustHttpServlet {
 		DustUtils.TableReader trMax = null;
 
 		String exprHead = Dust.access(data, MindAccess.Peek, null, ServletData.Parameter, "exprHead");
-		String exprFact = Dust.access(data, MindAccess.Peek, "(null != Concept) && Concept.contains(\"Emission\") ", ServletData.Parameter, "exprFact");
+		String exprFact = Dust.access(data, MindAccess.Peek, null, ServletData.Parameter, "exprFact");
 		String sort = Dust.access(data, MindAccess.Peek, null, ServletData.Parameter, "sort");
+		String repColStr = Dust.access(data, MindAccess.Peek, "Report", ServletData.Parameter, "repCols");
+
+		boolean loadFacts = !DustUtils.isEmpty(exprFact);
 
 		Map rep = new HashMap();
 
@@ -154,20 +127,33 @@ class XbrlTestServletReportList extends DustHttpServlet {
 
 		ArrayList<Map> res = new ArrayList<>();
 
+		DustUtils.TableReader tr = null;
+		Iterable<String[]> repFacts = null;
+
+		Set<Map> loadErr = new HashSet<>();
+
 		for (Map repSrc : filings.getReportData().values()) {
 			rep = ListColumns.load(repSrc, rep);
 
-			if ( exprFilter.test(rep) ) {
+			String id = (String) rep.get("Report");
+
+			tr = filings.getTableReader(id);
+			
+			if ( loadFacts ) {
+				repFacts = filings.getFacts(id);
+			}
+
+			if ( exprFilter.test(rep, tr, repFacts) ) {
 				res.add(rep);
-
-				if ( csvOut ) {
-					Object id = rep.get("Report");
-					DustUtils.TableReader tr = headers.get(id);
-
+				
+				if ( null == tr ) {
+					loadErr.add(rep);
+				} else if ( csvOut ) {
 					if ( (null == trMax) || (trMax.getSize() < tr.getSize()) ) {
 						trMax = tr;
 					}
 				}
+				
 				rep = null;
 			}
 		}
@@ -184,22 +170,32 @@ class XbrlTestServletReportList extends DustHttpServlet {
 
 			boolean filtered = "Filtered".equals(mode) && (null != exprFilter.factExpr);
 			String fn = Dust.access(data, MindAccess.Peek, "ReportData", ServletData.Parameter, "fName");
-			fn += ("_" + mode + ".csv");
+			fn += ("_" + mode + "_" + new SimpleDateFormat(DustConsts.FMT_TIMESTAMP).format(new Date()) + ".csv");
 			resp.setHeader("Content-Disposition", "attachment; filename=" + fn);
 			resp.setContentType(CONTENT_CSV + "; filename=" + fn);
 			Map currFact = new HashMap<>();
-
-			out.print("Report\t");
+						
+			String[] repCols = {};
+			int repColCount = 0;
+			if (!DustUtils.isEmpty(repColStr)) {
+				repCols = repColStr.split(",");
+				repColCount = repCols.length;
+				for (int i = 0; i < repColCount; ++i ) {
+					repCols[i] = repCols[i].trim();
+					out.print(repCols[i]);
+					out.print("\t");
+				}
+			}
 
 			trMax.writeHead(out, "\t");
 
 			for (Map r : res) {
 				String id = (String) r.get("Report");
 
-				ArrayList<String[]> repFacts = allFactsByRep.get(id);
+				repFacts = filings.getFacts(id);
 
-				if ( (null != repFacts) && !repFacts.isEmpty() ) {
-					DustUtils.TableReader tr = headers.get(id);
+				if ( null != repFacts ) {
+					tr = filings.getTableReader(id);
 					int ts = tr.getSize();
 					int diff = trMax.getSize() - ts;
 					int ovi = -1;
@@ -224,7 +220,15 @@ class XbrlTestServletReportList extends DustHttpServlet {
 							currFact.clear();
 						}
 
-						out.print(id);
+						for (int i = 0; i < repColCount; ++i ) {
+							if ( 0 < i ) {
+								out.print("\t");								
+							}
+							Object rv = r.get(repCols[i]);
+							if ( null != rv ) {
+								out.print(rv);
+							}
+						}
 
 						for (int i = 0; i < rf.length; ++i) {
 							out.print("\t");
@@ -257,6 +261,8 @@ class XbrlTestServletReportList extends DustHttpServlet {
 						str = exprFact;
 					} else if ( -1 != (idx = optGetIdxAfter(line, "name=\"sort\" ", sort)) ) {
 						str = "value=\"" + sort + "\" ";
+					} else if ( -1 != (idx = optGetIdxAfter(line, "name=\"repCols\" ", repColStr)) ) {
+						str = "value=\"" + repColStr + "\" ";
 					}
 
 					if ( -1 != idx ) {
@@ -275,13 +281,20 @@ class XbrlTestServletReportList extends DustHttpServlet {
 
 			for (Map r : res) {
 				out.println("<tr>\n");
+				boolean err = loadErr.contains(r);
 
 				for (ListColumns lc : ListColumns.values()) {
 					Object val = r.get(lc.name());
 
 					switch ( lc ) {
+					case CsvVal:
+					case CsvTxt:
+						if ( err ) {
+							val = "-";
+						}
+						break;
 					case Report:
-						val = "<a href=\"/report/" + val + "\">" + val + "</a>";
+						val = err ? "Load error": ("<a href=\"/report/" + val + "\">" + val + "</a>") ;
 						break;
 					default:
 						break;

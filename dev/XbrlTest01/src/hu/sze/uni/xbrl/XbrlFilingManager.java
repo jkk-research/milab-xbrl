@@ -1,5 +1,6 @@
 package hu.sze.uni.xbrl;
 
+import java.io.BufferedReader;
 import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.FileReader;
@@ -12,6 +13,7 @@ import java.util.ArrayList;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.HashSet;
+import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
@@ -25,7 +27,9 @@ import org.json.simple.JSONValue;
 import org.json.simple.parser.JSONParser;
 import org.json.simple.parser.ParseException;
 
+import hu.sze.milab.dust.Dust;
 import hu.sze.milab.dust.DustException;
+import hu.sze.milab.dust.utils.DustUtils;
 
 @SuppressWarnings({ "rawtypes", "unchecked" })
 public class XbrlFilingManager implements XbrlConsts {
@@ -38,6 +42,56 @@ public class XbrlFilingManager implements XbrlConsts {
 	public static final String REPORT_DATE = "__ReportDate";
 	public static final String REPORT_ID = "__ReportId";
 	public static final String REPORT_FILE = "__ReportFile";
+	
+	private class FactIter implements Iterable<String[]>, Iterator<String[]> {
+		BufferedReader br ;
+		String repId;
+		String sep;
+		
+		String line;
+		int row;
+		
+		public FactIter(String repId) throws Exception {
+			this(repId, "\t");
+		}
+		
+		public FactIter(String repId, String sep) throws Exception {
+			row = 1;
+			this.sep = sep;
+			this.repId = repId;
+			
+			File csvVal = getFactFile(repId);
+			br = new BufferedReader(new FileReader(csvVal));
+			line = br.readLine();// skip head!
+			line = br.readLine();
+		}
+
+		@Override
+		public boolean hasNext() {
+			return !DustUtils.isEmpty(line);
+		}
+
+		@Override
+		public String[] next() {
+			String[] data = line.split(sep);
+			
+			try {
+				++row;
+				line = br.readLine();
+			} catch (Throwable e) {
+				line = null;
+				DustException.wrap(e, repId, row);
+			}
+			
+			return data;
+		}
+
+		@Override
+		public Iterator<String[]> iterator() {
+			return this;
+		}
+		
+	}
 
 	private static final FilenameFilter FF_JSON = new FilenameFilter() {
 		@Override
@@ -45,6 +99,8 @@ public class XbrlFilingManager implements XbrlConsts {
 			return name.toLowerCase().endsWith(".json");
 		}
 	};
+	
+	
 	private static final String FMT_API = XBRL_ORG_ADDR + "/api/filings?include=entity,language&sort=-date_added&page%5Bsize%5D={0,number,#}&page%5Bnumber%5D=1";
 
 //https://www.random.org/integer-sets/?sets=1&num=100&min=0&max=6939&commas=on&sort=on&order=index&format=plain&rnd=new
@@ -55,7 +111,6 @@ public class XbrlFilingManager implements XbrlConsts {
 	JSONParser parser = new JSONParser();
 
 	Map<String, Map> entities;
-//	Map<String, Map> reports = new TreeMap<>();
 	Map<String, Map> reportData = new TreeMap<>();
 
 	Set<Map> downloaded = new HashSet<>();
@@ -63,7 +118,9 @@ public class XbrlFilingManager implements XbrlConsts {
 
 	Pattern PT_FXO = Pattern.compile("(?<eid>\\w+)-(?<date>\\d+-\\d+-\\d+)-(?<extra>.*)");
 
-//	XbrlReportLoaderToJson xhtmlLoader;
+	Map<String, DustUtils.TableReader> contentReaders = new HashMap<>();
+	Map<String, DustUtils.TableReader> headers = new HashMap<>();
+	Map<String, ArrayList<String[]>> allFactsByRep;
 
 	public XbrlFilingManager(String repoPath, boolean doUpdate) throws Exception {
 		this(new File(repoPath), doUpdate);
@@ -72,13 +129,16 @@ public class XbrlFilingManager implements XbrlConsts {
 	public XbrlFilingManager(File repoRoot, boolean doUpdate) throws Exception {
 		this.repoRoot = repoRoot;
 
+		String mm = System.getProperty("MinMem");
+		allFactsByRep = "true".equalsIgnoreCase(mm) ? null : new HashMap<>();
+
 		File srcRoot = new File(repoRoot, "sources/xbrl.org");
 
 		if ( !srcRoot.exists() ) {
 			srcRoot.mkdirs();
 		}
 
-		System.out.println("Starting filing manager in folder " + srcRoot.getCanonicalPath());
+		System.out.println("Starting filing manager in folder " + srcRoot.getCanonicalPath() + ((null == allFactsByRep) ? " MinMem mode" : ""));
 
 		File updates = new File(srcRoot, "updates");
 		if ( !updates.exists() ) {
@@ -162,7 +222,7 @@ public class XbrlFilingManager implements XbrlConsts {
 	public void setDownloadOnly(boolean downloadOnly) {
 		this.downloadOnly = downloadOnly;
 	}
-	
+
 	public void loadReports(File fAll) throws IOException, ParseException, FileNotFoundException {
 		Object allFilings = parser.parse(new FileReader(fAll));
 
@@ -223,6 +283,64 @@ public class XbrlFilingManager implements XbrlConsts {
 		}
 
 		System.out.println("Returned count: " + count + ", size of filings: " + filings.size() + ", local report count: " + getReportData().size() + ", downloaded: " + downloaded.size());
+	}
+
+	public DustUtils.TableReader getTableReader(String repId) throws Exception {
+		optLoadFacts(repId);
+		return headers.get(repId);
+	}
+
+	public Iterable<String[]> getFacts(String repId) throws Exception {
+		return optLoadFacts(repId) ? ( null == allFactsByRep ) ? new FactIter(repId) : allFactsByRep.get(repId) : null;
+	}
+
+	public boolean optLoadFacts(String repId) throws Exception {
+		if ( headers.containsKey(repId) ) {
+			return true;
+		}
+		
+		File f = getFactFile(repId);
+
+		if ( (null != f) && f.isFile() ) {
+			try (BufferedReader br = new BufferedReader(new FileReader(f))) {
+				DustUtils.TableReader tr = null;
+				ArrayList<String[]> allFacts = null;
+
+				for (String line; (line = br.readLine()) != null;) {
+					if ( !DustUtils.isEmpty(line) ) {
+						String[] data = line.split("\t");
+						
+						if ( null == tr ) {
+							tr = contentReaders.get(line);
+							if ( null == tr ) {
+								tr = new DustUtils.TableReader(data);
+								contentReaders.put(line, tr);
+							}
+							headers.put(repId, tr);
+							
+							if ( null == allFactsByRep ) {
+								return true;
+							} else {
+								allFacts = new ArrayList<>();
+								allFactsByRep.put(repId, allFacts);
+							}
+						} else {
+							allFacts.add(data);
+						}
+					}
+				}
+				return true;
+			}
+		}
+		
+		return false;
+	}
+
+	public File getFactFile(String repId) {
+		Map mapFiling = getReportData().get(repId);
+		String lDir = Dust.access(mapFiling, MindAccess.Peek, null, XbrlFilingManager.LOCAL_DIR);
+		File f = new File(repoRoot, lDir + "/Report_Val.csv");
+		return f;
 	}
 
 	public Map<String, String> getAllEntities(Map<String, String> target, String filter) {
