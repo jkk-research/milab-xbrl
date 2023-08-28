@@ -1,0 +1,10 @@
+
+
+if ( ProcState == "Fact" ) {
+ count(
+  fact.Format.substring(
+   fact.Format.lastIndexOf(":")+1
+  )
+ );
+}
+

@@ -93,29 +93,37 @@ public class XbrlTestPortal implements XbrlTestPortalConsts {
 
 					if ( extract ) {
 						if ( !repFileExists ) {
-							File repZip = filings.getReport(repSrc, XbrlReportType.Zip);
 
-							if ( DustUtils.isEmpty(repUrl) ) {
-								if ( 0 == repDir.listFiles(ffIsDir).length ) {
-									File unzipDir = new File(repDir, DustUtils.cutPostfix(repZip.getName(), "."));
-									XbrlTestPortalUtils.extractWithApacheZipFile(null, repZip, unzipDir);
-								}
+							File rf = filings.findReportToLoad(repDir);
 
-								File rf = filings.findReportToLoad(repDir);
-
-								if ( null != rf ) {
-									Files.copy(rf.toPath(), repFile.toPath());
-									repFileExists = true;
-								} else {
-									Dust.dumpObs(id, pkgUrl, "Missing report url (and could not guess)", repDir.getCanonicalPath());
-									continue;
-								}
+							if ( null != rf ) {
+								Files.copy(rf.toPath(), repFile.toPath());
+								repFileExists = true;
 							} else {
-								int sep = pkgUrl.lastIndexOf("/");
-								String repName = repUrl.substring(sep + 1);
+								File repZip = filings.getReport(repSrc, XbrlReportType.Zip);
 
-								XbrlTestPortalUtils.extractWithApacheZipFile(repName, repZip, repFile);
-								repFileExists = repFile.exists();
+								if ( DustUtils.isEmpty(repUrl) ) {
+									if ( 0 == repDir.listFiles(ffIsDir).length ) {
+										File unzipDir = new File(repDir, DustUtils.cutPostfix(repZip.getName(), "."));
+										XbrlTestPortalUtils.extractWithApacheZipFile(null, repZip, unzipDir);
+									}
+
+									rf = filings.findReportToLoad(repDir);
+
+									if ( null != rf ) {
+										Files.copy(rf.toPath(), repFile.toPath());
+										repFileExists = true;
+									} else {
+										Dust.dumpObs(id, pkgUrl, "Missing report url (and could not guess)", repDir.getCanonicalPath());
+										continue;
+									}
+								} else {
+									int sep = pkgUrl.lastIndexOf("/");
+									String repName = repUrl.substring(sep + 1);
+
+									XbrlTestPortalUtils.extractWithApacheZipFile(repName, repZip, repFile);
+									repFileExists = repFile.exists();
+								}
 							}
 						}
 					}

@@ -41,7 +41,9 @@ class XbrlTestServletReportData extends DustHttpServlet {
 
 		PrintWriter w = getWriter(data);
 
-		w.print("<html lang=\"en-US\">\n" + "<head>\n" + "<title>Data content of report " + rep.get("fxo_id") + "</title>\n"
+		w.print("<html lang=\"en-US\">\n" + "<head>\n" 
+				+ "<meta http-equiv=\"content-type\" content=\"text/html; charset=utf-8\">\n"
+				+ "<title>Data content of report " + rep.get("fxo_id") + "</title>\n"
 				+ "<style>\n" + "table, th, td {\n" + "  border: 1px solid black;\n"
 				+ "}" + "</style>\n" + "</head>\n" + "<body>");
 

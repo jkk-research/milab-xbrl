@@ -23,61 +23,110 @@ import hu.sze.milab.dust.DustConsts.MindAccess;
 import hu.sze.milab.dust.utils.DustUtils;
 import hu.sze.uni.http.DustHttpServlet;
 import hu.sze.uni.xbrl.XbrlFilingManager;
+import hu.sze.uni.xbrl.XbrlUtilsCounter;
 import hu.sze.uni.xbrl.portal.XbrlTestPortalConsts.ListColumns;
 
-@SuppressWarnings({"rawtypes"})
+@SuppressWarnings({ "rawtypes" })
 class XbrlTestServletReportList extends DustHttpServlet {
 	private static final long serialVersionUID = 1L;
 
 	public static class ExprSvc {
+		private static final String EXPR_REP_DATA = "report";
+		private static final String EXPR_REP_SRC = "repSrc";
+		private static final String EXPR_FACT = "fact";
+
+		private static final String EXPR_PROC_STATE = "ProcState";
+		private static final String EXPR_PROC_STATE_FACT = "Fact";
+		private static final String EXPR_PROC_STATE_REPEND = "RepEnd";
+		private static final String EXPR_PROC_STATE_PROCEND = "ProcEnd";
+
 		Object headExpr;
 		Object factExpr;
+		Object proc;
+		Map<String, Object> varCtx = new HashMap<>();
 
-		XbrlTestServletReportList repList;
-
-		public ExprSvc(XbrlTestServletReportList repList, String strHeadExpr, String strFactExpr) {
-			this.repList = repList;
-
+		public ExprSvc(String strHeadExpr, String strFactExpr, String strProc) {
 			headExpr = DustUtils.isEmpty(strHeadExpr) ? null : MVEL.compileExpression(strHeadExpr);
 			factExpr = DustUtils.isEmpty(strFactExpr) ? null : MVEL.compileExpression(strFactExpr);
+			proc = DustUtils.isEmpty(strProc) ? null : MVEL.compileExpression(strProc);
 		}
 
-		public boolean test(Map currRep, DustUtils.TableReader tr, Iterable<String[]> repFacts) {
+		public boolean test(Map src, Map currRep, DustUtils.TableReader tr, Iterable<String[]> repFacts) {
 			if ( (null == headExpr) && (null == factExpr) ) {
 				return true;
 			}
 
-			boolean match = (null == headExpr) ? true : (boolean) MVEL.executeExpression(headExpr, this, currRep);
+			varCtx.put(EXPR_REP_SRC, src);
+			varCtx.put(EXPR_REP_DATA, currRep);
+
+			boolean match = (null == headExpr) ? true : (boolean) MVEL.executeExpression(headExpr, this, varCtx);
 
 			if ( match && (null != factExpr) ) {
 				match = false;
 
 				if ( null != repFacts ) {
 					Map currFact = new HashMap<>();
+					varCtx.put(EXPR_FACT, currFact);
 
 					for (String[] rf : repFacts) {
-						if ( null == tr ) {
-							tr = new DustUtils.TableReader(rf);
-						} else {
-							tr.getUntil(rf, currFact, null);
+//						if ( null == tr ) {
+//							tr = new DustUtils.TableReader(rf);
+//						} else {
+						tr.getUntil(rf, currFact, null);
 
-							match = (boolean) MVEL.executeExpression(factExpr, this, currFact);
-
-							if ( match ) {
+						if ( (boolean) MVEL.executeExpression(factExpr, this, varCtx) ) {
+							if ( null == proc ) {
 								return true;
+							} else {
+								match = true;
+								varCtx.put(EXPR_PROC_STATE, EXPR_PROC_STATE_FACT);
+								MVEL.executeExpression(proc, this, varCtx);
 							}
-
-							currFact.clear();
 						}
+
+						currFact.clear();
+//						}
 
 					}
 				}
 
+				if ( null != proc ) {
+					varCtx.put(EXPR_PROC_STATE, EXPR_PROC_STATE_REPEND);
+					MVEL.executeExpression(proc, this, varCtx);
+				}
 			}
 
 			return match;
 		}
 
+		public boolean postFilter(Map src, Map currRep, Map currFact) {
+			varCtx.put(EXPR_REP_SRC, src);
+			varCtx.put(EXPR_REP_DATA, currRep);
+
+			varCtx.put(EXPR_FACT, currFact);
+			
+			return (boolean) MVEL.executeExpression(factExpr, this, varCtx);
+		}
+
+		public void count(String str) {
+			XbrlUtilsCounter cntr = (XbrlUtilsCounter) varCtx.get("Counter");
+			if ( null == cntr ) {
+				varCtx.put("Counter", cntr = new XbrlUtilsCounter(true));
+			}
+			cntr.add(str);
+		}
+
+		public void optClose() {
+			if ( null != proc ) {
+				varCtx.put(EXPR_PROC_STATE, EXPR_PROC_STATE_PROCEND);
+				MVEL.executeExpression(proc, this, varCtx);
+			}
+
+			XbrlUtilsCounter cntr = (XbrlUtilsCounter) varCtx.get("Counter");
+			if ( null != cntr ) {
+				cntr.dump("Counted in proc");
+			}
+		}
 	}
 
 	private XbrlFilingManager filings;
@@ -116,6 +165,7 @@ class XbrlTestServletReportList extends DustHttpServlet {
 
 		String exprHead = Dust.access(data, MindAccess.Peek, null, ServletData.Parameter, "exprHead");
 		String exprFact = Dust.access(data, MindAccess.Peek, null, ServletData.Parameter, "exprFact");
+		String proc = Dust.access(data, MindAccess.Peek, null, ServletData.Parameter, "exprProc");
 		String sort = Dust.access(data, MindAccess.Peek, null, ServletData.Parameter, "sort");
 		String repColStr = Dust.access(data, MindAccess.Peek, "Report", ServletData.Parameter, "repCols");
 
@@ -123,7 +173,8 @@ class XbrlTestServletReportList extends DustHttpServlet {
 
 		Map rep = new HashMap();
 
-		ExprSvc exprFilter = new ExprSvc(this, exprHead, exprFact);
+		ExprSvc exprSvc = null;
+		String exprErr = null;
 
 		ArrayList<Map> res = new ArrayList<>();
 
@@ -132,30 +183,52 @@ class XbrlTestServletReportList extends DustHttpServlet {
 
 		Set<Map> loadErr = new HashSet<>();
 
-		for (Map repSrc : filings.getReportData().values()) {
-			rep = ListColumns.load(repSrc, rep);
+		try {
+			exprSvc = new ExprSvc(exprHead, exprFact, proc);
 
-			String id = (String) rep.get("Report");
+			for (Map repSrc : filings.getReportData().values()) {
+				rep = ListColumns.load(repSrc, rep);
 
-			tr = filings.getTableReader(id);
-			
-			if ( loadFacts ) {
-				repFacts = filings.getFacts(id);
-			}
+				String id = (String) rep.get("Report");
 
-			if ( exprFilter.test(rep, tr, repFacts) ) {
-				res.add(rep);
-				
-				if ( null == tr ) {
-					loadErr.add(rep);
-				} else if ( csvOut ) {
-					if ( (null == trMax) || (trMax.getSize() < tr.getSize()) ) {
-						trMax = tr;
-					}
+				tr = filings.getTableReader(id);
+
+				if ( loadFacts ) {
+					repFacts = filings.getFacts(id);
 				}
-				
-				rep = null;
+
+				if ( exprSvc.test(repSrc, rep, tr, repFacts) ) {
+					res.add(rep);
+
+					if ( null == tr ) {
+						loadErr.add(rep);
+					} else if ( csvOut ) {
+						if ( (null == trMax) || (trMax.getSize() < tr.getSize()) ) {
+							trMax = tr;
+						}
+					}
+
+					rep = null;
+				}
 			}
+
+			exprSvc.optClose();
+		} catch (Throwable t) {
+
+			t.printStackTrace();
+
+			StringBuilder sb = new StringBuilder("<h1>Expression error</h1>");
+			sb.append("\n<ul>").append(t.toString());
+			for (StackTraceElement ste : t.getStackTrace()) {
+				sb.append("\n  <li>").append(ste.toString()).append("</li>");
+				if ( ste.getClassName().startsWith("javax.servlet") ) {
+					break;
+				}
+			}
+			sb.append("\n</ul>");
+
+			exprErr = sb.toString();
+			csvOut = false;
 		}
 
 		if ( !DustUtils.isEmpty(sort) && (res.size() > 1) ) {
@@ -163,24 +236,24 @@ class XbrlTestServletReportList extends DustHttpServlet {
 			res.sort(cmp);
 		}
 
-		PrintWriter out = getWriter(data);
+		HttpServletResponse resp = Dust.access(data, MindAccess.Peek, null, ServletData.Response);
 
 		if ( csvOut ) {
-			HttpServletResponse resp = Dust.access(data, MindAccess.Peek, null, ServletData.Response);
-
-			boolean filtered = "Filtered".equals(mode) && (null != exprFilter.factExpr);
+			boolean filtered = "Filtered".equals(mode) && (null != exprSvc.factExpr);
 			String fn = Dust.access(data, MindAccess.Peek, "ReportData", ServletData.Parameter, "fName");
 			fn += ("_" + mode + "_" + new SimpleDateFormat(DustConsts.FMT_TIMESTAMP).format(new Date()) + ".csv");
 			resp.setHeader("Content-Disposition", "attachment; filename=" + fn);
 			resp.setContentType(CONTENT_CSV + "; filename=" + fn);
 			Map currFact = new HashMap<>();
-						
+
+			PrintWriter out = getWriter(data);
+
 			String[] repCols = {};
 			int repColCount = 0;
-			if (!DustUtils.isEmpty(repColStr)) {
+			if ( !DustUtils.isEmpty(repColStr) ) {
 				repCols = repColStr.split(",");
 				repColCount = repCols.length;
-				for (int i = 0; i < repColCount; ++i ) {
+				for (int i = 0; i < repColCount; ++i) {
 					repCols[i] = repCols[i].trim();
 					out.print(repCols[i]);
 					out.print("\t");
@@ -213,16 +286,17 @@ class XbrlTestServletReportList extends DustHttpServlet {
 						if ( filtered ) {
 							tr.getUntil(rf, currFact, null);
 
-							if ( !(boolean) MVEL.executeExpression(exprFilter.factExpr, this, currFact) ) {
+							if ( !exprSvc.postFilter(r, null, currFact) ) {
+//							if ( !(boolean) MVEL.executeExpression(exprSvc.factExpr, this, currFact) ) {
 								continue;
 							}
 
 							currFact.clear();
 						}
 
-						for (int i = 0; i < repColCount; ++i ) {
+						for (int i = 0; i < repColCount; ++i) {
 							if ( 0 < i ) {
-								out.print("\t");								
+								out.print("\t");
 							}
 							Object rv = r.get(repCols[i]);
 							if ( null != rv ) {
@@ -244,6 +318,8 @@ class XbrlTestServletReportList extends DustHttpServlet {
 			}
 
 		} else {
+			resp.setContentType(CONTENT_HTML);
+			PrintWriter out = getWriter(data);
 
 			File fForm = new File("ReportFilterForm.html");
 			try (BufferedReader br = new BufferedReader(new FileReader(fForm))) {
@@ -259,6 +335,8 @@ class XbrlTestServletReportList extends DustHttpServlet {
 						str = exprHead;
 					} else if ( -1 != (idx = optGetIdxAfter(line, "name=\"exprFact\">", exprFact)) ) {
 						str = exprFact;
+					} else if ( -1 != (idx = optGetIdxAfter(line, "name=\"exprProc\">", proc)) ) {
+						str = proc;
 					} else if ( -1 != (idx = optGetIdxAfter(line, "name=\"sort\" ", sort)) ) {
 						str = "value=\"" + sort + "\" ";
 					} else if ( -1 != (idx = optGetIdxAfter(line, "name=\"repCols\" ", repColStr)) ) {
@@ -273,40 +351,45 @@ class XbrlTestServletReportList extends DustHttpServlet {
 				}
 			}
 
-			out.println("<table>\n	<thead>\n	<tr>\n");
-			for (ListColumns lc : ListColumns.values()) {
-				out.println("			<th>" + lc + "</th>\n");
-			}
-			out.println(" </tr>\n	</thead>\n <tbody>");
-
-			for (Map r : res) {
-				out.println("<tr>\n");
-				boolean err = loadErr.contains(r);
-
+			if ( null != exprErr ) {
+				out.println(exprErr);
+			} else {
+				out.println("<table>\n	<thead>\n	<tr>\n");
 				for (ListColumns lc : ListColumns.values()) {
-					Object val = r.get(lc.name());
+					out.println("			<th>" + lc + "</th>\n");
+				}
+				out.println(" </tr>\n	</thead>\n <tbody>");
 
-					switch ( lc ) {
-					case CsvVal:
-					case CsvTxt:
-						if ( err ) {
-							val = "-";
+				for (Map r : res) {
+					out.println("<tr>\n");
+					boolean err = loadErr.contains(r);
+
+					for (ListColumns lc : ListColumns.values()) {
+						Object val = r.get(lc.name());
+
+						switch ( lc ) {
+						case CsvVal:
+						case CsvTxt:
+							if ( err ) {
+								val = "-";
+							}
+							break;
+						case Report:
+							val = err ? "Load error" : ("<a href=\"/report/" + val + "\">" + val + "</a>");
+							break;
+						default:
+							break;
 						}
-						break;
-					case Report:
-						val = err ? "Load error": ("<a href=\"/report/" + val + "\">" + val + "</a>") ;
-						break;
-					default:
-						break;
+
+						out.println("			<td>" + val + "</td>\n");
 					}
 
-					out.println("			<td>" + val + "</td>\n");
+					out.println(" </tr>\n");
 				}
 
-				out.println(" </tr>\n");
+				out.println("	</tbody>\n</table>\n Row count: " + res.size());
 			}
-
-			out.println("	</tbody>\n</table>\n Row count: " + res.size() + "</body>\n</html>");
+			out.println("</body>\n</html>");
 		}
 	}
 }

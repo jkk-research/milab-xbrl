@@ -13,17 +13,11 @@
 				<attribute name="Rsrc-Main-Class" value="hu.sze.uni.xbrl.portal.XbrlTestPortal" />
 				<attribute name="Class-Path" value="." />
 				<attribute name="Rsrc-Class-Path"
-				           value="./ poi-3.14-20160307.jar poi-ooxml-3.14-20160307.jar poi-ooxml-schemas-3.14-20160307.jar xmlbeans-2.6.0.jar json-simple-1.1.1.jar jetty-http-9.3.7.v20160115.jar jetty-io-9.3.7.v20160115.jar jetty-security-9.3.7.v20160115.jar jetty-server-9.3.7.v20160115.jar jetty-servlet-9.3.7.v20160115.jar jetty-util-9.3.7.v20160115.jar jetty-webapp-9.3.7.v20160115.jar servlet-api-3.1.jar mvel2-2.4.15.Final.jar commons-compress-1.23.0.jar" />
+				           value="./ json-simple-1.1.1.jar jetty-http-9.3.7.v20160115.jar jetty-io-9.3.7.v20160115.jar jetty-security-9.3.7.v20160115.jar jetty-server-9.3.7.v20160115.jar jetty-servlet-9.3.7.v20160115.jar jetty-util-9.3.7.v20160115.jar jetty-webapp-9.3.7.v20160115.jar servlet-api-3.1.jar mvel2-2.4.15.Final.jar commons-compress-1.23.0.jar" />
 			</manifest>
 			<zipfileset src="jar-in-jar-loader.zip" />
 			<fileset dir="${dir.jarfile}/bin" />
 			<fileset dir="/Users/lkedves/git/milab-dust/DustSimple/bin" />
-			<zipfileset dir="/Users/lkedves/git/milab-dust/DustExtLibs/lib/poi" includes="poi-3.14-20160307.jar" />
-			<zipfileset dir="/Users/lkedves/git/milab-dust/DustExtLibs/lib/poi"
-			            includes="poi-ooxml-3.14-20160307.jar" />
-			<zipfileset dir="/Users/lkedves/git/milab-dust/DustExtLibs/lib/poi"
-			            includes="poi-ooxml-schemas-3.14-20160307.jar" />
-			<zipfileset dir="/Users/lkedves/git/milab-dust/DustExtLibs/lib/poi" includes="xmlbeans-2.6.0.jar" />
 			<zipfileset dir="/Users/lkedves/git/milab-dust/DustExtLibs/lib/json" includes="json-simple-1.1.1.jar" />
 			<zipfileset dir="/Users/lkedves/git/milab-dust/DustExtLibs/lib/jetty"
 			            includes="jetty-http-9.3.7.v20160115.jar" />

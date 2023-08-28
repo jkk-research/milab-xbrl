@@ -30,9 +30,11 @@ import org.json.simple.parser.ParseException;
 import hu.sze.milab.dust.Dust;
 import hu.sze.milab.dust.DustException;
 import hu.sze.milab.dust.utils.DustUtils;
+import hu.sze.milab.dust.utils.DustUtilsConsts;
+import hu.sze.milab.dust.utils.DustUtilsFile;
 
 @SuppressWarnings({ "rawtypes", "unchecked" })
-public class XbrlFilingManager implements XbrlConsts {
+public class XbrlFilingManager implements XbrlConsts, DustUtilsConsts {
 	public static final String ALL_REPORTS = "allReports.json";
 
 	public static final String XBRL_ORG_ADDR = "https://filings.xbrl.org";
@@ -440,17 +442,21 @@ public class XbrlFilingManager implements XbrlConsts {
 		}
 
 		if ( repDir.isDirectory() ) {
-			for (File fRep : repDir.listFiles()) {
-				if ( fRep.isFile() ) {
-					String fn = fRep.getName().toUpperCase();
-					int d = fn.lastIndexOf('.');
-					String type = fn.substring(d + 1).toUpperCase();
-
-					if ( "XHTML".equals(type) || "HTML".equals(type) ) {
-						return fRep;
-					}
-				}
-			}
+			DustFileFilter dff = new DustFileFilter(true, StringMatch.EndsWith, "xhtml", "html");
+			
+			return DustUtilsFile.searchRecursive(repDir, dff);
+			
+//			for (File fRep : repDir.listFiles()) {
+//				if ( fRep.isFile() ) {
+//					String fn = fRep.getName().toUpperCase();
+//					int d = fn.lastIndexOf('.');
+//					String type = fn.substring(d + 1).toUpperCase();
+//
+//					if ( "XHTML".equals(type) || "HTML".equals(type) ) {
+//						return fRep;
+//					}
+//				}
+//			}
 		}
 
 		return null;

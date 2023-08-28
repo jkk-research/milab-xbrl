@@ -68,11 +68,11 @@ public abstract class DustHttpServlet extends HttpServlet implements DustHttpCon
 			} catch (Throwable e) {
 				e.printStackTrace();
 			}
-			try {
-				getOutStream(data).close();
-			} catch (Throwable e) {
-				e.printStackTrace();
-			}
+//			try {
+//				getOutStream(data).close();
+//			} catch (Throwable e) {
+//				e.printStackTrace();
+//			}
 			
 			throw new ServletException("Quick and dirty exception handling", t);
 		}
