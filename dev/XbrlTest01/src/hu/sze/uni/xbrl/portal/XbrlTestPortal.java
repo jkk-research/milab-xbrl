@@ -21,9 +21,6 @@ public class XbrlTestPortal implements XbrlTestPortalConsts {
 	private File dataRoot;
 	XbrlFilingManager filings;
 
-//	ArrayList<String[]> allFacts = new ArrayList<>();
-//	ArrayList<Map> allFacts = new ArrayList<>(); TOO BIG!
-
 	private long spaceToFree;
 
 	public XbrlTestPortal() {
@@ -65,7 +62,6 @@ public class XbrlTestPortal implements XbrlTestPortalConsts {
 				return f.isDirectory();
 			}
 		};
-//		SimpleDateFormat dfmt = new SimpleDateFormat("yyyy-MM-dd");
 
 		for (Map.Entry<String, Map> e : reportData.entrySet()) {
 			String id = e.getKey();
@@ -100,7 +96,7 @@ public class XbrlTestPortal implements XbrlTestPortalConsts {
 								Files.copy(rf.toPath(), repFile.toPath());
 								repFileExists = true;
 							} else {
-								File repZip = filings.getReport(repSrc, XbrlReportType.Zip);
+								File repZip = filings.getReport(repSrc, XbrlReportType.Zip, true);
 
 								if ( DustUtils.isEmpty(repUrl) ) {
 									if ( 0 == repDir.listFiles(ffIsDir).length ) {
@@ -129,7 +125,7 @@ public class XbrlTestPortal implements XbrlTestPortalConsts {
 					}
 
 					if ( repFileExists ) {
-						XbrlReportLoaderDomBase.createSplitCsv(repFile, repDir, "Report", 200);
+						XbrlReportLoaderDomBase.createSplitCsv(repFile, repDir, "Report", TEXT_CUT_AT);
 					}
 				}
 
@@ -141,57 +137,6 @@ public class XbrlTestPortal implements XbrlTestPortalConsts {
 
 				if ( csvVal.isFile() ) {
 					filings.optLoadFacts(id);
-//					ArrayList<String[]> allFacts = new ArrayList<>();
-//					allFactsByRep.put(id, allFacts);
-//
-//					++parsedRepCount;
-////					String fPref = csvVal.getName() + "\t";
-//					try (BufferedReader br = new BufferedReader(new FileReader(csvVal))) {
-//						DustUtils.TableReader tr = null;
-//
-//						for (String line; (line = br.readLine()) != null;) {
-//							if ( !DustUtils.isEmpty(line) ) {
-//								String[] data = line.split("\t");
-//
-//								if ( null == tr ) {
-//									tr = contentReaders.get(line);
-//									if ( null == tr ) {
-//										tr = new DustUtils.TableReader(data);
-//										contentReaders.put(line, tr);
-//									}
-//									headers.put(id, tr);
-//								} else {
-//									String strVal = tr.get(data, "Value");
-//									if ( null == strVal ) {
-//										Dust.dumpObs("seems to be: fixed-empty text in val?", line);
-////										csvUpdate.add(csvVal);
-//										continue;
-//									}
-//									if ( strVal.startsWith("Txt len") ) {
-//										totalTxtCount++;
-//									} else {
-//										totalValCount++;
-////										String err = tr.get(data, "Err");
-////										if ( DustUtils.isEmpty(err) ) 
-//										{
-//											allFacts.add(data);
-////											Map fact = tr.get(data, null, "Unit", "Format", "Value");
-////											tr.getUntil(data, fact, "OrigValue");
-////											fact.put("repId", id);
-////											
-////											allFacts.add(fact);
-////										} else {
-//////											if ( !err.contains("monthname") ) 
-////											{
-////												errFactLines.add(fPref + line);
-//////												csvUpdate.add(csvVal);
-////											}
-//										}
-//									}
-//								}
-//							}
-//						}
-//					}
 				}
 			} catch (Throwable t) {
 				Dust.dumpObs(id, pkgUrl, t);

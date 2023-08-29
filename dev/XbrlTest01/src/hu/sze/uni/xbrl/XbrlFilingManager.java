@@ -427,10 +427,10 @@ public class XbrlFilingManager implements XbrlConsts, DustUtilsConsts {
 	long sizeAll = 0;
 	long sizeSeg = 0;
 
-	public File getReport(Map filing, XbrlReportType repType) throws Exception {
+	public File getReport(Map filing, XbrlReportType repType, boolean downloadMissing) throws Exception {
 		String repUrl = XbrlUtils.access(filing, AccessCmd.Peek, null, (repType == XbrlReportType.Json) ? "json_url" : "package_url");
 
-		return (null == repUrl) ? null : getReport(repUrl, XbrlUtils.access(filing, AccessCmd.Peek, null, LOCAL_DIR), repType);
+		return (null == repUrl) ? null : getReport(repUrl, XbrlUtils.access(filing, AccessCmd.Peek, null, LOCAL_DIR), repType, downloadMissing);
 	}
 
 	public File findReportToLoad(File ff) {
@@ -443,26 +443,17 @@ public class XbrlFilingManager implements XbrlConsts, DustUtilsConsts {
 
 		if ( repDir.isDirectory() ) {
 			DustFileFilter dff = new DustFileFilter(true, StringMatch.EndsWith, "xhtml", "html");
-			
 			return DustUtilsFile.searchRecursive(repDir, dff);
-			
-//			for (File fRep : repDir.listFiles()) {
-//				if ( fRep.isFile() ) {
-//					String fn = fRep.getName().toUpperCase();
-//					int d = fn.lastIndexOf('.');
-//					String type = fn.substring(d + 1).toUpperCase();
-//
-//					if ( "XHTML".equals(type) || "HTML".equals(type) ) {
-//						return fRep;
-//					}
-//				}
-//			}
 		}
 
 		return null;
 	}
 
 	public File getReport(String repUrl, String repDir, XbrlReportType repType) throws Exception {
+		return getReport(repUrl, repDir, repType, true);
+	}
+
+	public File getReport(String repUrl, String repDir, XbrlReportType repType, boolean downloadMissing) throws Exception {
 		File ret = null;
 
 //		String eId = XbrlUtils.access(filing, AccessCmd.Peek, null, "attributes", ENTITY_ID);
@@ -508,6 +499,9 @@ public class XbrlFilingManager implements XbrlConsts, DustUtilsConsts {
 		ret = new File(dir, retFileName);
 
 		if ( !ret.exists() ) {
+			if ( !downloadMissing ) {
+				return null;
+			}
 			File remoteFile = new File(dir, fName);
 			if ( !remoteFile.exists() ) {
 				url = url.replace(" ", "%20");
@@ -562,7 +556,7 @@ public class XbrlFilingManager implements XbrlConsts, DustUtilsConsts {
 			File fRep = findReportToLoad(ret);
 
 			if ( null != fRep ) {
-				XbrlReportLoaderDomBase.createSplitCsv(fRep, dir, "Report", 200);
+				XbrlReportLoaderDomBase.createSplitCsv(fRep, dir, "Report", TEXT_CUT_AT);
 				ret = fLoaded;
 			}
 		}
@@ -611,7 +605,7 @@ public class XbrlFilingManager implements XbrlConsts, DustUtilsConsts {
 		for (Map lm : fl) {
 //			XbrlUtils.dump(",", true, XbrlUtils.access(lm, AccessCmd.Peek, null, "attributes", ENTITY_NAME), XbrlUtils.access(lm, AccessCmd.Peek, null, "attributes", REPORT_ID));
 
-			File ff = fm.getReport(lm, XbrlReportType.Package);
+			File ff = fm.getReport(lm, XbrlReportType.Package, true);
 			if ( 0 >= fm.downloadLimit ) {
 				DustException.wrap(null, "Download limit exceeded");
 			}
