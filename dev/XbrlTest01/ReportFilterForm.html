@@ -7,14 +7,27 @@
 table, th, td {
 	border: 1px solid black;
 }
+
+.refinfo {
+	padding: 5px;
+}
 </style>
 </head>
 
 <body>
 
-	<h1>Search / process</h1>
+	<table>
+		<tr>
+			<td class="refinfo">Quick refs:</td>
+			<td class="refinfo"><a target="_blank" href="doc/Transwiki_MVEL_Language_Guide.html">The MVEL syntax</a></td>
+			<td class="refinfo">"report" and "fact" root objects: <a target="_blank" href="https://docs.oracle.com/javase/8/docs/api/java/util/Map.html#method.summary">Map</a></td>
+			<td class="refinfo">data fields: <a target="_blank" href="https://docs.oracle.com/javase/8/docs/api/java/lang/String.html#method.summary">String</a></td>
+			<td class="refinfo">the ["HU", "IT"] construct: <a target="_blank" href="https://docs.oracle.com/javase/8/docs/api/java/util/Collection.html#method.summary">Collection</a></td>
+		</tr>
+	</table>
+
 	<form method="GET">
-		<table border="1">
+		<table class="dataTable">
 			<thead>
 				<tr>
 					<th><label for="exprHead">Header filter</label></th>
@@ -28,12 +41,11 @@ table, th, td {
 							name="exprHead"></textarea></td>
 					<td><textarea id="exprFact" rows="5" cols="45"
 							placeholder="Filter expression by fact columns (include if any fact matches)" name="exprFact"></textarea></td>
-					<td><textarea id="exprProc" rows="5" cols="45"
-							placeholder="Script to execute (advanced)" name="exprProc"></textarea></td>
+					<td><textarea id="exprProc" rows="5" cols="45" placeholder="Script to execute (advanced)" name="exprProc"></textarea></td>
 				</tr>
 				<tr>
-					<td><label for="sort">Sort by: </label><input id="sort" name="sort" /> <input type="submit" name="mode"
-						value="ShowList" /></td>
+					<td><input type="reset" value="Reset" /> <label for="sort">Sort by: </label><input id="sort" name="sort" />
+						<input type="submit" name="mode" value="ShowList" /></td>
 					<td><label for="repCols">Report columns: </label><input id="repCols" name="repCols" /> <br /> <label
 						for="fName">File Name: </label><input id="fName" name="fName" /> <input type="submit" name="mode" value="All" />
 						<input type="submit" name="mode" value="Filtered" /></td>

@@ -514,8 +514,10 @@ public class XbrlFilingManager implements XbrlConsts, DustUtilsConsts {
 					}
 				}
 
+				if (--downloadLimit < 0 ) {
+					return null;
+				}
 				XbrlUtils.download(url, remoteFile);
-				--downloadLimit;
 
 				long s = remoteFile.length();
 				sizeAll += s;

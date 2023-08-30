@@ -1,0 +1,1374 @@
+<!DOCTYPE html>
+<html class="client-nojs" lang="en" dir="ltr">
+<head>
+<meta charset="UTF-8">
+<title>Transwiki:MVEL Language Guide - Wikibooks, open books for an open world</title>
+<script>document.documentElement.className="client-js";RLCONF={"wgBreakFrames":false,"wgSeparatorTransformTable":["",""],"wgDigitTransformTable":["",""],"wgDefaultDateFormat":"dmy","wgMonthNames":["","January","February","March","April","May","June","July","August","September","October","November","December"],"wgRequestId":"72c19df9-5614-4601-ab4c-6b094293a3aa","wgCanonicalNamespace":"Transwiki","wgCanonicalSpecialPageName":false,"wgNamespaceNumber":108,"wgPageName":"Transwiki:MVEL_Language_Guide","wgTitle":"MVEL Language Guide","wgCurRevisionId":3675372,"wgRevisionId":3675372,"wgArticleId":375111,"wgIsArticle":true,"wgIsRedirect":false,"wgAction":"view","wgUserName":null,"wgUserGroups":["*"],"wgCategories":["Pages with deep filing","Book:Transwiki:MVEL Language Guide"],"wgPageViewLanguage":"en","wgPageContentLanguage":"en","wgPageContentModel":"wikitext","wgRelevantPageName":"Transwiki:MVEL_Language_Guide","wgRelevantArticleId":375111,"wgIsProbablyEditable":true,
+"wgRelevantPageIsProbablyEditable":true,"wgRestrictionEdit":[],"wgRestrictionMove":[],"wgVisualEditor":{"pageLanguageCode":"en","pageLanguageDir":"ltr","pageVariantFallbacks":"en"},"wgMFDisplayWikibaseDescriptions":{"search":true,"watchlist":true,"tagline":false,"nearby":true},"wgWMESchemaEditAttemptStepOversample":false,"wgWMEPageLength":50000,"wgNoticeProject":"wikibooks","wgFlaggedRevsParams":{"tags":{"value":{"levels":3}}},"wgMediaViewerOnClick":true,"wgMediaViewerEnabledByDefault":true,"wgULSCurrentAutonym":"English","wgEditSubmitButtonLabelPublish":true,"wgCentralAuthMobileDomain":false,"wgULSPosition":"interlanguage","wgULSisCompactLinksEnabled":true,"wgULSisLanguageSelectorEmpty":false,"wgCheckUserClientHintsHeadersJsApi":["architecture","bitness","brands","fullVersionList","mobile","model","platform","platformVersion"],"wgSiteNoticeId":"2.24"};RLSTATE={"ext.globalCssJs.user.styles":"ready","site.styles":"ready","user.styles":"ready","ext.globalCssJs.user":"ready","user":
+"ready","user.options":"loading","skins.vector.styles.legacy":"ready","ext.visualEditor.desktopArticleTarget.noscript":"ready","ext.wikimediaBadges":"ready","ext.uls.interlanguage":"ready","wikibase.client.init":"ready","ext.dismissableSiteNotice.styles":"ready"};RLPAGEMODULES=["site","mediawiki.page.ready","mediawiki.toc","skins.vector.legacy.js","ext.visualEditor.desktopArticleTarget.init","ext.visualEditor.targetLoader","ext.eventLogging","ext.wikimediaEvents","ext.navigationTiming","ext.centralNotice.geoIP","ext.centralNotice.startUp","ext.gadget.wikidialog","ext.gadget.commons-file","ext.centralauth.centralautologin","ext.echo.centralauth","ext.uls.compactlinks","ext.uls.interface","ext.checkUser.clientHints","ext.dismissableSiteNotice"];</script>
+<script>(RLQ=window.RLQ||[]).push(function(){mw.loader.impl(function(){return["user.options@12s5i",function($,jQuery,require,module){mw.user.tokens.set({"patrolToken":"+\\","watchToken":"+\\","csrfToken":"+\\"});}];});});</script>
+<link rel="stylesheet" href="/w/load.php?lang=en&amp;modules=ext.dismissableSiteNotice.styles%7Cext.uls.interlanguage%7Cext.visualEditor.desktopArticleTarget.noscript%7Cext.wikimediaBadges%7Cskins.vector.styles.legacy%7Cwikibase.client.init&amp;only=styles&amp;skin=vector">
+<script async="" src="/w/load.php?lang=en&amp;modules=startup&amp;only=scripts&amp;raw=1&amp;skin=vector"></script>
+<meta name="ResourceLoaderDynamicStyles" content="">
+<link rel="stylesheet" href="/w/load.php?lang=en&amp;modules=site.styles&amp;only=styles&amp;skin=vector">
+<meta name="generator" content="MediaWiki 1.41.0-wmf.23">
+<meta name="referrer" content="origin">
+<meta name="referrer" content="origin-when-crossorigin">
+<meta name="referrer" content="origin-when-cross-origin">
+<meta name="robots" content="max-image-preview:standard">
+<meta name="format-detection" content="telephone=no">
+<meta name="viewport" content="width=1000">
+<meta property="og:title" content="Transwiki:MVEL Language Guide - Wikibooks, open books for an open world">
+<meta property="og:type" content="website">
+<link rel="alternate" media="only screen and (max-width: 720px)" href="//en.m.wikibooks.org/wiki/Transwiki:MVEL_Language_Guide">
+<link rel="alternate" type="application/x-wiki" title="Edit" href="/w/index.php?title=Transwiki:MVEL_Language_Guide&amp;action=edit">
+<link rel="icon" href="/static/favicon/wikibooks.ico">
+<link rel="search" type="application/opensearchdescription+xml" href="/w/opensearch_desc.php" title="Wikibooks (en)">
+<link rel="EditURI" type="application/rsd+xml" href="//en.wikibooks.org/w/api.php?action=rsd">
+<link rel="canonical" href="https://en.wikibooks.org/wiki/Transwiki:MVEL_Language_Guide">
+<link rel="license" href="https://creativecommons.org/licenses/by-sa/4.0/deed.en">
+<link rel="alternate" type="application/atom+xml" title="Wikibooks Atom feed" href="/w/index.php?title=Special:RecentChanges&amp;feed=atom">
+<link rel="dns-prefetch" href="//meta.wikimedia.org" />
+<link rel="dns-prefetch" href="//login.wikimedia.org">
+</head>
+<body class="skin-vector-legacy mediawiki ltr sitedir-ltr mw-hide-empty-elt ns-108 ns-subject mw-editable page-Transwiki_MVEL_Language_Guide rootpage-Transwiki_MVEL_Language_Guide skin-vector action-view"><div id="mw-page-base" class="noprint"></div>
+<div id="mw-head-base" class="noprint"></div>
+<div id="content" class="mw-body" role="main">
+	<a id="top"></a>
+	<div id="siteNotice"><!-- CentralNotice --><div id="mw-dismissablenotice-anonplace"></div><script>(function(){var node=document.getElementById("mw-dismissablenotice-anonplace");if(node){node.outerHTML="\u003Cdiv class=\"mw-dismissable-notice\"\u003E\u003Cdiv class=\"mw-dismissable-notice-close\"\u003E[\u003Ca tabindex=\"0\" role=\"button\"\u003Edismiss\u003C/a\u003E]\u003C/div\u003E\u003Cdiv class=\"mw-dismissable-notice-body\"\u003E\u003Cdiv id=\"localNotice\"\u003E\u003Cdiv class=\"anonnotice\" lang=\"en\" dir=\"ltr\"\u003E\u003Cdiv style=\"background: #ffffff; border: solid 1px #48b; width: auto; padding-left:2px; padding-right:2px; margin-left:auto; margin-right:auto; vertical-align: top; display:table; color:black;\"\u003E\u003Cfigure class=\"mw-halign-left\" typeof=\"mw:File\"\u003E\u003Ca href=\"/wiki/Shelf:Strategy_guides\" title=\"Shelf:Strategy guides\"\u003E\u003Cimg src=\"//upload.wikimedia.org/wikipedia/commons/thumb/0/01/Nuvola_apps_package_games.png/40px-Nuvola_apps_package_games.png\" decoding=\"async\" width=\"40\" height=\"40\" class=\"mw-file-element\" srcset=\"//upload.wikimedia.org/wikipedia/commons/thumb/0/01/Nuvola_apps_package_games.png/60px-Nuvola_apps_package_games.png 1.5x, //upload.wikimedia.org/wikipedia/commons/thumb/0/01/Nuvola_apps_package_games.png/80px-Nuvola_apps_package_games.png 2x\" data-file-width=\"128\" data-file-height=\"128\" /\u003E\u003C/a\u003E\u003Cfigcaption\u003E\u003C/figcaption\u003E\u003C/figure\u003EThe Wikibooks community has accepted \u003Ca href=\"/wiki/Shelf:Strategy_guides\" title=\"Shelf:Strategy guides\"\u003Evideo game strategy guides\u003C/a\u003E on this wiki! See \u003Ca href=\"/wiki/Wikibooks:Strategy_guides\" title=\"Wikibooks:Strategy guides\"\u003EWikibooks:Strategy guides\u003C/a\u003E for the newly-created policy on strategy games. We're looking forward to your contributions.\n\u003C/div\u003E\u003C/div\u003E\u003C/div\u003E\u003C/div\u003E\u003C/div\u003E";}}());</script></div>
+	<div class="mw-indicators">
+	</div>
+	<h1 id="firstHeading" class="firstHeading mw-first-heading"><span class="mw-page-title-namespace">Transwiki</span><span class="mw-page-title-separator">:</span><span class="mw-page-title-main">MVEL Language Guide</span></h1>
+	<div id="bodyContent" class="vector-body">
+		<div id="siteSub" class="noprint">From Wikibooks, open books for an open world</div>
+		<div id="contentSub"><div id="mw-content-subtitle"></div></div>
+		<div id="contentSub2"></div>
+		
+		<div id="jump-to-nav"></div>
+		<a class="mw-jump-link" href="#mw-head">Jump to navigation</a>
+		<a class="mw-jump-link" href="#searchInput">Jump to search</a>
+		<div id="mw-content-text" class="mw-body-content mw-content-ltr" lang="en" dir="ltr"><div class="mw-parser-output"><table style="width:100%; margin-bottom:5px; border:1px solid #ADA; background:#E4F2E4; text-align:center; font-size:0.9em;" id="headertemplate">
+
+<tbody><tr>
+<td class="header_backlink">
+</td>
+<td class="header_title"><b>MVEL Language Guide</b>
+</td>
+<td class="header_forelink">
+</td></tr></tbody></table>
+<table class="header_notes">
+
+<tbody><tr>
+<td>
+</td></tr></tbody></table>
+          <div id="toc" class="toc" role="navigation" aria-labelledby="mw-toc-heading"><input type="checkbox" role="button" id="toctogglecheckbox" class="toctogglecheckbox" style="display:none" /><div class="toctitle" lang="en" dir="ltr"><h2 id="mw-toc-heading">Contents</h2><span class="toctogglespan"><label class="toctogglelabel" for="toctogglecheckbox"></label></span></div>
+<ul>
+<li class="toclevel-1"><a href="#Language_Guide_for_2.0"><span class="tocnumber">1</span> <span class="toctext">Language Guide for 2.0</span></a>
+<ul>
+<li class="toclevel-2"><a href="#Basic_Syntax"><span class="tocnumber">1.1</span> <span class="toctext">Basic Syntax</span></a>
+<ul>
+<li class="toclevel-3"><a href="#Simple_Property_Expression"><span class="tocnumber">1.1.1</span> <span class="toctext">Simple Property Expression</span></a></li>
+<li class="toclevel-3"><a href="#Multiple_statements"><span class="tocnumber">1.1.2</span> <span class="toctext">Multiple statements</span></a></li>
+<li class="toclevel-3"><a href="#Returned_Values"><span class="tocnumber">1.1.3</span> <span class="toctext">Returned Values</span></a></li>
+</ul>
+</li>
+<li class="toclevel-2"><a href="#Value_Tests"><span class="tocnumber">1.2</span> <span class="toctext">Value Tests</span></a>
+<ul>
+<li class="toclevel-3"><a href="#Testing_for_Value_Emptiness"><span class="tocnumber">1.2.1</span> <span class="toctext">Testing for Value Emptiness</span></a></li>
+<li class="toclevel-3"><a href="#Testing_for_Null"><span class="tocnumber">1.2.2</span> <span class="toctext">Testing for Null</span></a></li>
+<li class="toclevel-3"><a href="#Value_coercion"><span class="tocnumber">1.2.3</span> <span class="toctext">Value coercion</span></a></li>
+<li class="toclevel-3"><a href="#Regular_expressions"><span class="tocnumber">1.2.4</span> <span class="toctext">Regular expressions</span></a></li>
+</ul>
+</li>
+<li class="toclevel-2"><a href="#Inline_List,_Maps_and_Arrays"><span class="tocnumber">1.3</span> <span class="toctext">Inline List, Maps and Arrays</span></a>
+<ul>
+<li class="toclevel-3"><a href="#Lists"><span class="tocnumber">1.3.1</span> <span class="toctext">Lists</span></a></li>
+<li class="toclevel-3"><a href="#Maps"><span class="tocnumber">1.3.2</span> <span class="toctext">Maps</span></a></li>
+<li class="toclevel-3"><a href="#Arrays"><span class="tocnumber">1.3.3</span> <span class="toctext">Arrays</span></a></li>
+<li class="toclevel-3"><a href="#Array_Coercion"><span class="tocnumber">1.3.4</span> <span class="toctext">Array Coercion</span></a></li>
+</ul>
+</li>
+<li class="toclevel-2"><a href="#Property_Navigation"><span class="tocnumber">1.4</span> <span class="toctext">Property Navigation</span></a>
+<ul>
+<li class="toclevel-3"><a href="#Bean_Properties"><span class="tocnumber">1.4.1</span> <span class="toctext">Bean Properties</span></a></li>
+<li class="toclevel-3"><a href="#Null-Safe_Bean_Navigation"><span class="tocnumber">1.4.2</span> <span class="toctext">Null-Safe Bean Navigation</span></a></li>
+<li class="toclevel-3"><a href="#Collections"><span class="tocnumber">1.4.3</span> <span class="toctext">Collections</span></a></li>
+<li class="toclevel-3"><a href="#List_Access"><span class="tocnumber">1.4.4</span> <span class="toctext">List Access</span></a></li>
+<li class="toclevel-3"><a href="#Map_Access"><span class="tocnumber">1.4.5</span> <span class="toctext">Map Access</span></a></li>
+<li class="toclevel-3"><a href="#Strings_as_Arrays"><span class="tocnumber">1.4.6</span> <span class="toctext">Strings as Arrays</span></a></li>
+</ul>
+</li>
+<li class="toclevel-2"><a href="#Literals"><span class="tocnumber">1.5</span> <span class="toctext">Literals</span></a>
+<ul>
+<li class="toclevel-3"><a href="#String_literals"><span class="tocnumber">1.5.1</span> <span class="toctext">String literals</span></a></li>
+<li class="toclevel-3"><a href="#String_escape_sequences"><span class="tocnumber">1.5.2</span> <span class="toctext">String escape sequences</span></a></li>
+<li class="toclevel-3"><a href="#Numeric_literals"><span class="tocnumber">1.5.3</span> <span class="toctext">Numeric literals</span></a></li>
+<li class="toclevel-3"><a href="#Floating_point_literals"><span class="tocnumber">1.5.4</span> <span class="toctext">Floating point literals</span></a></li>
+<li class="toclevel-3"><a href="#BigInteger_and_BigDecimal_literals"><span class="tocnumber">1.5.5</span> <span class="toctext">BigInteger and BigDecimal literals</span></a></li>
+<li class="toclevel-3"><a href="#Boolean_literals"><span class="tocnumber">1.5.6</span> <span class="toctext">Boolean literals</span></a></li>
+<li class="toclevel-3"><a href="#Null_literal"><span class="tocnumber">1.5.7</span> <span class="toctext">Null literal</span></a></li>
+</ul>
+</li>
+<li class="toclevel-2"><a href="#Type_Literals"><span class="tocnumber">1.6</span> <span class="toctext">Type Literals</span></a>
+<ul>
+<li class="toclevel-3"><a href="#Nested_Classes"><span class="tocnumber">1.6.1</span> <span class="toctext">Nested Classes</span></a></li>
+</ul>
+</li>
+<li class="toclevel-2"><a href="#Flow_Control"><span class="tocnumber">1.7</span> <span class="toctext">Flow Control</span></a>
+<ul>
+<li class="toclevel-3"><a href="#If-Then-Else"><span class="tocnumber">1.7.1</span> <span class="toctext">If-Then-Else</span></a></li>
+<li class="toclevel-3"><a href="#Ternary_statements"><span class="tocnumber">1.7.2</span> <span class="toctext">Ternary statements</span></a></li>
+<li class="toclevel-3"><a href="#Foreach"><span class="tocnumber">1.7.3</span> <span class="toctext">Foreach</span></a></li>
+<li class="toclevel-3"><a href="#For_Loop"><span class="tocnumber">1.7.4</span> <span class="toctext">For Loop</span></a></li>
+<li class="toclevel-3"><a href="#Do_While,_Do_Until"><span class="tocnumber">1.7.5</span> <span class="toctext">Do While, Do Until</span></a></li>
+<li class="toclevel-3"><a href="#While,_Until"><span class="tocnumber">1.7.6</span> <span class="toctext">While, Until</span></a></li>
+</ul>
+</li>
+<li class="toclevel-2"><a href="#Projections_and_Folds"><span class="tocnumber">1.8</span> <span class="toctext">Projections and Folds</span></a></li>
+<li class="toclevel-2"><a href="#Assignments"><span class="tocnumber">1.9</span> <span class="toctext">Assignments</span></a></li>
+<li class="toclevel-2"><a href="#Function_Definition"><span class="tocnumber">1.10</span> <span class="toctext">Function Definition</span></a>
+<ul>
+<li class="toclevel-3"><a href="#A_Simple_Example"><span class="tocnumber">1.10.1</span> <span class="toctext">A Simple Example</span></a></li>
+<li class="toclevel-3"><a href="#Accepting_Parameters_and_Returning_Values"><span class="tocnumber">1.10.2</span> <span class="toctext">Accepting Parameters and Returning Values</span></a></li>
+<li class="toclevel-3"><a href="#Closures"><span class="tocnumber">1.10.3</span> <span class="toctext">Closures</span></a></li>
+</ul>
+</li>
+<li class="toclevel-2"><a href="#Lambda_Expressions"><span class="tocnumber">1.11</span> <span class="toctext">Lambda Expressions</span></a>
+<ul>
+<li class="toclevel-3"><a href="#Example"><span class="tocnumber">1.11.1</span> <span class="toctext">Example</span></a></li>
+</ul>
+</li>
+<li class="toclevel-2"><a href="#Interceptors"><span class="tocnumber">1.12</span> <span class="toctext">Interceptors</span></a>
+<ul>
+<li class="toclevel-3"><a href="#The_org.mvel.integration.Interceptor_Interface"><span class="tocnumber">1.12.1</span> <span class="toctext">The org.mvel.integration.Interceptor Interface</span></a></li>
+<li class="toclevel-3"><a href="#doBefore"><span class="tocnumber">1.12.2</span> <span class="toctext">doBefore</span></a></li>
+<li class="toclevel-3"><a href="#doAfter"><span class="tocnumber">1.12.3</span> <span class="toctext">doAfter</span></a></li>
+<li class="toclevel-3"><a href="#Using_Interceptors_in_the_Compiler"><span class="tocnumber">1.12.4</span> <span class="toctext">Using Interceptors in the Compiler</span></a></li>
+</ul>
+</li>
+<li class="toclevel-2"><a href="#Typing"><span class="tocnumber">1.13</span> <span class="toctext">Typing</span></a>
+<ul>
+<li class="toclevel-3"><a href="#Dynamic_Typing_and_Coercion"><span class="tocnumber">1.13.1</span> <span class="toctext">Dynamic Typing and Coercion</span></a></li>
+<li class="toclevel-3"><a href="#Static_Typing"><span class="tocnumber">1.13.2</span> <span class="toctext">Static Typing</span></a></li>
+<li class="toclevel-3"><a href="#Strict_Typing"><span class="tocnumber">1.13.3</span> <span class="toctext">Strict Typing</span></a></li>
+</ul>
+</li>
+<li class="toclevel-2"><a href="#Shell"><span class="tocnumber">1.14</span> <span class="toctext">Shell</span></a>
+<ul>
+<li class="toclevel-3"><a href="#Launching_the_Shell"><span class="tocnumber">1.14.1</span> <span class="toctext">Launching the Shell</span></a></li>
+</ul>
+</li>
+<li class="toclevel-2"><a href="#Language_FAQ"><span class="tocnumber">1.15</span> <span class="toctext">Language FAQ</span></a>
+<ul>
+<li class="toclevel-3"><a href="#Why_doesn&#39;t_the_.class_reference_work?"><span class="tocnumber">1.15.1</span> <span class="toctext">Why doesn't the .class reference work?</span></a></li>
+<li class="toclevel-3"><a href="#Why_can&#39;t_I_write_object.class.name?"><span class="tocnumber">1.15.2</span> <span class="toctext">Why can't I write object.class.name?</span></a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li class="toclevel-1"><a href="#MVEL_2.0_Templating_Guide"><span class="tocnumber">2</span> <span class="toctext">MVEL 2.0 Templating Guide</span></a>
+<ul>
+<li class="toclevel-2"><a href="#MVEL_2.0_Basic_Templating"><span class="tocnumber">2.1</span> <span class="toctext">MVEL 2.0 Basic Templating</span></a>
+<ul>
+<li class="toclevel-3"><a href="#A_Simple_Template"><span class="tocnumber">2.1.1</span> <span class="toctext">A Simple Template</span></a></li>
+<li class="toclevel-3"><a href="#Escaping_the_@_symbol"><span class="tocnumber">2.1.2</span> <span class="toctext">Escaping the @ symbol</span></a></li>
+</ul>
+</li>
+<li class="toclevel-2"><a href="#MVEL_2.0_Orb_Tags"><span class="tocnumber">2.2</span> <span class="toctext">MVEL 2.0 Orb Tags</span></a>
+<ul>
+<li class="toclevel-3"><a href="#@{}_Expression_Orb"><span class="tocnumber">2.2.1</span> <span class="toctext">@{} Expression Orb</span></a></li>
+<li class="toclevel-3"><a href="#@code{}_Silent_Code_Tag"><span class="tocnumber">2.2.2</span> <span class="toctext">@code{} Silent Code Tag</span></a></li>
+<li class="toclevel-3"><a href="#@if{}-@else{}_Control_Flow_Tags"><span class="tocnumber">2.2.3</span> <span class="toctext">@if{}-@else{} Control Flow Tags</span></a></li>
+<li class="toclevel-3"><a href="#@foreach{}_Foreach_iteration"><span class="tocnumber">2.2.4</span> <span class="toctext">@foreach{} Foreach iteration</span></a></li>
+<li class="toclevel-3"><a href="#Multi-iteration"><span class="tocnumber">2.2.5</span> <span class="toctext">Multi-iteration</span></a></li>
+<li class="toclevel-3"><a href="#Delimiting"><span class="tocnumber">2.2.6</span> <span class="toctext">Delimiting</span></a></li>
+<li class="toclevel-3"><a href="#@include{}_Include_Template_File"><span class="tocnumber">2.2.7</span> <span class="toctext">@include{} Include Template File</span></a></li>
+<li class="toclevel-3"><a href="#@includeNamed{}_Include_a_Named_Template"><span class="tocnumber">2.2.8</span> <span class="toctext">@includeNamed{} Include a Named Template</span></a></li>
+<li class="toclevel-3"><a href="#@declare{}_Declare_a_Template"><span class="tocnumber">2.2.9</span> <span class="toctext">@declare{} Declare a Template</span></a></li>
+<li class="toclevel-3"><a href="#@comment{}_Comment_tag"><span class="tocnumber">2.2.10</span> <span class="toctext">@comment{} Comment tag</span></a></li>
+</ul>
+</li>
+<li class="toclevel-2"><a href="#MVEL_2.0_Template_Integration"><span class="tocnumber">2.3</span> <span class="toctext">MVEL 2.0 Template Integration</span></a>
+<ul>
+<li class="toclevel-3"><a href="#The_org.mvel.templates.TemplateRuntime_Class"><span class="tocnumber">2.3.1</span> <span class="toctext">The org.mvel.templates.TemplateRuntime Class</span></a></li>
+<li class="toclevel-3"><a href="#The_org.mvel.templates.TemplateCompiler_Class"><span class="tocnumber">2.3.2</span> <span class="toctext">The org.mvel.templates.TemplateCompiler Class</span></a></li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+</div>
+
+<h1><span class="mw-headline" id="Language_Guide_for_2.0">Language Guide for 2.0</span></h1>
+<p>MVEL has largely been inspired by Java syntax, but has some fundamental differences aimed at making it more efficient as an expression language, such as operators that directly support collection, array and string matching, as well as regular expressions. MVEL is used to evaluate expressions written using Java syntax.
+</p><p>In addition to the expression language, MVEL serves as a templating language for configuration and string construction.
+Another wiki page for a summary information is: <a class="external free" href="https://en.wikipedia.org/wiki/MVEL">https://en.wikipedia.org/wiki/MVEL</a>
+</p><p>MVEL 2.x expressions may consist of:
+</p>
+<ul>
+	<li>Property expressions</li>
+	<li>Boolean expressions</li>
+	<li>Method invocations</li>
+	<li>Variable assignments</li>
+	<li>Function definitions</li>
+</ul>
+          <h2 id="BasicSyntax"><span class="mw-headline" id="Basic_Syntax">Basic Syntax</span></h2>
+<p>MVEL is an expression language based on Java-syntax, with some marked differences specific to MVEL.&#160; Unlike Java however, MVEL is dynamically typed (with optional typing), meaning type qualification is not required in the source.&#160;
+</p><p>MVEL interpreters as downloadable libraries which can be integrated to the product is available. It needs to be downloaded from the <a rel="nofollow" class="external text" href="https://maven.apache.org/">maven</a> website. The libraries expose APIs. If an expression it passed to the interface of the library, the expression is evaluated and result is provided.
+</p><p><br />
+An MVEL expression can be as simple as a single identifier, or as complicated as a full blown boolean expression with method calls and inline collection creations.
+</p>
+<div class="section_2"><h3 id="BasicSyntax-SimplePropertyExpression"><span class="mw-headline" id="Simple_Property_Expression">Simple Property Expression</span></h3>
+<div class="code panel pdl" style="border-width: 1px;"><div class="codeContent panelContent pdl">
+<pre>user.name
+</pre></div></div>
+<p>In this expression, we simply have a single identifier (<strong>user.name</strong>), which by itself, is what we refer to in MVEL as a <strong>property expression</strong>, in that the only purpose of the expression is to extract a property out of a variable or context object.&#160; Property expressions are one of the most common uses, allowing MVEL to be used as a very high performance, easy to use, reflection-optimizer.&#160;
+<br class="atl-forced-newline" /><br />
+</p><p>MVEL can even be used for evaluating a boolean expression:
+</p>
+<div class="code panel pdl" style="border-width: 1px;"><div class="codeContent panelContent pdl">
+<pre>user.name == 'John Doe'
+</pre></div></div>
+<p>Like Java, MVEL supports the full gamut of operator precedence rules, including the ability to use bracketing to control execution order.<br class="atl-forced-newline" /><br />
+</p>
+<div class="code panel pdl" style="border-width: 1px;"><div class="codeContent panelContent pdl">
+<pre>(user.name == 'John Doe') &amp;&amp; ((x * 2) - 1) &gt; 20
+</pre></div></div>
+</div><div class="section_2"><h3 id="BasicSyntax-Multiplestatements"><span class="mw-headline" id="Multiple_statements">Multiple statements</span></h3>
+<p>You may write scripts with an arbitrary number of statements using the semi-colon to denote the termination of a statement.  This is required in all cases except in cases where there is only one statement, or for the last statement in a script.
+</p>
+<div class="code panel pdl" style="border-width: 1px;"><div class="codeContent panelContent pdl">
+<pre>statement1; statement2; statement3
+</pre></div></div>
+<p>Note the lack of semi-colon after statement3.
+</p><p>New lines are not substitutes for the use of the semi-colon in MVEL.
+</p>
+</div><div class="section_2"><h3 id="BasicSyntax-ReturnedValues"><span class="mw-headline" id="Returned_Values">Returned Values</span></h3>
+<p>MVEL is designed to be an integration language at its core, allowing developers to provide simple scripting facilities for binding and logic.  As such, MVEL expressions use a <i>last value out</i> principle.  This means, that although MVEL supports the <code>return</code> keyword, it is almost never needed.  For example:
+</p>
+<div class="code panel pdl" style="border-width: 1px;"><div class="codeContent panelContent pdl">
+<pre>a = 10;
+b = (a = a * 2) + 10;
+a;
+</pre></div></div>
+<p>In this particular example, the expression returns the value of <code>a</code> as it is the last value of the expression.  It is functionally identical to:
+</p>
+<div class="code panel pdl" style="border-width: 1px;"><div class="codeContent panelContent pdl">
+<pre>a = 10;
+b = (a = a * 2) + 10;
+return a;
+</pre></div></div>
+</div>
+<h2 id="ValueTests"><span class="mw-headline" id="Value_Tests">Value Tests</span></h2>
+<p>All equality checks in MVEL are based on <i>value</i> not <i>reference</i>.  Therefore, the expression <code>foo == 'bar'</code> is the equivalent to <code>foo.equals("bar")</code> in Java.
+</p>
+<h3 id="ValueTests-TestingforValueEmptiness"><span class="mw-headline" id="Testing_for_Value_Emptiness">Testing for Value Emptiness </span></h3>
+<p>MVEL provides a special literal for testing for emptiness of a value, cleverly named <strong>empty</strong>.
+</p><p>For example:
+</p>
+<div class="code panel pdl" style="border-width: 1px;"><div class="codeContent panelContent pdl">
+<pre>foo == empty
+</pre></div></div><p>&gt;
+</p><p>The example expression will be <i>true</i> if the value of foo satisfies any of the requirements of emptiness.
+</p>
+<h3 id="ValueTests-TestingforNull"><span class="mw-headline" id="Testing_for_Null">Testing for Null</span></h3>
+<p>MVEL allows both the use of the keyword <strong>null</strong> or <strong>nil</strong> to represent a null value.
+</p>
+<div class="code panel pdl" style="border-width: 1px;"><div class="codeContent panelContent pdl">
+<pre>foo == null;
+foo == nil; // same as null
+</pre></div></div>
+<h3 id="ValueTests-Valuecoercion"><span class="mw-headline" id="Value_coercion">Value coercion</span></h3>
+<p>MVEL's type coercion system is applied in cases where two incomparable types are presented by attempting to coerce the <i>right</i> value to that of the type of the <i>left</i> value, and then vice-versa.
+</p><p>For example:
+</p>
+<div class="code panel pdl" style="border-width: 1px;"><div class="codeContent panelContent pdl">
+<pre>"123" == 123;
+</pre></div></div>
+<p>This expression is <i>true</i> in MVEL because the type coercion system will coerce the untyped number <i>123</i> to a String in order to perform the comparison.
+</p>
+<h3 id="ValueTests-Regexp"><span class="mw-headline" id="Regular_expressions">Regular expressions</span></h3>
+<p>MVEL supports the test for matching a string against a regular expression with the operator <i>~=</i>.
+</p>
+<div class="code panel pdl" style="border-width: 1px;"><div class="codeContent panelContent pdl">
+<pre>if(text ~= '[A-F0-9]') {
+  ...
+}
+</pre></div></div>
+<h2 id="InlineListMaps"><span id="Inline_List.2C_Maps_and_Arrays"></span><span class="mw-headline" id="Inline_List,_Maps_and_Arrays">Inline List, Maps and Arrays</span></h2>
+<p>MVEL allows you to express Lists, Maps and Arrays using simple elegant syntax.  Consider the following example:
+</p>
+<div class="code panel pdl" style="border-width: 1px;"><div class="codeContent panelContent pdl">
+<pre>["Bob"&#160;: new Person("Bob"), "Michael"&#160;: new Person("Michael")]</pre></div></div>
+<p>This is functionally equivalent to the following code:
+</p>
+<div class="code panel pdl" style="border-width: 1px;"><div class="codeContent panelContent pdl">
+<pre>Map map = new HashMap();
+map.put("Bob", new Person("Bob"));
+map.put("Michael", new Person("Michael"));
+</pre></div></div>
+<p>This can be a very powerful way to express data structures inside of MVEL.  You can use these constructs anywhere, even as a parameter to a method:
+</p>
+<div class="code panel pdl" style="border-width: 1px;"><div class="codeContent panelContent pdl">
+<pre>something.someMethod(["foo"&#160;: "bar"]);</pre></div></div>
+<h3 id="InlineList,MapsandArrays-Lists"><span class="mw-headline" id="Lists">Lists</span></h3>
+<p>Lists are expressed in the following format: <i>[item1, item2, ...]</i>
+</p><p>For example:
+</p>
+<div class="code panel pdl" style="border-width: 1px;"><div class="codeContent panelContent pdl">
+<pre>["Jim", "Bob", "Smith"]</pre>
+</div></div>
+<h3 id="InlineList,MapsandArrays-Maps"><span class="mw-headline" id="Maps">Maps</span></h3>
+<p>Maps are expressed in the following format: <i>[key1&#160;: value1, key2: value2, ...]</i>
+</p><p>For example:
+</p>
+<div class="code panel pdl" style="border-width: 1px;"><div class="codeContent panelContent pdl">
+<pre>["Foo"&#160;: "Bar", "Bar"&#160;: "Foo"]</pre></div></div>
+<h3 id="InlineList,MapsandArrays-Arrays"><span class="mw-headline" id="Arrays">Arrays</span></h3>
+<p>Arrays are expressed in the following format: <i>{item1, item2, ...}</i>
+</p><p>For example:
+</p>
+<div class="code panel pdl" style="border-width: 1px;"><div class="codeContent panelContent pdl">
+<pre>{"Jim", "Bob", "Smith"}</pre></div></div>
+<h3 id="InlineList,MapsandArrays-ArrayCoercion"><span class="mw-headline" id="Array_Coercion">Array Coercion</span></h3>
+<p>One important facet about inline arrays to understand is their special ability to be coerced to other array types.  When you declare an inline array, it is untyped, but say for example you are passing to a method that accepts int[].  You simply can write your code as the following:
+</p>
+<div class="code panel pdl" style="border-width: 1px;"><div class="codeContent panelContent pdl">
+<pre>foo.someMethod({1,2,3,4});</pre></div></div>
+<p>In this case, MVEL will see that the target method accepts an <strong>int[]</strong> and automatically type the array as such.
+</p>
+<h2 id="PropertyNavigation"><span class="mw-headline" id="Property_Navigation">Property Navigation</span></h2>
+<p>MVEL property navigation follows well-established conventions found in other bean property expressions found in other languages such as Groovy, OGNL, EL, etc.
+</p><p>Unlike some other languages which require qualification depending on the underlying method of access, MVEL provides a single, unified syntax for accessing properties, static fields, maps, etc.
+</p>
+<h3 id="MVEL2.0PropertyNavigation-BeanProperties"><span class="mw-headline" id="Bean_Properties">Bean Properties</span></h3>
+<p>Most java developers are familiar with and user the getter/setter paradigm in their Java objects in order to encapsulate property accessors.&#160;&#160; For example, you might access a property from an object as such:
+</p>
+<div class="code panel pdl" style="border-width: 1px;"><div class="codeContent panelContent pdl">
+<pre>user.getManager().getName();</pre></div></div>
+<p>In order to simplify this, you can access the same property using the following expression:
+</p>
+<div class="code panel pdl" style="border-width: 1px;"><div class="codeContent panelContent pdl">
+<pre>user.manager.name</pre></div></div>
+<blockquote>
+<p><i><strong>Note:</strong> In situations where the field in the object is <strong>public</strong>, MVEL will still prefer to access the property via it's getter method.</i></p></blockquote>
+<h3 id="MVEL2.0PropertyNavigation-Null-SafeBeanNavigation"><span class="mw-headline" id="Null-Safe_Bean_Navigation">Null-Safe Bean Navigation</span></h3>
+<p>Sometimes you have property expressions which may contain a null element, requiring you to create a null-check.  You can simplify this by using the null-safe operator:
+</p>
+<div class="code panel pdl" style="border-width: 1px;"><div class="codeContent panelContent pdl">
+<pre>user.?manager.name</pre></div>&gt;
+<p>This is functionally equivalent to writing:
+</p>
+<div class="code panel pdl" style="border-width: 1px;"><div class="codeContent panelContent pdl">
+<pre>if (user.manager&#160;!= null) { return user.manager.name; } else { return null; }</pre></div></div>
+<h3 id="MVEL2.0PropertyNavigation-Collections"><span class="mw-headline" id="Collections">Collections</span></h3>
+<p>Traversal of collections can also be achieved using abbreviated syntax.
+</p>
+<h3 id="MVEL2.0PropertyNavigation-ListAccess"><span class="mw-headline" id="List_Access">List Access</span></h3>
+<p>Lists are accessed the same as array's.  For example:
+</p>
+<div class="code panel pdl" style="border-width: 1px;"><div class="codeContent panelContent pdl">
+<pre> user[5]</pre></div></div>
+<p>is the equivalent of the Java code:
+</p>
+<div class="code panel pdl" style="border-width: 1px;"><div class="codeContent panelContent pdl">
+<pre>user.get(5);</pre></div></div>
+<h3 id="MVEL2.0PropertyNavigation-MapAccess"><span class="mw-headline" id="Map_Access">Map Access</span></h3>
+<p>Maps are accessed in the same way as array's except any object can be passed as the index value.  For example:
+</p>
+<div class="code panel pdl" style="border-width: 1px;"><div class="codeContent panelContent pdl">
+<pre>user["foobar"]</pre></div></div>
+<p>is the equivalent of the Java code:
+</p>
+<div class="code panel pdl" style="border-width: 1px;"><div class="codeContent panelContent pdl">
+<pre>user.get("foobar");</pre></div></div>
+<p>For Maps that use a String as a key, you may use another special syntax:
+</p>
+<div class="code panel pdl" style="border-width: 1px;"><div class="codeContent panelContent pdl">
+<pre>user.foobar</pre></div></div>
+<p>... Allowing you to treat the Map itself as a virtual object.
+</p>
+<h3 id="MVEL2.0PropertyNavigation-StringsasArrays"><span class="mw-headline" id="Strings_as_Arrays">Strings as Arrays</span></h3>
+<p>For the purposes of using property indexes (as well as iteration) all Strings are treated as  arrays.  In MVEL you may refer to the first character in a String variable as such:
+</p>
+<div class="code panel pdl" style="border-width: 1px;"><div class="codeContent panelContent pdl">
+<pre>foo = "My String";
+foo[0]; // returns 'M';</pre></div></div>
+ <h2 id="Literals"><span class="mw-headline" id="Literals">Literals</span></h2>
+<p>A literal is used to represent a fixed-value in the source of a particular script.
+</p>
+<div class="section_2"><h3 id="MVEL2.0Literals-Stringliterals"><span class="mw-headline" id="String_literals">String literals</span></h3>
+<p>String literals may be denoted by single or double quotes.
+</p>
+<div class="code panel pdl" style="border-width: 1px;"><div class="codeContent panelContent pdl">
+<pre>"This is a string literal"
+'This is also string literal'
+</pre></div></div>
+<div class="section_3"><h3 id="MVEL2.0Literals-Stringescapesequences"><span class="mw-headline" id="String_escape_sequences">String escape sequences</span></h3>
+<ul>
+	<li><code>\\</code> - Double escape allows rendering of single backslash in string.</li>
+	<li><code>\n</code> - Newline</li>
+	<li><code>\r</code> - Return</li>
+	<li><code>\u####</code> - Unicode character (Example: <code>\uAE00</code>)</li>
+	<li><code>\###</code> - Octal character (Example: <code>\73</code>)</li>
+</ul>
+</div></div><div class="section_2"><h3 id="MVEL2.0Literals-Numericliterals"><span class="mw-headline" id="Numeric_literals">Numeric literals</span></h3>
+<p>Integers can be represented in decimal (base 10), octal (base 8), or hexadecimal (base 16).
+</p><p>A decimal integer can be expressed as any number that does not start with zero.
+</p>
+<div class="code panel pdl" style="border-width: 1px;"><div class="codeContent panelContent pdl">
+<pre>125 // decimal
+</pre></div></div>
+<p>An octal representation of an integer is possible by prefixing the number with a zero, followed by digits ranging from 0 to 7.
+</p>
+<div class="code panel pdl" style="border-width: 1px;"><div class="codeContent panelContent pdl">
+<pre>0353 // octal
+</pre></div></div>
+<p>Hexidecimal is represented by prefixing the integer with <code>0x</code> followed by numbers ranging from 0-9..A-F.
+</p>
+<div class="code panel pdl" style="border-width: 1px;"><div class="codeContent panelContent pdl">
+<pre>0xAFF0 // hex
+</pre></div></div>
+</div><div class="section_2"><h3 id="MVEL2.0Literals-Floatingpointliterals"><span class="mw-headline" id="Floating_point_literals">Floating point literals</span></h3>
+<p>A floating point number consists of a whole number and a factional part denoted by the point/period character, with an optional type suffix.
+</p>
+<div class="code panel pdl" style="border-width: 1px;"><div class="codeContent panelContent pdl">
+<pre>10.503 // a double
+94.92d // a double
+14.5f // a float
+</pre></div></div>
+</div><div class="section_2"><h3 id="MVEL2.0Literals-BigIntegerandBigDecimalliterals"><span class="mw-headline" id="BigInteger_and_BigDecimal_literals">BigInteger and BigDecimal literals</span></h3>
+<p>You can represent <code>BigInteger</code> and <code>BigDecimal</code> literals by using the suffixes <strong><code>B</code></strong> and <strong><code>I</code></strong> (uppercase is mandatory).
+</p>
+<div class="code panel pdl" style="border-width: 1px;"><div class="codeContent panelContent pdl">
+<pre>104.39484B // BigDecimal
+8.4I // BigInteger
+</pre></div></div>
+</div><div class="section_2"><h3 id="MVEL2.0Literals-Booleanliterals"><span class="mw-headline" id="Boolean_literals">Boolean literals</span></h3>
+<p>Boolean literals are represented by the reserved keywords <strong><code>true</code></strong> and <strong><code>false</code></strong>.
+</p>
+</div><div class="section_2"><h3 id="MVEL2.0Literals-Nullliteral"><span class="mw-headline" id="Null_literal">Null literal</span></h3>
+<p>The null literal is denoted by the reserved keywords <strong><code>null</code></strong> or <strong><code>nil</code></strong>.
+</p>
+</div>
+<p><br /> 
+</p>
+          <h2 id="TypeLiterals"><span class="mw-headline" id="Type_Literals">Type Literals</span></h2>
+<p>Type literals are treated pretty much the same as in Java, with the following format: <i>&lt;PackageName&gt;.&lt;ClassName&gt;</i>.
+</p><p>So a class may be qualified as such:
+</p>
+<div class="code panel pdl" style="border-width: 1px;"><div class="codeContent panelContent pdl">
+<pre>java.util.HashMap
+</pre></div></div>
+<p>Or if the class has been imported either inline by or by external configuration—it is simply referred to by its unqualified name:
+</p>
+<div class="code panel pdl" style="border-width: 1px;"><div class="codeContent panelContent pdl">
+<pre>HashMap
+</pre></div></div>
+<div class="section_2"><h3 id="MVEL2.0TypeLiterals-NestedClasses"><span class="mw-headline" id="Nested_Classes">Nested Classes</span></h3>
+<p>Nested classes are not accessible through the standard dot-notation (as in Java) in MVEL 2.0.  Rather, you must qualify these classes with the <code>$</code> symbol.
+</p>
+<div class="code panel pdl" style="border-width: 1px;"><div class="codeContent panelContent pdl">
+<pre>org.proctor.Person$BodyPart 
+</pre></div></div>
+</div>
+<h2 id="ControlFlow"><span class="mw-headline" id="Flow_Control">Flow Control</span></h2>
+<p>MVEL's power goes beyond simple expressions.  In fact, MVEL supports an assortment of control flow operators which will allow you to perform advanced scripting operations.
+</p>
+<h3 id="MVEL2.0ControlFlow-If-Then-Else"><span class="mw-headline" id="If-Then-Else">If-Then-Else</span></h3>
+<p>MVEL supports full, C/Java-style if-then-else blocks.   For example:
+</p>
+<div class="code panel pdl" style="border-width: 1px;"><div class="codeContent panelContent pdl">
+<pre>if (var &gt; 0) {
+   System.out.println("Greater than zero!");
+}
+else if (var == -1) { 
+   System.out.println("Minus one!");
+}
+else { 
+   System.out.println("Something else!");
+}</pre></div></div>
+<h3 id="MVEL2.0ControlFlow-Ternarystatements"><span class="mw-headline" id="Ternary_statements">Ternary statements</span></h3>
+<p>Ternary statements are supported just as in Java:
+</p>
+<div class="code panel pdl" style="border-width: 1px;"><div class="codeContent panelContent pdl">
+<pre>var &gt; 0&#160;? "Yes"&#160;: "No";</pre></div></div>
+<p>And nested ternary statements:
+</p>
+<div class="code panel pdl" style="border-width: 1px;"><div class="codeContent panelContent pdl">
+<pre>var &gt; 0&#160;? "Yes"&#160;: (var == -1&#160;? "Minus One!"&#160;: "No")</pre></div></div>
+<h3 id="MVEL2.0ControlFlow-Foreach"><span class="mw-headline" id="Foreach">Foreach</span></h3>
+<p>One of the most powerful features in MVEL is it's <strong>foreach</strong> operator.  It is similar to the for each operator in Java 1.5 in both syntax and functionality.  It accepts two parameters separated by a colon, the first is the local variable for the current element, and the second is the collection or array to be iterated.
+</p><p>For example:
+</p>
+<div class="code panel pdl" style="border-width: 1px;"><div class="codeContent panelContent pdl">
+<pre>count = 0;
+foreach (name&#160;: people) {
+   count++;
+   System.out.println("Person #" + count + ":" + name);
+}
+    
+System.out.println("Total people: " + count);</pre></div></div>
+<p>Since MVEL treats Strings as iterable objects you can iterate a String (character by character) with a foreach block:
+</p>
+<div class="code panel pdl" style="border-width: 1px;"><div class="codeContent panelContent pdl">
+<pre>str = "ABCDEFGHIJKLMNOPQRSTUVWXYZ";
+
+foreach (el&#160;: str) {
+   System.out.print("["+ el + "]"); 
+}</pre></div></div>
+<p>The above example outputs: <i>[A][B][C][D][E][F][G][H][I][J][K][L][M][N][O][P][Q][R][S][T][U][V][W][X][Y][Z]</i>
+</p><p>You can also use MVEL to count up to an integer value (from 1):
+</p>
+<div class="code panel pdl" style="border-width: 1px;"><div class="codeContent panelContent pdl">
+<pre>foreach (x&#160;: 9) { 
+   System.out.print(x);
+} </pre></div></div>
+<p>Which outputs: <i>123456789</i>
+</p><p><strong>Syntax Note:</strong> As of MVEL 2.0, it is now possible to simply abbreviate <i>foreach</i> in the same way it is in Java 5.0, by using the <strong><code>for</code></strong> keyword. For example:
+</p>
+<div class="code panel pdl" style="border-width: 1px;"><div class="codeContent panelContent pdl">
+<pre>for (item&#160;: collection) { ... }</pre></div></div>
+<h3 id="MVEL2.0ControlFlow-ForLoop"><span class="mw-headline" id="For_Loop">For Loop</span></h3>
+<p>MVEL 2.0 implements standard C for-loops:
+</p>
+<div class="code panel pdl" style="border-width: 1px;"><div class="codeContent panelContent pdl">
+<pre>for (int i =0; i &lt; 100; i++) { 
+   System.out.println(i);
+}</pre></div></div>
+<h3 id="MVEL2.0ControlFlow-DoWhile,DoUntil"><span id="Do_While.2C_Do_Until"></span><span class="mw-headline" id="Do_While,_Do_Until">Do While, Do Until</span></h3>
+<p><strong><code>do while</code></strong> and <strong><code>do until</code></strong> are implemented in MVEL, following the same convention as Java, with <strong><code>until</code></strong> being the inverse of <strong><code>while</code></strong>.
+</p>
+<div class="code panel pdl" style="border-width: 1px;"><div class="codeContent panelContent pdl">
+<pre>do { 
+   x = something();
+} 
+while (x&#160;!= null);</pre></div></div>
+<p>... is semantically equivalent to ...
+</p>
+<div class="code panel pdl" style="border-width: 1px;"><div class="codeContent panelContent pdl">
+<pre>do {
+   x = something();
+}
+until (x == null);</pre></div></div>
+<h3 id="MVEL2.0ControlFlow-While,Until"><span id="While.2C_Until"></span><span class="mw-headline" id="While,_Until">While, Until</span></h3>
+<p>MVEL 2.0 implements standard <strong><code>while</code></strong>, with the addition of the inverse <strong><code>until</code></strong>.
+</p>
+<div class="code panel pdl" style="border-width: 1px;"><div class="codeContent panelContent pdl">
+<pre>while (isTrue()) {
+   doSomething();
+}</pre></div></div>
+<p>... or ...
+</p>
+<div class="code panel pdl" style="border-width: 1px;"><div class="codeContent panelContent pdl">
+<pre>until (isFalse()) {
+   doSomething();
+}</pre></div></div>
+<h2 id="ProjectionsFolds"><span class="mw-headline" id="Projections_and_Folds">Projections and Folds</span></h2>
+<p>Put simply, projections are a way of representing collections.  Using a very simple syntax, you can inspect very complex object models inside collections.
+</p><p>Imagine you have a collection of <strong>User</strong> objects.  Each of these objects has a <strong>Parent</strong>. Now say you want to get a list of all names of the parents (assuming the Parent class has a <strong>name</strong> field) in the hierarchy of users, you would write something like this:
+</p>
+<div class="code panel pdl" style="border-width: 1px;"><div class="codeContent panelContent pdl">
+<pre>parentNames = (parent.name in users);</pre></div></div>
+<p>You can even perform nested operations.  Imagine instead, that the User object had a collection member called familyMembers, and we wanted a list of all the family members names:
+</p>
+<div class="code panel pdl" style="border-width: 1px;"><div class="codeContent panelContent pdl">
+<pre>familyMembers = (name in (familyMembers in users));</pre></div></div>
+<h2 id="Assignments"><span class="mw-headline" id="Assignments">Assignments</span></h2>
+<p>MVEL allows you assign variable in your expression, either for extraction from the runtime, or for use inside the expression.
+</p><p>As MVEL is a dynamically typed language, you do not have to specify a type in order to declare a new variable.  However, you may optionally do so.
+</p>
+<div class="code panel pdl" style="border-width: 1px;"><div class="codeContent panelContent pdl">
+<pre>str = "My String"; // valid
+String str = "My String"; // valid
+</pre></div></div>
+<p>Unlike Java however, MVEL provides automatic type conversion (when possible) when assigning a value to a typed variable.  For example:
+</p>
+<div class="code panel pdl" style="border-width: 1px;"><div class="codeContent panelContent pdl">
+<pre>String num = 1;
+assert num instanceof String &amp;&amp; num == "1";
+</pre></div></div>
+<p>For dynamically typed variables where you simply want to perform a type conversion, you may simply cast the value to the type you desire:
+</p>
+<div class="code panel pdl" style="border-width: 1px;"><div class="codeContent panelContent pdl">
+<pre>num = (String) 1;
+assert num instanceof String &amp;&amp; num == "1";
+</pre></div></div>
+<h2 id="FunctionDefinition"><span class="mw-headline" id="Function_Definition">Function Definition</span></h2>
+<p>MVEL allows the definition of native functions with either the <strong><code>def</code></strong> or <strong><code>function</code></strong> keywords.
+</p><p>Functions are defined in-order of declaration, and cannot be foreword referenced.  The only exception to this is <i>within</i> functions themselves, it is possible to forward reference another function.
+</p>
+<div class="section_2"><h3 id="FunctionDefinition-ASimpleExample"><span class="mw-headline" id="A_Simple_Example">A Simple Example</span></h3>
+<p><i>Defining a Simple Function</i>
+</p>
+<div class="code panel pdl" style="border-width: 1px;"><div class="codeContent panelContent pdl">
+<pre>def hello() { System.out.println("Hello!"); }
+</pre></div></div>
+<p>This defines a simple function called "hello" that accepts no parameters.  When called it prints "Hello!" to the console.  An MVEL-defined function works just like any regular method call, and resolution preference is to MVEL functions over base context methods.
+</p>
+<div class="code panel pdl" style="border-width: 1px;"><div class="codeContent panelContent pdl">
+<pre>hello(); // calls function
+</pre></div></div>
+</div><div class="section_2"><h3 id="FunctionDefinition-AcceptingParametersandReturningValues"><span class="mw-headline" id="Accepting_Parameters_and_Returning_Values">Accepting Parameters and Returning Values</span></h3>
+<p>Functions can be declared to accept parameters, and can return a single value.  Consider the following example:
+</p>
+<div class="code panel pdl" style="border-width: 1px;"><div class="codeContent panelContent pdl">
+<pre>def addTwo(a, b) { 
+   a + b;
+}
+</pre></div></div>
+<p>This function will accept two parameters (<strong><code>a</code></strong> and <strong><code>b</code></strong>) and then adds the two variables together.  Since MVEL uses the <i>last-value-out</i> principle, the resultant value will be returned.  Therefore, you can use the function as follows:
+</p>
+<div class="code panel pdl" style="border-width: 1px;"><div class="codeContent panelContent pdl">
+<pre>val = addTwo(5, 2);
+assert val == 10;
+</pre></div></div>
+<p>The <strong><code>return</code></strong> keyword can also be used to force a return a value from within the internal program flow of the function.
+</p>
+</div><div class="section_2"><h3 id="FunctionDefinition-Closures"><span class="mw-headline" id="Closures">Closures</span></h3>
+<p>MVEL allows closures.  However the functionality is not interoperable with native Java methods.
+</p>
+<div class="code panel pdl" style="border-width: 1px;"><div class="codeContent panelContent pdl">
+<pre>// define a function that accepts a parameter    
+def someFunction(f_ptr) { f_ptr(); }
+
+// define a var
+var a = 10;
+
+// pass the function a closure
+someFunction(def { a * 10 }); 
+</pre></div></div>
+</div>
+<h2 id="LambdaExpressions"><span class="mw-headline" id="Lambda_Expressions">Lambda Expressions</span></h2>
+<p>MVEL allows the definition of lambda functions.
+</p>
+<div class="section_2"><h3 id="LambdaExpressions-Example"><span class="mw-headline" id="Example">Example</span></h3>
+<p><i>A simple lambda expression</i>
+</p>
+<div class="code panel pdl" style="border-width: 1px;"><div class="codeContent panelContent pdl">
+<pre>threshold = def (x) { x &gt;= 10&#160;? x&#160;: 0 }; result = cost + threshold(lowerBound);
+</pre></div></div>
+<p>The above example defines a lambda and assigns it to the variable "threshold".  Lambda's are essentially functions that are assignable to variables.  They are essentially closures and can be used as such.
+</p>
+</div>
+  <h2 id="Interceptors"><span class="mw-headline" id="Interceptors">Interceptors</span></h2>
+<p>MVEL provides the ability to place interceptors within a <i>compiled</i> expression.  This can be particularly useful for implementing change listeners or firing external events based from within an expression.
+</p><p>An interceptor declaration uses the <i>@Syntax</i>, similar to annotations in Java.
+</p><p>You declare interceptors before a statement you wish to enclose, and as such, an interceptor may implement either before or after listeners, or both.  For example:
+</p>
+<div class="code panel pdl" style="border-width: 1px;"><div class="codeContent panelContent pdl">
+<pre>@Intercept
+foreach (item&#160;: fooItems) { 
+   total += fooItems.price;
+}
+</pre></div></div>
+<p>In this particular statement, the interceptor encloses the entire <strong>foreach</strong> block, so if the interceptor implements the after listener, that action will be fired when the foreach has completed.
+</p>
+<div class="section_2"><h3 id="Interceptors-Theorg.mvel.integration.InterceptorInterface"><span class="mw-headline" id="The_org.mvel.integration.Interceptor_Interface">The <code>org.mvel.integration.Interceptor</code> Interface</span></h3>
+<div class="code panel pdl" style="border-width: 1px;"><div class="codeContent panelContent pdl">
+<pre>public interface Interceptor {
+    public int doBefore(ASTNode node, VariableResolverFactory factory);
+    public int doAfter(Object exitStackValue, ASTNode node, VariableResolverFactory factory);
+}
+</pre></div></div>
+<p>The Interceptor interface provides two methods to be implemented: <code>doBefore</code> and <code>doAfter</code>.  Here we will describe the meaning of the values passed into the methods from the MVEL runtime.
+</p>
+<div class="section_3"><h3 id="Interceptors-doBefore"><span class="mw-headline" id="doBefore">doBefore</span></h3>
+<p>The <code>doBefore</code> method is called before the enclosing statement is executed.
+</p>
+<hr />
+<p><strong>org.mvel.ASTNode::node</strong>
+</p><p>The handle to the ASTNode is a reference to the ASTNode which is wrapped by the interceptor.  This can be used to obtain information about the actual compiled code.
+</p>
+<div class="aui-message success shadowed information-macro">
+<p class="title">About AST API</p>
+<p>While access to the AST is provided, there is no guarantee that changes to the underlying AST API will not be changed in maintenance releases and subsequent revisions to MVEL, as certain bug fixes and performance improvements.  Also certain compiler options may effect the structure of the AST and produce unexpected results, so understand this is an advanced feature.
+</p><p><br />                   
+</p>
+    </div>
+<hr />
+<p><strong>org.mvel.integration.VariableResolverFactory::factory</strong>
+</p><p>The variable resolver factory provides access to the current scope of variables in the expression.  Please see 3Variable Resolvers for more information.
+</p>
+</div><div class="section_3"><h3 id="Interceptors-doAfter"><span class="mw-headline" id="doAfter">doAfter</span></h3>
+<p>The <code>doAfter</code> method is called after the enclosing statement has executed.
+</p>
+<hr />
+<p><strong>java.lang.Object::exitStackValue</strong>
+</p><p>The <code>doAfter</code> method is executed after the enclosing statement has executed, but <i>not</i> before the end of the frame.  Therefore, any value left on the stack at the end of the operation will still be present and therefore accessible to the interceptor.  For example:
+</p>
+<div class="code panel pdl" style="border-width: 1px;"><div class="codeContent panelContent pdl">
+<pre>    @Intercept cost += value;
+</pre></div></div>
+<p>In this particular case, the reduced value of <i>cost = cost + value</i> will be present on the stack until the end of the execution frame, and therefore this value will be available as the <code>exitStackValue</code> in the <code>doAfter</code> call.
+</p>
+<hr />
+<p><strong>org.mvel.ASTNode::node</strong>
+</p><p>This is the same AST element as is passed to <code>doBefore</code>.  See the last section for more details.
+</p><p><strong>org.mvel.integration.VariableResolverFactory::factory</strong>
+</p><p>See the last section for more details.
+</p>
+</div></div><div class="section_2"><h3 id="Interceptors-UsingInterceptorsintheCompiler"><span class="mw-headline" id="Using_Interceptors_in_the_Compiler">Using Interceptors in the Compiler</span></h3>
+<p>Interceptors must be provided to the compiler prior to compiling the expression in order to wire the interceptors into the expression.  So it should be noted here that interceptors <i>may not</i> be used with the MVEL interpreter.
+</p><p>A Map is used to provide the compiler with the interceptors with the key representing the name of the interceptor, and the value being the interceptor instance.
+</p><p>For example:
+</p>
+<div class="code panel pdl" style="border-width: 1px;"><div class="codeContent panelContent pdl">
+<pre>
+
+// Create a new ParserContext
+ParserContext context = new ParserContext();
+
+Map&lt;String, Interceptor&gt; myInterceptors = new HashMap&lt;String, Interceptor&gt;();
+
+// Create a simple interceptor.
+Interceptor myInterceptor = new Interceptor() {
+    public int doBefore(ASTNode node, VariableResolverFactory factory) {
+        System.out.println("BEFORE!");
+    }
+
+    public int doAfter((Object value, ASTNode node, VariableResolverFactory factory) {
+        System.out.println("AFTER!");
+    }
+};
+
+// Now add the interceptor to the map.
+myInterceptors.put("Foo", myInterceptor);
+
+// Add the interceptors map to the parser context.
+context.setInterceptors(myInterceptors);
+
+// Compile the expression.
+Serializable compiledExpression = MVEL.compileExpression(expression, context);
+</pre></div></div>
+    <div class="aui-message success shadowed information-macro">
+                    <p class="title">Serializability of Expressions</p>
+<p>If you intend to serialize a compiled expression for re-use across multiple runtime instances, you must ensure that your interceptors are, themselves, Serializable otherwise you will encounter serialization problems since your Interceptor <i>instance</i> is added to the AST directly.
+</p><p><br />                    
+</p>
+    </div>
+</div>
+		     <h2 id="Typing"><span class="mw-headline" id="Typing">Typing</span></h2>
+<p>MVEL is dynamically typed language, with static typing.  Most users of MVEL will rely simply on dynamic typing.  It's simple, and easy to work with.
+</p>
+<div class="code panel pdl" style="border-width: 1px;"><div class="codeContent panelContent pdl">
+<pre>a = 10; // declare a variable 'a'
+b = 15; // declare a variable 'b';
+
+a + b;
+</pre></div></div>
+<div class="section_2"><h3 id="Typing-DynamicTypingandCoercion"><span class="mw-headline" id="Dynamic_Typing_and_Coercion">Dynamic Typing and Coercion</span></h3>
+<p>The most important aspect of a language like MVEL, which interacts directly with native Java objects, which themselves are statically typed, is that of <i>type coercion</i>.  Since MVEL cannot truly treat say, a <code>java.lang.String</code> object as a <code>java.lang.Integer</code> object for math operations, it must be able to <i>coerce</i> one type to another.
+</p><p><strong>Performance Considerations</strong>
+</p><p>This is of course a serious performance consideration when using something like MVEL as an integration point at a <i>hot spot</i> of your application.  For heavy processing load, coercion overload is mitigated by caches and the MVEL optimizers (available only for pre-compiled expressions).  However it is not always possible to bypass the overhead of a hard coercion operation depending on what is being done.
+</p><p>However, if String variables are being injected into the runtime to be evaluated as Integers, it is simply not possible to prevent the runtime from needing to parse the strings into new Integer objects.  This should always be considered.
+</p><p><strong>Method Calls</strong>
+</p><p>Calling of methods is one of the most important aspects of coercion.  Fundamentally, it allows you to directly call method without the need to finesse the inputs.  Instead the interpreter or compiler will analyze the types being passed to the method, determine what coercion needs to be done to accomplish the call, and in the case of overloaded methods, choose the method which most closely matches the input types by avoiding using coercion if possible.
+</p><p><strong>Arrays</strong>
+</p><p>Arrays are one of the more interesting aspects of the coercion system in MVEL, in that, MVEL uses untyped arrays by default (meaning <code>Object[]</code> arrays for all intents and purposes).  Only when faced with an array type conflict, will MVEL attempt to <i>coerce</i> the entire array to the needed input type.  For example: in the case of a method call parameter.
+</p><p>Example:
+</p>
+<div class="code panel pdl" style="border-width: 1px;"><div class="codeContent panelContent pdl">
+<pre>myArray = {1,2,3};
+
+// pass to method that accepts String[]
+myObject.someMethod(myArray);
+</pre></div></div>
+<p>In this particular case, <code>someMethod()</code> accepts a <code>String[]</code> array.  This will not fail in MVEL, instead MVEL will convert the array to a <code>String[]</code>.
+</p>
+</div><div class="section_2"><h3 id="Typing-StaticTyping"><span class="mw-headline" id="Static_Typing">Static Typing</span></h3>
+<p>Static typing in MVEL functions just as it does in Java, but by default still works in concert with coercion.
+</p>
+<div class="code panel pdl" style="border-width: 1px;"><div class="codeContent panelContent pdl">
+<pre>int num = 10;
+</pre></div></div>
+<p>This declares a typed integer variable called <code>num</code>.  When you do this, the MVEL runtime <strong>will</strong> enforce the type.  For example, trying to assign an incompatible type after the declaration will result in an exception:
+</p>
+<div class="code panel pdl" style="border-width: 1px;"><div class="codeContent panelContent pdl">
+<pre>num = new HashMap(); // will throw an incompatible typing exception.
+</pre></div></div>
+<p>However, MVEL <i>will</i> perform coercion to a statically typed variable if the value being assigned is coercable.
+</p>
+<div class="code panel pdl" style="border-width: 1px;"><div class="codeContent panelContent pdl">
+<pre>num = "100"; // will work -- parses String to an integer.
+</pre></div></div>
+    <div class="aui-message hint shadowed information-macro">
+                    <p class="title">Only once in scope</p>
+<pre>                           <span class="aui-icon icon-hint">Icon</span>
+</pre>
+                <div class="message-content">
+<p>Once you have declared a statically typed variable, you cannot declare a new variable of the same name within the scope.  For example:
+</p><p>int i = 100;
+</p><p>int i = 200; // will throw an exception.
+</p>
+                    </div>
+    </div>
+</div><div class="section_2"><h3 id="Typing-StrictTyping"><span class="mw-headline" id="Strict_Typing">Strict Typing</span></h3>
+<p>Strict typing in MVEL is an optional mode for the compiler, in which all types must be fully qualified, either by declaration or inference.
+</p><p><strong>Enabling Strict Mode</strong>
+</p><p>When compiling an expression, the compiler can be put into strict mode through the <code>ParserContext</code> by setting <code>setStrictTypeEnforcement(true)</code>.
+</p><p>Satisfying type strictness can be accomplished both by requiring explicit declaration of types inside the expression, or by notifying the parser ahead of time of what the types of certain inputs are.
+</p><p>For example:
+</p>
+<div class="code panel pdl" style="border-width: 1px;"><div class="codeContent panelContent pdl">
+<pre>ExpressionCompiler compiler = new ExpressionCompiler(expr);
+
+ParserContext context = new ParserContext();
+context.setStrictTypeEnforcement(true);
+
+context.addInput("message", Message.class);
+context.addInput("person", Person.class);
+
+compiler.compile(context);
+</pre></div></div>
+<p>In this example we inform the compiler that this expression will be accepting two external inputs: <code>message</code> and <code>person</code> and what the types of those inputs are.  This allows the compiler to determine if a particular call is safe at compile time, instead of failing at runtime.
+</p>
+</div>
+ <h2 id="Shell"><span class="mw-headline" id="Shell">Shell</span></h2>
+<p>The MVEL interactive shell allows you to directly interface with MVEL, and explore features of the MVEL language.
+See also <a class="external free" href="https://en.wikipedia.org/wiki/Drools">https://en.wikipedia.org/wiki/Drools</a>
+<a class="external free" href="https://en.wikipedia.org/wiki/Unified_Expression_Language">https://en.wikipedia.org/wiki/Unified_Expression_Language</a>
+</p>
+<h3 id="MVELShell-LaunchingtheShell"><span class="mw-headline" id="Launching_the_Shell">Launching the Shell</span></h3>
+<p>To launch the MVEL shell, simply run the MVEL distribution JAR as an executable jar:
+</p>
+<div class="code panel pdl" style="border-width: 1px;"><div class="codeContent panelContent pdl">
+</div></div>
+<p>Alternatively, you can run the shell from within your favorite IDE by setting up a run profile for the class: <strong><code>org.mvel2.sh.Main</code></strong>.
+</p>
+                 <h2 id="LanguageFAQ"><span class="mw-headline" id="Language_FAQ">Language FAQ</span></h2>  
+<p><br />    
+</p>
+          <div class="section_2"><h3 id="MVEL2.0LanguageFAQ-Whydoesn&#39;tthe.classreferencework?"><span id="Why_doesn.27t_the_.class_reference_work.3F"></span><span class="mw-headline" id="Why_doesn't_the_.class_reference_work?">Why doesn't the .class reference work?</span></h3>
+<p>MVEL does not have a special <i>.class</i> identifier to refer to type literals like Java.  There are no class literals per se. Instead you refer to a class reference simply by its name. For example, if a method accepts type <code>Class</code> as a parameter you would call it just like this:
+</p>
+<div class="code panel pdl" style="border-width: 1px;"><div class="codeContent panelContent pdl">
+<pre>// MVEL
+someMethod(String);
+
+// Java-equivalent
+someMethod(String.class);
+</pre></div></div>
+<p>In fact, MVEL treats <i>.class</i> as a regular bean property.  So by writing <code>String.class</code> the value returned will be an instance of <code>java.lang.Class</code> referring to <code>java.lang.Class</code> itself, since it would be the equivalent of writing <code>String.class.getClass()</code> in Java.
+</p><p>The principle reason for this, is that MVEL has a dynamic type system which treats types as regular variables, rather than qualified type-literals like in Java. And as such, MVEL allows for class types to be referenced as ordinary variables unlike Java, allowing for type-aliasing.
+</p>
+</div><div class="section_2"><h3 id="MVEL2.0LanguageFAQ-Whycan&#39;tIwriteobject.class.name?"><span id="Why_can.27t_I_write_object.class.name.3F"></span><span class="mw-headline" id="Why_can't_I_write_object.class.name?">Why can't I write object.class.name?</span></h3>
+<p>This is a limitation which may be addressed in a future version of MVEL, but bean properties are <i>not</i> supported against <strong><code>Class</code></strong> references.  This does not mean that you cannot call methods of <strong><code>Class</code></strong>, but that you must use full qualified method calls like:
+</p>
+<div class="code panel pdl" style="border-width: 1px;"><div class="codeContent panelContent pdl">
+<pre>someVar.class.getName();     // Yes!
+someVar.class.name;          // No!
+
+someVar.getClass().getName() // Yes!
+someVar.getClass().name      // No!
+</pre></div></div>
+<p>This limitation is completely limited to <strong><code>java.lang.Class</code></strong> as a consequence of property-resolution orders and the way that MVEL deals with class references.
+</p>
+</div>
+          <h1><span class="mw-headline" id="MVEL_2.0_Templating_Guide">MVEL 2.0 Templating Guide</span></h1>
+<p>MVEL 2.0 offers a new, more powerful, and unified templating engine to bring together many of the template concepts that were introduced in 1.2. Unfortunately, the architecture of the template engine in 1.2 was inadequate for regular maintenance, and the decision to completely re-write the template engine from the ground up was made.</p>
+  <h2 id="MVEL_2.0_Basic_Templating"><span class="mw-headline" id="MVEL_2.0_Basic_Templating">MVEL 2.0 Basic Templating</span></h2>
+<p>MVEL Templates are comprised of <em>orb-tags</em> inside a plaintext document.  Orb-tags denote dynamic elements of the template which the engine will evaluate at runtime.
+</p>
+<p>If you are familiar with FreeMarker, this type of syntax will not be completely alien to you.</p>
+<p><em>For a list of all orb-tags included in MVEL 2.0 <a href="/w/index.php?title=MVEL_Language_Guide&amp;action=edit&amp;redlink=1" class="new" title="MVEL Language Guide (does not exist)">click here</a></em></p>
+<div class="section_2"><h3 id="MVEL2.0BasicTemplating-ASimpleTemplate"><span class="mw-headline" id="A_Simple_Template">A Simple Template</span></h3>
+<div class="code panel pdl" style="border-width: 1px;"><div class="codeContent panelContent pdl">
+<pre>Hello, @{person.getSex() == &#39;F&#39;&#160;? &#39;Ms.&#39;&#160;: &#39;Mr.&#39;} @{person.name}
+
+This e-mail is to thank you for your interest in MVEL Templates 2.0.</pre>
+</div></div>
+<p>This template shows a simple template with a simple embedded expression.  When evaluated the output might look something like this:</p>
+<div class="code panel pdl" style="border-width: 1px;"><div class="codeContent panelContent pdl">
+<pre>Hello, Ms. Sarah Peterson
+
+This e-mail is to thank you for your interest in MVEL Templates 2.0.
+</pre>
+</div></div>
+</div><div class="section_2"><h3 id="MVEL2.0BasicTemplating-Escapingthe@symbol"><span id="Escaping_the_.40_symbol"></span><span class="mw-headline" id="Escaping_the_@_symbol">Escaping the @ symbol</span></h3>
+<p>Naturally, since the @ symbol is used to denote the beginning of an orb-tag, you may need to <em>escape</em> it, to prevent it from being processed by the compiler.  Thankfully, there is only one situation where this is necessary: when you actually need to produce the string '@{' as output in your template.</p>
+<p>Since the compiler requires a combination of @ and { to trigger the orb recognition, you <em>can</em> freely use @ symbols without escaping them.  For example:</p>
+<div class="code panel pdl" style="border-width: 1px;"><div class="codeContent panelContent pdl">
+<pre>Email any questions to: foo@bar.com
+
+@{date}
+@include{&#39;disclaimer.html&#39;}
+</pre>
+</div></div></div>
+<p>But in the case where you need an @ symbol up-against an orb-tag, you will need to escape it by repeating it twice:</p>
+<div class="code panel pdl" style="border-width: 1px;"><div class="codeContent panelContent pdl">
+<pre>@{username}@@@{domain}
+</pre>
+</div></div>
+<p>That's two @'s to escape one symbol, and the third @ being the beginning of the tag. If this looks too messy, you can always use the alternate approach of using an expression tag, like this:</p>
+<div class="code panel pdl" style="border-width: 1px;"><div class="codeContent panelContent pdl">
+<pre>@{username}@{&#39;@&#39;}@{domain}
+</pre>
+</div></div>
+  <h2 id="MVEL_2.0_Orb_Tags"><span class="mw-headline" id="MVEL_2.0_Orb_Tags">MVEL 2.0 Orb Tags</span></h2>
+<p>This page contains a list of all <em>orb-tags</em> available out-of-the-box in the MVEL 2.0 templating engine.
+</p>
+<div class="section_2"><h3 id="MVEL2.0OrbTags-@&#123;&#125;ExpressionOrb"><span id=".40.7B.7D_Expression_Orb"></span><span class="mw-headline" id="@{}_Expression_Orb"><strong>@{}</strong> <em>Expression Orb</em></span></h3>
+<p>The expression orb is the most rudimentary form of orb-tag. It contains a value expression which will be evaluated to a string, and appended to the output template.  For example:</p>
+<div class="code panel pdl" style="border-width: 1px;"><div class="codeContent panelContent pdl">
+<pre>Hello, my name is @{person.name}
+</pre>
+</div></div>
+</div><div class="section_2"><h3 id="MVEL2.0OrbTags-@code&#123;&#125;SilentCodeTag"><span id=".40code.7B.7D_Silent_Code_Tag"></span><span class="mw-headline" id="@code{}_Silent_Code_Tag"><strong>@code{}</strong> <em>Silent Code Tag</em></span></h3>
+<p>The silent code tag allows you to execute MVEL expression code in your template.  It does not return a value and does not affect the formatting of the template in any way.</p>
+<div class="code panel pdl" style="border-width: 1px;"><div class="codeContent panelContent pdl">
+<pre>@code{age = 23; name = &#39;John Doe&#39;}
+@{name} is @{age} years old.
+</pre>
+</div></div>
+<p>This template will evaluate to: <em>John Doe is 23 years old</em>.</p>
+</div><div class="section_2"><h3 id="MVEL2.0OrbTags-@if&#123;&#125;-@else&#123;&#125;ControlFlowTags"><span id=".40if.7B.7D-.40else.7B.7D_Control_Flow_Tags"></span><span class="mw-headline" id="@if{}-@else{}_Control_Flow_Tags"><strong>@if{}-@else{}</strong> <em>Control Flow Tags</em></span></h3>
+<p>The <strong>@if{}</strong> and <strong>@else{}</strong> tags provide full if-then-else functionality in MVEL Templates.  For example:</p>
+<div class="code panel pdl" style="border-width: 1px;"><div class="codeContent panelContent pdl">
+<pre>@if{foo&#160;!= bar}
+   Foo not a bar!
+@else{bar&#160;!= cat}
+   Bar is not a cat!
+@else{}
+   Foo may be a Bar or a Cat!
+@end{}
+</pre>
+</div></div>
+<p><br />                           
+</p>
+<p>All blocks in MVEL Templates <em>must</em> be terminated with an @end{} orb, except in cases of an if-then-else structure, where @else{} tags denote the termination of the previous control statement.</p>
+    </div>
+<p><br />
+</p>
+</div><div class="section_2"><h3 id="MVEL2.0OrbTags-@foreach&#123;&#125;Foreachiteration"><span id=".40foreach.7B.7D_Foreach_iteration"></span><span class="mw-headline" id="@foreach{}_Foreach_iteration"><strong>@foreach{}</strong> <em>Foreach iteration</em></span></h3>
+<p>The foreach tag allows you to iterate either collections or arrays in your template.  Note: that the syntax for foreach has changed in MVEL Templates 2.0 to standardize the foreach notation with that of the MVEL language itself.</p>
+<div class="code panel pdl" style="border-width: 1px;"><div class="codeContent panelContent pdl">
+<pre>@foreach{item&#160;: products} 
+ - @{item.serialNumber}
+@end{}
+</pre>
+</div></div>
+<p>MVEL 2.0 <em>requires</em> you specify an iteration variable.  While MVEL 1.2 assumed the name <em>item</em> if you did not specify an alias, this has been dropped due to some complaints about that default action.</p>
+<div class="section_3"><h3 id="MVEL2.0OrbTags-Multi-iteration"><span class="mw-headline" id="Multi-iteration">Multi-iteration</span></h3>
+<p>You can iterate more than one collection in a single foreach loop at one time by comma-separating the iterations:</p>
+<div class="code panel pdl" style="border-width: 1px;"><div class="codeContent panelContent pdl">
+<pre>@foreach{var1&#160;: set1, var2&#160;: set2}
+  @{var1}-@{var2}
+@end{}
+</pre>
+</div></div>
+</div><div class="section_3"><h3 id="MVEL2.0OrbTags-Delimiting"><span class="mw-headline" id="Delimiting">Delimiting</span></h3>
+<p>You can automatically add a text delimiter to an iteration by specifying the iterator in <strong>@end{}</strong> tag.</p>
+<div class="code panel pdl" style="border-width: 1px;"><div class="codeContent panelContent pdl">
+<pre>@foreach{item&#160;: people}@{item.name}@end{&#39;, &#39;}
+</pre>
+</div></div>
+<p>This would return something like: <em>John, Mary, Joseph</em>.</p>
+</div></div><div class="section_2"><h3 id="MVEL2.0OrbTags-@include&#123;&#125;IncludeTemplateFile"><span id=".40include.7B.7D_Include_Template_File"></span><span class="mw-headline" id="@include{}_Include_Template_File"><strong>@include{}</strong> <em>Include Template File</em></span></h3>
+<p>You may include a template file into an MVEL template using this tag.</p>
+<div class="code panel pdl" style="border-width: 1px;"><div class="codeContent panelContent pdl">
+<pre>@include{&#39;header.mv&#39;}
+
+This is a test template.
+</pre>
+</div></div>
+<p>You may also execute an MVEL expression inside an include tag by adding a semicolon after the template name:</p>
+<div class="code panel pdl" style="border-width: 1px;"><div class="codeContent panelContent pdl">
+<pre>@include{&#39;header.mv&#39;; title=&#39;Foo Title&#39;}
+</pre>
+</div></div>
+</div><div class="section_2"><h3 id="MVEL2.0OrbTags-@includeNamed&#123;&#125;IncludeaNamedTemplate"><span id=".40includeNamed.7B.7D_Include_a_Named_Template"></span><span class="mw-headline" id="@includeNamed{}_Include_a_Named_Template"><strong>@includeNamed{}</strong> <em>Include a Named Template</em></span></h3>
+<p>Named templates are templates that have been precompiled and passed to the runtime via a TemplateRegistry, or templates that have been declared within the template itself.  You simply include </p>
+<p>You may also execute MVEL code in an @includeNamed{} tag, just as with the @include{} tag.</p>
+<div class="code panel pdl" style="border-width: 1px;"><div class="codeContent panelContent pdl">
+<pre>@includeNamed{&#39;fooTemplate&#39;}
+@includeNamed{&#39;footerTemplate&#39;, showSomething=true}
+</pre>
+</div></div>
+</div><div class="section_2"><h3 id="MVEL2.0OrbTags-@declare&#123;&#125;DeclareaTemplate"><span id=".40declare.7B.7D_Declare_a_Template"></span><span class="mw-headline" id="@declare{}_Declare_a_Template"><strong>@declare{}</strong> <em>Declare a Template</em></span></h3>
+<p>In addition to including external templates from external files, and passing them in programmatically, you can declare a template from within a template.  Which allows you to do things like this:</p>
+<div class="code panel pdl" style="border-width: 1px;"><div class="codeContent panelContent pdl">
+<pre>@declare{&#39;personTemplate&#39;}
+ Name: @{name}
+ Age:  @{age}
+@end{}
+
+@includeNamed{&#39;personTemplate&#39;; name=&#39;John Doe&#39;; age=22}
+</pre>
+</div></div>
+</div><div class="section_2"><h3 id="MVEL2.0OrbTags-@comment&#123;&#125;Commenttag"><span id=".40comment.7B.7D_Comment_tag"></span><span class="mw-headline" id="@comment{}_Comment_tag"><strong>@comment{}</strong> <em>Comment tag</em></span></h3>
+<p>The comment tag allows you add an invisible comment to the template.  For example:</p>
+<div class="code panel pdl" style="border-width: 1px;"><div class="codeContent panelContent pdl">
+<pre>@comment{
+  This is a comment
+}
+Hello: @{name}!
+</pre>
+</div></div></div>
+<p><br />
+</p>
+  <h2 id="MVEL_2.0_Template_Integration"><span class="mw-headline" id="MVEL_2.0_Template_Integration">MVEL 2.0 Template Integration</span></h2>
+          <p>Using MVEL templates is straight-forward and easy.  Like regular MVEL expressions, they can be executed interpretively, or be pre-compiled and be re-used for faster evaluation.</p>
+<div class="section_2"><h3 id="MVEL2.0TemplateIntegration-Theorg.mvel.templates.TemplateRuntimeClass"><span class="mw-headline" id="The_org.mvel.templates.TemplateRuntime_Class">The <strong><code>org.mvel.templates.TemplateRuntime</code></strong> Class</span></h3>
+<p>The <strong><code>TemplateRuntime</code></strong> class is the center of the template engine.  You can pass a template to be evaluated to the template engine by way of the <strong><code>eval()</code></strong> method.</p>
+<p>In general, the template engine follows all the same rules for context and variable binding, with an overloaded set of <strong><code>eval()</code></strong> methods.</p>
+<p>Here's a simple example of parsing a template interpretively:</p>
+<div class="code panel pdl" style="border-width: 1px;"><div class="codeContent panelContent pdl">
+<pre>String template = &quot;Hello, my name is @{name.toUpperCase()}&quot;);
+Map vars = new HashMap();
+vars.put(&quot;name&quot;, &quot;Michael&quot;);
+
+String output = (String) TemplateRuntime.eval(template, vars);
+</pre>
+</div></div>
+<p>At the end of execution, the "output" variable will contain the string: </p>
+<div class="code panel pdl" style="border-width: 1px;"><div class="codeContent panelContent pdl">
+<pre>Hello, my name is MICHAEL
+</pre>
+</div></div>
+</div><div class="section_2"><h3 id="MVEL2.0TemplateIntegration-Theorg.mvel.templates.TemplateCompilerClass"><span class="mw-headline" id="The_org.mvel.templates.TemplateCompiler_Class">The <strong><code>org.mvel.templates.TemplateCompiler</code></strong> Class</span></h3>
+<p>The <strong><code>TemplateCompiler</code></strong> class allows for pre-compilation of the templates.  </p>
+<p>When you compile a template, a compact, reusable evaluation tree is produced that can be quickly used to evaluate a template.  It is used straightforwardly:</p>
+<div class="code panel pdl" style="border-width: 1px;"><div class="codeContent panelContent pdl">
+<pre>String template = &quot;1 + 1 = @{1+1}&quot;;
+
+// compile the template
+CompiledTemplate compiled = TemplateCompiler.compileTemplate(template);
+
+// execute the template
+String output = (String) TemplateRuntime.execute(compiled);
+
+</pre>
+</div></div>
+<p>At the end of execution, the "output" variable will contain the string:</p>
+<div class="code panel pdl" style="border-width: 1px;"><div class="codeContent panelContent pdl">
+<pre>1 + 1 = 2
+</pre>
+</div></div></div>
+<!-- 
+NewPP limit report
+Parsed by mw1481
+Cached time: 20230824151049
+Cache expiry: 1814400
+Reduced expiry: false
+Complications: [show‐toc]
+CPU time usage: 0.064 seconds
+Real time usage: 0.077 seconds
+Preprocessor visited node count: 786/1000000
+Post‐expand include size: 1481/2097152 bytes
+Template argument size: 299/2097152 bytes
+Highest expansion depth: 11/100
+Expensive parser function count: 1/500
+Unstrip recursion depth: 0/20
+Unstrip post‐expand size: 7218/5000000 bytes
+Lua time usage: 0.007/10.000 seconds
+Lua memory usage: 727979/52428800 bytes
+Number of Wikibase entities loaded: 0/400
+-->
+<!--
+Transclusion expansion time report (%,ms,calls,template)
+100.00%   31.258      1 -total
+100.00%   31.258      1 Template:Header
+ 55.33%   17.295      1 Template:BOOKTEMPLATE
+ 50.36%   15.742      1 Template:BOOKNAME
+ 45.79%   14.313      1 Template:BOOKNAME/core
+ 23.48%    7.340      1 Template:BookCat
+  4.68%    1.462      2 Template:(
+  4.57%    1.427      2 Template:)
+  3.88%    1.212      1 Template:BOOKCATEGORY
+-->
+
+<!-- Saved in parser cache with key enwikibooks:pcache:idhash:375111-0!canonical and timestamp 20230824151049 and revision id 3675372. Rendering was triggered because: page-view
+ -->
+</div><!--esi <esi:include src="/esitest-fa8a495983347898/content" /> --><noscript><img src="//en.wikibooks.org/wiki/Special:CentralAutoLogin/start?type=1x1" alt="" title="" width="1" height="1" style="border: none; position: absolute;" /></noscript>
+<div class="printfooter" data-nosnippet="">Retrieved from "<a dir="ltr" href="https://en.wikibooks.org/w/index.php?title=Transwiki:MVEL_Language_Guide&amp;oldid=3675372">https://en.wikibooks.org/w/index.php?title=Transwiki:MVEL_Language_Guide&amp;oldid=3675372</a>"</div></div>
+		<div id="catlinks" class="catlinks" data-mw="interface"><div id="mw-normal-catlinks" class="mw-normal-catlinks"><a href="/wiki/Special:Categories" title="Special:Categories">Category</a>: <ul><li><a href="/w/index.php?title=Category:Book:Transwiki:MVEL_Language_Guide&amp;action=edit&amp;redlink=1" class="new" title="Category:Book:Transwiki:MVEL Language Guide (does not exist)">Book:Transwiki:MVEL Language Guide</a></li></ul></div><div id="mw-hidden-catlinks" class="mw-hidden-catlinks mw-hidden-cats-hidden">Hidden category: <ul><li><a href="/wiki/Category:Pages_with_deep_filing" title="Category:Pages with deep filing">Pages with deep filing</a></li></ul></div></div>
+	</div>
+</div>
+
+<div id="mw-navigation">
+	<h2>Navigation menu</h2>
+	<div id="mw-head">
+		
+<nav id="p-personal" class="vector-menu mw-portlet mw-portlet-personal vector-user-menu-legacy" aria-labelledby="p-personal-label" role="navigation"  >
+	<h3
+		id="p-personal-label"
+		
+		class="vector-menu-heading "
+	>
+		<span class="vector-menu-heading-label">Personal tools</span>
+	</h3>
+	<div class="vector-menu-content">
+		
+		<ul class="vector-menu-content-list">
+			
+			<li id="pt-anonuserpage" class="mw-list-item"><span title="The user page for the IP address you are editing as">Not logged in</span></li><li id="pt-anontalk" class="mw-list-item"><a href="/wiki/Special:MyTalk" title="Discussion about edits from this IP address [n]" accesskey="n"><span>Discussion for this IP address</span></a></li><li id="pt-anoncontribs" class="mw-list-item"><a href="/wiki/Special:MyContributions" title="A list of edits made from this IP address [y]" accesskey="y"><span>Contributions</span></a></li><li id="pt-createaccount" class="mw-list-item"><a href="/w/index.php?title=Special:CreateAccount&amp;returnto=Transwiki%3AMVEL+Language+Guide" title="You are encouraged to create an account and log in; however, it is not mandatory"><span>Create account</span></a></li><li id="pt-login" class="mw-list-item"><a href="/w/index.php?title=Special:UserLogin&amp;returnto=Transwiki%3AMVEL+Language+Guide" title="You are encouraged to log in; however, it is not mandatory [o]" accesskey="o"><span>Log in</span></a></li>
+		</ul>
+		
+	</div>
+</nav>
+
+		<div id="left-navigation">
+			
+<nav id="p-namespaces" class="vector-menu mw-portlet mw-portlet-namespaces vector-menu-tabs vector-menu-tabs-legacy" aria-labelledby="p-namespaces-label" role="navigation"  >
+	<h3
+		id="p-namespaces-label"
+		
+		class="vector-menu-heading "
+	>
+		<span class="vector-menu-heading-label">Namespaces</span>
+	</h3>
+	<div class="vector-menu-content">
+		
+		<ul class="vector-menu-content-list">
+			
+			<li id="ca-nstab-transwiki" class="selected mw-list-item"><a href="/wiki/Transwiki:MVEL_Language_Guide" title="View the subject page [c]" accesskey="c"><span>Transwiki</span></a></li><li id="ca-talk" class="new mw-list-item"><a href="/w/index.php?title=Transwiki_talk:MVEL_Language_Guide&amp;action=edit&amp;redlink=1" rel="discussion" title="Discussion about the content page (does not exist) [t]" accesskey="t"><span>Discussion</span></a></li>
+		</ul>
+		
+	</div>
+</nav>
+
+			
+<nav id="p-variants" class="vector-menu mw-portlet mw-portlet-variants emptyPortlet vector-menu-dropdown" aria-labelledby="p-variants-label" role="navigation"  >
+	<input type="checkbox"
+		id="p-variants-checkbox"
+		role="button"
+		aria-haspopup="true"
+		data-event-name="ui.dropdown-p-variants"
+		class="vector-menu-checkbox"
+		aria-labelledby="p-variants-label"
+	/>
+	<label
+		id="p-variants-label"
+		
+		class="vector-menu-heading "
+	>
+		<span class="vector-menu-heading-label">English</span>
+	</label>
+	<div class="vector-menu-content">
+		
+		<ul class="vector-menu-content-list">
+			
+			
+		</ul>
+		
+	</div>
+</nav>
+
+		</div>
+		<div id="right-navigation">
+			
+<nav id="p-views" class="vector-menu mw-portlet mw-portlet-views vector-menu-tabs vector-menu-tabs-legacy" aria-labelledby="p-views-label" role="navigation"  >
+	<h3
+		id="p-views-label"
+		
+		class="vector-menu-heading "
+	>
+		<span class="vector-menu-heading-label">Views</span>
+	</h3>
+	<div class="vector-menu-content">
+		
+		<ul class="vector-menu-content-list">
+			
+			<li id="ca-view" class="selected mw-list-item"><a href="/wiki/Transwiki:MVEL_Language_Guide"><span>Read</span></a></li><li id="ca-edit" class="mw-list-item"><a href="/w/index.php?title=Transwiki:MVEL_Language_Guide&amp;action=edit" title="Edit the source code of this page [e]" accesskey="e"><span>Edit source</span></a></li><li id="ca-history" class="mw-list-item"><a href="/w/index.php?title=Transwiki:MVEL_Language_Guide&amp;action=history" title="Past revisions of this page [h]" accesskey="h"><span>View history</span></a></li>
+		</ul>
+		
+	</div>
+</nav>
+
+			
+<nav id="p-cactions" class="vector-menu mw-portlet mw-portlet-cactions emptyPortlet vector-menu-dropdown" aria-labelledby="p-cactions-label" role="navigation"  title="More options" >
+	<input type="checkbox"
+		id="p-cactions-checkbox"
+		role="button"
+		aria-haspopup="true"
+		data-event-name="ui.dropdown-p-cactions"
+		class="vector-menu-checkbox"
+		aria-labelledby="p-cactions-label"
+	/>
+	<label
+		id="p-cactions-label"
+		
+		class="vector-menu-heading "
+	>
+		<span class="vector-menu-heading-label">More</span>
+	</label>
+	<div class="vector-menu-content">
+		
+		<ul class="vector-menu-content-list">
+			
+			
+		</ul>
+		
+	</div>
+</nav>
+
+			
+<div id="p-search" role="search" class="vector-search-box-vue  vector-search-box-show-thumbnail vector-search-box-auto-expand-width vector-search-box">
+	<h3 >Search</h3>
+	<form action="/w/index.php" id="searchform" class="vector-search-box-form">
+		<div id="simpleSearch"
+			class="vector-search-box-inner"
+			 data-search-loc="header-navigation">
+			<input class="vector-search-box-input"
+				 type="search" name="search" placeholder="Search Wikibooks" aria-label="Search Wikibooks" autocapitalize="sentences" title="Search Wikibooks [f]" accesskey="f" id="searchInput"
+			>
+			<input type="hidden" name="title" value="Special:Search">
+			<input id="mw-searchButton"
+				 class="searchButton mw-fallbackSearchButton" type="submit" name="fulltext" title="Search the pages for this text" value="Search">
+			<input id="searchButton"
+				 class="searchButton" type="submit" name="go" title="Go to a page with this exact name if it exists" value="Go">
+		</div>
+	</form>
+</div>
+
+		</div>
+	</div>
+	
+<div id="mw-panel" class="vector-legacy-sidebar">
+	<div id="p-logo" role="banner">
+		<a class="mw-wiki-logo" href="/wiki/Main_Page"
+			title="Visit the main page"></a>
+	</div>
+	
+<nav id="p-navigation" class="vector-menu mw-portlet mw-portlet-navigation vector-menu-portal portal" aria-labelledby="p-navigation-label" role="navigation"  >
+	<h3
+		id="p-navigation-label"
+		
+		class="vector-menu-heading "
+	>
+		<span class="vector-menu-heading-label">Navigation</span>
+	</h3>
+	<div class="vector-menu-content">
+		
+		<ul class="vector-menu-content-list">
+			
+			<li id="n-mainpage" class="mw-list-item"><a href="/wiki/Main_Page" title="Visit the main page [z]" accesskey="z"><span>Main Page</span></a></li><li id="n-help" class="mw-list-item"><a href="/wiki/Help:Contents" title="Find help on how to use and edit Wikibooks"><span>Help</span></a></li><li id="n-Browse" class="mw-list-item"><a href="/wiki/Wikibooks:Card_Catalog_Office" title="Check out what Wikibooks has to offer"><span>Browse</span></a></li><li id="n-Cookbook" class="mw-list-item"><a href="/wiki/Cookbook:Table_of_Contents" title="Learn recipes from around the world"><span>Cookbook</span></a></li><li id="n-Wikijunior" class="mw-list-item"><a href="/wiki/Wikijunior" title="Books for children"><span>Wikijunior</span></a></li><li id="n-Featured-books" class="mw-list-item"><a href="/wiki/Wikibooks:Featured_books" title="The best of Wikibooks"><span>Featured books</span></a></li><li id="n-recentchanges" class="mw-list-item"><a href="/wiki/Special:RecentChanges" title="A list of recent changes in the wiki [r]" accesskey="r"><span>Recent changes</span></a></li><li id="n-sitesupport" class="mw-list-item"><a href="//donate.wikimedia.org/wiki/Special:FundraiserRedirector?utm_source=donate&amp;utm_medium=sidebar&amp;utm_campaign=C13_en.wikibooks.org&amp;uselang=en" title="Support Wikibooks"><span>Donations</span></a></li><li id="n-randomrootpage" class="mw-list-item"><a href="/wiki/Special:RandomInCategory/Book:Wikibooks_Stacks/Books"><span>Random book</span></a></li><li id="n-Using-Wikibooks" class="mw-list-item"><a href="/wiki/Using_Wikibooks"><span>Using Wikibooks</span></a></li>
+		</ul>
+		
+	</div>
+</nav>
+
+	
+<nav id="p-community" class="vector-menu mw-portlet mw-portlet-community vector-menu-portal portal" aria-labelledby="p-community-label" role="navigation"  >
+	<h3
+		id="p-community-label"
+		
+		class="vector-menu-heading "
+	>
+		<span class="vector-menu-heading-label">community</span>
+	</h3>
+	<div class="vector-menu-content">
+		
+		<ul class="vector-menu-content-list">
+			
+			<li id="n-Reading-room-forum" class="mw-list-item"><a href="/wiki/Wikibooks:Reading_room"><span>Reading room forum</span></a></li><li id="n-portal" class="mw-list-item"><a href="/wiki/Wikibooks:Community_Portal" title="Find your way around the Wikibooks community"><span>Community portal</span></a></li><li id="n-currentevents" class="mw-list-item"><a href="/wiki/Wikibooks:Reading_room/Bulletin_Board" title="Important community news"><span>Bulletin Board</span></a></li><li id="n-maintenance" class="mw-list-item"><a href="/wiki/Wikibooks:Maintenance" title="Frequent tasks that you can help with"><span>Help out!</span></a></li><li id="n-Policies-and-guidelines" class="mw-list-item"><a href="/wiki/Wikibooks:Policies_and_guidelines" title="Pages detailing important rules and procedures"><span>Policies and guidelines</span></a></li><li id="n-contact" class="mw-list-item"><a href="/wiki/Wikibooks:Contact_us" title="Alternative methods of communication"><span>Contact us</span></a></li>
+		</ul>
+		
+	</div>
+</nav>
+
+<nav id="p-tb" class="vector-menu mw-portlet mw-portlet-tb vector-menu-portal portal" aria-labelledby="p-tb-label" role="navigation"  >
+	<h3
+		id="p-tb-label"
+		
+		class="vector-menu-heading "
+	>
+		<span class="vector-menu-heading-label">Tools</span>
+	</h3>
+	<div class="vector-menu-content">
+		
+		<ul class="vector-menu-content-list">
+			
+			<li id="t-whatlinkshere" class="mw-list-item"><a href="/wiki/Special:WhatLinksHere/Transwiki:MVEL_Language_Guide" title="A list of all wiki pages that link here [j]" accesskey="j"><span>What links here</span></a></li><li id="t-recentchangeslinked" class="mw-list-item"><a href="/wiki/Special:RecentChangesLinked/Transwiki:MVEL_Language_Guide" rel="nofollow" title="Recent changes in pages linked from this page [k]" accesskey="k"><span>Related changes</span></a></li><li id="t-upload" class="mw-list-item"><a href="//commons.wikimedia.org/wiki/Special:UploadWizard?uselang=en" title="Upload files [u]" accesskey="u"><span>Upload file</span></a></li><li id="t-specialpages" class="mw-list-item"><a href="/wiki/Special:SpecialPages" title="A list of all special pages [q]" accesskey="q"><span>Special pages</span></a></li><li id="t-permalink" class="mw-list-item"><a href="/w/index.php?title=Transwiki:MVEL_Language_Guide&amp;oldid=3675372" title="Permanent link to this revision of this page"><span>Permanent link</span></a></li><li id="t-info" class="mw-list-item"><a href="/w/index.php?title=Transwiki:MVEL_Language_Guide&amp;action=info" title="More information about this page"><span>Page information</span></a></li>
+		</ul>
+		
+	</div>
+</nav>
+
+<nav id="p-sister_projects" class="vector-menu mw-portlet mw-portlet-sister_projects vector-menu-portal portal" aria-labelledby="p-sister_projects-label" role="navigation"  >
+	<h3
+		id="p-sister_projects-label"
+		
+		class="vector-menu-heading "
+	>
+		<span class="vector-menu-heading-label">sister projects</span>
+	</h3>
+	<div class="vector-menu-content">
+		
+		<ul class="vector-menu-content-list">
+			
+			<li id="n-Wikipedia" class="mw-list-item"><a href="https://en.wikipedia.org/wiki/Main_Page"><span>Wikipedia</span></a></li><li id="n-Wikiversity" class="mw-list-item"><a href="https://en.wikiversity.org/wiki/Wikiversity:Main_Page"><span>Wikiversity</span></a></li><li id="n-Wiktionary" class="mw-list-item"><a href="https://en.wiktionary.org/wiki/Wiktionary:Main_Page"><span>Wiktionary</span></a></li><li id="n-Wikiquote" class="mw-list-item"><a href="https://en.wikiquote.org/wiki/Main_Page"><span>Wikiquote</span></a></li><li id="n-Wikisource" class="mw-list-item"><a href="https://en.wikisource.org/wiki/Main_Page"><span>Wikisource</span></a></li><li id="n-Wikinews" class="mw-list-item"><a href="https://en.wikinews.org/wiki/Main_Page"><span>Wikinews</span></a></li><li id="n-Wikivoyage" class="mw-list-item"><a href="https://en.wikivoyage.org/wiki/Main_Page"><span>Wikivoyage</span></a></li><li id="n-Commons" class="mw-list-item"><a href="https://commons.wikimedia.org/wiki/Main_Page"><span>Commons</span></a></li><li id="n-Wikidata" class="mw-list-item"><a href="https://www.wikidata.org/wiki/Wikidata:Main_Page"><span>Wikidata</span></a></li><li id="n-MediaWiki" class="mw-list-item"><a href="https://www.mediawiki.org/wiki/Main_Page"><span>MediaWiki</span></a></li><li id="n-Meta-Wiki" class="mw-list-item"><a href="https://meta.wikimedia.org/wiki/Main_Page"><span>Meta-Wiki</span></a></li>
+		</ul>
+		
+	</div>
+</nav>
+
+<nav id="p-coll-print_export" class="vector-menu mw-portlet mw-portlet-coll-print_export vector-menu-portal portal" aria-labelledby="p-coll-print_export-label" role="navigation"  >
+	<h3
+		id="p-coll-print_export-label"
+		
+		class="vector-menu-heading "
+	>
+		<span class="vector-menu-heading-label">Print/export</span>
+	</h3>
+	<div class="vector-menu-content">
+		
+		<ul class="vector-menu-content-list">
+			
+			<li id="coll-create_a_book" class="mw-list-item"><a href="/w/index.php?title=Special:Book&amp;bookcmd=book_creator&amp;referer=Transwiki%3AMVEL+Language+Guide"><span>Create a collection</span></a></li><li id="coll-download-as-rl" class="mw-list-item"><a href="/w/index.php?title=Special:DownloadAsPdf&amp;page=Transwiki%3AMVEL_Language_Guide&amp;action=show-download-screen"><span>Download as PDF</span></a></li><li id="t-print" class="mw-list-item"><a href="/w/index.php?title=Transwiki:MVEL_Language_Guide&amp;printable=yes" title="Printable version of this page [p]" accesskey="p"><span>Printable version</span></a></li>
+		</ul>
+		
+	</div>
+</nav>
+
+	
+<nav id="p-lang" class="vector-menu mw-portlet mw-portlet-lang vector-menu-portal portal" aria-labelledby="p-lang-label" role="navigation"  >
+	<h3
+		id="p-lang-label"
+		
+		class="vector-menu-heading "
+	>
+		<span class="vector-menu-heading-label">In other languages</span>
+	</h3>
+	<div class="vector-menu-content">
+		
+		<ul class="vector-menu-content-list">
+			
+			
+		</ul>
+		<div class="after-portlet after-portlet-lang"><span class="uls-after-portlet-link"></span><span class="wb-langlinks-add wb-langlinks-link"><a href="https://www.wikidata.org/wiki/Special:NewItem?site=enwikibooks&amp;page=Transwiki%3AMVEL+Language+Guide" title="Add interlanguage links" class="wbc-editpage">Add links</a></span></div>
+	</div>
+</nav>
+
+</div>
+
+</div>
+
+<footer id="footer" class="mw-footer" role="contentinfo" >
+	<ul id="footer-info">
+	<li id="footer-info-lastmod"> This page was last edited on 15 April 2020, at 15:08.</li>
+	<li id="footer-info-copyright">Text is available under the <a href="//creativecommons.org/licenses/by-sa/4.0/">Creative Commons Attribution-ShareAlike License</a>; additional terms may apply.  By using this site, you agree to the <a href="//foundation.wikimedia.org/wiki/Terms_of_Use">Terms of Use</a> and <a href="//foundation.wikimedia.org/wiki/Privacy_policy">Privacy Policy.</a></li>
+</ul>
+
+	<ul id="footer-places">
+	<li id="footer-places-privacy"><a href="https://foundation.wikimedia.org/wiki/Special:MyLanguage/Policy:Privacy_policy">Privacy policy</a></li>
+	<li id="footer-places-about"><a href="/wiki/Wikibooks:Welcome">About Wikibooks</a></li>
+	<li id="footer-places-disclaimers"><a href="/wiki/Wikibooks:General_disclaimer">Disclaimers</a></li>
+	<li id="footer-places-wm-codeofconduct"><a href="https://foundation.wikimedia.org/wiki/Special:MyLanguage/Universal_Code_of_Conduct">Code of Conduct</a></li>
+	<li id="footer-places-mobileview"><a href="//en.m.wikibooks.org/w/index.php?title=Transwiki:MVEL_Language_Guide&amp;mobileaction=toggle_view_mobile" class="noprint stopMobileRedirectToggle">Mobile view</a></li>
+	<li id="footer-places-developers"><a href="https://developer.wikimedia.org">Developers</a></li>
+	<li id="footer-places-statslink"><a href="https://stats.wikimedia.org/#/en.wikibooks.org">Statistics</a></li>
+	<li id="footer-places-cookiestatement"><a href="https://foundation.wikimedia.org/wiki/Special:MyLanguage/Policy:Cookie_statement">Cookie statement</a></li>
+</ul>
+
+	<ul id="footer-icons" class="noprint">
+	<li id="footer-copyrightico"><a href="https://wikimediafoundation.org/"><img src="/static/images/footer/wikimedia-button.png" srcset="/static/images/footer/wikimedia-button-1.5x.png 1.5x, /static/images/footer/wikimedia-button-2x.png 2x" width="88" height="31" alt="Wikimedia Foundation" loading="lazy" /></a></li>
+	<li id="footer-poweredbyico"><a href="https://www.mediawiki.org/"><img src="/static/images/footer/poweredby_mediawiki_88x31.png" alt="Powered by MediaWiki" srcset="/static/images/footer/poweredby_mediawiki_132x47.png 1.5x, /static/images/footer/poweredby_mediawiki_176x62.png 2x" width="88" height="31" loading="lazy"></a></li>
+</ul>
+
+</footer>
+
+<script>(RLQ=window.RLQ||[]).push(function(){mw.config.set({"wgHostname":"mw1481","wgBackendResponseTime":188,"wgPageParseReport":{"limitreport":{"cputime":"0.064","walltime":"0.077","ppvisitednodes":{"value":786,"limit":1000000},"postexpandincludesize":{"value":1481,"limit":2097152},"templateargumentsize":{"value":299,"limit":2097152},"expansiondepth":{"value":11,"limit":100},"expensivefunctioncount":{"value":1,"limit":500},"unstrip-depth":{"value":0,"limit":20},"unstrip-size":{"value":7218,"limit":5000000},"entityaccesscount":{"value":0,"limit":400},"timingprofile":["100.00%   31.258      1 -total","100.00%   31.258      1 Template:Header"," 55.33%   17.295      1 Template:BOOKTEMPLATE"," 50.36%   15.742      1 Template:BOOKNAME"," 45.79%   14.313      1 Template:BOOKNAME/core"," 23.48%    7.340      1 Template:BookCat","  4.68%    1.462      2 Template:(","  4.57%    1.427      2 Template:)","  3.88%    1.212      1 Template:BOOKCATEGORY"]},"scribunto":{"limitreport-timeusage":{"value":"0.007","limit":"10.000"},"limitreport-memusage":{"value":727979,"limit":52428800}},"cachereport":{"origin":"mw1481","timestamp":"20230824151049","ttl":1814400,"transientcontent":false}}});});</script>
+</body>
+</html>

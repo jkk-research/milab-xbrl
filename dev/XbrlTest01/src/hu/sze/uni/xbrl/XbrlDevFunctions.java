@@ -7,6 +7,7 @@ import java.io.FileWriter;
 import java.io.PrintWriter;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Calendar;
 import java.util.Date;
@@ -82,6 +83,9 @@ public class XbrlDevFunctions implements XbrlConsts {
 		File dataRoot = new File(System.getProperty("user.home") + "/work/xbrl/data");
 		XbrlFilingManager filings = new XbrlFilingManager(dataRoot, true);
 		filings.setDownloadOnly(false);
+		
+		boolean downloadMode = true;
+		filings.downloadLimit = 330;
 
 		Map<String, Map> reportData = filings.getReportData();
 		int count = 0;
@@ -92,7 +96,9 @@ public class XbrlDevFunctions implements XbrlConsts {
 //		XbrlUtilsCounter dc = new XbrlUtilsCounter(true);
 
 		Set<String> knownDims = new HashSet<>(Arrays.asList("concept", "entity", "unit", "period", "language"));
-				
+		
+		System.out.println("\nJSON validation of " + reportData.size() + " reports\n");
+
 		for (Map.Entry<String, Map> e : reportData.entrySet()) {
 			String id = e.getKey();
 			Map repSrc = e.getValue();
@@ -103,7 +109,6 @@ public class XbrlDevFunctions implements XbrlConsts {
 
 			String repDirName = XbrlUtils.access(repSrc, AccessCmd.Peek, null, XbrlFilingManager.LOCAL_DIR);
 			File repDir = new File(filings.getRepoRoot(), repDirName);
-			File fJson = filings.getReport(repSrc, XbrlReportType.Json, false);
 
 			File jsonFile = new File(repDir, "extractedJson.json");
 			boolean jsonFileExists = jsonFile.isFile();
@@ -111,9 +116,9 @@ public class XbrlDevFunctions implements XbrlConsts {
 			Map valFacts = null;
 
 			if ( !jsonFileExists ) {
-				if ( (null != fJson) && fJson.isFile() ) {
-					++jsonCount;
+				File fJson = filings.getReport(repSrc, XbrlReportType.Json, downloadMode);
 
+				if ( (null != fJson) && fJson.isFile() ) {
 					Object report = parser.parse(new FileReader(fJson));
 
 					valFacts = (Map) XbrlUtils.access(report, AccessCmd.Peek, null, "facts");
@@ -137,39 +142,52 @@ public class XbrlDevFunctions implements XbrlConsts {
 			}
 
 			if ( null != valFacts ) {
+				++jsonCount;
 
 				DustUtilsFactory<String, Set> extInfo = new DustUtilsFactory.Simple<String, Set>(true, HashSet.class);
 				for (Object f : valFacts.values()) {
 //					String concept = XbrlUtils.access(f, AccessCmd.Peek, null, "dimensions", "concept");
 //					extInfo.get(concept).add(f);
-					
+
 					Map dim = XbrlUtils.access(f, AccessCmd.Peek, null, "dimensions");
 					String concept = (String) dim.get("concept");
 					extInfo.get(concept).add(f);
-					
+
 					Set ks = new HashSet<>(dim.keySet());
 					ks.removeAll(knownDims);
-					
+
 					((Map) f).put("__ds", ks.size());
 				}
 
 				int toMatch = valFacts.size();
 				int mm = 0;
-				System.out.println("Validating " + id + " factCount " + toMatch + " from " + jsonFile.getCanonicalPath());
+				int lineCount = 0;
+//				System.out.println("Validating " + id + " factCount " + toMatch + " from " + jsonFile.getCanonicalPath());
 
 				DustUtils.TableReader tr = filings.getTableReader(id);
-				
+
 				int extDimCount = (tr.getColIdx("OrigValue") - tr.getColIdx("Instant") - 1) / 2;
-				
+
 				for (String[] rf : filings.getFacts(id)) {
+					++lineCount;
+
 					String ci = tr.get(rf, "Taxonomy") + ":" + tr.get(rf, "Concept");
 					Set vset = extInfo.peek(ci);
 
+					String val = null;
+					String testVal = null;
+
+					int tmBefore = toMatch;
+
 					if ( null == vset ) {
-						System.out.println("CSV fact not found in json " + ci);
+						if ( !downloadMode ) {
+							System.out.println("CSV fact not found in json " + ci);
+						}
 					} else {
-						Set<Map> lm = new HashSet<>();
-						
+						ArrayList<Map> ctxMatch = new ArrayList<>();
+
+						Map lastMatch = null;
+
 						for (Object vv : vset) {
 							Map tf = (Map) vv;
 							Map dim = (Map) tf.get("dimensions");
@@ -186,9 +204,9 @@ public class XbrlDevFunctions implements XbrlConsts {
 							if ( !DustUtils.isEqual(time, valTime) ) {
 								continue;
 							}
-							
+
 							int dimsToMatch = (int) tf.get("__ds");
-							for (int i = 1; i <= extDimCount; ++i ) {
+							for (int i = 1; i <= extDimCount; ++i) {
 								String axis = tr.get(rf, "Axis_" + i);
 								if ( !DustUtils.isEmpty(axis) ) {
 									String d = tr.get(rf, "Dim_" + i);
@@ -203,57 +221,78 @@ public class XbrlDevFunctions implements XbrlConsts {
 							}
 
 							if ( 0 == dimsToMatch ) {
-								String val = tr.get(rf, "Value");
+								ctxMatch.add(tf);
+
+								val = tr.get(rf, "Value");
 
 								if ( val.startsWith("Txt len") ) {
-									--toMatch;
-									lm.add(tf);
+									lastMatch = tf;
 								} else {
-									String testVal = (String) tf.get("value");
-									if ( "-0".equals(testVal) ) {
-										testVal = "0";
-									}
 									if ( "-0".equals(val) ) {
 										val = "0";
 									}
-									if ( testVal.contains(".") && testVal.endsWith("0")) {
+
+									testVal = (String) tf.get("value");
+									if ( "-0".equals(testVal) ) {
+										testVal = "0";
+									}
+									if ( (null != testVal) && testVal.contains(".") && testVal.endsWith("0") ) {
 										testVal = testVal.replaceAll("(0+)$", "");
 									}
-									if ( !DustUtils.isEqual(testVal, val) ) {
-										Dust.dumpObs("  Test mismatch", ci, "local", val, "json", testVal);
 
-//										dimsToMatch = (int) tf.get("__ds");
-//										for (int i = 1; i <= extDimCount; ++i ) {
-//											String axis = tr.get(rf, "Axis_" + i);
-//											if ( !DustUtils.isEmpty(axis) ) {
-//												String d = tr.get(rf, "Dim_" + i);
-//												Object vd = dim.getOrDefault(axis, "");
-//												if ( DustUtils.isEqual(d, vd) ) {
-//													--dimsToMatch;
-//												} else {
-//													dimsToMatch = -1;
-//													break;
-//												}
-//											}
-//										}
-									} else {
-										--toMatch;
-										lm.add(tf);
+									if ( DustUtils.isEqual(testVal, val) ) {
+										lastMatch = tf;
+									}
+//									if ( !DustUtils.isEqual(testVal, val) ) {
+//										Dust.dumpObs("  Test mismatch", ci, "local", val, "json", testVal);
+//									} else {
+//										lastMatch = tf;
+//										--toMatch;
+//									}
+								}
+							}
+						}
+
+						if ( 1 < ctxMatch.size() ) {
+							mm += (ctxMatch.size() - 1);
+						}
+
+						if ( null != lastMatch ) {
+							vset.remove(lastMatch);
+							--toMatch;
+						} else {
+							Dust.dumpObs("  Test mismatch", ci, "local", val, "json", testVal);
+						}
+
+						if ( ctxMatch.isEmpty() ) {
+							Dust.dumpObs("  NO match found for", ci, "local", DustUtils.sbAppend(null, ", ", true, (Object[]) rf));
+						} else if ( 1 < ctxMatch.size() && !val.startsWith("Txt len") ) {
+							// multiple appearance of the same fact, quite usual in xhtml - but MUST be the
+							// same value!
+
+							Set<Object> seen = new HashSet<>();
+							for (Map m : ctxMatch) {
+								Object cv = m.get("value");
+								if ( !DustUtils.isEqual(val, cv) ) {
+									if ( seen.add(cv) ) {
+//										Dust.dumpObs("  Report error: conflict with known value", val, "in", m);
 									}
 								}
 							}
 						}
-						
-						if ( 1 < lm.size() ) {
-							mm += (lm.size() - 1);
-						}
-						
-						vset.removeAll(lm);
+					}
+
+					int diff = tmBefore - toMatch;
+
+					if ( 1 < diff ) {
+						System.out.println("multimatch " + ci + " count " + diff + " data " + DustUtils.sbAppend(null, ", ", true, (Object[]) rf));
 					}
 				}
 
-				System.out.println("Mismatch count " + toMatch + " multimatch " + mm);
-
+				if ( 0 != toMatch ) {
+					System.out.println("In " + id + " JSON - CSV diff: " + (valFacts.size() - lineCount) + " Not matched: " + toMatch + " multimatch " + mm + " from " + jsonFile.getCanonicalPath());
+					System.out.println();
+				}
 			}
 		}
 

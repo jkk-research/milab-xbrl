@@ -9,6 +9,7 @@ import java.util.Map;
 import java.util.Set;
 
 import hu.sze.milab.dust.Dust;
+import hu.sze.milab.dust.net.httpsrv.DustHttpServletDirectFile;
 import hu.sze.milab.dust.utils.DustUtils;
 import hu.sze.uni.http.DustHttpServerJetty;
 import hu.sze.uni.xbrl.XbrlFilingManager;
@@ -168,6 +169,8 @@ public class XbrlTestPortal implements XbrlTestPortalConsts {
 				addServlet("/list/*", new XbrlTestServletReportList(XbrlTestPortal.this));
 				addServlet("/report/*", new XbrlTestServletReportData(filings));
 				addServlet("/bin/*", new XbrlTestServletReportBinary(filings));
+				
+				addServlet("/*", new DustHttpServletDirectFile("webroot"));
 			}
 		};
 		srv.activeInit();

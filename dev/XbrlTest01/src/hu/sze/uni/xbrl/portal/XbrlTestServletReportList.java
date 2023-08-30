@@ -354,6 +354,8 @@ class XbrlTestServletReportList extends DustHttpServlet {
 			if ( null != exprErr ) {
 				out.println(exprErr);
 			} else {
+				out.println("Row count: " + res.size());
+
 				out.println("<table>\n	<thead>\n	<tr>\n");
 				for (ListColumns lc : ListColumns.values()) {
 					out.println("			<th>" + lc + "</th>\n");
@@ -387,7 +389,7 @@ class XbrlTestServletReportList extends DustHttpServlet {
 					out.println(" </tr>\n");
 				}
 
-				out.println("	</tbody>\n</table>\n Row count: " + res.size());
+				out.println("	</tbody>\n</table>\n");
 			}
 			out.println("</body>\n</html>");
 		}
