@@ -13,10 +13,9 @@ import hu.sze.uni.xbrl.XbrlFilingManager;
 public interface XbrlTestPortalConsts extends XbrlConsts {
 	Pattern PT_DATE_ONLY = Pattern.compile("(\\d+-\\d+-\\d+).*");
 
-	// report_url
 	enum ListColumns {
 		Country("country"), PeriodEnd("period_end"), Publisher(XbrlFilingManager.ENTITY_NAME), DateAdded("date_added"), Report(XbrlFilingManager.REPORT_ID), CsvVal(XbrlFilingManager.REPORT_ID),
-		CsvTxt(XbrlFilingManager.REPORT_ID), Zip("package_url"), Json("json_url"), ChkErr("error_count"), ChkWarn("warning_count"), ChkInc("inconsistency_count");
+		CsvTxt(XbrlFilingManager.REPORT_ID), Zip("package_url"), Json("json_url"), Orig("report_url"), ChkErr("error_count"), ChkWarn("warning_count"), ChkInc("inconsistency_count");
 
 		public final String colName;
 
@@ -50,6 +49,9 @@ public interface XbrlTestPortalConsts extends XbrlConsts {
 				case Zip:
 				case Json:
 					val = DustUtils.isEmpty((String) val) ? " - " : "<a href=\"/bin?type=" + lc.colName + "&id=" + repId + "\">" + lc + "</a>";
+					break;
+				case Orig:
+					val = DustUtils.isEmpty((String) val) ? " - " : "<a target=\"_blank\" href=\"https://filings.xbrl.org" + val + "\">" + lc + "</a>";
 					break;
 				default:
 					break;

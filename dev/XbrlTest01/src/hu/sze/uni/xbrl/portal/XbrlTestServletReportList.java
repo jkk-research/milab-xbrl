@@ -169,6 +169,9 @@ class XbrlTestServletReportList extends DustHttpServlet {
 		String sort = Dust.access(data, MindAccess.Peek, null, ServletData.Parameter, "sort");
 		String repColStr = Dust.access(data, MindAccess.Peek, "Report", ServletData.Parameter, "repCols");
 
+		String pageSize = Dust.access(data, MindAccess.Peek, "500", ServletData.Parameter, "page[size]");
+		String pageNum = Dust.access(data, MindAccess.Peek, "1", ServletData.Parameter, "page[number]");
+
 		boolean loadFacts = !DustUtils.isEmpty(exprFact);
 
 		Map rep = new HashMap();
@@ -341,6 +344,12 @@ class XbrlTestServletReportList extends DustHttpServlet {
 						str = "value=\"" + sort + "\" ";
 					} else if ( -1 != (idx = optGetIdxAfter(line, "name=\"repCols\" ", repColStr)) ) {
 						str = "value=\"" + repColStr + "\" ";
+					} else if ( -1 != (idx = optGetIdxAfter(line, "name=\"page[size]\" ", pageSize)) ) {
+						str = "value=\"" + pageSize + "\" ";
+					} else if ( -1 != (idx = optGetIdxAfter(line, "name=\"page[number]\" ", pageNum)) ) {
+						str = "value=\"" + pageNum + "\" ";
+					} else if ( -1 != (idx = optGetIdxAfter(line, "Row count: ", " ")) ) {
+						str = " " + res.size();
 					}
 
 					if ( -1 != idx ) {
@@ -354,16 +363,33 @@ class XbrlTestServletReportList extends DustHttpServlet {
 			if ( null != exprErr ) {
 				out.println(exprErr);
 			} else {
-				out.println("Row count: " + res.size());
+//				out.println("Row count: " + res.size());
 
 				out.println("<table>\n	<thead>\n	<tr>\n");
+				out.println("			<th>#</th>\n");
+
 				for (ListColumns lc : ListColumns.values()) {
 					out.println("			<th>" + lc + "</th>\n");
 				}
 				out.println(" </tr>\n	</thead>\n <tbody>");
+				
+				int ps = Integer.parseInt(pageSize);
+				int pn = Integer.parseInt(pageNum);
+				
+				int end = pn * ps + 1;
+				int start = end - ps;
+				int row = 0;
 
 				for (Map r : res) {
-					out.println("<tr>\n");
+					++row;
+					if ( row < start) {
+						continue;
+					}
+					if ( row >= end ) {
+						break;
+					}
+					
+					out.println("<tr>\n			<td>" + row + "</td>\n");
 					boolean err = loadErr.contains(r);
 
 					for (ListColumns lc : ListColumns.values()) {

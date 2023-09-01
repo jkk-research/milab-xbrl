@@ -10,6 +10,7 @@ import java.io.IOException;
 import java.text.MessageFormat;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.HashSet;
@@ -36,6 +37,7 @@ import hu.sze.milab.dust.utils.DustUtilsFile;
 @SuppressWarnings({ "rawtypes", "unchecked" })
 public class XbrlFilingManager implements XbrlConsts, DustUtilsConsts {
 	public static final String ALL_REPORTS = "allReports.json";
+	public static final String OVERRIDE = "filings.xbrl.org.override.json";
 
 	public static final String XBRL_ORG_ADDR = "https://filings.xbrl.org";
 	public static final String ENTITY_NAME = "__EntityName";
@@ -44,24 +46,24 @@ public class XbrlFilingManager implements XbrlConsts, DustUtilsConsts {
 	public static final String REPORT_DATE = "__ReportDate";
 	public static final String REPORT_ID = "__ReportId";
 	public static final String REPORT_FILE = "__ReportFile";
-	
+
 	private class FactIter implements Iterable<String[]>, Iterator<String[]> {
-		BufferedReader br ;
+		BufferedReader br;
 		String repId;
 		String sep;
-		
+
 		String line;
 		int row;
-		
+
 		public FactIter(String repId) throws Exception {
 			this(repId, "\t");
 		}
-		
+
 		public FactIter(String repId, String sep) throws Exception {
 			row = 1;
 			this.sep = sep;
 			this.repId = repId;
-			
+
 			File csvVal = getFactFile(repId);
 			br = new BufferedReader(new FileReader(csvVal));
 			line = br.readLine();// skip head!
@@ -76,7 +78,7 @@ public class XbrlFilingManager implements XbrlConsts, DustUtilsConsts {
 		@Override
 		public String[] next() {
 			String[] data = line.split(sep);
-			
+
 			try {
 				++row;
 				line = br.readLine();
@@ -84,7 +86,7 @@ public class XbrlFilingManager implements XbrlConsts, DustUtilsConsts {
 				line = null;
 				DustException.wrap(e, repId, row);
 			}
-			
+
 			return data;
 		}
 
@@ -92,7 +94,7 @@ public class XbrlFilingManager implements XbrlConsts, DustUtilsConsts {
 		public Iterator<String[]> iterator() {
 			return this;
 		}
-		
+
 	}
 
 	private static final FilenameFilter FF_JSON = new FilenameFilter() {
@@ -101,8 +103,7 @@ public class XbrlFilingManager implements XbrlConsts, DustUtilsConsts {
 			return name.toLowerCase().endsWith(".json");
 		}
 	};
-	
-	
+
 	private static final String FMT_API = XBRL_ORG_ADDR + "/api/filings?include=entity,language&sort=-date_added&page%5Bsize%5D={0,number,#}&page%5Bnumber%5D=1";
 
 //https://www.random.org/integer-sets/?sets=1&num=100&min=0&max=6939&commas=on&sort=on&order=index&format=plain&rnd=new
@@ -111,6 +112,8 @@ public class XbrlFilingManager implements XbrlConsts, DustUtilsConsts {
 	File allReports;
 
 	JSONParser parser = new JSONParser();
+
+	Map<String, Map> urlOverride;
 
 	Map<String, Map> entities;
 	Map<String, Map> reportData = new TreeMap<>();
@@ -134,6 +137,10 @@ public class XbrlFilingManager implements XbrlConsts, DustUtilsConsts {
 		String mm = System.getProperty("MinMem");
 		allFactsByRep = "true".equalsIgnoreCase(mm) ? null : new HashMap<>();
 
+		File override = new File(OVERRIDE);
+
+		urlOverride = override.isFile() ? (Map<String, Map>) parser.parse(new FileReader(override)) : new HashMap<>();
+		
 		File srcRoot = new File(repoRoot, "sources/xbrl.org");
 
 		if ( !srcRoot.exists() ) {
@@ -293,14 +300,14 @@ public class XbrlFilingManager implements XbrlConsts, DustUtilsConsts {
 	}
 
 	public Iterable<String[]> getFacts(String repId) throws Exception {
-		return optLoadFacts(repId) ? ( null == allFactsByRep ) ? new FactIter(repId) : allFactsByRep.get(repId) : null;
+		return optLoadFacts(repId) ? (null == allFactsByRep) ? new FactIter(repId) : allFactsByRep.get(repId) : null;
 	}
 
 	public boolean optLoadFacts(String repId) throws Exception {
 		if ( headers.containsKey(repId) ) {
 			return true;
 		}
-		
+
 		File f = getFactFile(repId);
 
 		if ( (null != f) && f.isFile() ) {
@@ -311,7 +318,7 @@ public class XbrlFilingManager implements XbrlConsts, DustUtilsConsts {
 				for (String line; (line = br.readLine()) != null;) {
 					if ( !DustUtils.isEmpty(line) ) {
 						String[] data = line.split("\t");
-						
+
 						if ( null == tr ) {
 							tr = contentReaders.get(line);
 							if ( null == tr ) {
@@ -319,7 +326,7 @@ public class XbrlFilingManager implements XbrlConsts, DustUtilsConsts {
 								contentReaders.put(line, tr);
 							}
 							headers.put(repId, tr);
-							
+
 							if ( null == allFactsByRep ) {
 								return true;
 							} else {
@@ -334,7 +341,7 @@ public class XbrlFilingManager implements XbrlConsts, DustUtilsConsts {
 				return true;
 			}
 		}
-		
+
 		return false;
 	}
 
@@ -464,6 +471,8 @@ public class XbrlFilingManager implements XbrlConsts, DustUtilsConsts {
 
 		File fLoaded = null;
 		String pf;
+		
+		Map<String, String> ovr = urlOverride.getOrDefault(repType.name(), Collections.EMPTY_MAP); 
 
 		switch ( repType ) {
 		case ContentVal:
@@ -505,6 +514,13 @@ public class XbrlFilingManager implements XbrlConsts, DustUtilsConsts {
 			File remoteFile = new File(dir, fName);
 			if ( !remoteFile.exists() ) {
 				url = url.replace(" ", "%20");
+				
+				String url2 = ovr.get(url);
+				
+				if ( null != url2 ) {
+					url = url2;
+				}
+				
 				System.out.println("Accessing file " + fName + " from URL: " + url);
 
 				if ( -1 == tsSeg ) {
@@ -514,7 +530,7 @@ public class XbrlFilingManager implements XbrlConsts, DustUtilsConsts {
 					}
 				}
 
-				if (--downloadLimit < 0 ) {
+				if ( --downloadLimit < 0 ) {
 					return null;
 				}
 				XbrlUtils.download(url, remoteFile);

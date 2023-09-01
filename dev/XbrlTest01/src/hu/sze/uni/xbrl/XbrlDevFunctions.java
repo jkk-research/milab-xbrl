@@ -85,7 +85,7 @@ public class XbrlDevFunctions implements XbrlConsts {
 		filings.setDownloadOnly(false);
 		
 		boolean downloadMode = true;
-		filings.downloadLimit = 330;
+//		filings.downloadLimit = 2000;
 
 		Map<String, Map> reportData = filings.getReportData();
 		int count = 0;
@@ -104,7 +104,7 @@ public class XbrlDevFunctions implements XbrlConsts {
 			Map repSrc = e.getValue();
 
 			if ( 0 == (++count % 100) ) {
-//				System.out.println("Count " + count);
+				System.out.println("Count " + count);
 			}
 
 			String repDirName = XbrlUtils.access(repSrc, AccessCmd.Peek, null, XbrlFilingManager.LOCAL_DIR);
@@ -116,7 +116,14 @@ public class XbrlDevFunctions implements XbrlConsts {
 			Map valFacts = null;
 
 			if ( !jsonFileExists ) {
-				File fJson = filings.getReport(repSrc, XbrlReportType.Json, downloadMode);
+				
+				File fJson;
+				try {
+					fJson = filings.getReport(repSrc, XbrlReportType.Json, downloadMode);
+				} catch ( Throwable t) {
+					System.out.println("Download error " + id + " from: " + repSrc.get("json_url"));
+					fJson = null;
+				}
 
 				if ( (null != fJson) && fJson.isFile() ) {
 					Object report = parser.parse(new FileReader(fJson));
@@ -143,6 +150,10 @@ public class XbrlDevFunctions implements XbrlConsts {
 
 			if ( null != valFacts ) {
 				++jsonCount;
+				
+				if (downloadMode ) {
+					continue;
+				}
 
 				DustUtilsFactory<String, Set> extInfo = new DustUtilsFactory.Simple<String, Set>(true, HashSet.class);
 				for (Object f : valFacts.values()) {
@@ -181,7 +192,7 @@ public class XbrlDevFunctions implements XbrlConsts {
 
 					if ( null == vset ) {
 						if ( !downloadMode ) {
-							System.out.println("CSV fact not found in json " + ci);
+						//	System.out.println("CSV fact not found in json " + ci);
 						}
 					} else {
 						ArrayList<Map> ctxMatch = new ArrayList<>();
@@ -224,6 +235,9 @@ public class XbrlDevFunctions implements XbrlConsts {
 								ctxMatch.add(tf);
 
 								val = tr.get(rf, "Value");
+								if ( null == val ) {
+									val = "0";
+								}
 
 								if ( val.startsWith("Txt len") ) {
 									lastMatch = tf;
@@ -233,10 +247,12 @@ public class XbrlDevFunctions implements XbrlConsts {
 									}
 
 									testVal = (String) tf.get("value");
-									if ( "-0".equals(testVal) ) {
+									
+									if ( null == testVal ) {
 										testVal = "0";
-									}
-									if ( (null != testVal) && testVal.contains(".") && testVal.endsWith("0") ) {
+									} else if ( "-0".equals(testVal) ) {
+										testVal = "0";
+									} else if ( testVal.contains(".") && testVal.endsWith("0") ) {
 										testVal = testVal.replaceAll("(0+)$", "");
 									}
 

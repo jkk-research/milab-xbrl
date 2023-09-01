@@ -44,12 +44,17 @@ table, th, td {
 					<td><textarea id="exprProc" rows="5" cols="45" placeholder="Script to execute (advanced)" name="exprProc"></textarea></td>
 				</tr>
 				<tr>
-					<td><input type="reset" value="Reset" /> <label for="sort">Sort by: </label><input id="sort" name="sort" />
+					<td><label for="sort">Sort by: </label><input id="sort" name="sort" />
 						<input type="submit" name="mode" value="ShowList" /></td>
 					<td><label for="repCols">Report columns: </label><input id="repCols" name="repCols" /> <br /> <label
 						for="fName">File Name: </label><input id="fName" name="fName" /> <input type="submit" name="mode" value="All" />
 						<input type="submit" name="mode" value="Filtered" /></td>
 					<td>Placeholder for proc controls</td>
+				</tr>
+				<tr>
+					<td>Row count: </td>
+					<td><label for="page[size]">Page size: </label><input id="page[size]" name="page[size]" /></td>
+					<td><label for="page[number]">Page num: </label><input id="page[number]" name="page[number]" /></td>
 				</tr>
 			</tbody>
 		</table>

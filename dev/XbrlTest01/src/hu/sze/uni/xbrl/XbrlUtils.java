@@ -103,15 +103,13 @@ public class XbrlUtils implements XbrlConsts {
 		return ret;
 	}
 
-	public static void download(String url, File file) {
+	public static void download(String url, File file) throws Exception {
 		try (BufferedInputStream in = new BufferedInputStream(new URL(url).openStream()); FileOutputStream fileOutputStream = new FileOutputStream(file)) {
 			byte dataBuffer[] = new byte[1024];
 			int bytesRead;
 			while ((bytesRead = in.read(dataBuffer, 0, 1024)) != -1) {
 				fileOutputStream.write(dataBuffer, 0, bytesRead);
 			}
-		} catch (Throwable e) {
-			e.printStackTrace();
 		}
 	}
 
