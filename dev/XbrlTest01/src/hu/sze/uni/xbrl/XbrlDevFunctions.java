@@ -5,6 +5,8 @@ import java.io.File;
 import java.io.FileReader;
 import java.io.FileWriter;
 import java.io.PrintWriter;
+import java.math.BigDecimal;
+import java.text.DecimalFormat;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
@@ -12,6 +14,7 @@ import java.util.Arrays;
 import java.util.Calendar;
 import java.util.Date;
 import java.util.HashSet;
+import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
@@ -83,8 +86,12 @@ public class XbrlDevFunctions implements XbrlConsts {
 		File dataRoot = new File(System.getProperty("user.home") + "/work/xbrl/data");
 		XbrlFilingManager filings = new XbrlFilingManager(dataRoot, true);
 		filings.setDownloadOnly(false);
-		
-		boolean downloadMode = true;
+
+		DecimalFormat df = new DecimalFormat("#");
+		df.setMaximumFractionDigits(8);
+		SimpleDateFormat fmtOut = new SimpleDateFormat("yyyy-MM-dd");
+
+		boolean downloadMode = false;
 //		filings.downloadLimit = 2000;
 
 		Map<String, Map> reportData = filings.getReportData();
@@ -93,14 +100,23 @@ public class XbrlDevFunctions implements XbrlConsts {
 		int jsonCount = 0;
 		JSONParser parser = new JSONParser();
 
-//		XbrlUtilsCounter dc = new XbrlUtilsCounter(true);
+		XbrlUtilsCounter dc = new XbrlUtilsCounter(true);
 
 		Set<String> knownDims = new HashSet<>(Arrays.asList("concept", "entity", "unit", "period", "language"));
-		
+
 		System.out.println("\nJSON validation of " + reportData.size() + " reports\n");
+
+		List<String> filter = null;
+
+//		filter = Arrays.asList("lei:213800CLGZW58U8QAJ68:2021-12-31:xbrl.org:ESEF-SE-0");
 
 		for (Map.Entry<String, Map> e : reportData.entrySet()) {
 			String id = e.getKey();
+
+			if ( (null != filter) && !filter.contains(id) ) {
+				continue;
+			}
+
 			Map repSrc = e.getValue();
 
 			if ( 0 == (++count % 100) ) {
@@ -116,11 +132,11 @@ public class XbrlDevFunctions implements XbrlConsts {
 			Map valFacts = null;
 
 			if ( !jsonFileExists ) {
-				
+
 				File fJson;
 				try {
 					fJson = filings.getReport(repSrc, XbrlReportType.Json, downloadMode);
-				} catch ( Throwable t) {
+				} catch (Throwable t) {
 					System.out.println("Download error " + id + " from: " + repSrc.get("json_url"));
 					fJson = null;
 				}
@@ -150,8 +166,8 @@ public class XbrlDevFunctions implements XbrlConsts {
 
 			if ( null != valFacts ) {
 				++jsonCount;
-				
-				if (downloadMode ) {
+
+				if ( downloadMode ) {
 					continue;
 				}
 
@@ -187,12 +203,33 @@ public class XbrlDevFunctions implements XbrlConsts {
 
 					String val = null;
 					String testVal = null;
+					String ov = tr.get(rf, "OrigValue");
+					String valOrig = (ov.startsWith("\"")) ? ov.substring(1, ov.length() - 1) : ov;
+
+					String scale = tr.get(rf, "Scale");
+					String dec = tr.get(rf, "Dec");
+					String sign = tr.get(rf, "Sign");
+
+					String fmt = tr.get(rf, "Format");
+					if ( DustUtils.isEmpty(fmt) ) {
+						fmt = "ixt4:num-dot-decimal";
+					}
+					String fmtCode = "";
+					if ( !DustUtils.isEmpty(fmt) ) {
+						int sep = fmt.indexOf(":");
+						fmtCode = fmt.substring(sep + 1);
+					}
+
+					String valErr = null;
+					String valTime = null;
+					String time = null;
 
 					int tmBefore = toMatch;
 
 					if ( null == vset ) {
 						if ( !downloadMode ) {
-						//	System.out.println("CSV fact not found in json " + ci);
+//							dc.add(id + ", " + "Concept");
+							// System.out.println("CSV fact not found in json " + ci);
 						}
 					} else {
 						ArrayList<Map> ctxMatch = new ArrayList<>();
@@ -203,9 +240,9 @@ public class XbrlDevFunctions implements XbrlConsts {
 							Map tf = (Map) vv;
 							Map dim = (Map) tf.get("dimensions");
 
-							String valTime = (String) dim.get("period");
+							valTime = (String) dim.get("period");
 
-							String time = tr.get(rf, "Instant");
+							time = tr.get(rf, "Instant");
 							if ( DustUtils.isEmpty(time) ) {
 								time = dateToTime(tr.get(rf, "StartDate"), false) + "/" + dateToTime(tr.get(rf, "EndDate"), true);
 							} else {
@@ -247,7 +284,7 @@ public class XbrlDevFunctions implements XbrlConsts {
 									}
 
 									testVal = (String) tf.get("value");
-									
+
 									if ( null == testVal ) {
 										testVal = "0";
 									} else if ( "-0".equals(testVal) ) {
@@ -277,11 +314,37 @@ public class XbrlDevFunctions implements XbrlConsts {
 							vset.remove(lastMatch);
 							--toMatch;
 						} else {
-							Dust.dumpObs("  Test mismatch", ci, "local", val, "json", testVal);
+
+							try {
+								if ( fmtCode.startsWith("num") ) {
+									BigDecimal dVal = XbrlCoreUtils.convertToNumber(valOrig, fmt, scale, dec, sign);
+									val = dVal.toPlainString();
+									if ( val.contains(".") && val.endsWith("0") ) {
+										val = val.replaceAll("(\\.?0+)$", "");
+									}
+								} else if ( fmtCode.startsWith("date") ) {
+									if ( DustUtils.isEmpty(val) ) {
+										Date d = XbrlCoreUtils.convertToDate(valOrig, fmtCode);
+										val = fmtOut.format(d);
+									}
+								}
+							} catch (Throwable t) {
+								valErr = t.toString();
+							}
+
+							if ( !DustUtils.isEqual(val, testVal) ) {
+//								Dust.dumpObs("  Test mismatch", ci, "time", time, "json ", testVal, "csv line:", DustUtils.sbAppend(null, "|", true, (Object[]) rf));
+								dc.add(id + ", " + "Value");
+
+								if ( !DustUtils.isEmpty(testVal) && !DustUtils.isEmpty(val) ) {
+									Dust.dump("\t", true, id, testVal, val, ov, fmt, scale, dec, sign, time, ci);
+								}
+							}
 						}
 
 						if ( ctxMatch.isEmpty() ) {
-							Dust.dumpObs("  NO match found for", ci, "local", DustUtils.sbAppend(null, ", ", true, (Object[]) rf));
+//							Dust.dumpObs("  NO match found for", ci, "local", DustUtils.sbAppend(null, ", ", true, (Object[]) rf));
+//							dc.add(id + ", " + "Context, " + valTime + ", " + time);
 						} else if ( 1 < ctxMatch.size() && !val.startsWith("Txt len") ) {
 							// multiple appearance of the same fact, quite usual in xhtml - but MUST be the
 							// same value!
@@ -305,14 +368,16 @@ public class XbrlDevFunctions implements XbrlConsts {
 					}
 				}
 
-				if ( 0 != toMatch ) {
-					System.out.println("In " + id + " JSON - CSV diff: " + (valFacts.size() - lineCount) + " Not matched: " + toMatch + " multimatch " + mm + " from " + jsonFile.getCanonicalPath());
-					System.out.println();
-				}
+//				if ( 0 != toMatch ) {
+//					System.out.println("In " + id + " JSON - CSV diff: " + (valFacts.size() - lineCount) + " Not matched: " + toMatch + " multimatch " + mm + " from " + jsonFile.getCanonicalPath());
+//					System.out.println();
+//				}
 			}
 		}
 
 		System.out.println("Json count " + jsonCount);
+
+		dc.dump("Summary");
 	}
 
 	static DustUtilsFactory<String, String> nextDay = new DustUtilsFactory<String, String>(true) {
