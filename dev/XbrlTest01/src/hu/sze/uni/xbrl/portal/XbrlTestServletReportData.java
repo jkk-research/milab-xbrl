@@ -33,8 +33,8 @@ class XbrlTestServletReportData extends DustHttpServlet {
 		String id = Dust.access(data, MindAccess.Peek, null, ServletData.Command);
 
 		Map rep = filings.getReportData().get(id);
-		String lDir = Dust.access(rep, MindAccess.Peek, null, XbrlFilingManager.LOCAL_DIR);
-		String url = Dust.access(rep, MindAccess.Peek, null, "package_url");
+//		String lDir = Dust.access(rep, MindAccess.Peek, null, XbrlFilingManager.LOCAL_DIR);
+//		String url = Dust.access(rep, MindAccess.Peek, null, "package_url");
 
 		HttpServletResponse resp = Dust.access(data, MindAccess.Peek, null, ServletData.Response);
 		resp.setContentType(CONTENT_HTML);
@@ -58,7 +58,7 @@ class XbrlTestServletReportData extends DustHttpServlet {
 
 		File f;
 
-		f = filings.getReport(url, lDir, XbrlReportType.ContentVal);
+		f = filings.getReport(rep, XbrlReportType.ContentVal, true);
 
 		try (BufferedReader br = new BufferedReader(new FileReader(f))) {
 			boolean first = true;
@@ -84,7 +84,7 @@ class XbrlTestServletReportData extends DustHttpServlet {
 			}
 		}
 
-		f = filings.getReport(url, lDir, XbrlReportType.ContentTxt);
+		f = filings.getReport(rep, XbrlReportType.ContentTxt, true);
 
 		try (BufferedReader br = new BufferedReader(new FileReader(f))) {
 			boolean first = true;

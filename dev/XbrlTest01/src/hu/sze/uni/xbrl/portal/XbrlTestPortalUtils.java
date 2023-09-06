@@ -2,6 +2,7 @@ package hu.sze.uni.xbrl.portal;
 
 import java.io.File;
 import java.io.FileInputStream;
+import java.io.FilenameFilter;
 import java.io.IOException;
 import java.io.OutputStream;
 import java.nio.file.Files;
@@ -38,6 +39,25 @@ public class XbrlTestPortalUtils implements XbrlTestPortalConsts {
 			} else {
 				ZipArchiveEntry ze = zf.getEntry(name);
 				unzipEntry(zf, ze, destFile);
+			}
+		}
+	}
+
+	public static void extractWithApacheZipFile(File zipFile, File destFile, String name) throws Exception {
+		try (ZipFile zf = new ZipFile(zipFile)) {
+			ZipArchiveEntry ze = zf.getEntry(name);
+			unzipEntry(zf, ze, destFile);
+		}
+	}
+
+	public static void extractWithApacheZipFile(File zipFile, File destFile, FilenameFilter fnf) throws Exception {
+		try (ZipFile zf = new ZipFile(zipFile)) {
+			for (Enumeration<ZipArchiveEntry> ee = zf.getEntries(); ee.hasMoreElements();) {
+				ZipArchiveEntry ze = ee.nextElement();
+				if ( fnf.accept(null, ze.getName())) {
+					unzipEntry(zf, ze, destFile);
+					return;
+				}
 			}
 		}
 	}

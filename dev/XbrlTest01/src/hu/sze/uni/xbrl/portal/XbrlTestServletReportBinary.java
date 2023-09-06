@@ -32,8 +32,8 @@ class XbrlTestServletReportBinary extends DustHttpServlet {
 		String type = Dust.access(data, MindAccess.Peek, null, ServletData.Parameter, "type");
 
 		Map rep = filings.getReportData().get(id);
-		String lDir = Dust.access(rep, MindAccess.Peek, null, XbrlFilingManager.LOCAL_DIR);
-		String url = Dust.access(rep, MindAccess.Peek, null, type);
+//		String lDir = Dust.access(rep, MindAccess.Peek, null, XbrlFilingManager.LOCAL_DIR);
+//		String url = Dust.access(rep, MindAccess.Peek, null, type);
 
 		String cType = CONTENT_TEXT;
 		XbrlReportType repType = null;
@@ -61,14 +61,14 @@ class XbrlTestServletReportBinary extends DustHttpServlet {
 
 			repType = ListColumns.CsvTxt.name().equals(ct) ? XbrlReportType.ContentTxt : XbrlReportType.ContentVal;
 
-			url = Dust.access(rep, MindAccess.Peek, null, "package_url");
+//			url = Dust.access(rep, MindAccess.Peek, null, "package_url");
 			break;
 		}
 
 		if ( null != repType ) {
 			resp.setContentType(cType);
 
-			File f = filings.getReport(url, lDir, repType);
+			File f = filings.getReport(data, repType, true);
 			OutputStream out = getOutStream(data);
 			Files.copy(f.toPath(), out);
 			out.flush();

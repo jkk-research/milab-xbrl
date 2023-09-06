@@ -5,12 +5,69 @@ import java.math.RoundingMode;
 import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.Locale;
+import java.util.Map;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 import hu.sze.milab.dust.utils.DustUtils;
 
 public class XbrlCoreUtils implements XbrlConsts {
+
+	public static boolean convertValue(Map<XbrlFactDataInfo, Object> data) {
+		String error = null;
+		XbrlFactDataType ft = XbrlFactDataType.empty;
+		Object valObj = null;
+
+		try {
+			String valOrig = (String) data.get(XbrlFactDataInfo.OrigValue);
+
+			String fmtCode = (String) data.get(XbrlFactDataInfo.Format);
+			fmtCode = DustUtils.getPostfix(fmtCode, ":");
+			
+			if ( fmtCode.startsWith("num") ) {
+				ft = XbrlFactDataType.number;
+				String scale = (String) data.get(XbrlFactDataInfo.Scale);
+				String decimals = (String) data.get(XbrlFactDataInfo.Dec);
+				String sign = (String) data.get(XbrlFactDataInfo.Sign);
+
+				valObj = convertToNumber(valOrig, fmtCode, scale, decimals, sign);
+			} else if ( fmtCode.startsWith("fixed") ) {
+				String pf = DustUtils.getPostfix(fmtCode, "-").toLowerCase();
+				switch ( pf ) {
+				case "zero":
+					valObj = BigDecimal.ZERO;
+					ft = XbrlFactDataType.number;
+					break;
+				case "empty":
+					ft = XbrlFactDataType.empty;
+					break;
+				case "false":
+					valObj = Boolean.FALSE;
+					ft = XbrlFactDataType.bool;
+					break;
+				case "true":
+					valObj = Boolean.TRUE;
+					ft = XbrlFactDataType.bool;
+					break;
+				}
+			} else if ( fmtCode.startsWith("date") ) {
+				ft = XbrlFactDataType.date;
+				valObj = convertToDate(valOrig, fmtCode);
+			}
+
+		} catch (Throwable e) {
+			error = "Conversion exception " + e.toString();
+		}
+
+		data.put(XbrlFactDataInfo.Value, valObj);
+		data.put(XbrlFactDataInfo.Type, ft);
+		if ( null != error ) {
+			data.put(XbrlFactDataInfo.Err, error);
+			return false;
+		} else {
+			return true;
+		}
+	}
 
 	public static Date convertToDate(String val, String fmtCode) throws Exception {
 		Date ret = null;
@@ -92,7 +149,7 @@ public class XbrlCoreUtils implements XbrlConsts {
 		}
 		return dVal;
 	}
-	
+
 //	static BigDecimal DEF_UNIT_DIV = new BigDecimal(100);
 
 	public static BigDecimal convertToNumber(String val, String fmt, String scale, String decimals, String sign) {
@@ -145,7 +202,7 @@ public class XbrlCoreUtils implements XbrlConsts {
 					dVal = dVal.movePointRight(Integer.valueOf(scale));
 				}
 
-				if (!DustUtils.isEmpty(decimals) && !"0".equals(decimals) && !"INF".equals(decimals) ) {
+				if ( !DustUtils.isEmpty(decimals) && !"0".equals(decimals) && !"INF".equals(decimals) ) {
 					dVal = dVal.setScale(Integer.valueOf(decimals), RoundingMode.FLOOR);
 				}
 
@@ -154,7 +211,7 @@ public class XbrlCoreUtils implements XbrlConsts {
 				}
 			}
 		}
-		
+
 		return dVal;
 	}
 }

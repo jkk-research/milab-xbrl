@@ -13,6 +13,14 @@ public interface XbrlConsts extends DustMetaConsts, DustStreamXmlConsts {
 		Context, Unit, Fact
 	}
 	
+	enum XbrlFactDataType {
+		number, string, text, date, bool, empty
+	}
+	
+	enum XbrlFactDataInfo {
+		OrigValue, Unit, Format, Sign, Dec, Scale, Type, Value, Err
+	}
+	
 	public static MindHandle XBRL_UNIT = Dust.resolveID(null, null);
 	
 	public static MindHandle XBRL_ASP_REPORT = Dust.resolveID(null, null);

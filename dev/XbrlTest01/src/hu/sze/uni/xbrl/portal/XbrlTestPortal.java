@@ -1,28 +1,19 @@
 package hu.sze.uni.xbrl.portal;
 
 import java.io.File;
-import java.io.FileFilter;
-import java.nio.file.Files;
-import java.util.ArrayList;
-import java.util.HashSet;
-import java.util.Map;
-import java.util.Set;
 
 import hu.sze.milab.dust.Dust;
 import hu.sze.milab.dust.net.httpsrv.DustHttpServletDirectFile;
-import hu.sze.milab.dust.utils.DustUtils;
 import hu.sze.uni.http.DustHttpServerJetty;
 import hu.sze.uni.xbrl.XbrlFilingManager;
-import hu.sze.uni.xbrl.XbrlReportLoaderDomBase;
-import hu.sze.uni.xbrl.XbrlUtils;
 
-@SuppressWarnings("rawtypes")
+//@SuppressWarnings("rawtypes")
 public class XbrlTestPortal implements XbrlTestPortalConsts {
 
 	private File dataRoot;
 	XbrlFilingManager filings;
 
-	private long spaceToFree;
+//	private long spaceToFree;
 
 	public XbrlTestPortal() {
 		dataRoot = new File(System.getProperty("user.home") + "/work/xbrl/data");
@@ -33,131 +24,131 @@ public class XbrlTestPortal implements XbrlTestPortalConsts {
 		filings = new XbrlFilingManager(dataRoot, true);
 		filings.setDownloadOnly(false);
 
-		getAllZips();
+//		getAllZips();
 
 		initJetty();
 
 	}
 
 //	@SuppressWarnings("unchecked")
-	void getAllZips() throws Exception {
-		boolean extract = true;
-
-		spaceToFree = 0;
-		int errCount = 0;
-		Map<String, Map> reportData = filings.getReportData();
-
-		int count = 0;
-
-		int parsedRepCount = 0;
-		int totalValCount = 0;
-		int totalTxtCount = 0;
-		ArrayList<String> errFactLines = new ArrayList<>();
-
-		@SuppressWarnings("unused")
-		Set<File> csvUpdate = new HashSet<>();
-
-		FileFilter ffIsDir = new FileFilter() {
-			@Override
-			public boolean accept(File f) {
-				return f.isDirectory();
-			}
-		};
-
-		for (Map.Entry<String, Map> e : reportData.entrySet()) {
-			String id = e.getKey();
-			Map repSrc = e.getValue();
-
-			if ( 0 == (++count % 100) ) {
-				System.out.println("Count " + count);
-			}
-
-			String pkgUrl = XbrlUtils.access(repSrc, AccessCmd.Peek, null, "package_url");
-			String repUrl = XbrlUtils.access(repSrc, AccessCmd.Peek, null, "report_url");
-
-			String repDirName = XbrlUtils.access(repSrc, AccessCmd.Peek, null, XbrlFilingManager.LOCAL_DIR);
-			File repDir = new File(filings.getRepoRoot(), repDirName);
-
-			File repFile = new File(repDir, "extractedReport.xhtml");
-			File csvVal = new File(repDir, "Report_Val.csv");
-			boolean repFileExists = repFile.isFile();
-
-			try {
-				if ( !csvVal.isFile() ) {
-					if ( !repDir.isDirectory() ) {
-						repDir.mkdirs();
-					}
-
-					if ( extract ) {
-						if ( !repFileExists ) {
-
-							File rf = filings.findReportToLoad(repDir);
-
-							if ( null != rf ) {
-								Files.copy(rf.toPath(), repFile.toPath());
-								repFileExists = true;
-							} else {
-								File repZip = filings.getReport(repSrc, XbrlReportType.Zip, true);
-
-								if ( DustUtils.isEmpty(repUrl) ) {
-									if ( 0 == repDir.listFiles(ffIsDir).length ) {
-										File unzipDir = new File(repDir, DustUtils.cutPostfix(repZip.getName(), "."));
-										XbrlTestPortalUtils.extractWithApacheZipFile(null, repZip, unzipDir);
-									}
-
-									rf = filings.findReportToLoad(repDir);
-
-									if ( null != rf ) {
-										Files.copy(rf.toPath(), repFile.toPath());
-										repFileExists = true;
-									} else {
-										Dust.dumpObs(id, pkgUrl, "Missing report url (and could not guess)", repDir.getCanonicalPath());
-										continue;
-									}
-								} else {
-									int sep = pkgUrl.lastIndexOf("/");
-									String repName = repUrl.substring(sep + 1);
-
-									XbrlTestPortalUtils.extractWithApacheZipFile(repName, repZip, repFile);
-									repFileExists = repFile.exists();
-								}
-							}
-						}
-					}
-
-					if ( repFileExists ) {
-						XbrlReportLoaderDomBase.createSplitCsv(repFile, repDir, "Report", TEXT_CUT_AT);
-					}
-				}
-
-				if ( repFile.isFile() ) {
-					Dust.dumpObs("Delete", repFile);
-					spaceToFree += repFile.length();
-					repFile.delete();
-				}
-
-				if ( csvVal.isFile() ) {
-					filings.optLoadFacts(id);
-				}
-			} catch (Throwable t) {
-				Dust.dumpObs(id, pkgUrl, t);
-				t.printStackTrace();
-				++errCount;
-			}
-		}
-
-		Dust.dumpObs("Total count", reportData.size(), "errors", errCount, "space to free", spaceToFree);
-
-		for (String e : errFactLines) {
-			Dust.dumpObs(e);
-		}
-
-		Dust.dumpObs("Parsed files", parsedRepCount, "Val", totalValCount, "Txt", totalTxtCount, "Err", errFactLines.size());
-
-//		for ( File f : csvUpdate ) {
-//			f.delete();
+//	void getAllZips() throws Exception {
+//		boolean extract = true;
+//
+//		spaceToFree = 0;
+//		int errCount = 0;
+//		Map<String, Map> reportData = filings.getReportData();
+//
+//		int count = 0;
+//
+//		int parsedRepCount = 0;
+//		int totalValCount = 0;
+//		int totalTxtCount = 0;
+//		ArrayList<String> errFactLines = new ArrayList<>();
+//
+//		@SuppressWarnings("unused")
+//		Set<File> csvUpdate = new HashSet<>();
+//
+//		FileFilter ffIsDir = new FileFilter() {
+//			@Override
+//			public boolean accept(File f) {
+//				return f.isDirectory();
+//			}
+//		};
+//
+//		for (Map.Entry<String, Map> e : reportData.entrySet()) {
+//			String id = e.getKey();
+//			Map repSrc = e.getValue();
+//
+//			if ( 0 == (++count % 100) ) {
+//				System.out.println("Count " + count);
+//			}
+//
+//			String pkgUrl = XbrlUtils.access(repSrc, AccessCmd.Peek, null, "package_url");
+//			String repUrlx = XbrlUtils.access(repSrc, AccessCmd.Peek, null, "report_url");
+//
+//			String repDirName = XbrlUtils.access(repSrc, AccessCmd.Peek, null, XbrlFilingManager.LOCAL_DIR);
+//			File repDir = new File(filings.getRepoRoot(), repDirName);
+//
+//			File repFile = new File(repDir, "extractedReport.xhtml");
+//			File csvVal = new File(repDir, "Report_Val.csv");
+//			boolean repFileExists = repFile.isFile();
+//
+//			try {
+//				if ( !csvVal.isFile() ) {
+//					if ( !repDir.isDirectory() ) {
+//						repDir.mkdirs();
+//					}
+//
+//					if ( extract ) {
+//						if ( !repFileExists ) {
+//
+//							File rf = filings.findReportToLoad(repDir);
+//
+//							if ( null != rf ) {
+//								Files.copy(rf.toPath(), repFile.toPath());
+//								repFileExists = true;
+//							} else {
+//								File repZip = filings.getReport(repSrc, XbrlReportType.Zip, true);
+//
+//								if ( DustUtils.isEmpty(repUrl) ) {
+//									if ( 0 == repDir.listFiles(ffIsDir).length ) {
+//										File unzipDir = new File(repDir, DustUtils.cutPostfix(repZip.getName(), "."));
+//										XbrlTestPortalUtils.extractWithApacheZipFile(null, repZip, unzipDir);
+//									}
+//
+//									rf = filings.findReportToLoad(repDir);
+//
+//									if ( null != rf ) {
+//										Files.copy(rf.toPath(), repFile.toPath());
+//										repFileExists = true;
+//									} else {
+//										Dust.dumpObs(id, pkgUrl, "Missing report url (and could not guess)", repDir.getCanonicalPath());
+//										continue;
+//									}
+//								} else {
+//									int sep = pkgUrl.lastIndexOf("/");
+//									String repName = repUrl.substring(sep + 1);
+//
+//									XbrlTestPortalUtils.extractWithApacheZipFile(repName, repZip, repFile);
+//									repFileExists = repFile.exists();
+//								}
+//							}
+//						}
+//					}
+//
+//					if ( repFileExists ) {
+//						XbrlReportLoaderDomBase.createSplitCsv(repFile, repDir, "Report", TEXT_CUT_AT);
+//					}
+//				}
+//
+//				if ( repFile.isFile() ) {
+//					Dust.dumpObs("Delete", repFile);
+//					spaceToFree += repFile.length();
+//					repFile.delete();
+//				}
+//
+//				if ( csvVal.isFile() ) {
+//					filings.optLoadFacts(id);
+//				}
+//			} catch (Throwable t) {
+//				Dust.dumpObs(id, pkgUrl, t);
+//				t.printStackTrace();
+//				++errCount;
+//			}
 //		}
-	}
+//
+//		Dust.dumpObs("Total count", reportData.size(), "errors", errCount, "space to free", spaceToFree);
+//
+//		for (String e : errFactLines) {
+//			Dust.dumpObs(e);
+//		}
+//
+//		Dust.dumpObs("Parsed files", parsedRepCount, "Val", totalValCount, "Txt", totalTxtCount, "Err", errFactLines.size());
+//
+////		for ( File f : csvUpdate ) {
+////			f.delete();
+////		}
+//	}
 
 	void initJetty() throws Exception {
 

@@ -2,6 +2,7 @@ package hu.sze.uni.xbrl;
 
 import java.io.File;
 import java.io.PrintStream;
+import java.math.BigDecimal;
 import java.text.DecimalFormat;
 import java.text.SimpleDateFormat;
 import java.util.Date;
@@ -20,6 +21,8 @@ import org.w3c.dom.NodeList;
 import hu.sze.milab.dust.Dust;
 import hu.sze.milab.dust.utils.DustUtils;
 import hu.sze.milab.xbrl.XbrlCoreUtils;
+import hu.sze.milab.xbrl.XbrlConsts.XbrlFactDataInfo;
+import hu.sze.milab.xbrl.XbrlConsts.XbrlFactDataType;
 
 @SuppressWarnings("rawtypes")
 public abstract class XbrlReportLoaderDomBase implements XbrlConsts {
@@ -30,9 +33,18 @@ public abstract class XbrlReportLoaderDomBase implements XbrlConsts {
 	enum XbrlElements {
 		Context, Unit, Continuation, Footnote, DimCount, DefLang,
 	}
+	
+	Map<XbrlFactDataInfo, String> cvtKeys = new HashMap<>();
 
 	DocumentBuilderFactory dbf;
 	SimpleDateFormat DFMT_ISO = new SimpleDateFormat(FMT_DATE);
+	
+	public XbrlReportLoaderDomBase() {
+		cvtKeys.put(XbrlFactDataInfo.Format, "format");
+		cvtKeys.put(XbrlFactDataInfo.Scale, "scale");
+		cvtKeys.put(XbrlFactDataInfo.Dec, "decimals");
+		cvtKeys.put(XbrlFactDataInfo.Sign, "sign");
+	}
 
 	public void load(File f) throws Exception {
 		Throwable loadErr = null;
@@ -123,6 +135,7 @@ public abstract class XbrlReportLoaderDomBase implements XbrlConsts {
 			}
 
 			Dust.access(xbrlElements, MindAccess.Set, dimCount, XbrlElements.DimCount);
+			Map<XbrlFactDataInfo, Object> data = new HashMap<>();
 
 			for (int idx = 0; idx < nodeCount; ++idx) {
 				Element e = (Element) nl.item(idx);
@@ -131,115 +144,43 @@ public abstract class XbrlReportLoaderDomBase implements XbrlConsts {
 				if ( !DustUtils.isEmpty(ctxId) ) {
 
 					String valOrig = e.getTextContent().trim();
-					String valErr = null;
-					String valStr = null;
-					Object valObj = null;
-					String fmt = e.getAttribute("format");
+					String fmtCode = e.getAttribute("format");
 					
-					if ( DustUtils.isEmpty(fmt) ) {
+					if ( DustUtils.isEmpty(fmtCode) ) {
 						String tn = e.getTagName();
 						
 						if ( tn.contains("nonFraction") ) {
-							fmt = "ixt4:num-dot-decimal";
+							fmtCode = "ixt4:num-dot-decimal";
 						}
 					}
+					
+					data.clear();
 
-					String fmtCode = "";
-
-					if ( !DustUtils.isEmpty(fmt) ) {
-						int sep = fmt.indexOf(":");
-						fmtCode = fmt.substring(sep + 1);
-					}
-
-					boolean storeValue = true;
-
-					if ( fmtCode.startsWith("num") ) {
-						String scale = e.getAttribute("scale");
-						String sign = e.getAttribute("sign");
-
-						try {
-							Double dVal = XbrlCoreUtils.convertToDouble(valOrig, fmt, scale, sign);
-							valObj = dVal;
-
-							valStr = df.format(dVal);
-							if ( valStr.startsWith(".") ) {
-								valStr = "0" + valStr;
-							} else {
-								valStr = valStr.replace("-.", "-0.");
-							}
-						} catch (Throwable t) {
-							valErr = t.toString();
-						}
-					} else if ( fmtCode.startsWith("fixed") ) {
-						String pf = DustUtils.getPostfix(fmtCode, "-").toLowerCase();
-						switch ( pf ) {
-						case "zero":
-							valObj = 0.0;
-							valStr = "0";
-							break;
-						case "empty":
-							valObj = "";
-							valStr = "";
-							break;
-						case "false":
-							valObj = Boolean.FALSE;
-							valStr = "false";
-							break;
-						case "true":
-							valObj = Boolean.TRUE;
-							valStr = "true";
-							break;
-						}
-					} else if ( fmtCode.startsWith("date") ) {
-						String dfmt = null;
-
-						if ( fmtCode.contains("monthname") ) {
-							valErr = "No converter for " + fmtCode;
-						} else {
-							switch ( fmtCode ) {
-							case "date-day-month-year":
-								dfmt = "dd-MM-yyyy";
-								break;
-							case "date-month-day-year":
-								dfmt = "MM-dd-yyyy";
-								break;
-							case "date-year-month-day":
-								dfmt = "yyyy-MM-dd";
-								break;
+					if ( !DustUtils.isEmpty(fmtCode) ) {
+						data.put(XbrlFactDataInfo.OrigValue, valOrig);
+						for ( Map.Entry<XbrlFactDataInfo, String> ce : cvtKeys.entrySet() ) {
+							Object v = e.getAttribute(ce.getValue());
+							if ( null != v ) {
+								data.put(ce.getKey(), v);
 							}
 						}
-
-						if ( null != dfmt ) {
-							SimpleDateFormat fmtDate = new SimpleDateFormat(dfmt);
-							try {
-								Date d = fmtDate.parse(valOrig);
-								valObj = d;
-
-								valStr = DFMT_ISO.format(d);
-							} catch (Throwable t) {
-								valErr = t.toString();
-							}
-						}
+						XbrlCoreUtils.convertValue(data);
+						storeValue(xbrlElements, e, data);
 					} else {
-						storeValue = false;
-
 						Element txtFrag = e;
 						boolean last = false;
 						do {
 							String contID = txtFrag.getAttribute("continuedAt");
 							last = DustUtils.isEmpty(contID);
+							data.put(XbrlFactDataInfo.OrigValue, valOrig);
 
-							storeText(xbrlElements, e, valOrig, txtFrag == e, last);
+							storeText(xbrlElements, e, data, txtFrag == e, last);
 
 							if ( !last ) {
 								txtFrag = Dust.access(xbrlElements, MindAccess.Peek, null, XbrlElements.Continuation, contID.trim());
 								valOrig = txtFrag.getTextContent().trim();
 							}
 						} while (!last);
-					}
-
-					if ( storeValue ) {
-						storeValue(xbrlElements, e, valOrig, valStr, valObj, valErr);
 					}
 				}
 			}
@@ -254,9 +195,9 @@ public abstract class XbrlReportLoaderDomBase implements XbrlConsts {
 		}
 	}
 
-	protected abstract void storeText(Object xbrlElements, Element e, String valStr, boolean first, boolean last) throws Exception;
+	protected abstract void storeText(Object xbrlElements, Element e, Map<XbrlFactDataInfo, Object> data, boolean first, boolean last) throws Exception;
 
-	protected abstract void storeValue(Object xbrlElements, Element e, String valOrig, String valStr, Object valObj, String valErr) throws Exception;
+	protected abstract void storeValue(Object xbrlElements, Element e, Map<XbrlFactDataInfo, Object> data) throws Exception;
 
 	protected abstract void loadComplete(Object xbrlElements, Throwable err);
 
@@ -333,11 +274,11 @@ public abstract class XbrlReportLoaderDomBase implements XbrlConsts {
 					ps.print("\tAxis_" + i + "\tDim_" + i);
 				}
 
-				ps.println(valStream ? "\tOrigValue\tUnit\tFormat\tSign\tDec\tScale\tValue\tErr" : "\tLanguage\tValue");
+				ps.println(valStream ? "\tOrigValue\tUnit\tFormat\tSign\tDec\tScale\tType\tValue\tErr" : "\tLanguage\tValue");
 			}
 
 			@Override
-			protected void storeText(Object xbrlElements, Element e, String valStr, boolean first, boolean last) throws Exception {
+			protected void storeText(Object xbrlElements, Element e, Map<XbrlFactDataInfo, Object> data, boolean first, boolean last) throws Exception {
 				PrintStream ps = first ? startLine(xbrlElements, e, false) : psText;
 				
 				if ( first ) {
@@ -352,9 +293,9 @@ public abstract class XbrlReportLoaderDomBase implements XbrlConsts {
 					ps.print(" ");
 				}
 
+				String valStr = (String) data.get(XbrlFactDataInfo.OrigValue);
 				String escapedLine = csvEscape(valStr, false);
 				ps.print(escapedLine);
-				
 				
 				int el = valStr.length();
 				txtLen += el;
@@ -371,7 +312,19 @@ public abstract class XbrlReportLoaderDomBase implements XbrlConsts {
 				
 				if ( last ) {
 					ps.println("\"");
-					storeValue(xbrlElements, e, sbTxtFrag.toString(), "Txt len: " + txtLen, null, "");
+					data.clear();
+					String txt = sbTxtFrag.toString();
+					data.put(XbrlFactDataInfo.OrigValue, txt);		
+
+					if (txtLen < textCut) {
+						data.put(XbrlFactDataInfo.Type, XbrlFactDataType.string);
+						data.put(XbrlFactDataInfo.Value, csvEscape(txt, true));		
+					} else {
+						data.put(XbrlFactDataInfo.Type, XbrlFactDataType.text);
+						data.put(XbrlFactDataInfo.Value, "Txt len: " + txtLen);			
+					}
+					
+					storeValue(xbrlElements, e, data);
 				}
 			}
 
@@ -386,7 +339,7 @@ public abstract class XbrlReportLoaderDomBase implements XbrlConsts {
 			}
 
 			@Override
-			protected void storeValue(Object xbrlElements, Element e, String valOrig, String valStr, Object valObj, String valErr) throws Exception {
+			protected void storeValue(Object xbrlElements, Element e, Map<XbrlFactDataInfo, Object> data) throws Exception {
 				PrintStream ps = startLine(xbrlElements, e, true);
 
 				String unit = "-";
@@ -404,8 +357,30 @@ public abstract class XbrlReportLoaderDomBase implements XbrlConsts {
 				String scale = e.getAttribute("scale");
 				String dec = e.getAttribute("decimals");
 				String sign = e.getAttribute("sign");
-
-				StringBuilder sbData = DustUtils.sbAppend(null, "\t", true, csvEscape(valOrig, true), unit, fmt, sign, dec, scale, valStr, valErr);
+				
+				String valOrig = (String) data.get(XbrlFactDataInfo.OrigValue);
+				Object type = data.get(XbrlFactDataInfo.Type);
+				Object value = data.get(XbrlFactDataInfo.Value);
+				Object err = data.get(XbrlFactDataInfo.Err);
+				
+				if ( (null != value) && (null != type) ) {
+					switch ( (XbrlFactDataType) type) {
+					case date:
+						value = DFMT_ISO.format((Date) value);
+						break;
+					case empty:
+						value = "";
+						break;
+					case number:
+						value = ((BigDecimal)value).toPlainString();
+						break;
+					default:
+						break;
+					
+					}
+				}
+				
+				StringBuilder sbData = DustUtils.sbAppend(null, "\t", true, csvEscape(valOrig, true), unit, fmt, sign, dec, scale, type, value, err);
 				ps.println("\t" + sbData);
 			}
 
