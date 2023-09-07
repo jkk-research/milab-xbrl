@@ -40,7 +40,6 @@ public abstract class XbrlReportLoaderDomBase implements XbrlConsts {
 	SimpleDateFormat DFMT_ISO = new SimpleDateFormat(FMT_DATE);
 	
 	public XbrlReportLoaderDomBase() {
-		cvtKeys.put(XbrlFactDataInfo.Format, "format");
 		cvtKeys.put(XbrlFactDataInfo.Scale, "scale");
 		cvtKeys.put(XbrlFactDataInfo.Dec, "decimals");
 		cvtKeys.put(XbrlFactDataInfo.Sign, "sign");
@@ -158,6 +157,7 @@ public abstract class XbrlReportLoaderDomBase implements XbrlConsts {
 
 					if ( !DustUtils.isEmpty(fmtCode) ) {
 						data.put(XbrlFactDataInfo.OrigValue, valOrig);
+						data.put(XbrlFactDataInfo.Format, fmtCode);
 						for ( Map.Entry<XbrlFactDataInfo, String> ce : cvtKeys.entrySet() ) {
 							Object v = e.getAttribute(ce.getValue());
 							if ( null != v ) {
@@ -353,15 +353,20 @@ public abstract class XbrlReportLoaderDomBase implements XbrlConsts {
 					}
 				}
 
-				String fmt = e.getAttribute("format");
-				String scale = e.getAttribute("scale");
-				String dec = e.getAttribute("decimals");
-				String sign = e.getAttribute("sign");
+//				String fmt = e.getAttribute("format");
+//				String scale = e.getAttribute("scale");
+//				String dec = e.getAttribute("decimals");
+//				String sign = e.getAttribute("sign");
 				
 				String valOrig = (String) data.get(XbrlFactDataInfo.OrigValue);
 				Object type = data.get(XbrlFactDataInfo.Type);
 				Object value = data.get(XbrlFactDataInfo.Value);
 				Object err = data.get(XbrlFactDataInfo.Err);
+				
+				Object fmt = data.get(XbrlFactDataInfo.Format);
+				Object scale = data.get(XbrlFactDataInfo.Scale);
+				Object dec = data.get(XbrlFactDataInfo.Dec);
+				Object sign = data.get(XbrlFactDataInfo.Sign);
 				
 				if ( (null != value) && (null != type) ) {
 					switch ( (XbrlFactDataType) type) {

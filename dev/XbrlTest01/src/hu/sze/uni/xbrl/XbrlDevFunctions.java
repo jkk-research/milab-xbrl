@@ -3,6 +3,8 @@ package hu.sze.uni.xbrl;
 import java.io.File;
 import java.io.FileReader;
 import java.io.PrintStream;
+import java.math.BigDecimal;
+import java.math.RoundingMode;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
@@ -70,11 +72,15 @@ public class XbrlDevFunctions implements XbrlConsts {
 		XbrlUtilsCounter dc = new XbrlUtilsCounter(true);
 
 		int count = 0;
+		int valCount = 0;
 		int jsonCount = 0;
 
 		boolean verbose = false;
+		boolean doDelete = false;
 
 		Map<String, Map> reportData = filings.getReportData();
+
+		Set<Map> repToUpdate = new HashSet<>();
 
 		for (Map.Entry<String, Map> e : reportData.entrySet()) {
 			String id = e.getKey();
@@ -82,18 +88,39 @@ public class XbrlDevFunctions implements XbrlConsts {
 
 //			if ( !id.contains("lei:21380031XTLI9X5MTY92:2021-06-30:xbrl.org:ESEF-DK-0") )
 //			if ( !id.contains("21380031XTLI9X5MTY92") )
-//		if ( !id.contains("xbrl.org:ESEF-DK") )
-//			if ( !id.contains("743700X6KUJ0Z8GJIF03:2021-12-31") )
-//			{
+//			if ( !id.contains("xbrl.org:ESEF-DK") )
+//			if ( id.contains("lei:74780000B0QHXQ0LQW20:2022-12-31:xbrl.org:ESEF-HR-0") ) {
 //				continue;
 //			}
 
 			if ( 0 == (++count % 100) ) {
 				System.out.println("Count " + count);
 			}
+			
+			DustUtils.TableReader tr = filings.getTableReader(id);
+
+			if ( null == tr ) {
+				System.out.println("PROCESS, Accessing facts for report " + id);
+				try {
+					filings.getReport(repSrc, XbrlReportType.ContentVal, true);
+					tr = filings.getTableReader(id);
+				} catch (Throwable err) {
+					DustException.swallow(err, "accessing facts for", id);
+				}
+
+				if ( null == tr ) {
+					System.out.println("ERROR, facts not found for report " + id);
+					continue;
+				}
+			}
+
+			int extDimCount = (tr.getColIdx("OrigValue") - tr.getColIdx("Instant") - 1) / 2;
+
+			++valCount;
+			
 
 			File jsonFile = null;
-			
+
 			try {
 				jsonFile = filings.getReport(repSrc, XbrlReportType.GenJson, true);
 			} catch (Throwable err) {
@@ -103,6 +130,9 @@ public class XbrlDevFunctions implements XbrlConsts {
 			if ( null == jsonFile ) {
 				continue;
 			}
+			
+//			File ccc = filings.getReport(repSrc, XbrlReportType.ContentVal, false);
+//			System.out.println(ccc.getCanonicalPath());
 
 			Object report = parser.parse(new FileReader(jsonFile));
 			Map valFacts = (Map) XbrlUtils.access(report, AccessCmd.Peek, null, "facts");
@@ -125,28 +155,9 @@ public class XbrlDevFunctions implements XbrlConsts {
 
 				((Map) f).put("__ds", ks.size());
 			}
-
 			int toMatch = valFacts.size();
-
-			DustUtils.TableReader tr = filings.getTableReader(id);
-
-			if ( null == tr ) {
-				System.out.println("PROCESS, Accessing facts for report " + id);
-				try {
-					filings.getReport(repSrc, XbrlReportType.ContentVal, true);
-					tr = filings.getTableReader(id);
-				} catch (Throwable err) {
-					DustException.swallow(err, "accessing facts for", id);
-				}
-
-				if ( null == tr ) {
-					System.out.println("ERROR, facts not found for report " + id);
-					continue;
-				}
-			}
-
-			int extDimCount = (tr.getColIdx("OrigValue") - tr.getColIdx("Instant") - 1) / 2;
-
+			
+			
 			for (String[] rf : filings.getFacts(id)) {
 				String ci = tr.get(rf, "Taxonomy") + ":" + tr.get(rf, "Concept");
 				Set vset = extInfo.peek(ci);
@@ -154,22 +165,44 @@ public class XbrlDevFunctions implements XbrlConsts {
 				String tt = tr.get(rf, "Type");
 				boolean isText = "string".equals(tt) || "text".equals(tt);
 
-				String val = null;
+				String fmt = tr.get(rf, "Format");
+				fmt = DustUtils.getPostfix(fmt, ":");
+
+				String time = tr.get(rf, "Instant");
+				if ( DustUtils.isEmpty(time) ) {
+					time = dateToTime(tr.get(rf, "StartDate"), false) + "/" + dateToTime(tr.get(rf, "EndDate"), true);
+				} else {
+					time = dateToTime(time, true);
+				}
+
+				String unit = tr.get(rf, "Unit");
+				String dec = tr.get(rf, "Dec");
+
+				if ( "ifrs-full:Equity".equals(ci) ) {
+					ci = "ifrs-full:Equity";
+				}
+
+				String val = tr.get(rf, "Value");
+				val = pruneNum(val);
+
+				if ( "277880000".equals(val) ) {
+					val = "277880000";
+				}
+
 				String testVal = null;
+				String testValOrig = null;
 				String ov = tr.get(rf, "OrigValue");
 				String valOrig = (ov.startsWith("\"")) ? ov.substring(1, ov.length() - 1) : ov;
 
 				String valErr = null;
 				String valTime = null;
-				String time = null;
 				String valUnit = null;
-				String unit = null;
 
 				int tmBefore = toMatch;
 
 				if ( null == vset ) {
-//					dc.add("Error CONCEPT " + ci);
-					dc.add("Error CONCEPT " + id);
+					dc.add("Error CONCEPT <ALL>");
+					dc.add("Error CONCEPT " + repSrc.get("country"));
 					if ( verbose ) {
 //						System.out.println(id + " CSV fact not found in json " + ci);
 					}
@@ -183,19 +216,15 @@ public class XbrlDevFunctions implements XbrlConsts {
 						Map dim = (Map) tf.get("dimensions");
 
 						valUnit = (String) dim.getOrDefault("unit", "-");
-						unit = tr.get(rf, "Unit");
+						if ( "-".equals(valUnit) && "xbrli:pure".equals(unit) ) {
+							valUnit = "xbrli:pure";
+						}
 
-						if ( !DustUtils.isEqual(unit, valUnit) ) {
+						if ( "number".equals(tt) && !"fixed-zero".equals(fmt) && !DustUtils.isEqual(unit, valUnit) ) {
 							continue;
 						}
 
 						valTime = (String) dim.get("period");
-						time = tr.get(rf, "Instant");
-						if ( DustUtils.isEmpty(time) ) {
-							time = dateToTime(tr.get(rf, "StartDate"), false) + "/" + dateToTime(tr.get(rf, "EndDate"), true);
-						} else {
-							time = dateToTime(time, true);
-						}
 
 						if ( !DustUtils.isEqual(time, valTime) ) {
 							continue;
@@ -219,21 +248,23 @@ public class XbrlDevFunctions implements XbrlConsts {
 						if ( 0 == dimsToMatch ) {
 							ctxMatch.add(tf);
 
-							val = tr.get(rf, "Value");
-							testVal = (String) tf.get("value");
+							testValOrig = testVal = (String) tf.get("value");
 
-							if ( null == testVal ) {
-							} else if ( "-0".equals(testVal) ) {
-								testVal = "0";
-							} else if ( testVal.contains(".") && testVal.endsWith("0") ) {
-								testVal = testVal.replaceAll("(0+)$", "");
-							}
-							if ( null != val ) {
-								if ( val.contains(".") && val.endsWith("0") ) {
-									val = val.replaceAll("(0+)$", "");
-								}
-								if ( val.endsWith(".") ) {
-									val = val.substring(0, val.length() - 1);
+							testVal = pruneNum(testVal);
+
+							if ( "number".equals(tt) && !DustUtils.isEqual(testVal, val) && !DustUtils.isEmpty(dec) && !"INF".equals(dec) ) {
+								if ( DustUtils.isEmpty(testVal) ) {
+									testVal = "0";
+								} else {
+									try {
+										int dd = Integer.parseInt(dec);
+										BigDecimal bdTest = new BigDecimal(testVal);
+										bdTest = bdTest.setScale(dd, RoundingMode.FLOOR);
+										testVal = bdTest.toPlainString();
+										testVal = pruneNum(testVal);
+									} catch (Throwable eee) {
+										testVal = "0";
+									}
 								}
 							}
 
@@ -243,30 +274,32 @@ public class XbrlDevFunctions implements XbrlConsts {
 						}
 					}
 
-					String fmt = tr.get(rf, "Format");
-					fmt = DustUtils.getPostfix(fmt, ":");
-
 					if ( null != lastMatch ) {
 						vset.remove(lastMatch);
 						--toMatch;
 						dc.add("Success " + fmt);
 						dc.add("Success <ALL>");
 					} else {
-//						dc.add("Error VALUE " + id);
-						dc.add("Error VALUE " + fmt);
+						if ( "number".equals(tt) ) {
+//							repToUpdate.add(repSrc);
+//							System.out.println("hmm");
+						}
+						dc.add("Error VALUE fmt  " + fmt);
+						dc.add("Error VALUE type " + tt);
 						dc.add("Error VALUE <ALL>");
+						dc.add("Error VALUE id   " + id);
 
 						String scale = tr.get(rf, "Scale");
-						String dec = tr.get(rf, "Dec");
 						String sign = tr.get(rf, "Sign");
 
-						if ( verbose ) {
+						if ( verbose ) 
+						{
 							if ( !DustUtils.isEmpty(testVal) && !DustUtils.isEmpty(val) ) {
-								Dust.dump("\t", true, id, testVal, val, ov, fmt, scale, dec, sign, time, ci);
+								Dust.dump("\t", true, id, testValOrig, testVal, val, ov, fmt, scale, dec, sign, time, ci);
 							} else if ( DustUtils.isEmpty(testVal) ) {
-								Dust.dump("\t", true, id, "<null>", val, ov, fmt, scale, dec, sign, time, ci);
+								Dust.dump("\t", true, id, testValOrig, "<null>", val, ov, fmt, scale, dec, sign, time, ci);
 							} else {
-								Dust.dump("\t", true, id, testVal, "<null>", ov, fmt, scale, dec, sign, time, ci);
+								Dust.dump("\t", true, id, testValOrig, testVal, "<null>", ov, fmt, scale, dec, sign, time, ci);
 							}
 						}
 					}
@@ -276,6 +309,7 @@ public class XbrlDevFunctions implements XbrlConsts {
 							Dust.dumpObs("  NO match found for", ci, "local", DustUtils.sbAppend(null, ", ", true, (Object[]) rf));
 						}
 						dc.add("Error CONTEXT " + id);
+						dc.add("Error CONTEXT <ALL>");
 					} else if ( 1 < ctxMatch.size() && (null != val) && !val.startsWith("Txt len") ) {
 						// multiple appearance of the same fact, quite usual in xhtml - but MUST be the
 						// same value!
@@ -300,9 +334,39 @@ public class XbrlDevFunctions implements XbrlConsts {
 			}
 		}
 
-		System.out.println("Json count " + jsonCount);
+		System.out.println("COUNTS - all reports: " + count + ", parsed CSV: " + valCount + ", Json available: " + jsonCount);
 
 		dc.dump("Summary");
+
+		System.out.println("Selected for update [");
+		for (Map toUpdate : repToUpdate) {
+			System.out.println("  " + toUpdate.get("fxo_id"));
+
+			if ( doDelete ) {
+				File csv = filings.getReport(toUpdate, XbrlReportType.ContentVal, false);
+				if ( null != csv ) {
+					csv.delete();
+					System.out.println("   deleted " + csv.getCanonicalPath());
+				}
+			}
+		}
+		System.out.println("] " + repToUpdate.size() + " reports.");
+	}
+
+	public static String pruneNum(String val) {
+		if ( null == val ) {
+			val = "";
+		} else if ( "-0".equals(val) ) {
+			val = "0";
+		} else {
+			if ( val.endsWith("0") && val.contains(".") ) {
+				val = val.replaceAll("(0+)$", "");
+			}
+			if ( val.endsWith(".") ) {
+				val = val.substring(0, val.length() - 1);
+			}
+		}
+		return val;
 	}
 
 	static DustUtilsFactory<String, String> nextDay = new DustUtilsFactory<String, String>(true) {

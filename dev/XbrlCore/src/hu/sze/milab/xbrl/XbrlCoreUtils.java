@@ -202,12 +202,12 @@ public class XbrlCoreUtils implements XbrlConsts {
 					dVal = dVal.movePointRight(Integer.valueOf(scale));
 				}
 
-				if ( !DustUtils.isEmpty(decimals) && !"0".equals(decimals) && !"INF".equals(decimals) ) {
-					dVal = dVal.setScale(Integer.valueOf(decimals), RoundingMode.FLOOR);
-				}
-
 				if ( "-".equals(sign) ) {
 					dVal = dVal.negate();
+				}
+				
+				if ( !DustUtils.isEmpty(decimals) && !"0".equals(decimals) && !"INF".equals(decimals) ) {
+					dVal = dVal.setScale(Integer.valueOf(decimals), RoundingMode.FLOOR);
 				}
 			}
 		}
