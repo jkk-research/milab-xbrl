@@ -7,7 +7,6 @@ import java.io.FileReader;
 import java.io.FileWriter;
 import java.io.FilenameFilter;
 import java.io.IOException;
-import java.nio.file.Files;
 import java.text.MessageFormat;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
@@ -32,8 +31,6 @@ import hu.sze.milab.dust.Dust;
 import hu.sze.milab.dust.DustException;
 import hu.sze.milab.dust.utils.DustUtils;
 import hu.sze.milab.dust.utils.DustUtilsConsts;
-import hu.sze.milab.dust.utils.DustUtilsFile;
-import hu.sze.uni.xbrl.XbrlConsts.AccessCmd;
 import hu.sze.uni.xbrl.portal.XbrlTestPortalUtils;
 
 @SuppressWarnings({ "rawtypes", "unchecked" })
