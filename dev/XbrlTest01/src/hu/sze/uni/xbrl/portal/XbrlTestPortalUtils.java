@@ -17,7 +17,9 @@ import org.apache.commons.compress.archivers.zip.ZipArchiveInputStream;
 import org.apache.commons.compress.archivers.zip.ZipFile;
 import org.apache.commons.compress.utils.IOUtils;
 
-public class XbrlTestPortalUtils implements XbrlTestPortalConsts {
+import hu.sze.milab.dust.utils.DustUtilsFile;
+
+public class XbrlTestPortalUtils extends DustUtilsFile implements XbrlTestPortalConsts {
 
 //	private static final ArchiveStreamFactory af = new ArchiveStreamFactory();
 
@@ -66,12 +68,6 @@ public class XbrlTestPortalUtils implements XbrlTestPortalConsts {
 		ensureDir(toFile.getParentFile());
 		try (OutputStream o = Files.newOutputStream(toFile.toPath())) {
 			IOUtils.copy(zipFile.getInputStream(zipEntry), o);
-		}
-	}
-
-	public static void ensureDir(File f) throws IOException {
-		if ( !f.isDirectory() && !f.mkdirs() ) {
-			throw new IOException("failed to create directory " + f);
 		}
 	}
 
