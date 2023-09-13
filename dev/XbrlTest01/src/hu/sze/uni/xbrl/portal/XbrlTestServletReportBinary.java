@@ -68,7 +68,7 @@ class XbrlTestServletReportBinary extends DustHttpServlet {
 		if ( null != repType ) {
 			resp.setContentType(cType);
 
-			File f = filings.getReport(data, repType, true);
+			File f = filings.getReport(rep, repType, true);
 			OutputStream out = getOutStream(data);
 			Files.copy(f.toPath(), out);
 			out.flush();

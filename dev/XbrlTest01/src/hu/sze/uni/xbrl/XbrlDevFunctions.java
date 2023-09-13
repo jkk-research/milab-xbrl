@@ -80,6 +80,8 @@ public class XbrlDevFunctions implements XbrlConsts {
 		int count = 0;
 		int valCount = 0;
 		int jsonCount = 0;
+		
+		int missCount = 0;
 
 		boolean verbose = true;
 		boolean doDelete = false;
@@ -156,10 +158,7 @@ public class XbrlDevFunctions implements XbrlConsts {
 
 			++jsonCount;
 
-			Collection<Map> jsonFacts = (Collection<Map>) valFacts.values();
-			int toMatch = jsonFacts.size();
-
-			for (Object f : jsonFacts) {
+			for (Object f : valFacts.values()) {
 				Map dim = XbrlUtils.access(f, AccessCmd.Peek, null, "dimensions");
 
 				Set ks = new HashSet<>(dim.keySet());
@@ -167,13 +166,16 @@ public class XbrlDevFunctions implements XbrlConsts {
 
 				((Map) f).put("__ds", ks.size());
 			}
+			
+			ArrayList<Map> jsonFacts = new ArrayList<>((Collection<Map>) valFacts.values());
+			int fcJson = jsonFacts.size();
+			int fcCsv = 0;
 
 			ArrayList<Map> ctxMatch = new ArrayList<>();
-			ArrayList<Map> valMatch = new ArrayList<>();
+			ArrayList<Integer> valMatch = new ArrayList<>();
 			
-			int missCount = 0;
-
 			for (String[] rf : filings.getFacts(id)) {
+				++fcCsv;
 				String ci = tr.get(rf, "Taxonomy") + ":" + tr.get(rf, "Concept");
 
 				String tt = tr.get(rf, "Type");
@@ -212,7 +214,8 @@ public class XbrlDevFunctions implements XbrlConsts {
 				ctxMatch.clear();
 				valMatch.clear();
 
-				for (Map tf : jsonFacts) {
+				for (int jsonIdx = jsonFacts.size(); jsonIdx-->0; ) {
+					Map tf = jsonFacts.get(jsonIdx);
 					Map dim = (Map) tf.get("dimensions");
 
 					String concept = (String) dim.get("concept");
@@ -265,20 +268,20 @@ public class XbrlDevFunctions implements XbrlConsts {
 							objValJson = null;
 
 							if ( VAL_NOCHECK == objVal) {
-								valMatch.add(tf);
+								valMatch.add(jsonIdx);
 							} else if (VAL_EMPTY == objVal) {
 								if ( DustUtils.isEmpty(valJson)) {
-									valMatch.add(tf);
+									valMatch.add(jsonIdx);
 								}
 							} else if (DustUtils.isEmpty(valJson)) {
 								if ( VAL_EMPTY == objVal) {
-									valMatch.add(tf);
+									valMatch.add(jsonIdx);
 								}
 							} else {
 								objValJson = strToObj(factType, valJson, decInt, dfmtIso);
 
 								if ( 0 == ((Comparable)objVal).compareTo(objValJson) ) {
-									valMatch.add(tf);
+									valMatch.add(jsonIdx);
 								}
 							}
 						} catch (Throwable eee) {
@@ -294,7 +297,11 @@ public class XbrlDevFunctions implements XbrlConsts {
 
 						int valMatchCount = valMatch.size();
 						if ( 0 < valMatchCount ) {
-							--toMatch;
+							jsonFacts.remove((int) valMatch.get(0));
+//							if ( !jsonFacts.remove(valMatch.get(0))) {
+//								System.out.println("hopp");
+//							}
+//							--toMatch;
 							dc.add("Success " + fmt);
 							dc.add("Success <ALL>");
 						} else {
@@ -328,29 +335,33 @@ public class XbrlDevFunctions implements XbrlConsts {
 						if ( verbose ) {
 //							Dust.dumpObs("  NO match found for", ci, "local", DustUtils.sbAppend(null, ", ", true, (Object[]) rf));
 						}
-						dc.add("Error CONTEXT " + id);
+//						dc.add("Error CONTEXT " + id);
 						dc.add("Error CONTEXT <ALL>");
-						++missCount;
 					}
 				} else {
-					++missCount;
-
 					dc.add("Error CONCEPT <ALL>");
-					dc.add("Error CONCEPT " + repSrc.get("country"));
+//					dc.add("Error CONCEPT " + repSrc.get("country"));
 					if ( verbose ) {
 //			System.out.println(id + " CSV fact not found in json " + ci);
 					}
 				}
 			}
 			
-			if (0 < toMatch) {
+			if ( fcJson != fcCsv ) {
+				dc.add("Error JSON/CSV COUNT <ALL>");
+			}
+			
+//			if (0 < toMatch) {
+			if ( !jsonFacts.isEmpty() ) {
+				missCount += jsonFacts.size();
 				dc.add("Error JSON MISSED <ALL>");
 			}
 		}
 
-		System.out.println("COUNTS - all reports: " + count + ", parsed CSV: " + valCount + ", Json available: " + jsonCount);
-
 		dc.dump("Summary");
+
+		System.out.println("FILE COUNTS - all reports: " + count + ", parsed CSV: " + valCount + ", Json available: " + jsonCount);
+		System.out.println("FACT COUNTS - missed in CSV: " + missCount);
 
 		System.out.println("Selected for update [");
 		for (

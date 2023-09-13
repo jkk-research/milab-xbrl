@@ -294,7 +294,7 @@ public abstract class XbrlReportLoaderDomBase implements XbrlConsts {
 				}
 
 				String valStr = (String) data.get(XbrlFactDataInfo.OrigValue);
-				String escapedLine = csvEscape(valStr, false);
+				String escapedLine = DustUtils.csvEscape(valStr, false);
 				ps.print(escapedLine);
 				
 				int el = valStr.length();
@@ -318,7 +318,7 @@ public abstract class XbrlReportLoaderDomBase implements XbrlConsts {
 
 					if (txtLen < textCut) {
 						data.put(XbrlFactDataInfo.Type, XbrlFactDataType.string);
-						data.put(XbrlFactDataInfo.Value, csvEscape(txt, true));		
+						data.put(XbrlFactDataInfo.Value, DustUtils.csvEscape(txt, true));		
 					} else {
 						data.put(XbrlFactDataInfo.Type, XbrlFactDataType.text);
 						data.put(XbrlFactDataInfo.Value, "Txt len: " + txtLen);			
@@ -326,16 +326,6 @@ public abstract class XbrlReportLoaderDomBase implements XbrlConsts {
 					
 					storeValue(xbrlElements, e, data);
 				}
-			}
-
-			public String csvEscape(String valStr, boolean addQuotes) {
-				String ret = valStr.replace("\"", "\"\"").replaceAll("\\s+", " ");
-				
-				if ( addQuotes ) {
-					ret = "\"" + ret + "\"";
-				}
-				
-				return ret;
 			}
 
 			@Override
@@ -385,7 +375,7 @@ public abstract class XbrlReportLoaderDomBase implements XbrlConsts {
 					}
 				}
 				
-				StringBuilder sbData = DustUtils.sbAppend(null, "\t", true, csvEscape(valOrig, true), unit, fmt, sign, dec, scale, type, value, err);
+				StringBuilder sbData = DustUtils.sbAppend(null, "\t", true, DustUtils.csvEscape(valOrig, true), unit, fmt, sign, dec, scale, type, value, err);
 				ps.println("\t" + sbData);
 			}
 

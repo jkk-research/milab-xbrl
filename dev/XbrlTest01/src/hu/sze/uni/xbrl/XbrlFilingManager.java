@@ -31,6 +31,7 @@ import hu.sze.milab.dust.Dust;
 import hu.sze.milab.dust.DustException;
 import hu.sze.milab.dust.utils.DustUtils;
 import hu.sze.milab.dust.utils.DustUtilsConsts;
+import hu.sze.uni.xbrl.XbrlConsts.XbrlReportType;
 import hu.sze.uni.xbrl.portal.XbrlTestPortalUtils;
 
 @SuppressWarnings({ "rawtypes", "unchecked" })
@@ -440,38 +441,6 @@ public class XbrlFilingManager implements XbrlConsts, DustUtilsConsts {
 	long sizeAll = 0;
 	long sizeSeg = 0;
 
-//	public File findReportToLoad(File ff) {
-//		File repDir = XbrlUtils.searchByName(ff, "reports");
-//
-//		if ( null == repDir ) {
-//			// old reports had no "reports" subfolder
-//			repDir = ff;
-//		}
-//
-//		if ( repDir.isDirectory() ) {
-//			DustFileFilter dff = new DustFileFilter(true, StringMatch.EndsWith, "xhtml", "html");
-//			return DustUtilsFile.searchRecursive(repDir, dff);
-//		}
-//
-//		return null;
-//	}
-
-//	public File getReport(Map filing, XbrlReportType repType, boolean downloadMissing) throws Exception {
-//		String repUrl = XbrlUtils.access(filing, AccessCmd.Peek, null, (repType == XbrlReportType.Json) ? "json_url" : "package_url");
-//
-//		return (null == repUrl) ? null : getReport(repUrl, XbrlUtils.access(filing, AccessCmd.Peek, null, LOCAL_DIR), repType, downloadMissing);
-//	}
-//
-//	public File getReport(String repUrl, String repDir, XbrlReportType repType) throws Exception {
-//		return getReport(repUrl, repDir, repType, true);
-//	}
-//
-//	public File getReport(String repUrl, String repDir, XbrlReportType repType, boolean downloadMissing) throws Exception {
-//		File ret = null;
-//
-//		return ret;
-//	}
-
 	public File getReport(Map filing, XbrlReportType repType, boolean downloadMissing) throws Exception {
 		File ret = null;
 
@@ -646,4 +615,55 @@ public class XbrlFilingManager implements XbrlConsts, DustUtilsConsts {
 	public File getRepoRoot() {
 		return repoRoot;
 	}
+
+	public void loadAllData() throws Exception {
+		System.out.println("Filing manager loadAllData...");
+
+		String cg = System.getProperty("ClearGen", "false");
+		boolean clearGen = "true".equals(cg);
+
+		if ( clearGen ) {
+			System.out.println("  + cleaning old generated files");
+		}
+
+		XbrlUtilsCounter dc = clearGen ? new XbrlUtilsCounter(true) : null;
+
+		String[] genFiles = { "extractedJson.json", "Report_Val.csv", "Report_Txt.csv" };
+
+		int count = 0;
+		
+		for (Map.Entry<String, Map> e : reportData.entrySet()) {
+			if ( 0 == (++count % 100) ) {
+				System.out.println("Count " + count);
+			}
+
+			Map repSrc = e.getValue();
+
+			if ( clearGen ) {
+				String repDirName = XbrlUtils.access(repSrc, AccessCmd.Peek, null, LOCAL_DIR);
+				File repDir = new File(getRepoRoot(), repDirName);
+
+				for (String gf : genFiles) {
+					File f = new File(repDir, gf);
+					if ( f.isFile() ) {
+						f.delete();
+						dc.add("Deleted old gen file " + gf);
+					}
+				}
+			}
+
+			dc.add("Report seen");
+			try {
+				File f = getReport(repSrc, XbrlReportType.ContentVal, true);
+				if ( (null != f) && f.isFile() ) {
+					dc.add("Report loaded");
+				}
+			} catch (Throwable err) {
+				DustException.swallow(err);
+			}
+		}
+
+		dc.dump("ESEF init summary");
+	}
+
 }
