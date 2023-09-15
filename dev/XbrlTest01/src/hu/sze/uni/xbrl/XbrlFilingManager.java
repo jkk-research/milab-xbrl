@@ -592,7 +592,7 @@ public class XbrlFilingManager implements XbrlConsts, DustUtilsConsts {
 							XbrlTestPortalUtils.extractWithApacheZipFile(fSrc, fRep, repName);
 						}
 					}
-					if ( null != fRep ) {
+					if ( (null != fRep ) && fRep.isFile()) {
 						try {
 							XbrlReportLoaderDomBase.createSplitCsv(fRep, dir, genFilePrefix, TEXT_CUT_AT);
 							fRep.delete();

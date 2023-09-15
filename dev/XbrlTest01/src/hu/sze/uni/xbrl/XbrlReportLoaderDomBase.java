@@ -20,6 +20,7 @@ import org.w3c.dom.NodeList;
 
 import hu.sze.milab.dust.Dust;
 import hu.sze.milab.dust.utils.DustUtils;
+import hu.sze.milab.dust.utils.DustUtilsFile;
 import hu.sze.milab.xbrl.XbrlCoreUtils;
 import hu.sze.milab.xbrl.XbrlConsts.XbrlFactDataInfo;
 import hu.sze.milab.xbrl.XbrlConsts.XbrlFactDataType;
@@ -185,6 +186,9 @@ public abstract class XbrlReportLoaderDomBase implements XbrlConsts {
 				}
 			}
 		} catch (Throwable tl) {
+			File repDir = f.getParentFile();
+			System.out.println("Deleting problematic report dir " + repDir.getCanonicalPath());
+			DustUtilsFile.deleteRec(repDir);
 			loadErr = tl;
 		} finally {
 			loadComplete(xbrlElements, loadErr);
@@ -375,7 +379,9 @@ public abstract class XbrlReportLoaderDomBase implements XbrlConsts {
 					}
 				}
 				
-				StringBuilder sbData = DustUtils.sbAppend(null, "\t", true, DustUtils.csvEscape(valOrig, true), unit, fmt, sign, dec, scale, type, value, err);
+				String safeErr = (null == err) ? "" : DustUtils.csvEscape(err.toString(), true);
+				
+				StringBuilder sbData = DustUtils.sbAppend(null, "\t", true, DustUtils.csvEscape(valOrig, true), unit, fmt, sign, dec, scale, type, value, safeErr);
 				ps.println("\t" + sbData);
 			}
 

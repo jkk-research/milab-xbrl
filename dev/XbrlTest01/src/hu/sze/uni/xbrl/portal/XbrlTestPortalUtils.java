@@ -17,6 +17,7 @@ import org.apache.commons.compress.archivers.zip.ZipArchiveInputStream;
 import org.apache.commons.compress.archivers.zip.ZipFile;
 import org.apache.commons.compress.utils.IOUtils;
 
+import hu.sze.milab.dust.Dust;
 import hu.sze.milab.dust.utils.DustUtilsFile;
 
 public class XbrlTestPortalUtils extends DustUtilsFile implements XbrlTestPortalConsts {
@@ -48,7 +49,11 @@ public class XbrlTestPortalUtils extends DustUtilsFile implements XbrlTestPortal
 	public static void extractWithApacheZipFile(File zipFile, File destFile, String name) throws Exception {
 		try (ZipFile zf = new ZipFile(zipFile)) {
 			ZipArchiveEntry ze = zf.getEntry(name);
-			unzipEntry(zf, ze, destFile);
+			if ( null == ze ) {
+				Dust.log(null, "Unzipping report error, entry: " + name + " not found in file " + zipFile.getCanonicalPath());
+			} else {
+				unzipEntry(zf, ze, destFile);
+			}
 		}
 	}
 
@@ -56,7 +61,7 @@ public class XbrlTestPortalUtils extends DustUtilsFile implements XbrlTestPortal
 		try (ZipFile zf = new ZipFile(zipFile)) {
 			for (Enumeration<ZipArchiveEntry> ee = zf.getEntries(); ee.hasMoreElements();) {
 				ZipArchiveEntry ze = ee.nextElement();
-				if ( fnf.accept(null, ze.getName())) {
+				if ( fnf.accept(null, ze.getName()) ) {
 					unzipEntry(zf, ze, destFile);
 					return;
 				}

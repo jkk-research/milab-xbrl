@@ -192,10 +192,13 @@ class XbrlTestServletReportList extends DustHttpServlet {
 
 			for (Map repSrc : filings.getReportData().values()) {
 				rep = ListColumns.load(repSrc, rep);
-
 				String id = (String) rep.get("Report");
-
 				tr = filings.getTableReader(id);
+				
+				if (null == tr ) {
+					loadErr.add(rep);
+					continue;
+				}
 
 				if ( loadFacts ) {
 					repFacts = filings.getFacts(id);
@@ -204,9 +207,7 @@ class XbrlTestServletReportList extends DustHttpServlet {
 				if ( exprSvc.test(repSrc, rep, tr, repFacts) ) {
 					res.add(rep);
 
-					if ( null == tr ) {
-						loadErr.add(rep);
-					} else if ( csvOut ) {
+					if ( csvOut ) {
 						if ( (null == trMax) || (trMax.getSize() < tr.getSize()) ) {
 							trMax = tr;
 						}
