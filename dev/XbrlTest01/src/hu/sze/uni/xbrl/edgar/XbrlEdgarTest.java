@@ -1,6 +1,7 @@
 package hu.sze.uni.xbrl.edgar;
 
 import java.io.File;
+import java.io.FileFilter;
 import java.io.FileReader;
 import java.io.FileWriter;
 import java.io.PrintWriter;
@@ -36,7 +37,11 @@ public class XbrlEdgarTest implements XbrlConsts {
 
 	private static int count = 0;
 
-	static void unzip(String kind, boolean unzip) throws Exception {
+	static Pattern PT_FID = Pattern.compile("CIK(\\w+).*");
+
+	static Set<String> ids = new TreeSet<>();
+
+	static void unzip(String kind, int unzipCount, String subdir) throws Exception {
 
 		File zipFile = new File(EDGAR_ROOT, kind + ".zip");
 		File dir = new File(EDGAR_ROOT, kind);
@@ -45,29 +50,50 @@ public class XbrlEdgarTest implements XbrlConsts {
 
 		long compSize = 0;
 		long totSize = 0;
+		int count = 0;
 
 		try (ZipFile zf = new ZipFile(zipFile)) {
 
 			for (Enumeration<ZipArchiveEntry> ee = zf.getEntries(); ee.hasMoreElements();) {
 				ZipArchiveEntry ze = ee.nextElement();
 
+				boolean unzip = ++count < unzipCount;
+				String fName = ze.getName();
+				long realSize = ze.getSize();
+
 				if ( unzip && !ze.isDirectory() ) {
-					String fName = ze.getName();
 					String id = DustUtils.cutPostfix(fName, ".");
-					File d = new File(dir, DustUtilsFile.getHashForID(id));
+					File d = new File(dir, (null == subdir) ? DustUtilsFile.getHashForID(id) : subdir);
 					File f = new File(d, fName);
 
 					if ( !f.exists() ) {
 						XbrlTestPortalUtils.unzipEntry(zf, ze, f);
+					} else {
+						if ( realSize != f.length() ) {
+							System.out.println("hmm");
+						}
 					}
 				}
 
 				dc.add(ze.isDirectory() ? "Dir" : "File");
 
+//				if ( fName.contains("1318605")) {
+//					dc.add(fName);
+//				}
+
+				Matcher m = PT_FID.matcher(fName);
+				if ( m.matches() ) {
+					ids.add(m.group(1));
+//				} else {
+//					dc.add("CIK NO " + fName);
+				}
+
+//				dc.add("CIK " + fName.startsWith("CIK") );
+
 				logCount();
 
 				compSize += ze.getCompressedSize();
-				totSize += ze.getSize();
+				totSize += realSize;
 //				zf.getInputStream(ze);
 
 //			if ( (857400 < count) && (count < 857500) ){
@@ -79,6 +105,38 @@ public class XbrlEdgarTest implements XbrlConsts {
 
 		System.out.println("Com size: " + compSize + ", totSize:" + totSize);
 
+//		dc.dump("Zip summary");
+
+	}
+
+	public static void checkSubmissions() throws Exception {
+		File dir = new File(EDGAR_ROOT, "submissions");
+
+		FileFilter ff = new FileFilter() {
+			@Override
+			public boolean accept(File f) {
+				if ( f.isFile() ) {
+					logCount();
+					
+					String fn = f.getName();
+					String pf = DustUtils.getPostfix(fn, ".");
+					
+					dc.add(pf);
+//					if ( fn.endsWith("json") ) {
+//						logCount();
+//
+//						if ( !ids.add(fn) ) {
+//							System.out.println("hmm");
+//						}
+//					}
+				}
+				
+				return false;
+			}
+		};
+
+		System.out.println("file count " + ids.size());
+		DustUtilsFile.searchRecursive(dir, ff);
 	}
 
 	public static void logCount() {
@@ -281,7 +339,9 @@ public class XbrlEdgarTest implements XbrlConsts {
 
 		long t = System.currentTimeMillis();
 
-		unzip("submissions", false);
+		checkSubmissions();
+//		unzip("submissions", Integer.MAX_VALUE, null);
+//		unzip("submissions", 0, "test");
 //		unzip("companyfacts", false);
 //		process("companyfacts");
 
@@ -289,6 +349,8 @@ public class XbrlEdgarTest implements XbrlConsts {
 //		load(f, "us-gaap:AccountsPayableOther", "ifrs-full:AccountingProfit");
 
 //		sum.close();
+		
+		dc.dump("Summary");
 
 		System.out.println("Count: " + count + ", Time " + (System.currentTimeMillis() - t) + " msec.");
 

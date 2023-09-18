@@ -31,7 +31,6 @@ import hu.sze.milab.dust.Dust;
 import hu.sze.milab.dust.DustException;
 import hu.sze.milab.dust.utils.DustUtils;
 import hu.sze.milab.dust.utils.DustUtilsConsts;
-import hu.sze.uni.xbrl.XbrlConsts.XbrlReportType;
 import hu.sze.uni.xbrl.portal.XbrlTestPortalUtils;
 
 @SuppressWarnings({ "rawtypes", "unchecked" })
@@ -581,15 +580,18 @@ public class XbrlFilingManager implements XbrlConsts, DustUtilsConsts {
 					if ( !fRep.exists() ) {
 						repUrl = XbrlUtils.access(filing, AccessCmd.Peek, null, "report_url");
 
-						if ( DustUtils.isEmpty(repUrl) ) {
-							XbrlTestPortalUtils.extractWithApacheZipFile(fSrc, fRep, reportFilter);
-						} else {
+						if ( !DustUtils.isEmpty(repUrl) ) {
 							String pkgUrl = XbrlUtils.access(filing, AccessCmd.Peek, null, "package_url");
 
 							sep = pkgUrl.lastIndexOf("/");
 							String repName = repUrl.substring(sep + 1);
 
 							XbrlTestPortalUtils.extractWithApacheZipFile(fSrc, fRep, repName);
+						}
+						
+						// repUrl extraction fails in some old cases, safety fallback
+						if ( !fRep.isFile() ) {
+							XbrlTestPortalUtils.extractWithApacheZipFile(fSrc, fRep, reportFilter);
 						}
 					}
 					if ( (null != fRep ) && fRep.isFile()) {
@@ -626,7 +628,7 @@ public class XbrlFilingManager implements XbrlConsts, DustUtilsConsts {
 			System.out.println("  + cleaning old generated files");
 		}
 
-		XbrlUtilsCounter dc = clearGen ? new XbrlUtilsCounter(true) : null;
+		XbrlUtilsCounter dc = new XbrlUtilsCounter(true);
 
 		String[] genFiles = { "extractedJson.json", "Report_Val.csv", "Report_Txt.csv" };
 

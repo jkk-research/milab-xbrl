@@ -21,6 +21,7 @@ import hu.sze.milab.dust.Dust;
 import hu.sze.milab.dust.DustConsts;
 import hu.sze.milab.dust.DustConsts.MindAccess;
 import hu.sze.milab.dust.utils.DustUtils;
+import hu.sze.milab.xbrl.tools.XbrlToolsCurrencyConverter;
 import hu.sze.uni.http.DustHttpServlet;
 import hu.sze.uni.xbrl.XbrlConsts.XbrlReportType;
 import hu.sze.uni.xbrl.XbrlFilingManager;
@@ -173,6 +174,8 @@ class XbrlTestServletReportList extends DustHttpServlet {
 		String pageSize = Dust.access(data, MindAccess.Peek, "500", ServletData.Parameter, "page[size]");
 		String pageNum = Dust.access(data, MindAccess.Peek, "1", ServletData.Parameter, "page[number]");
 
+		boolean inEUR = "on".equals(Dust.access(data, MindAccess.Peek, "off", ServletData.Parameter, "inEUR"));
+
 		boolean loadFacts = !DustUtils.isEmpty(exprFact);
 
 		Map rep = new HashMap();
@@ -194,8 +197,8 @@ class XbrlTestServletReportList extends DustHttpServlet {
 				rep = ListColumns.load(repSrc, rep);
 				String id = (String) rep.get("Report");
 				tr = filings.getTableReader(id);
-				
-				if (null == tr ) {
+
+				if ( null == tr ) {
 					loadErr.add(rep);
 					continue;
 				}
@@ -251,6 +254,9 @@ class XbrlTestServletReportList extends DustHttpServlet {
 			resp.setContentType(CONTENT_CSV + "; filename=" + fn);
 			Map currFact = new HashMap<>();
 
+			XbrlToolsCurrencyConverter cCvt = inEUR ? new XbrlToolsCurrencyConverter("EUR", "params/excRate_5yr_v2.csv", ";") : null;
+			Map<String, Object> mapFacts = new HashMap<>();
+
 			PrintWriter out = getWriter(data);
 
 			String[] repCols = {};
@@ -265,12 +271,17 @@ class XbrlTestServletReportList extends DustHttpServlet {
 					out.print("\t");
 				}
 			}
-			
+
 			if ( "Text".equals(mode) ) {
 				trMax.writeHeadPart(out, "\t", trMax.getColIdx("OrigValue"));
 				out.println("\tLanguage\tValue");
 			} else {
-				trMax.writeHead(out, "\t");				
+				if ( inEUR ) {
+					trMax.writeHeadPart(out, "\t", Integer.MAX_VALUE);
+					out.println("\tcvtEurValue\tcvtEurStatus\tcvtEurCount");
+				} else {
+					trMax.writeHead(out, "\t");
+				}
 			}
 
 			for (Map r : res) {
@@ -289,7 +300,7 @@ class XbrlTestServletReportList extends DustHttpServlet {
 					}
 					ovi = tr.getColIdx("OrigValue");
 				}
-				
+
 				StringBuilder sbRepHead = null;
 				for (int i = 0; i < repColCount; ++i) {
 					sbRepHead = DustUtils.sbAppend(sbRepHead, "\t", true, r.get(repCols[i]));
@@ -307,7 +318,7 @@ class XbrlTestServletReportList extends DustHttpServlet {
 								if ( firstLine ) {
 									firstLine = false;
 									continue;
-								} 
+								}
 
 								if ( 0 < diff ) {
 									int insertIdx = 0;
@@ -358,6 +369,17 @@ class XbrlTestServletReportList extends DustHttpServlet {
 								out.print(rf[i]);
 							}
 
+							for (int i = rf.length; i < tr.getSize(); ++i) {
+								out.print("\t");
+							}
+
+							if ( inEUR ) {
+								mapFacts.clear();
+								tr.get(rf, mapFacts);
+								cCvt.optConvert(mapFacts);
+								out.print("\t" + mapFacts.get("cvtValue") + "\t" + mapFacts.get("cvtStatus") + "\t" + mapFacts.get("cvtCount"));
+							}
+
 							out.println();
 						}
 					}
@@ -392,6 +414,10 @@ class XbrlTestServletReportList extends DustHttpServlet {
 						str = "value=\"" + pageSize + "\" ";
 					} else if ( -1 != (idx = optGetIdxAfter(line, "name=\"page[number]\" ", pageNum)) ) {
 						str = "value=\"" + pageNum + "\" ";
+					} else if ( -1 != (idx = optGetIdxAfter(line, "name=\"inEUR\" ", pageNum)) ) {
+						if ( inEUR ) {
+							str = "checked ";
+						}
 					} else if ( -1 != (idx = optGetIdxAfter(line, "Row count: ", " ")) ) {
 						str = " " + res.size();
 					}
