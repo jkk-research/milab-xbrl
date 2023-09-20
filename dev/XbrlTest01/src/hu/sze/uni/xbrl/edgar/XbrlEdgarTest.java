@@ -6,6 +6,7 @@ import java.io.FileReader;
 import java.io.FileWriter;
 import java.io.PrintWriter;
 import java.util.Collection;
+import java.util.Collections;
 import java.util.Enumeration;
 import java.util.HashMap;
 import java.util.Map;
@@ -35,11 +36,204 @@ public class XbrlEdgarTest implements XbrlConsts {
 
 	private static XbrlUtilsCounter dc = new XbrlUtilsCounter(true);
 
+	static Map index;
+
 	private static int count = 0;
 
 	static Pattern PT_FID = Pattern.compile("CIK(\\w+).*");
 
 	static Set<String> ids = new TreeSet<>();
+
+	public static void main(String[] args) throws Exception {
+		Dust.main(args);
+
+		long t = System.currentTimeMillis();
+
+		checkSubmissions();
+//		fixFileLocation();
+//		unzip("submissions", Integer.MAX_VALUE, null);
+//		unzip("submissions", 0, "test");
+//		unzip("companyfacts", false);
+//		process("companyfacts");
+
+//		File f = new File("work/EdgarTestExport.csv");
+//		load(f, "us-gaap:AccountsPayableOther", "ifrs-full:AccountingProfit");
+
+//		sum.close();
+
+		dc.dump("Summary");
+
+		System.out.println("Count: " + count + ", Time " + (System.currentTimeMillis() - t) + " msec.");
+
+	}
+
+	public static void checkSubmissions() throws Exception {
+		File dir = new File(EDGAR_ROOT, "submissions");
+//		File dir = new File(EDGAR_ROOT, "submissions/00");
+		int cut = dir.getCanonicalPath().length();
+
+		FileFilter ff = new FileFilter() {
+			long fCount;
+			long subCount;
+			long fSize;
+
+			@Override
+			public String toString() {
+				return "Total JSON count " + fCount + ", sub count: " + subCount + ", total size: " + fSize;
+			}
+
+			@Override
+			public boolean accept(File f) {
+				if ( f.isFile() ) {
+					logCount();
+
+					try {
+						String shortName = f.getCanonicalPath().substring(cut + 1);
+//						String[] path = shortName.split("/");
+
+						if ( shortName.endsWith("json") ) {
+//							if ( path[0].startsWith("0") && path[1].endsWith("json") ) {
+//						if ( "00".equals(path[0]) && path[1].startsWith("0") && path[2].endsWith("json") ) {
+							++fCount;
+							fSize += f.length();
+
+							Map subInfo = (Map) parser.parse(new FileReader(f));
+
+							boolean subFile = shortName.contains("submissions");
+							if ( subFile ) {
+								++subCount;
+								String[] sp = f.getName().split("-");
+								File fp = new File(f.getParentFile(), sp[0] + ".json");
+								if ( !fp.isFile() ) {
+									dc.add("Validation - Misplaced child file\t" + shortName + "\t");
+								}
+							} else {
+
+								for (Object he : subInfo.entrySet()) {
+									String k = (String) ((Map.Entry) he).getKey();
+									Object v = ((Map.Entry) he).getValue();
+
+									if ( null != v ) {
+										dc.add("Key Head\t" + k + "\t" + v.getClass().getSimpleName());
+
+										switch ( k ) {
+										case "filings":
+											for (Object fk : ((Map) v).keySet()) {
+												dc.add("Key Filings\t" + fk + "\t");
+											}
+
+											break;
+										case "exchanges":
+											for (Object fk : (Collection) v ) {
+												dc.add("Exchange\t" + fk + "\t");
+											}
+											break;
+										}
+									}
+								}
+
+								Collection ff = Dust.access(subInfo, MindAccess.Peek, Collections.EMPTY_LIST, "filings", "files");
+								for (Object fe : ff) {
+									String subFileName = Dust.access(fe, MindAccess.Peek, null, "name");
+									File fp = new File(f.getParentFile(), subFileName);
+									if ( !fp.isFile() ) {
+										dc.add("Validation - Missing child file\t" + shortName + "\t" + subFileName);
+									}
+								}
+							}
+
+							Map fm = subFile ? subInfo : Dust.access(subInfo, MindAccess.Peek, Collections.EMPTY_MAP, "filings", "recent");
+							Integer fs = null;
+
+							for (Object fe : fm.entrySet()) {
+								Object fk = ((Map.Entry) fe).getKey();
+
+								dc.add("Key Submission\t" + fk + "\t");
+
+								Collection fv = (Collection) ((Map.Entry) fe).getValue();
+								int fc = fv.size();
+								if ( null == fs ) {
+									fs = fc;
+								} else if ( fs != fc ) {
+									dc.add("Validation - Submission arr length\t" + shortName + "\t" + fk);
+								}
+								
+								if ( "form".equals(fk)) {
+									for (Object ft : fv ) {
+										dc.add("Form type\t" + ft + "\t");
+									}
+								}
+							}
+						}
+					} catch (Exception e) {
+						DustException.swallow(e);
+					}
+				}
+
+				return false;
+			}
+		};
+
+		DustUtilsFile.searchRecursive(dir, ff);
+
+		System.out.println(ff);
+	}
+
+	public static void fixFileLocation() throws Exception {
+		File root = new File(EDGAR_ROOT, "submissions");
+		File dir = root;
+//		File dir = new File(root, "00");
+		int cut = dir.getCanonicalPath().length();
+
+		FileFilter ff = new FileFilter() {
+			@Override
+			public boolean accept(File f) {
+				if ( f.isFile() ) {
+					logCount();
+
+					try {
+						String shortName = f.getCanonicalPath().substring(cut + 1);
+
+						if ( shortName.endsWith("json") && shortName.contains("submissions") ) {
+							String[] path = f.getName().split("-");
+							String id = path[0];
+							String realHash = DustUtilsFile.getHashForID(id);
+							String actualHash = DustUtils.cutPostfix(shortName, "/");
+//							String actualHash = "00/" + DustUtils.cutPostfix(shortName, "/");
+
+							if ( !DustUtils.isEqual(realHash, actualHash) ) {
+								dc.add("Misplaced old file\t" + shortName + "\t" + realHash);
+
+//								File fd = new File(root, realHash);
+//								File fp = new File(fd, id + ".json");
+//								if ( fp.isFile() ) {
+//									dc.add("Planned move\t" + shortName + "\t" + realHash);
+//									File ft = new File(fd, f.getName());
+//									f.renameTo(ft);
+//								} else {
+//									System.out.println("hmm");
+//								}
+							}
+						}
+					} catch (Exception e) {
+						DustException.swallow(e);
+					}
+				}
+				return false;
+			}
+		};
+
+		DustUtilsFile.searchRecursive(dir, ff);
+
+		System.out.println(ff);
+
+	}
+
+	public static void logCount() {
+		if ( 0 == (++count % 100) ) {
+			System.out.println("Count " + count);
+		}
+	}
 
 	static void unzip(String kind, int unzipCount, String subdir) throws Exception {
 
@@ -109,44 +303,6 @@ public class XbrlEdgarTest implements XbrlConsts {
 
 	}
 
-	public static void checkSubmissions() throws Exception {
-		File dir = new File(EDGAR_ROOT, "submissions");
-
-		FileFilter ff = new FileFilter() {
-			@Override
-			public boolean accept(File f) {
-				if ( f.isFile() ) {
-					logCount();
-					
-					String fn = f.getName();
-					String pf = DustUtils.getPostfix(fn, ".");
-					
-					dc.add(pf);
-//					if ( fn.endsWith("json") ) {
-//						logCount();
-//
-//						if ( !ids.add(fn) ) {
-//							System.out.println("hmm");
-//						}
-//					}
-				}
-				
-				return false;
-			}
-		};
-
-		System.out.println("file count " + ids.size());
-		DustUtilsFile.searchRecursive(dir, ff);
-	}
-
-	public static void logCount() {
-		if ( 0 == (++count % 100) ) {
-			System.out.println("Count " + count);
-		}
-	}
-
-	static Map index;
-
 	public static void process(String kind) throws Exception {
 		File dir = new File(EDGAR_ROOT, kind);
 
@@ -174,7 +330,7 @@ public class XbrlEdgarTest implements XbrlConsts {
 			} else if ( f.getName().toLowerCase().endsWith(".json") ) {
 				logCount();
 				try {
-					String id = DustUtils.cutPostfix(f.getName(), ".");
+//					String id = DustUtils.cutPostfix(f.getName(), ".");
 
 					Map report = (Map) parser.parse(new FileReader(f));
 
@@ -332,28 +488,6 @@ public class XbrlEdgarTest implements XbrlConsts {
 				}
 			}
 		}
-	}
-
-	public static void main(String[] args) throws Exception {
-		Dust.main(args);
-
-		long t = System.currentTimeMillis();
-
-		checkSubmissions();
-//		unzip("submissions", Integer.MAX_VALUE, null);
-//		unzip("submissions", 0, "test");
-//		unzip("companyfacts", false);
-//		process("companyfacts");
-
-//		File f = new File("work/EdgarTestExport.csv");
-//		load(f, "us-gaap:AccountsPayableOther", "ifrs-full:AccountingProfit");
-
-//		sum.close();
-		
-		dc.dump("Summary");
-
-		System.out.println("Count: " + count + ", Time " + (System.currentTimeMillis() - t) + " msec.");
-
 	}
 
 //private static class EdgarInfoCollector implements ContentHandler {
