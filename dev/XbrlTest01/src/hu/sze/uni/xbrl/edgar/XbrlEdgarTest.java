@@ -67,6 +67,9 @@ public class XbrlEdgarTest implements XbrlConsts {
 
 	}
 
+	public static void addPath() throws Exception {
+	}
+
 	public static void checkSubmissions() throws Exception {
 		File dir = new File(EDGAR_ROOT, "submissions");
 //		File dir = new File(EDGAR_ROOT, "submissions/00");
@@ -490,75 +493,50 @@ public class XbrlEdgarTest implements XbrlConsts {
 		}
 	}
 
-//private static class EdgarInfoCollector implements ContentHandler {
-//	
-//	Collection<Map> target;
-//	
-//	public void setTarget(Collection<Map> target) {
-//		this.target = target;
-//	}
-//
-//	@Override
-//	public void startJSON() throws ParseException, IOException {
-//		// TODO Auto-generated method stub
-//
-//	}
-//
-//	@Override
-//	public void endJSON() throws ParseException, IOException {
-//		// TODO Auto-generated method stub
-//
-//	}
-//
-//	@Override
-//	public boolean startObject() throws ParseException, IOException {
-//		// TODO Auto-generated method stub
-//		return false;
-//	}
-//
-//	@Override
-//	public boolean endObject() throws ParseException, IOException {
-//		// TODO Auto-generated method stub
-//		return false;
-//	}
-//
-//	@Override
-//	public boolean startObjectEntry(String key) throws ParseException, IOException {
-//		// TODO Auto-generated method stub
-//		return false;
-//	}
-//
-//	@Override
-//	public boolean endObjectEntry() throws ParseException, IOException {
-//		// TODO Auto-generated method stub
-//		return false;
-//	}
-//
-//	@Override
-//	public boolean startArray() throws ParseException, IOException {
-//		// TODO Auto-generated method stub
-//		return false;
-//	}
-//
-//	@Override
-//	public boolean endArray() throws ParseException, IOException {
-//		// TODO Auto-generated method stub
-//		return false;
-//	}
-//
-//	@Override
-//	public boolean primitive(Object value) throws ParseException, IOException {
-//		// TODO Auto-generated method stub
-//		return false;
-//	}
-//
-//}
 
-//private static EdgarInfoCollector EC = new EdgarInfoCollector();
+//public void addPath() throws Exception {
+//	pm = new DustUtils.ProcessMonitor("Add path", 1000);
 //
-//public static void collectInfo(String cik, File fJson, Collection<Map> target) throws Exception {
-//	try (FileReader jr = new FileReader(fJson)) {
-//		parser.parse(jr, EC);
+//	DustUtils.TableReader tr = null;
+//
+//	File dir = new File(edgarRoot, "submissions");
+//	File f = new File(dir, "SubmissionIndex2.csv");
+//	PrintWriter pwHead = new PrintWriter(f);
+//	pwHead.println(EDGAR_HEAD_HEADER);
+////	pwHead.print(EDGAR_HEAD_HEADER);
+////	pwHead.println("\t__PathPrefix");
+//
+//	try (BufferedReader br = new BufferedReader(new FileReader(fSubmissionIndex))) {
+//		for (String line; (line = br.readLine()) != null;) {
+//
+//			if ( pm.step() ) {
+//				pwHead.flush();
+//			}
+//
+//			String[] row = line.split("\t");
+//			if ( null == tr ) {
+//				tr = new DustUtils.TableReader(row);
+//			} else {
+//				String cik = tr.get(row, EdgarHeadFields.cik.name());
+//				// CIK0000877443
+//				String pathPrefix = String.format("CIK%10s", cik).replace(' ', '0');
+//				pathPrefix = DustUtilsFile.getHashForID(pathPrefix) + "/" + pathPrefix;
+//
+////				File fj = new File(dir, pathPrefix + ".json");
+////				if ( !fj.isFile() ) {
+////					DustUtils.breakpoint();
+////				}
+//
+//				pwHead.print(line);
+//				pwHead.print("\t");
+//				pwHead.println(pathPrefix);
+//			}
+//		}
 //	}
+//
+//	pwHead.flush();
+//	pwHead.close();
+//
+//	System.out.println(pm);
 //}
 }

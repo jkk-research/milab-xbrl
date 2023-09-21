@@ -4,7 +4,9 @@ import java.io.BufferedReader;
 import java.io.File;
 import java.io.FileFilter;
 import java.io.FileReader;
+import java.io.PrintStream;
 import java.io.PrintWriter;
+import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.EnumMap;
@@ -21,6 +23,7 @@ import hu.sze.milab.dust.Dust;
 import hu.sze.milab.dust.DustException;
 import hu.sze.milab.dust.utils.DustUtils;
 import hu.sze.milab.dust.utils.DustUtilsFile;
+import hu.sze.uni.xbrl.XbrlUtils;
 import hu.sze.uni.xbrl.XbrlUtilsCounter;
 
 @SuppressWarnings({ "unchecked", "rawtypes" })
@@ -34,11 +37,31 @@ public class XbrlEdgarSource implements XbrlEdgarConsts {
 	XbrlUtilsCounter dc = new XbrlUtilsCounter(true);
 	DustUtils.ProcessMonitor pm;
 	private File fSubmissionIndex;
+	private File fSubmissionRoot;
+	private File fReportRoot;
+
+	private static Long tsLastDownload = 0L;
 
 	public XbrlEdgarSource(File dataRoot) {
 		edgarRoot = new File(dataRoot + "/sources/edgar");
 
+		fSubmissionRoot = new File(edgarRoot, "submissions");
+		fReportRoot = new File(edgarRoot, "reports");
 		fSubmissionIndex = new File(edgarRoot, "SubmissionIndex.csv");
+	}
+
+	private static synchronized void safeDownload(String url, File file) throws Exception {
+		long ts = System.currentTimeMillis();
+		long diff = ts - tsLastDownload;
+
+		if ( 200 > diff ) {
+			synchronized (tsLastDownload) {
+				tsLastDownload.wait(diff);
+			}
+		}
+
+		tsLastDownload = System.currentTimeMillis();
+		XbrlUtils.download(url, file, EDGAR_APIHDR_USER, EDGAR_APIHDR_ENCODING /* , EDGAR_APIHDR_HOST */);
 	}
 
 	public static void main(String[] args) throws Exception {
@@ -49,50 +72,167 @@ public class XbrlEdgarSource implements XbrlEdgarConsts {
 		XbrlEdgarSource edgarSource = new XbrlEdgarSource(dataRoot);
 
 //		edgarSource.loadSubmissions();
-		edgarSource.processSubmissions("\"3711\".equals(sic)");
+		edgarSource.processSubmissions("\"3711\".equals(company.sic)", "filing.form.contains(\"10-Q\")", "company.name.contains(\"Tesla\") && filing.reportDate.startsWith(\"202\")");
+//		edgarSource.addPath();
 
 		edgarSource.dc.dump("Summary");
 	}
 
-	public void processSubmissions(String filter) throws Exception {
-		pm = new DustUtils.ProcessMonitor("Find companies", 0);
+	public File getFiling(Map company, Map filing) throws Exception {
+		File f = null;
+
+		String formType = (String) filing.get(EdgarSubmissionAtt.form.name());
+		String accn = (String) filing.get(EdgarSubmissionAtt.accessionNumber.name());
+
+		File dir = new File(fReportRoot, company.get(EdgarHeadFields.__PathPrefix.name()) + "/" + formType + "/" + accn);
+		String docName = (String) filing.get(EdgarSubmissionAtt.primaryDocument.name());
+
+		boolean docNameMissing = DustUtils.isEmpty(docName);
+		if ( docNameMissing ) {
+			docName = "index.json";
+		}
+
+		dir.mkdirs();
+		f = new File(dir, docName);
+
+		if ( !f.isFile() ) {
+			String url = EDGAR_URL_DATA + company.get(EdgarHeadFields.cik.name()) + "/" + accn.replace("-", "") + "/" + docName;
+			safeDownload(url, f);
+
+			if ( docNameMissing ) {
+				// TODO post process the json, get the zip, extract, return the main file
+			}
+		}
+
+		return f;
+	}
+
+	public void processSubmissions(String filterHead, String filterFiling, String filterDownload) throws Exception {
 		
+		pm = new DustUtils.ProcessMonitor("Find companies", 0);
+
 		DustUtils.TableReader tr = null;
 		Map<String, Object> values = new TreeMap<>();
-		
-		Object mvelFilter = DustUtils.isEmpty(filter) ? null : MVEL.compileExpression(filter);
+		Map<String, Object> filing = new TreeMap<>();
 
-		try (BufferedReader br = new BufferedReader(new FileReader(fSubmissionIndex))) {
+		Map<String, Object> ctx = new TreeMap<>();
+		ctx.put("company", values);
+		ctx.put("filing", filing);
+
+		ArrayList<String> filingLines = new ArrayList<>();
+
+		Object mvelFilterHead = DustUtils.isEmpty(filterHead) ? null : MVEL.compileExpression(filterHead);
+		Object mvelFilterFiling = DustUtils.isEmpty(filterFiling) ? null : MVEL.compileExpression(filterFiling);
+		Object mvelFilterDownload = DustUtils.isEmpty(filterDownload) ? null : MVEL.compileExpression(filterDownload);
+
+		long fcAll = 0;
+		long fcSel = 0;
+
+		try (PrintStream ps = new PrintStream("work/subProcTest.txt"); BufferedReader br = new BufferedReader(new FileReader(fSubmissionIndex))) {
 			for (String line; (line = br.readLine()) != null;) {
 
 				pm.step();
-				
+
 				String[] row = line.split("\t");
 				if ( null == tr ) {
 					tr = new DustUtils.TableReader(row);
-					System.out.println(line);
+					ps.println(line);
 				} else {
 					values.clear();
+
+					for (int i = row.length; i-- > 0;) {
+						String sv = row[i];
+						if ( (null != sv) && sv.startsWith("\"") ) {
+							sv = sv.substring(1, sv.length() - 1);
+							sv = sv.replace("\"\"", "\"");
+							row[i] = sv;
+						}
+					}
+
 					tr.get(row, values);
-					for ( Map.Entry<String, Object> e : values.entrySet() ) {
-						String sv = (String) e.getValue();
-						
-						if ( (null != sv) && sv.startsWith("[") ) {
-							String[] vv = sv.substring(1, sv.length()-1).split(",");
-							Set<String> s = new TreeSet<>();
-							for ( String v : vv ) {
-								s.add(v.trim());
+					for (String k : values.keySet()) {
+						String sv = (String) values.get(k);
+
+						if ( null != sv ) {
+							if ( sv.startsWith("[") ) {
+								String[] vv = sv.substring(1, sv.length() - 1).split(",");
+								Set<String> s = new TreeSet<>();
+								for (String v : vv) {
+									s.add(v.trim());
+								}
+								values.put(k, s);
 							}
 						}
 					}
-					
-					if ( (null == mvelFilter ) || (Boolean)MVEL.executeExpression(mvelFilter, values) ) {
-						System.out.println(line);
+
+					long fc = Long.parseLong((String) values.get(EdgarHeadFields.__FilingCount.name()));
+
+					fcAll += fc;
+
+					boolean accepted = true;
+
+					if ( accepted && (null != mvelFilterHead) ) {
+						accepted = (Boolean) MVEL.executeExpression(mvelFilterHead, ctx);
+					}
+
+					if ( accepted && (null != mvelFilterFiling) ) {
+						filingLines.clear();
+						File ff = new File(fSubmissionRoot, values.get(EdgarHeadFields.__PathPrefix.name()) + ".csv");
+
+						if ( ff.isFile() ) {
+							accepted = false;
+							try (BufferedReader brf = new BufferedReader(new FileReader(ff))) {
+
+								DustUtils.TableReader trf = null;
+
+								for (String linef; (linef = brf.readLine()) != null;) {
+									String[] rowf = linef.split("\t");
+									if ( null == trf ) {
+										trf = new DustUtils.TableReader(rowf);
+									} else {
+										filing.clear();
+
+										for (int i = rowf.length; i-- > 0;) {
+											String sv = rowf[i];
+											if ( (null != sv) && sv.startsWith("\"") ) {
+												sv = sv.substring(1, sv.length() - 1);
+												sv = sv.replace("\"\"", "\"");
+												rowf[i] = sv;
+											}
+										}
+
+										trf.get(rowf, filing);
+
+										if ( (Boolean) MVEL.executeExpression(mvelFilterFiling, ctx) ) {
+											accepted = true;
+											filingLines.add(linef);
+
+											if ( (null != mvelFilterDownload) && (Boolean) MVEL.executeExpression(mvelFilterDownload, ctx) ) {
+												getFiling(values, filing);
+											}
+										}
+									}
+								}
+							}
+						}
+					}
+
+					if ( accepted ) {
+						ps.println(line);
+						fcSel += fc;
+
+						for (String fl : filingLines) {
+							ps.println("  " + fl);
+						}
+						
+						ps.flush();
 					}
 				}
 			}
 		}
-		
+
+		System.out.println("All filings: " + fcAll + ", selected: " + fcSel);
+
 		System.out.println(pm);
 	}
 
