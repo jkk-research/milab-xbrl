@@ -15,6 +15,8 @@ import java.util.Map;
 import java.util.Set;
 import java.util.TreeMap;
 import java.util.TreeSet;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
 
 import org.json.simple.parser.JSONParser;
 import org.mvel2.MVEL;
@@ -23,6 +25,7 @@ import hu.sze.milab.dust.Dust;
 import hu.sze.milab.dust.DustException;
 import hu.sze.milab.dust.utils.DustUtils;
 import hu.sze.milab.dust.utils.DustUtilsFile;
+import hu.sze.uni.xbrl.XbrlReportLoaderDomBase;
 import hu.sze.uni.xbrl.XbrlUtils;
 import hu.sze.uni.xbrl.XbrlUtilsCounter;
 
@@ -31,12 +34,19 @@ public class XbrlEdgarSource implements XbrlEdgarConsts {
 
 	final File edgarRoot;
 	JSONParser parser = new JSONParser();
+	ThreadLocal<JSONParser> jp = new ThreadLocal<JSONParser>() {
+		@Override
+		protected JSONParser initialValue() {
+			return new JSONParser();
+		}
+	};
 
 //	Map companies;
 
 	XbrlUtilsCounter dc = new XbrlUtilsCounter(true);
 	DustUtils.ProcessMonitor pm;
 	private File fSubmissionIndex;
+	private File fFactRoot;
 	private File fSubmissionRoot;
 	private File fReportRoot;
 
@@ -45,6 +55,7 @@ public class XbrlEdgarSource implements XbrlEdgarConsts {
 	public XbrlEdgarSource(File dataRoot) {
 		edgarRoot = new File(dataRoot + "/sources/edgar");
 
+		fFactRoot = new File(edgarRoot, "companyfacts");
 		fSubmissionRoot = new File(edgarRoot, "submissions");
 		fReportRoot = new File(edgarRoot, "reports");
 		fSubmissionIndex = new File(edgarRoot, "SubmissionIndex.csv");
@@ -72,8 +83,12 @@ public class XbrlEdgarSource implements XbrlEdgarConsts {
 		XbrlEdgarSource edgarSource = new XbrlEdgarSource(dataRoot);
 
 //		edgarSource.loadSubmissions();
-		edgarSource.processSubmissions("\"3711\".equals(company.sic)", "filing.form.contains(\"10-Q\")", "company.name.contains(\"Tesla\") && filing.reportDate.startsWith(\"202\")");
+//		edgarSource.processSubmissions("\"3711\".equals(company.sic)", "filing.form.contains(\"10-Q\")", "company.name.contains(\"Tesla\") && filing.reportDate.startsWith(\"202\")");
 //		edgarSource.addPath();
+
+//		edgarSource.delGen();
+//		edgarSource.factGen();
+		edgarSource.factStats();
 
 		edgarSource.dc.dump("Summary");
 	}
@@ -104,11 +119,14 @@ public class XbrlEdgarSource implements XbrlEdgarConsts {
 			}
 		}
 
+		if ( f.isFile() ) {
+			XbrlReportLoaderDomBase.createSplitCsv(f, dir, accn, TEXT_CUT_AT);
+		}
 		return f;
 	}
 
 	public void processSubmissions(String filterHead, String filterFiling, String filterDownload) throws Exception {
-		
+
 		pm = new DustUtils.ProcessMonitor("Find companies", 0);
 
 		DustUtils.TableReader tr = null;
@@ -224,7 +242,7 @@ public class XbrlEdgarSource implements XbrlEdgarConsts {
 						for (String fl : filingLines) {
 							ps.println("  " + fl);
 						}
-						
+
 						ps.flush();
 					}
 				}
@@ -319,6 +337,231 @@ public class XbrlEdgarSource implements XbrlEdgarConsts {
 
 			w.println(sbLine);
 		}
+	}
+
+	public void factGen() throws Exception {
+		pm = new DustUtils.ProcessMonitor("Fact gen", 100);
+		
+		ExecutorService pool = Executors.newFixedThreadPool(10);
+
+		FileFilter ff = new FileFilter() {
+			@Override
+			public boolean accept(File f) {
+				if ( f.isFile() && f.getName().endsWith(EXT_JSON) ) {
+					try {
+						File fCsv = new File(DustUtils.cutPostfix(f.getCanonicalPath(), ".") + EXT_CSV);
+						if ( !fCsv.isFile() ) 
+						{
+							pool.execute(new Runnable() {
+								@Override
+								public void run() {
+									try {
+										genFactCsv(pm, f, fCsv);
+									} catch (Exception e) {
+										// TODO Auto-generated catch block
+										e.printStackTrace();
+									}
+								}
+							});
+						}
+					} catch (Throwable e) {
+						DustException.swallow(e);
+					}
+				}
+
+//				return 10000 < pm.getCount();
+				return false;
+			}
+		};
+
+		File dir = fFactRoot;
+//		dir = new File(fFactRoot, "00");
+		DustUtilsFile.searchRecursive(dir, ff);
+
+//		System.out.println(ff);
+		
+		pool.shutdown();
+
+		System.out.println(pm);
+	}
+	
+	public void genFactCsv(DustUtils.ProcessMonitor pm, File f, File fCsv) throws Exception {
+		pm.step();
+		
+		JSONParser p = jp.get();
+		
+		Map head = (Map) p.parse(new FileReader(f));
+		Map<String, Object> facts = (Map) head.getOrDefault("facts", Collections.EMPTY_MAP);
+
+		try (PrintStream ps = new PrintStream(fCsv)) {
+
+			ps.println(EDGAR_FACT_HEADER);
+			Map<EdgarFactField, Object> factData = new TreeMap<>();
+			factData.put(EdgarFactField.cik, head.get("cik"));
+
+			for (Map.Entry<String, Object> te : facts.entrySet()) {
+				String t = te.getKey();
+				factData.put(EdgarFactField.taxonomy, t);
+				Map<String, Object> concepts = (Map) ((Map.Entry) te).getValue();
+				for (Map.Entry<String, Object> ce : concepts.entrySet()) {
+					String ck = ce.getKey();
+					factData.put(EdgarFactField.concept, ck);
+					Object units = ((Map<String, Object>) ce.getValue()).getOrDefault("units", Collections.EMPTY_MAP);
+
+					for (Object va : ((Map) units).entrySet()) {
+						Object uk = ((Map.Entry) va).getKey();
+						factData.put(EdgarFactField.unit, uk);
+
+						for (Object v : (Collection) ((Map.Entry) va).getValue()) {
+							Map fact = (Map) v;
+							for (EdgarFactField eff : EDGAR_FACT_EXT) {
+								factData.put(eff, fact.get(eff.name()));
+							}
+							if ( null == factData.get(EdgarFactField.start) ) {
+								factData.put(EdgarFactField.instant, factData.remove(EdgarFactField.end));
+							} else {
+								factData.remove(EdgarFactField.instant);
+							}
+
+							StringBuilder sbLine = null;
+							for (EdgarFactField eff : EdgarFactField.values()) {
+								sbLine = DustUtils.sbAppend(sbLine, "\t", true, factData.get(eff));
+							}
+							ps.println(sbLine);
+						}
+					}
+				}
+			}
+			
+			ps.flush();
+		}
+	}
+
+	public void delGen() throws Exception {
+
+		pm = new DustUtils.ProcessMonitor("Fact stats", 100);
+
+		FileFilter ff = new FileFilter() {
+			@Override
+			public boolean accept(File f) {
+				if ( f.isFile() && f.getName().endsWith(EXT_CSV) ) {
+					pm.step();
+					f.delete();
+				}
+
+				return false;
+			}
+		};
+
+		File dir = fFactRoot;
+//		dir = new File(fFactRoot, "00");
+		DustUtilsFile.searchRecursive(dir, ff);
+
+		System.out.println(ff);
+
+		System.out.println(pm);
+	}
+	
+	public void factStats() throws Exception {
+
+		pm = new DustUtils.ProcessMonitor("Fact stats", 100);
+
+//		PrintWriter pwHead = new PrintWriter(fSubmissionIndex);
+//		pwHead.println(EDGAR_HEAD_HEADER);
+
+		int cut = fFactRoot.getCanonicalPath().length();
+
+		FileFilter ff = new FileFilter() {
+
+			long submissionCount = 0;
+			long docCount = 0;
+
+			@Override
+			public boolean accept(File f) {
+				if ( f.isFile() && f.getName().endsWith(EXT_CSV) ) {
+					try {
+						if ( pm.step() ) {
+							System.out.println("Submissions to check so far: " + submissionCount);
+						}
+
+						Set<String> reports = new TreeSet<>();
+						
+						try (BufferedReader brf = new BufferedReader(new FileReader(f))) {
+							DustUtils.TableReader trf = null;
+
+							for (String linef; (linef = brf.readLine()) != null;) {
+								String[] rowf = linef.split("\t");
+								if ( null == trf ) {
+									trf = new DustUtils.TableReader(rowf);
+								} else {
+									String accn = trf.get(rowf, EdgarFactField.accn.name());
+									reports.add((String) accn);
+								}
+							}
+						}
+
+						if ( !reports.isEmpty() ) {
+							String id = DustUtils.cutPostfix(f.getCanonicalPath().substring(cut), ".");
+							File fSubmissions = new File(fSubmissionRoot, id + EXT_CSV);
+
+							if ( fSubmissions.isFile() ) {
+								submissionCount += reports.size();
+
+								try (BufferedReader brf = new BufferedReader(new FileReader(fSubmissions))) {
+
+									DustUtils.TableReader trf = null;
+
+									for (String linef; (linef = brf.readLine()) != null;) {
+										String[] rowf = linef.split("\t");
+										if ( null == trf ) {
+											trf = new DustUtils.TableReader(rowf);
+										} else {
+											String accn = trf.get(rowf, EdgarSubmissionAtt.accessionNumber.name());
+											if ( reports.remove(accn) ) {
+												String primaryDoc = trf.get(rowf, EdgarSubmissionAtt.primaryDocument.name());
+												if ( primaryDoc.isEmpty() ) {
+													DustUtils.breakpoint("Primary doc not found");
+												} else {
+													++docCount;
+												}
+
+												if ( reports.isEmpty() ) {
+													break;
+												}
+											}
+										}
+									}
+
+									if ( !reports.isEmpty() ) {
+										DustUtils.breakpoint("Referred submissions not found", reports, "in", id);
+									}
+								}
+							} else {
+								DustUtils.breakpoint("Submission file not found");
+							}
+						}
+
+					} catch (Throwable e) {
+						DustException.swallow(e);
+					}
+				}
+
+				return false;
+			}
+
+			@Override
+			public String toString() {
+				return "Referred submission count: " + submissionCount + " found doc count: " + docCount;
+			}
+		};
+
+		File dir = fFactRoot;
+//		dir = new File(fFactRoot, "00");
+		DustUtilsFile.searchRecursive(dir, ff);
+
+		System.out.println(ff);
+
+		System.out.println(pm);
 	}
 
 	public void loadSubmissions() throws Exception {
