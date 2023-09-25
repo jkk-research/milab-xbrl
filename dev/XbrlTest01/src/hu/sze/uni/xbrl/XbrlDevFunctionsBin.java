@@ -25,6 +25,7 @@ import org.json.simple.parser.JSONParser;
 import hu.sze.milab.dust.Dust;
 import hu.sze.milab.dust.DustException;
 import hu.sze.milab.dust.utils.DustUtils;
+import hu.sze.milab.dust.utils.DustUtilsData;
 import hu.sze.milab.dust.utils.DustUtilsFactory;
 import hu.sze.milab.xbrl.XbrlCoreUtils;
 
@@ -38,13 +39,13 @@ public class XbrlDevFunctionsBin implements XbrlConsts {
 		SimpleDateFormat fmtOut = new SimpleDateFormat("yyyy-MM-dd");
 
 		try (BufferedReader br = new BufferedReader(new FileReader(f))) {
-			DustUtils.TableReader tr = null;
+			DustUtilsData.TableReader tr = null;
 
 			for (String line; (line = br.readLine()) != null;) {
 				String[] data = line.split("\t");
 
 				if ( null == tr ) {
-					tr = new DustUtils.TableReader(data);
+					tr = new DustUtilsData.TableReader(data);
 				} else {
 					String fmt = tr.get(data, "Format");
 					tr.set(data, "Err", "");
@@ -179,7 +180,7 @@ public class XbrlDevFunctionsBin implements XbrlConsts {
 
 			int toMatch = valFacts.size();
 
-			DustUtils.TableReader tr = filings.getTableReader(id);
+			DustUtilsData.TableReader tr = filings.getTableReader(id);
 
 			if ( null == tr ) {
 				System.out.println("PROCESS, Accessing facts for report " + id);
@@ -463,7 +464,7 @@ public class XbrlDevFunctionsBin implements XbrlConsts {
 				int lineCount = 0;
 //				System.out.println("Validating " + id + " factCount " + toMatch + " from " + jsonFile.getCanonicalPath());
 
-				DustUtils.TableReader tr = filings.getTableReader(id);
+				DustUtilsData.TableReader tr = filings.getTableReader(id);
 
 				if ( null == tr ) {
 					System.out.println("PROCESS, Accessing facts for report " + id);

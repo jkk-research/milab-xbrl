@@ -5,6 +5,9 @@ import java.io.File;
 import hu.sze.milab.dust.DustConsts;
 
 public interface XbrlConsts extends DustConsts {
+	String POSTFIX_TXT = "_Txt.csv";
+	String POSTFIX_VAL = "_Val.csv";
+
 	int TEXT_CUT_AT = 200;
 	
 	enum ContainerType {

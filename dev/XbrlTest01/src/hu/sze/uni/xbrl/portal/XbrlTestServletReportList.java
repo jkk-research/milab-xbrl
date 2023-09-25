@@ -21,6 +21,7 @@ import hu.sze.milab.dust.Dust;
 import hu.sze.milab.dust.DustConsts;
 import hu.sze.milab.dust.DustConsts.MindAccess;
 import hu.sze.milab.dust.utils.DustUtils;
+import hu.sze.milab.dust.utils.DustUtilsData;
 import hu.sze.milab.xbrl.tools.XbrlToolsCurrencyConverter;
 import hu.sze.uni.http.DustHttpServlet;
 import hu.sze.uni.xbrl.XbrlConsts.XbrlReportType;
@@ -53,7 +54,7 @@ class XbrlTestServletReportList extends DustHttpServlet {
 			proc = DustUtils.isEmpty(strProc) ? null : MVEL.compileExpression(strProc);
 		}
 
-		public boolean test(Map src, Map currRep, DustUtils.TableReader tr, Iterable<String[]> repFacts) {
+		public boolean test(Map src, Map currRep, DustUtilsData.TableReader tr, Iterable<String[]> repFacts) {
 			if ( (null == headExpr) && (null == factExpr) ) {
 				return true;
 			}
@@ -72,7 +73,7 @@ class XbrlTestServletReportList extends DustHttpServlet {
 
 					for (String[] rf : repFacts) {
 //						if ( null == tr ) {
-//							tr = new DustUtils.TableReader(rf);
+//							tr = new DustUtilsData.TableReader(rf);
 //						} else {
 						tr.getUntil(rf, currFact, null);
 
@@ -134,7 +135,7 @@ class XbrlTestServletReportList extends DustHttpServlet {
 	private XbrlFilingManager filings;
 //		ArrayList<String[]> allFacts = new ArrayList<>();
 //	Map<String, ArrayList<String[]>> allFactsByRep = new HashMap<>();
-//	Map<String, DustUtils.TableReader> headers = new HashMap<>();
+//	Map<String, DustUtilsData.TableReader> headers = new HashMap<>();
 
 	public XbrlTestServletReportList(XbrlTestPortal portal) {
 		this.filings = portal.filings;
@@ -163,7 +164,7 @@ class XbrlTestServletReportList extends DustHttpServlet {
 
 		String mode = Dust.access(data, MindAccess.Peek, "ShowList", ServletData.Parameter, "mode");
 		boolean csvOut = !"ShowList".equals(mode);
-		DustUtils.TableReader trMax = null;
+		DustUtilsData.TableReader trMax = null;
 
 		String exprHead = Dust.access(data, MindAccess.Peek, null, ServletData.Parameter, "exprHead");
 		String exprFact = Dust.access(data, MindAccess.Peek, null, ServletData.Parameter, "exprFact");
@@ -185,7 +186,7 @@ class XbrlTestServletReportList extends DustHttpServlet {
 
 		ArrayList<Map> res = new ArrayList<>();
 
-		DustUtils.TableReader tr = null;
+		DustUtilsData.TableReader tr = null;
 		Iterable<String[]> repFacts = null;
 
 		Set<Map> loadErr = new HashSet<>();
@@ -240,7 +241,7 @@ class XbrlTestServletReportList extends DustHttpServlet {
 		}
 
 		if ( !DustUtils.isEmpty(sort) && (res.size() > 1) ) {
-			Comparator<Map> cmp = new DustUtils.MapComparator(sort, ",");
+			Comparator<Map> cmp = new DustUtilsData.MapComparator(sort, ",");
 			res.sort(cmp);
 		}
 

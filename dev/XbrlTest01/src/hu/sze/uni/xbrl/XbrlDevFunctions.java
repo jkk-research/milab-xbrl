@@ -8,6 +8,7 @@ import java.util.Map;
 
 import hu.sze.milab.dust.Dust;
 import hu.sze.milab.dust.utils.DustUtils;
+import hu.sze.milab.dust.utils.DustUtilsData;
 import hu.sze.milab.xbrl.tools.XbrlToolsCurrencyConverter;
 
 @SuppressWarnings({ "rawtypes" })
@@ -40,7 +41,7 @@ public class XbrlDevFunctions implements XbrlConsts {
 			for (Map.Entry<String, Map> e : reportData.entrySet()) {
 				String id = e.getKey();
 
-				DustUtils.TableReader tr = filings.getTableReader(id);
+				DustUtilsData.TableReader tr = filings.getTableReader(id);
 
 				if ( null == tr ) {
 					continue;

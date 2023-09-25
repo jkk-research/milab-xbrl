@@ -17,11 +17,11 @@ import org.w3c.dom.NodeList;
 import hu.sze.milab.dust.Dust;
 import hu.sze.milab.dust.stream.DustStreamUtils;
 import hu.sze.milab.dust.stream.xml.DustStreamXmlDocumentGraphLoader;
-import hu.sze.milab.dust.utils.DustUtils;
 import hu.sze.milab.dust.utils.DustUtils.QueueContainer;
+import hu.sze.milab.dust.utils.DustUtilsData;
 
 class XbrlTaxonomyToExcel implements DustStreamXmlDocumentGraphLoader.XmlDocumentProcessor {
-		DustUtils.Indexer<String> attCols = new DustUtils.Indexer<String>();
+	DustUtilsData.Indexer<String> attCols = new DustUtilsData.Indexer<String>();
 		private static final String[] KNOWN_ATT_COLS = {"name", "id", "type", "substitutionGroup", "xbrli:periodType", "abstract"};
 
 		private Workbook wb;

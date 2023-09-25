@@ -31,6 +31,7 @@ import hu.sze.milab.dust.Dust;
 import hu.sze.milab.dust.DustException;
 import hu.sze.milab.dust.utils.DustUtils;
 import hu.sze.milab.dust.utils.DustUtilsConsts;
+import hu.sze.milab.dust.utils.DustUtilsData;
 import hu.sze.uni.xbrl.portal.XbrlTestPortalUtils;
 
 @SuppressWarnings({ "rawtypes", "unchecked" })
@@ -123,8 +124,8 @@ public class XbrlFilingManager implements XbrlConsts, DustUtilsConsts {
 
 	Pattern PT_FXO = Pattern.compile("(?<eid>\\w+)-(?<date>\\d+-\\d+-\\d+)-(?<extra>.*)");
 
-	Map<String, DustUtils.TableReader> contentReaders = new HashMap<>();
-	Map<String, DustUtils.TableReader> headers = new HashMap<>();
+	Map<String, DustUtilsData.TableReader> contentReaders = new HashMap<>();
+	Map<String, DustUtilsData.TableReader> headers = new HashMap<>();
 	Map<String, ArrayList<String[]>> allFactsByRep;
 
 	DustFileFilter reportFilter = new DustFileFilter(true, StringMatch.EndsWith, "xhtml", "html");
@@ -298,7 +299,7 @@ public class XbrlFilingManager implements XbrlConsts, DustUtilsConsts {
 		System.out.println("Returned count: " + count + ", size of filings: " + filings.size() + ", local report count: " + getReportData().size() + ", downloaded: " + downloaded.size());
 	}
 
-	public DustUtils.TableReader getTableReader(String repId) throws Exception {
+	public DustUtilsData.TableReader getTableReader(String repId) throws Exception {
 		optLoadFacts(repId);
 		return headers.get(repId);
 	}
@@ -316,7 +317,7 @@ public class XbrlFilingManager implements XbrlConsts, DustUtilsConsts {
 
 		if ( (null != f) && f.isFile() ) {
 			try (BufferedReader br = new BufferedReader(new FileReader(f))) {
-				DustUtils.TableReader tr = null;
+				DustUtilsData.TableReader tr = null;
 				ArrayList<String[]> allFacts = null;
 
 				for (String line; (line = br.readLine()) != null;) {
@@ -326,7 +327,7 @@ public class XbrlFilingManager implements XbrlConsts, DustUtilsConsts {
 						if ( null == tr ) {
 							tr = contentReaders.get(line);
 							if ( null == tr ) {
-								tr = new DustUtils.TableReader(data);
+								tr = new DustUtilsData.TableReader(data);
 								contentReaders.put(line, tr);
 							}
 							headers.put(repId, tr);

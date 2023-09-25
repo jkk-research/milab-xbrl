@@ -24,6 +24,7 @@ import org.mvel2.MVEL;
 import hu.sze.milab.dust.Dust;
 import hu.sze.milab.dust.DustException;
 import hu.sze.milab.dust.utils.DustUtils;
+import hu.sze.milab.dust.utils.DustUtilsData;
 import hu.sze.milab.dust.utils.DustUtilsFile;
 import hu.sze.uni.xbrl.XbrlReportLoaderDomBase;
 import hu.sze.uni.xbrl.XbrlUtils;
@@ -45,10 +46,10 @@ public class XbrlEdgarSource implements XbrlEdgarConsts {
 
 	XbrlUtilsCounter dc = new XbrlUtilsCounter(true);
 	DustUtils.ProcessMonitor pm;
-	private File fSubmissionIndex;
-	private File fFactRoot;
-	private File fSubmissionRoot;
-	private File fReportRoot;
+	File fSubmissionIndex;
+	File fFactRoot;
+	File fSubmissionRoot;
+	File fReportRoot;
 
 	private static Long tsLastDownload = 0L;
 
@@ -84,34 +85,42 @@ public class XbrlEdgarSource implements XbrlEdgarConsts {
 
 //		edgarSource.loadSubmissions();
 //		edgarSource.processSubmissions("\"3711\".equals(company.sic)", "filing.form.contains(\"10-Q\")", "company.name.contains(\"Tesla\") && filing.reportDate.startsWith(\"202\")");
+		edgarSource.processSubmissions("\"3711\".equals(company.sic)", null, "company.name.contains(\"Tesla\") && filing.reportDate.startsWith(\"202\")");
 //		edgarSource.addPath();
 
 //		edgarSource.delGen();
 //		edgarSource.factGen();
-		edgarSource.factStats();
+//		edgarSource.factStats();
 
 		edgarSource.dc.dump("Summary");
 	}
 
 	public File getFiling(Map company, Map filing) throws Exception {
-		File f = null;
-
 		String formType = (String) filing.get(EdgarSubmissionAtt.form.name());
 		String accn = (String) filing.get(EdgarSubmissionAtt.accessionNumber.name());
 
-		File dir = new File(fReportRoot, company.get(EdgarHeadFields.__PathPrefix.name()) + "/" + formType + "/" + accn);
+		String cik = (String) company.get(EdgarHeadFields.cik.name());
+		String pathPrefix = (String) company.get(EdgarHeadFields.__PathPrefix.name());
 		String docName = (String) filing.get(EdgarSubmissionAtt.primaryDocument.name());
+
+		return getFiling(cik, pathPrefix, formType, accn, docName);
+	}
+
+	public File getFiling(String cik, String pathPrefix, String formType, String accn, String docName) throws Exception {
+		File f = null;
 
 		boolean docNameMissing = DustUtils.isEmpty(docName);
 		if ( docNameMissing ) {
 			docName = "index.json";
 		}
 
+		File dir = new File(fReportRoot, pathPrefix + "/" + formType + "/" + accn);
 		dir.mkdirs();
+		
 		f = new File(dir, docName);
 
 		if ( !f.isFile() ) {
-			String url = EDGAR_URL_DATA + company.get(EdgarHeadFields.cik.name()) + "/" + accn.replace("-", "") + "/" + docName;
+			String url = EDGAR_URL_DATA + cik + "/" + accn.replace("-", "") + "/" + docName;
 			safeDownload(url, f);
 
 			if ( docNameMissing ) {
@@ -120,7 +129,10 @@ public class XbrlEdgarSource implements XbrlEdgarConsts {
 		}
 
 		if ( f.isFile() ) {
-			XbrlReportLoaderDomBase.createSplitCsv(f, dir, accn, TEXT_CUT_AT);
+			File fVal = new File(dir, accn + POSTFIX_VAL);
+			if ( !fVal.isFile() ) {
+				XbrlReportLoaderDomBase.createSplitCsv(f, dir, accn, TEXT_CUT_AT);
+			}
 		}
 		return f;
 	}
@@ -129,7 +141,7 @@ public class XbrlEdgarSource implements XbrlEdgarConsts {
 
 		pm = new DustUtils.ProcessMonitor("Find companies", 0);
 
-		DustUtils.TableReader tr = null;
+		DustUtilsData.TableReader tr = null;
 		Map<String, Object> values = new TreeMap<>();
 		Map<String, Object> filing = new TreeMap<>();
 
@@ -153,7 +165,7 @@ public class XbrlEdgarSource implements XbrlEdgarConsts {
 
 				String[] row = line.split("\t");
 				if ( null == tr ) {
-					tr = new DustUtils.TableReader(row);
+					tr = new DustUtilsData.TableReader(row);
 					ps.println(line);
 				} else {
 					values.clear();
@@ -201,12 +213,12 @@ public class XbrlEdgarSource implements XbrlEdgarConsts {
 							accepted = false;
 							try (BufferedReader brf = new BufferedReader(new FileReader(ff))) {
 
-								DustUtils.TableReader trf = null;
+								DustUtilsData.TableReader trf = null;
 
 								for (String linef; (linef = brf.readLine()) != null;) {
 									String[] rowf = linef.split("\t");
 									if ( null == trf ) {
-										trf = new DustUtils.TableReader(rowf);
+										trf = new DustUtilsData.TableReader(rowf);
 									} else {
 										filing.clear();
 
@@ -341,7 +353,7 @@ public class XbrlEdgarSource implements XbrlEdgarConsts {
 
 	public void factGen() throws Exception {
 		pm = new DustUtils.ProcessMonitor("Fact gen", 100);
-		
+
 		ExecutorService pool = Executors.newFixedThreadPool(10);
 
 		FileFilter ff = new FileFilter() {
@@ -350,8 +362,7 @@ public class XbrlEdgarSource implements XbrlEdgarConsts {
 				if ( f.isFile() && f.getName().endsWith(EXT_JSON) ) {
 					try {
 						File fCsv = new File(DustUtils.cutPostfix(f.getCanonicalPath(), ".") + EXT_CSV);
-						if ( !fCsv.isFile() ) 
-						{
+						if ( !fCsv.isFile() ) {
 							pool.execute(new Runnable() {
 								@Override
 								public void run() {
@@ -379,17 +390,17 @@ public class XbrlEdgarSource implements XbrlEdgarConsts {
 		DustUtilsFile.searchRecursive(dir, ff);
 
 //		System.out.println(ff);
-		
+
 		pool.shutdown();
 
 		System.out.println(pm);
 	}
-	
+
 	public void genFactCsv(DustUtils.ProcessMonitor pm, File f, File fCsv) throws Exception {
 		pm.step();
-		
+
 		JSONParser p = jp.get();
-		
+
 		Map head = (Map) p.parse(new FileReader(f));
 		Map<String, Object> facts = (Map) head.getOrDefault("facts", Collections.EMPTY_MAP);
 
@@ -432,7 +443,7 @@ public class XbrlEdgarSource implements XbrlEdgarConsts {
 					}
 				}
 			}
-			
+
 			ps.flush();
 		}
 	}
@@ -461,7 +472,7 @@ public class XbrlEdgarSource implements XbrlEdgarConsts {
 
 		System.out.println(pm);
 	}
-	
+
 	public void factStats() throws Exception {
 
 		pm = new DustUtils.ProcessMonitor("Fact stats", 100);
@@ -485,14 +496,14 @@ public class XbrlEdgarSource implements XbrlEdgarConsts {
 						}
 
 						Set<String> reports = new TreeSet<>();
-						
+
 						try (BufferedReader brf = new BufferedReader(new FileReader(f))) {
-							DustUtils.TableReader trf = null;
+							DustUtilsData.TableReader trf = null;
 
 							for (String linef; (linef = brf.readLine()) != null;) {
 								String[] rowf = linef.split("\t");
 								if ( null == trf ) {
-									trf = new DustUtils.TableReader(rowf);
+									trf = new DustUtilsData.TableReader(rowf);
 								} else {
 									String accn = trf.get(rowf, EdgarFactField.accn.name());
 									reports.add((String) accn);
@@ -509,12 +520,12 @@ public class XbrlEdgarSource implements XbrlEdgarConsts {
 
 								try (BufferedReader brf = new BufferedReader(new FileReader(fSubmissions))) {
 
-									DustUtils.TableReader trf = null;
+									DustUtilsData.TableReader trf = null;
 
 									for (String linef; (linef = brf.readLine()) != null;) {
 										String[] rowf = linef.split("\t");
 										if ( null == trf ) {
-											trf = new DustUtils.TableReader(rowf);
+											trf = new DustUtilsData.TableReader(rowf);
 										} else {
 											String accn = trf.get(rowf, EdgarSubmissionAtt.accessionNumber.name());
 											if ( reports.remove(accn) ) {

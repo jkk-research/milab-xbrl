@@ -497,7 +497,7 @@ public class XbrlEdgarTest implements XbrlConsts {
 //public void addPath() throws Exception {
 //	pm = new DustUtils.ProcessMonitor("Add path", 1000);
 //
-//	DustUtils.TableReader tr = null;
+//	DustUtilsData.TableReader tr = null;
 //
 //	File dir = new File(edgarRoot, "submissions");
 //	File f = new File(dir, "SubmissionIndex2.csv");
@@ -515,7 +515,7 @@ public class XbrlEdgarTest implements XbrlConsts {
 //
 //			String[] row = line.split("\t");
 //			if ( null == tr ) {
-//				tr = new DustUtils.TableReader(row);
+//				tr = new DustUtilsData.TableReader(row);
 //			} else {
 //				String cik = tr.get(row, EdgarHeadFields.cik.name());
 //				// CIK0000877443

@@ -33,6 +33,7 @@ import hu.sze.milab.dust.stream.xml.DustStreamXmlConsts;
 import hu.sze.milab.dust.stream.xml.DustStreamXmlDocumentGraphLoader;
 import hu.sze.milab.dust.utils.DustUtils;
 import hu.sze.milab.dust.utils.DustUtils.QueueContainer;
+import hu.sze.milab.dust.utils.DustUtilsData;
 import hu.sze.milab.dust.utils.DustUtilsFactory;
 import hu.sze.milab.dust.utils.DustUtilsFile;
 
@@ -154,7 +155,7 @@ class XbrlTaxonomyLoader implements DustStreamXmlDocumentGraphLoader.XmlDocument
 		linkInfo.dump();
 	}
 
-	DustUtils.Indexer<String> attCols = new DustUtils.Indexer<String>();
+	DustUtilsData.Indexer<String> attCols = new DustUtilsData.Indexer<String>();
 	private static final String[] KNOWN_ATT_COLS = { "name", "id", "type", "substitutionGroup", "xbrli:periodType", "Parent", "Children", "http://www.xbrl.org/2003/role/label",
 //			"abstract", "nillable", "xbrli:balance", "cyclesAllowed", "roleURI", "arcroleURI",
 //			"http://www.xbrl.org/2003/role/label", "http://www.xbrl.org/2003/role/documentation" 

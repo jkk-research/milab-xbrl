@@ -20,6 +20,7 @@ import org.json.simple.parser.JSONParser;
 import hu.sze.milab.dust.Dust;
 import hu.sze.milab.dust.DustException;
 import hu.sze.milab.dust.utils.DustUtils;
+import hu.sze.milab.dust.utils.DustUtilsData;
 import hu.sze.milab.dust.utils.DustUtilsFactory;
 import hu.sze.milab.xbrl.XbrlConsts.XbrlFactDataType;
 
@@ -76,7 +77,7 @@ public class XbrlDevJsonValidation implements XbrlConsts {
 //				continue;
 //			}
 
-			DustUtils.TableReader tr = filings.getTableReader(id);
+			DustUtilsData.TableReader tr = filings.getTableReader(id);
 
 			if ( null == tr ) {
 				System.out.println("PROCESS, Accessing facts for report " + id);

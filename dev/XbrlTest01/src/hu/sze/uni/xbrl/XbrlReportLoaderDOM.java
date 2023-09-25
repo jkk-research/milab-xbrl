@@ -20,6 +20,7 @@ import org.w3c.dom.NodeList;
 
 import hu.sze.milab.dust.Dust;
 import hu.sze.milab.dust.utils.DustUtils;
+import hu.sze.milab.dust.utils.DustUtilsData;
 
 @SuppressWarnings({ "rawtypes", "unchecked" })
 public class XbrlReportLoaderDOM implements XbrlConsts {
@@ -77,7 +78,7 @@ public class XbrlReportLoaderDOM implements XbrlConsts {
 
 		NamedNodeMap nnm = eHtml.getAttributes();
 
-		DustUtils.Indexer<String> dims = new DustUtils.Indexer<>();
+		DustUtilsData.Indexer<String> dims = new DustUtilsData.Indexer<>();
 
 		Map<String, Element> continuation = new TreeMap<>();
 		Map<String, String> units = new TreeMap<>();
