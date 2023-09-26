@@ -130,7 +130,8 @@ public class XbrlEdgarSource implements XbrlEdgarConsts {
 
 		if ( f.isFile() ) {
 			File fVal = new File(dir, accn + POSTFIX_VAL);
-			if ( !fVal.isFile() ) {
+			if ( !fVal.isFile() ) 
+			{
 				XbrlReportLoaderDomBase.createSplitCsv(f, dir, accn, TEXT_CUT_AT);
 			}
 		}

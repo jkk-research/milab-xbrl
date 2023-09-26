@@ -19,6 +19,7 @@ import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
 
 import hu.sze.milab.dust.Dust;
+import hu.sze.milab.dust.DustException;
 import hu.sze.milab.dust.utils.DustUtils;
 import hu.sze.milab.dust.utils.DustUtilsFile;
 import hu.sze.milab.xbrl.XbrlConsts.XbrlFactDataInfo;
@@ -227,6 +228,8 @@ public abstract class XbrlReportLoaderDomBase implements XbrlConsts {
 
 	public static void createSplitCsv(File xhtml, File targetDir, String fnPrefix, int textCut) throws Exception {
 		XbrlReportLoaderDomBase loader = new XbrlReportLoaderDomBase() {
+			File fVal;
+			File fText;
 			PrintStream psVal;
 			PrintStream psText;
 			StringBuilder sbTxtFrag = new StringBuilder();
@@ -238,12 +241,15 @@ public abstract class XbrlReportLoaderDomBase implements XbrlConsts {
 
 				if ( null == ps ) {
 					targetDir.mkdirs();
-					ps = new PrintStream(new File(targetDir, fnPrefix + (valStream ? POSTFIX_VAL : POSTFIX_TXT)));
+					File pf = new File(targetDir, fnPrefix + (valStream ? POSTFIX_VAL : POSTFIX_TXT));
+					ps = new PrintStream(pf);
 
 					if ( valStream ) {
 						psVal = ps;
+						fVal = pf;
 					} else {
 						psText = ps;
+						fText = pf;
 					}
 
 					writeFirstLine(valStream, ps, dimCount);
@@ -258,12 +264,13 @@ public abstract class XbrlReportLoaderDomBase implements XbrlConsts {
 				String ctxId = e.getAttribute("contextRef");
 				Map<String, String> ctx = Dust.access(xbrlElements, MindAccess.Peek, null, XbrlElements.Context, ctxId.trim());
 				if ( null == ctx ) {
-					Dust.dumpObs("  Referred context not found", ctxId);
+					DustException.wrap(null, "Referred context not found", ctxId);
 				}
 
 				String tag = e.getAttribute("name");
 				String[] tt = tag.split(":");
 				StringBuilder sbLine = DustUtils.sbAppend(null, "\t", true, ctx.get("xbrli:entity"), tt[0], tt[1], ctx.get("xbrli:startDate"), ctx.get("xbrli:endDate"), ctx.get("xbrli:instant"));
+
 				for (int i = 1; i <= dimCount; ++i) {
 					DustUtils.sbAppend(sbLine, "\t", true, ctx.get("DimName_" + i), ctx.get("DimValue_" + i));
 				}
@@ -394,6 +401,15 @@ public abstract class XbrlReportLoaderDomBase implements XbrlConsts {
 				if ( null != psText ) {
 					psText.flush();
 					psText.close();
+				}
+
+				if ( null != err ) {
+					if ( null != fVal ) {
+						fVal.delete();
+					}
+					if ( null != fText ) {
+						fText.delete();
+					}
 				}
 			}
 
