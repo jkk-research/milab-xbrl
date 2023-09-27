@@ -86,12 +86,23 @@ public abstract class XbrlReportLoaderDomBase implements XbrlConsts {
 					String ctxId = e.getAttribute("id");
 					Dust.access(xbrlElements, MindAccess.Set, cd, XbrlElements.Context, ctxId);
 
-					getInfo(cd, e, "xbrli:entity");
 					getInfo(cd, e, "xbrli:startDate");
 					getInfo(cd, e, "xbrli:endDate");
 					getInfo(cd, e, "xbrli:instant");
 
-					Element eS = (Element) e.getElementsByTagName("xbrli:scenario").item(0);
+					Element eS = null;
+
+					eS = (Element) e.getElementsByTagName("xbrli:segment").item(0);
+					if ( null == eS ) {
+						getInfo(cd, e, "xbrli:entity");
+						eS = (Element) e.getElementsByTagName("xbrli:scenario").item(0);
+					} else {
+						NodeList nn = e.getElementsByTagName("xbrli:entity");
+						if ( 0 < nl.getLength() ) {
+							String eid = getInfo( (Element) nn.item(0), "xbrli:identifier");
+							cd.putIfAbsent("xbrli:entity", eid);
+						}
+					}
 					if ( null != eS ) {
 						NodeList nlS = eS.getChildNodes();
 						int dimIdx = 0;
@@ -268,6 +279,11 @@ public abstract class XbrlReportLoaderDomBase implements XbrlConsts {
 				}
 
 				String tag = e.getAttribute("name");
+
+//				if ( tag.contains("BasicAndDilutedNetLossPerShareNonredeemableCommonStock") ) {
+//					DustUtils.breakpoint();
+//				}
+
 				String[] tt = tag.split(":");
 				StringBuilder sbLine = DustUtils.sbAppend(null, "\t", true, ctx.get("xbrli:entity"), tt[0], tt[1], ctx.get("xbrli:startDate"), ctx.get("xbrli:endDate"), ctx.get("xbrli:instant"));
 

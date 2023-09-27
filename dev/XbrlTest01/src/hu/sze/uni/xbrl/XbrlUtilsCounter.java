@@ -22,8 +22,12 @@ public class XbrlUtilsCounter implements Iterable<Map.Entry<Object, Long>> {
 	}
 
 	public void add(Object ob) {
+		add(ob, 1L);
+	}
+
+	public void add(Object ob, long count) {
 		Long l = counts.getOrDefault(ob, 0L);
-		counts.put(ob, l + 1);
+		counts.put(ob, l + count);
 	}
 
 	@Override
