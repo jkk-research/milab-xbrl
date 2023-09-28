@@ -6,10 +6,12 @@ import java.io.FileFilter;
 import java.io.FileReader;
 import java.io.PrintStream;
 import java.io.PrintWriter;
+import java.io.Reader;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.EnumMap;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
@@ -17,15 +19,25 @@ import java.util.TreeMap;
 import java.util.TreeSet;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
+
+import javax.xml.parsers.DocumentBuilder;
+import javax.xml.parsers.DocumentBuilderFactory;
 
 import org.json.simple.parser.JSONParser;
 import org.mvel2.MVEL;
+import org.w3c.dom.Document;
+import org.w3c.dom.Element;
+import org.w3c.dom.Node;
+import org.w3c.dom.NodeList;
 
 import hu.sze.milab.dust.Dust;
 import hu.sze.milab.dust.DustException;
 import hu.sze.milab.dust.utils.DustUtils;
 import hu.sze.milab.dust.utils.DustUtilsData;
 import hu.sze.milab.dust.utils.DustUtilsFile;
+import hu.sze.milab.dust.utils.DustUtilsXml;
 import hu.sze.uni.xbrl.XbrlReportLoaderDomBase;
 import hu.sze.uni.xbrl.XbrlUtils;
 import hu.sze.uni.xbrl.XbrlUtilsCounter;
@@ -41,6 +53,8 @@ public class XbrlEdgarSource implements XbrlEdgarConsts {
 			return new JSONParser();
 		}
 	};
+
+	DocumentBuilderFactory dbf;
 
 //	Map companies;
 
@@ -62,7 +76,7 @@ public class XbrlEdgarSource implements XbrlEdgarConsts {
 		fSubmissionIndex = new File(edgarRoot, "SubmissionIndex.csv");
 	}
 
-	private static synchronized void safeDownload(String url, File file) throws Exception {
+	public static synchronized void safeDownload(String url, File file) throws Exception {
 		long ts = System.currentTimeMillis();
 		long diff = ts - tsLastDownload;
 
@@ -116,26 +130,170 @@ public class XbrlEdgarSource implements XbrlEdgarConsts {
 
 		File dir = new File(fReportRoot, pathPrefix + "/" + formType + "/" + accn);
 		dir.mkdirs();
-		
+
 		f = new File(dir, docName);
 
 		if ( !f.isFile() ) {
 			String url = EDGAR_URL_DATA + cik + "/" + accn.replace("-", "") + "/" + docName;
 			safeDownload(url, f);
-
-			if ( docNameMissing ) {
-				// TODO post process the json, get the zip, extract, return the main file
-			}
 		}
 
 		if ( f.isFile() ) {
-			File fVal = new File(dir, accn + POSTFIX_VAL);
-			if ( !fVal.isFile() ) 
-			{
-				XbrlReportLoaderDomBase.createSplitCsv(f, dir, accn, TEXT_CUT_AT);
+			if ( docNameMissing ) {
+				docName = selectFileFromJsonIndex(f);
+				f = new File(dir, accn + EXT_XML);
+
+				if ( !f.isFile() ) {
+					String url = EDGAR_URL_DATA + cik + "/" + accn.replace("-", "") + "/" + docName;
+					safeDownload(url, f);
+				}
+
+				createSplitCsvFromXml(f, dir, accn, TEXT_CUT_AT);
+			} else {
+				File fVal = new File(dir, accn + POSTFIX_VAL);
+				if ( !fVal.isFile() ) {
+					XbrlReportLoaderDomBase.createSplitCsv(f, dir, accn, TEXT_CUT_AT);
+				}
 			}
 		}
 		return f;
+	}
+
+	Pattern ptSkipFile = Pattern.compile("(R(\\d+)\\.xml)|(.*_(cal|def|lab|pre)\\.xml)");
+
+	public String selectFileFromJsonIndex(File f) throws Exception {
+		String selName = null;
+
+		try (Reader fr = new FileReader(f)) {
+			Object root = jp.get().parse(fr);
+			Collection<Map<String, Object>> items = Dust.access(root, MindAccess.Peek, Collections.EMPTY_LIST, "directory", "item");
+			long maxLen = 0;
+
+			for (Map<String, Object> item : items) {
+				String name = (String) item.get("name");
+				if ( name.endsWith(".xml") ) {
+					Matcher m = ptSkipFile.matcher(name);
+					if ( !m.matches() ) {
+						int l = Integer.parseInt((String) item.get("size"));
+						if ( l > maxLen ) {
+							maxLen = l;
+							selName = name;
+						}
+					}
+				}
+			}
+		}
+
+		return selName;
+	}
+
+	@SuppressWarnings("unused")
+	public void createSplitCsvFromXml(File f, File targetDir, String fnPrefix, int textCut) throws Exception {
+		Map xbrlElements = new HashMap();
+
+		if ( null == dbf ) {
+			dbf = DocumentBuilderFactory.newInstance();
+			dbf.setNamespaceAware(true);
+		}
+
+		DocumentBuilder db = dbf.newDocumentBuilder();
+		Document doc = db.parse(f);
+
+		int dimCount = 0;
+
+		Element eRoot = doc.getDocumentElement();
+		String[] tt = eRoot.getTagName().split(":");
+		String defNS = "";
+		
+		if ( tt.length > 1 ) {
+			defNS = eRoot.getAttribute("xmlns:" + tt[0]);
+		}
+
+		String defLang = eRoot.getAttribute("xml:lang");
+		Dust.access(xbrlElements, MindAccess.Set, defLang, XbrlElements.DefLang);
+
+		NodeList nl = eRoot.getElementsByTagName("*");
+		int nodeCount = nl.getLength();
+
+		for (int idx = 0; idx < nodeCount; ++idx) {
+			Element e = (Element) nl.item(idx);
+			String tagName = e.getLocalName();
+
+			switch ( tagName ) {
+			case "context":
+				Map<String, String> cd = new TreeMap<>();
+
+				String ctxId = e.getAttribute("id");
+				Dust.access(xbrlElements, MindAccess.Set, cd, XbrlElements.Context, ctxId);
+
+				DustUtilsXml.optLoadTagText(cd, e, defNS, "startDate");
+				DustUtilsXml.optLoadTagText(cd, e, defNS, "endDate");
+				DustUtilsXml.optLoadTagText(cd, e, defNS, "instant");
+
+				Element eS = null;
+
+				eS = DustUtilsXml.getFirstElement(e, defNS, "segment");
+				if ( null == eS ) {
+					DustUtilsXml.optLoadTagText(cd, e, defNS, "entity");
+					eS = (Element) DustUtilsXml.getFirstElement(e, defNS, "scenario");
+				} else {
+					Element ee = DustUtilsXml.getFirstElement(e, defNS, "entity");
+					String eid = DustUtilsXml.getTagText(ee, defNS, "identifier");
+					cd.put("entity", eid);
+				}
+
+				if ( null != eS ) {
+					NodeList nlS = eS.getChildNodes();
+					int dimIdx = 0;
+					int dc = nlS.getLength();
+
+					for (int i2 = 0; i2 < dc; ++i2) {
+						Node dn = nlS.item(i2);
+						if ( dn instanceof Element ) {
+							Element m = (Element) dn;
+							String dim = m.getAttribute("dimension");
+							String dVal = m.getTextContent().trim();
+							++dimIdx;
+							cd.put("DimName_" + dimIdx, dim);
+							cd.put("DimValue_" + dimIdx, dVal);
+
+							if ( dimIdx > dimCount ) {
+								dimCount = dimIdx;
+							}
+						}
+					}
+				}
+				break;
+			case "unit":
+				String val = DustUtilsXml.getTagText(e, defNS, "unitNumerator");
+				if ( null != val ) {
+					String denom = DustUtilsXml.getTagText(e, defNS, "unitDenominator");
+					val = val + "/" + denom;
+				} else {
+					val = DustUtilsXml.getTagText(e, defNS, "measure");
+				}
+
+				Dust.access(xbrlElements, MindAccess.Set, val, XbrlElements.Unit, e.getAttribute("id"));
+
+				break;
+			}
+		}
+
+		for (int idx = 0; idx < nodeCount; ++idx) {
+			Element e = (Element) nl.item(idx);
+			String ctxId = e.getAttribute("contextRef");
+
+			if ( !DustUtils.isEmpty(ctxId) ) {
+				String tn = e.getTagName();
+				String value = e.getTextContent().trim();
+				Map<String, String> ctx = Dust.access(xbrlElements, MindAccess.Peek, null, XbrlElements.Context, ctxId);
+
+				String unitId = e.getAttribute("unitRef");
+				String unit = DustUtils.isEmpty(unitId) ? "-" : Dust.access(xbrlElements, MindAccess.Peek, null, XbrlElements.Unit, unitId);
+
+				String dec = e.getAttribute("decimals");
+			}
+		}
 	}
 
 	public void processSubmissions(String filterHead, String filterFiling, String filterDownload) throws Exception {

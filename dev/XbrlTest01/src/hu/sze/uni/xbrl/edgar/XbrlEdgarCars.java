@@ -2,16 +2,26 @@ package hu.sze.uni.xbrl.edgar;
 
 import java.io.BufferedReader;
 import java.io.File;
+import java.io.FileFilter;
 import java.io.FileReader;
 import java.io.PrintStream;
+import java.io.Reader;
 import java.util.ArrayList;
+import java.util.Collection;
+import java.util.Collections;
 import java.util.Iterator;
 import java.util.Map;
 import java.util.TreeMap;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
+
+import org.json.simple.parser.JSONParser;
 
 import hu.sze.milab.dust.Dust;
+import hu.sze.milab.dust.DustException;
 import hu.sze.milab.dust.utils.DustUtils;
 import hu.sze.milab.dust.utils.DustUtilsData;
+import hu.sze.milab.dust.utils.DustUtilsFile;
 import hu.sze.uni.xbrl.XbrlReportLoaderDomBase;
 import hu.sze.uni.xbrl.XbrlUtilsCounter;
 
@@ -32,11 +42,78 @@ public class XbrlEdgarCars implements XbrlEdgarConsts {
 		XbrlEdgarCars ec = new XbrlEdgarCars();
 
 		ec.procCarsDirect();
+//		ec.checkJsonIndex();
 
-		ec.edgarSource.dc.dump("Summary");
 	}
 
-	private void procCarsDirect() throws Exception {
+	void checkJsonIndex() throws Exception {
+		File dir = edgarSource.fReportRoot;
+		int cut = dir.getCanonicalPath().length();
+		JSONParser parser = new JSONParser();
+
+		Pattern ptRFiles = Pattern.compile("R(\\d+)\\.(xml|htm)");
+		Pattern ptXbrlExtFiles = Pattern.compile(".*_(cal|def|lab|pre)\\.xml");
+
+		DustUtils.ProcessMonitor pm = new DustUtils.ProcessMonitor("Car manufacturing file index", 0);
+
+		try (PrintStream ps = new PrintStream("work/carsJson.csv")) {
+
+			ps.println("Index\tFile\tType\tSize\tLastModified\tDownload");
+
+			FileFilter ff = new FileFilter() {
+				@Override
+				public boolean accept(File f) {
+					if ( f.isFile() && f.getName().endsWith(EXT_JSON) ) {
+						pm.step();
+						try (Reader fr = new FileReader(f)) {
+							String shortName = f.getCanonicalPath().substring(cut + 1);
+
+							Object root = parser.parse(fr);
+							Collection<Map<String, Object>> items = Dust.access(root, MindAccess.Peek, Collections.EMPTY_LIST, "directory", "item");
+							ArrayList<Map<String, Object>> sel = new ArrayList<>();
+							long maxLen = 0;
+							Object si = null;
+
+							for (Map<String, Object> item : items) {
+								String name = (String) item.get("name");
+								Matcher m = ptRFiles.matcher(name);
+								if ( !m.matches() ) {
+									sel.add(item);
+									if ( name.endsWith(".xml") ) {
+										Matcher m2 = ptXbrlExtFiles.matcher(name);
+										if ( !m2.matches() ) {
+											int l = Integer.parseInt((String) item.get("size"));
+											if ( l > maxLen ) {
+												maxLen = l;
+												si = item;
+											}
+										}
+									}
+								}
+							}
+
+							String selName = edgarSource.selectFileFromJsonIndex(f);
+
+							for (Map<String, Object> item : sel) {
+								String name = (String) item.get("name");
+								ps.println(DustUtils.sbAppend(null, "\t", true, shortName, name, item.get("type"), item.get("size"), item.get("last-modified"), si == item, DustUtils.isEqual(name, selName)));
+							}
+
+							ps.flush();
+						} catch (Exception e) {
+							DustException.swallow(e);
+						}
+					}
+					return false;
+				}
+			};
+
+			DustUtilsFile.searchRecursive(dir, ff);
+			System.out.println(pm);
+		}
+	}
+
+	void procCarsDirect() throws Exception {
 		DustUtils.ProcessMonitor pm = new DustUtils.ProcessMonitor("Car manufacturing collection", 10000);
 		XbrlUtilsCounter dc = new XbrlUtilsCounter(true);
 
@@ -45,9 +122,10 @@ public class XbrlEdgarCars implements XbrlEdgarConsts {
 		XbrlReportLoaderDomBase.DELETE_ON_ERROR = false;
 
 		try (PrintStream ps = new PrintStream("work/cars.csv"); BufferedReader br = new BufferedReader(new FileReader(edgarSource.fSubmissionIndex))) {
-			
-			ps.println("CIK\tCompany Name\tForm Type\tReport Date\tFiling Date\tAccession Number\tFile Size\tDocument name\tFactRefs\tDirectory\tData file\tData lines\tData valid\tMatch\tFactMiss\tDataMiss");
-			
+
+			ps.println(
+					"CIK\tCompany Name\tForm Type\tReport Date\tFiling Date\tAccession Number\tFile Size\tDocument name\tFactRefs\tDirectory\tData file\tData lines\tData valid\tMatch\tFactMiss\tDataMiss");
+
 			for (String line; (line = br.readLine()) != null;) {
 
 				pm.step();
@@ -107,9 +185,9 @@ public class XbrlEdgarCars implements XbrlEdgarConsts {
 									} else {
 										dc.add("Doc <ALL>");
 //										++cntDocLine;
-										
+
 										String accn = trf.get(rowf, EdgarSubmissionAtt.accessionNumber.name());
-										
+
 //										if ( !"0001213900-21-042428".equals(accn)) {
 //											continue;
 //										}
@@ -124,7 +202,8 @@ public class XbrlEdgarCars implements XbrlEdgarConsts {
 //											++cntDocOK;
 										}
 
-										StringBuilder sbLog = DustUtils.sbAppend(null, "\t", true, trSubIdx.get(row, "cik"), trSubIdx.get(row, "name"), trf.get(rowf, "form"), trf.get(rowf, "reportDate"), trf.get(rowf, "filingDate"), accn, trf.get(rowf, "size"), docName);
+										StringBuilder sbLog = DustUtils.sbAppend(null, "\t", true, trSubIdx.get(row, "cik"), trSubIdx.get(row, "name"), trf.get(rowf, "form"), trf.get(rowf, "reportDate"),
+												trf.get(rowf, "filingDate"), accn, trf.get(rowf, "size"), docName);
 
 										ArrayList<String> compFacts = reports.remove(accn);
 										if ( null != compFacts ) {
@@ -134,13 +213,14 @@ public class XbrlEdgarCars implements XbrlEdgarConsts {
 											String cik = trSubIdx.get(row, EdgarHeadFields.cik.name());
 											String pathPrefix = trSubIdx.get(row, EdgarHeadFields.__PathPrefix.name());
 											docName = docName.substring(1, docName.length() - 1);
-											
+
 											String dirName = pathPrefix + "/" + formType + "/" + accn;
 
 											DustUtils.sbAppend(sbLog, "\t", true, compFacts.size(), dirName);
 
 											try {
-												edgarSource.getFiling(cik, pathPrefix, formType, accn, docName);
+												edgarSource.getFiling(cik, pathPrefix, formType, accn, null);
+//												edgarSource.getFiling(cik, pathPrefix, formType, accn, docName);
 
 											} catch (Throwable e) {
 												String msg = e.toString();
@@ -152,11 +232,11 @@ public class XbrlEdgarCars implements XbrlEdgarConsts {
 											String dataFileName = accn + POSTFIX_VAL;
 //											File dir = new File(edgarSource.fReportRoot, pathPrefix + "/" + formType + "/" + accn);
 //											File fVal = new File(dir, accn + POSTFIX_VAL);
-											File fVal = new File(edgarSource.fReportRoot, dirName + "/" +dataFileName);
+											File fVal = new File(edgarSource.fReportRoot, dirName + "/" + dataFileName);
 											if ( fVal.isFile() ) {
 												dc.add("Data doc <Available>");
 												DustUtils.sbAppend(sbLog, "\t", true, dataFileName);
-												
+
 												dc.add("Fact TO MATCH", compFacts.size());
 
 												int cntLine = 0;
@@ -234,11 +314,10 @@ public class XbrlEdgarCars implements XbrlEdgarConsts {
 
 												dc.add("Fact not found in Data", compFacts.size());
 
-												
 												DustUtils.sbAppend(sbLog, "\t", true, cntLine, cntData, cntMatch, compFacts.size(), cntMiss);
 											}
 										}
-										
+
 										ps.println(sbLog);
 
 									}
@@ -252,7 +331,7 @@ public class XbrlEdgarCars implements XbrlEdgarConsts {
 					}
 				}
 				ps.flush();
-			}			
+			}
 		}
 
 //		Dust.dump(" ", true, "Companies:", cntCompanies, "Referred Docs:", cntDocRefs, "All Submission:", cntDocLine, "Primary document known", cntDocOK, "Successfully loaded", cntDocLoaded);

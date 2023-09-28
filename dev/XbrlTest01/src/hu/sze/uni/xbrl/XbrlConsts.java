@@ -52,10 +52,17 @@ public interface XbrlConsts extends DustConsts {
 			return ret;
 		}
 	}
+	
+	enum XbrlElements {
+		Context, Unit, Continuation, Footnote, DimCount, DefLang,
+	}
+
 
 	String XML_ELEMENT = "XmlElement";
 	String XML_ATTRIBUTES = "XmlAttributes";
 	String XML_CONTENT = "XmlContent";
+
+	String NS_XBRLI = "xbrli";
 
 	String KEY_XBRL_ID = "id";
 	String KEY_XBRL_CTXREF = "contextRef";

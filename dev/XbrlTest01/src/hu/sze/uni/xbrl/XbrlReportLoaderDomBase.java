@@ -31,9 +31,6 @@ public abstract class XbrlReportLoaderDomBase implements XbrlConsts {
 
 	public static boolean DELETE_ON_ERROR = true;
 
-	enum XbrlElements {
-		Context, Unit, Continuation, Footnote, DimCount, DefLang,
-	}
 
 	Map<XbrlFactDataInfo, String> cvtKeys = new HashMap<>();
 
