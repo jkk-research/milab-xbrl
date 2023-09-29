@@ -6,6 +6,7 @@ import java.io.FileFilter;
 import java.io.FileReader;
 import java.io.PrintStream;
 import java.io.Reader;
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
@@ -21,6 +22,7 @@ import hu.sze.milab.dust.Dust;
 import hu.sze.milab.dust.DustException;
 import hu.sze.milab.dust.utils.DustUtils;
 import hu.sze.milab.dust.utils.DustUtilsData;
+import hu.sze.milab.dust.utils.DustUtilsData.TableReader;
 import hu.sze.milab.dust.utils.DustUtilsFile;
 import hu.sze.uni.xbrl.XbrlReportLoaderDomBase;
 import hu.sze.uni.xbrl.XbrlUtilsCounter;
@@ -120,7 +122,11 @@ public class XbrlEdgarCars implements XbrlEdgarConsts {
 		DustUtilsData.TableReader trSubIdx = null;
 
 		XbrlReportLoaderDomBase.DELETE_ON_ERROR = false;
-
+		
+		boolean unitAware = false;
+		String selAccn = null;
+		selAccn = "0000950123-11-073440";
+		
 		try (PrintStream ps = new PrintStream("work/cars.csv"); BufferedReader br = new BufferedReader(new FileReader(edgarSource.fSubmissionIndex))) {
 
 			ps.println(
@@ -188,9 +194,9 @@ public class XbrlEdgarCars implements XbrlEdgarConsts {
 
 										String accn = trf.get(rowf, EdgarSubmissionAtt.accessionNumber.name());
 
-//										if ( !"0001213900-21-042428".equals(accn)) {
-//											continue;
-//										}
+										if ( !DustUtils.isEmpty(selAccn) && !selAccn.equals(accn)) {
+											continue;
+										}
 
 										String docName = (String) trf.get(rowf, EdgarSubmissionAtt.primaryDocument.name());
 										docName = DustUtils.csvUnEscape(docName, true);
@@ -248,7 +254,7 @@ public class XbrlEdgarCars implements XbrlEdgarConsts {
 
 													DustUtilsData.TableReader trv = null;
 													Map<String, Object> val = new TreeMap<>();
-													String[] find = new String[] { "Concept", "Taxonomy", "Instant", "StartDate", "EndDate" };
+													String[] find = new String[] { "Concept", "Taxonomy" };
 
 													for (String linev; (linev = brv.readLine()) != null;) {
 														String[] rowv = linev.split("\t");
@@ -264,10 +270,10 @@ public class XbrlEdgarCars implements XbrlEdgarConsts {
 															trv.get(rowv, val, "Taxonomy", "Concept", "Unit", "Value", "StartDate", "EndDate", "Instant");
 
 															if ( val.isEmpty() ) {
+																dc.add("Data facts INVALID");
 																continue;
 															}
 
-															dc.add("Data facts <Valid>");
 															++cntData;
 
 															String unit = ((String) val.getOrDefault("Unit", "-")).replace("iso4217:", "").replace("xbrli:", "");
@@ -282,14 +288,32 @@ public class XbrlEdgarCars implements XbrlEdgarConsts {
 																		break;
 																	}
 																}
-																if ( match && !"-".equals(unit) && !DustUtils.isEqual(unit, trcf.get(rowcf, "Unit")) ) {
+																if ( match ) {
+																	match = matchPeriod(val, trcf, rowcf);
+																}
+																if ( unitAware && match && !"-".equals(unit) && !DustUtils.isEqual(unit, trcf.get(rowcf, "Unit")) ) {
 																	match = false;
 																	break;
 																}
 
 																if ( match ) {
-																	if ( DustUtils.isEqual(val.get("Value"), trcf.get(rowcf, "Value")) ) {
-																		dc.add("Fact match " + trv.get(rowv, "Type"));
+																	String vVal = (String) val.get("Value");
+																	String cfVal = trcf.get(rowcf, "Value");
+
+																	String type = trv.get(rowv, "Type");
+
+																	if ( (null != vVal) && vVal.contains(".") && vVal.endsWith("0") ) {
+																		vVal = vVal.replaceAll("(0+)$", "");
+																		if ( vVal.endsWith(".") ) {
+																			vVal = vVal.substring(0, vVal.length() - 1);
+																		}
+																	}
+																	if ( (null != vVal) && cfVal.contains(".") && cfVal.endsWith("0") ) {
+																		cfVal = cfVal.replaceAll("(0+)$", "");
+																	}
+
+																	if ( DustUtils.isEqual(vVal, cfVal) ) {
+																		dc.add("Fact match " + type);
 																		++cntMatch;
 																		if ( null == matchLine ) {
 																			matchLine = cfl;
@@ -299,6 +323,8 @@ public class XbrlEdgarCars implements XbrlEdgarConsts {
 																		}
 																		cfIt.remove();
 																		break;
+//																	} else {
+//																		dc.add("Fact DIFF " + accn);
 																	}
 																}
 															}
@@ -312,8 +338,11 @@ public class XbrlEdgarCars implements XbrlEdgarConsts {
 													}
 												}
 
-												dc.add("Fact not found in Data", compFacts.size());
-
+												int dmiss = compFacts.size();
+												if ( 0 < dmiss ) {
+													dc.add("Fact not found in Data", dmiss);
+													dc.add("Fact not found in Data " + accn, dmiss);
+												}
 												DustUtils.sbAppend(sbLog, "\t", true, cntLine, cntData, cntMatch, compFacts.size(), cntMiss);
 											}
 										}
@@ -336,7 +365,45 @@ public class XbrlEdgarCars implements XbrlEdgarConsts {
 
 //		Dust.dump(" ", true, "Companies:", cntCompanies, "Referred Docs:", cntDocRefs, "All Submission:", cntDocLine, "Primary document known", cntDocOK, "Successfully loaded", cntDocLoaded);
 		dc.dump("Car stats");
+		edgarSource.dc.dump("Load stats");
 
 		System.out.println(pm);
+	}
+
+	private final String[] DATEFLDS = new String[] { "Instant", "StartDate", "EndDate" };
+	private final SimpleDateFormat DFISO = new SimpleDateFormat("yyyy-MM-dd");
+	private static final long PERIODRANGE = 1000 * 60 * 60 * 24 * 4;
+	
+	private boolean matchPeriod(Map<String, Object> val, TableReader trcf, String[] rowcf) throws Exception {
+		
+		String vsd = (String) val.get("StartDate");
+		if ( !DustUtils.isEmpty(vsd) && DustUtils.isEqual(vsd, val.get("EndDate")) && !DustUtils.isEmpty(trcf.get(rowcf, "Instant"))) {
+			val.remove("StartDate");
+			val.remove("EndDate");
+			val.put("Instant", vsd);
+		}
+		
+		for ( String k : DATEFLDS ) {
+			String d1 = (String) val.get(k);
+			String d2 = trcf.get(rowcf, k);
+			
+			if ( DustUtils.isEmpty(d1) ) {
+				if ( !DustUtils.isEmpty(d2) ) {
+					return false;
+				}
+			} else {
+				if ( DustUtils.isEmpty(d2) ) {
+					return false;
+				} else {
+					long diff = DFISO.parse(d1).getTime() - DFISO.parse(d2).getTime();
+					
+					if ( (diff < -PERIODRANGE) || ( PERIODRANGE < diff )) {
+						return false;
+					}
+				}
+			}
+		}
+		
+		return true;
 	}
 }

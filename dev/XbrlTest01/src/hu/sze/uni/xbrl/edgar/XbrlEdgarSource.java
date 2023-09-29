@@ -38,6 +38,7 @@ import hu.sze.milab.dust.utils.DustUtils;
 import hu.sze.milab.dust.utils.DustUtilsData;
 import hu.sze.milab.dust.utils.DustUtilsFile;
 import hu.sze.milab.dust.utils.DustUtilsXml;
+import hu.sze.milab.xbrl.XbrlConsts.XbrlFactDataType;
 import hu.sze.uni.xbrl.XbrlReportLoaderDomBase;
 import hu.sze.uni.xbrl.XbrlUtils;
 import hu.sze.uni.xbrl.XbrlUtilsCounter;
@@ -90,7 +91,7 @@ public class XbrlEdgarSource implements XbrlEdgarConsts {
 		XbrlUtils.download(url, file, EDGAR_APIHDR_USER, EDGAR_APIHDR_ENCODING /* , EDGAR_APIHDR_HOST */);
 	}
 
-	public static void main(String[] args) throws Exception {
+	public static void mainX(String[] args) throws Exception {
 		Dust.main(args);
 
 		File dataRoot = new File(System.getProperty("user.home") + "/work/xbrl/data");
@@ -139,19 +140,20 @@ public class XbrlEdgarSource implements XbrlEdgarConsts {
 		}
 
 		if ( f.isFile() ) {
-			if ( docNameMissing ) {
-				docName = selectFileFromJsonIndex(f);
-				f = new File(dir, accn + EXT_XML);
+			File fVal = new File(dir, accn + POSTFIX_VAL);
+//			if ( !fVal.isFile() ) 
+			{
+				if ( docNameMissing ) {
+					docName = selectFileFromJsonIndex(f);
+					f = new File(dir, accn + EXT_XML);
 
-				if ( !f.isFile() ) {
-					String url = EDGAR_URL_DATA + cik + "/" + accn.replace("-", "") + "/" + docName;
-					safeDownload(url, f);
-				}
+					if ( !f.isFile() ) {
+						String url = EDGAR_URL_DATA + cik + "/" + accn.replace("-", "") + "/" + docName;
+						safeDownload(url, f);
+					}
 
-				createSplitCsvFromXml(f, dir, accn, TEXT_CUT_AT);
-			} else {
-				File fVal = new File(dir, accn + POSTFIX_VAL);
-				if ( !fVal.isFile() ) {
+					createSplitCsvFromXml(f, dir, accn, TEXT_CUT_AT);
+				} else {
 					XbrlReportLoaderDomBase.createSplitCsv(f, dir, accn, TEXT_CUT_AT);
 				}
 			}
@@ -187,7 +189,6 @@ public class XbrlEdgarSource implements XbrlEdgarConsts {
 		return selName;
 	}
 
-	@SuppressWarnings("unused")
 	public void createSplitCsvFromXml(File f, File targetDir, String fnPrefix, int textCut) throws Exception {
 		Map xbrlElements = new HashMap();
 
@@ -202,12 +203,8 @@ public class XbrlEdgarSource implements XbrlEdgarConsts {
 		int dimCount = 0;
 
 		Element eRoot = doc.getDocumentElement();
-		String[] tt = eRoot.getTagName().split(":");
-		String defNS = "";
-		
-		if ( tt.length > 1 ) {
-			defNS = eRoot.getAttribute("xmlns:" + tt[0]);
-		}
+		String[] tt = null; 
+		String defNS = null;
 
 		String defLang = eRoot.getAttribute("xml:lang");
 		Dust.access(xbrlElements, MindAccess.Set, defLang, XbrlElements.DefLang);
@@ -215,12 +212,23 @@ public class XbrlEdgarSource implements XbrlEdgarConsts {
 		NodeList nl = eRoot.getElementsByTagName("*");
 		int nodeCount = nl.getLength();
 
+		boolean empty = true;
+
 		for (int idx = 0; idx < nodeCount; ++idx) {
 			Element e = (Element) nl.item(idx);
-			String tagName = e.getLocalName();
+			
+			tt = e.getTagName().split(":");
+			String tagName = tt[0];
+			String locNS = null;
+			
+			if ( tt.length > 1 ) {
+				locNS = eRoot.getAttribute("xmlns:" + tt[0]);
+				tagName = tt[1];
+			}
 
 			switch ( tagName ) {
 			case "context":
+				defNS = locNS;
 				Map<String, String> cd = new TreeMap<>();
 
 				String ctxId = e.getAttribute("id");
@@ -265,6 +273,9 @@ public class XbrlEdgarSource implements XbrlEdgarConsts {
 				}
 				break;
 			case "unit":
+				defNS = locNS;
+				String unidId = e.getAttribute("id");
+
 				String val = DustUtilsXml.getTagText(e, defNS, "unitNumerator");
 				if ( null != val ) {
 					String denom = DustUtilsXml.getTagText(e, defNS, "unitDenominator");
@@ -273,25 +284,94 @@ public class XbrlEdgarSource implements XbrlEdgarConsts {
 					val = DustUtilsXml.getTagText(e, defNS, "measure");
 				}
 
-				Dust.access(xbrlElements, MindAccess.Set, val, XbrlElements.Unit, e.getAttribute("id"));
+				Dust.access(xbrlElements, MindAccess.Set, val, XbrlElements.Unit, unidId);
 
 				break;
 			}
 		}
 
-		for (int idx = 0; idx < nodeCount; ++idx) {
-			Element e = (Element) nl.item(idx);
-			String ctxId = e.getAttribute("contextRef");
+		try (PrintStream psData = new PrintStream(new File(targetDir, fnPrefix + POSTFIX_VAL)); PrintStream psText = new PrintStream(new File(targetDir, fnPrefix + POSTFIX_TXT));) {
 
-			if ( !DustUtils.isEmpty(ctxId) ) {
-				String tn = e.getTagName();
-				String value = e.getTextContent().trim();
-				Map<String, String> ctx = Dust.access(xbrlElements, MindAccess.Peek, null, XbrlElements.Context, ctxId);
+			psData.print("Entity\tTaxonomy\tConcept\tStartDate\tEndDate\tInstant");
+			psText.print("Entity\tTaxonomy\tConcept\tStartDate\tEndDate\tInstant");
 
-				String unitId = e.getAttribute("unitRef");
-				String unit = DustUtils.isEmpty(unitId) ? "-" : Dust.access(xbrlElements, MindAccess.Peek, null, XbrlElements.Unit, unitId);
+			for (int i = 1; i <= dimCount; ++i) {
+				psData.print("\tAxis_" + i + "\tDim_" + i);
+				psText.print("\tAxis_" + i + "\tDim_" + i);
+			}
 
-				String dec = e.getAttribute("decimals");
+			psData.println("\tOrigValue\tUnit\tFormat\tSign\tDec\tScale\tType\tValue\tErr");
+			psText.println("\tLanguage\tValue");
+
+			Pattern ptDate = Pattern.compile("\\d{4}-\\d{2}-\\d{2}");
+
+			for (int idx = 0; idx < nodeCount; ++idx) {
+				Element e = (Element) nl.item(idx);
+				String ctxId = e.getAttribute("contextRef");
+
+				if ( !DustUtils.isEmpty(ctxId) ) {
+					String tn = e.getTagName();
+					tt = tn.split(":");
+					String value = e.getTextContent().trim();
+					String valOrig = value;
+					Map<String, String> ctx = Dust.access(xbrlElements, MindAccess.Peek, null, XbrlElements.Context, ctxId);
+
+					String unitId = e.getAttribute("unitRef");
+					String unit = DustUtils.isEmpty(unitId) ? "-" : Dust.access(xbrlElements, MindAccess.Peek, null, XbrlElements.Unit, unitId);
+
+					String dec = e.getAttribute("decimals");
+
+					StringBuilder sbLine = DustUtils.sbAppend(null, "\t", true, ctx.get("entity"), tt[0], tt[1], ctx.get("startDate"), ctx.get("endDate"), ctx.get("instant"));
+
+					for (int i = 1; i <= dimCount; ++i) {
+						DustUtils.sbAppend(sbLine, "\t", true, ctx.get("DimName_" + i), ctx.get("DimValue_" + i));
+					}
+
+					int vl = value.length();
+					XbrlFactDataType xt = XbrlFactDataType.string;
+					String safeErr = "";
+
+					if ( 0 == vl ) {
+						xt = XbrlFactDataType.empty;
+					} else if ( vl > textCut ) {
+						String lang = e.getAttribute("xml:lang");
+						if ( DustUtils.isEmpty(lang) ) {
+							lang = Dust.access(xbrlElements, MindAccess.Peek, null, XbrlElements.DefLang);
+						}
+						StringBuilder sbTxt = DustUtils.sbAppend(null, "\t", true, sbLine, lang, DustUtils.csvEscape(value, true));
+
+						psText.println(sbTxt);
+
+						xt = XbrlFactDataType.text;
+						value = "Txt len: " + vl;
+						valOrig = valOrig.substring(0, textCut);
+					} else if ( DustUtils.isEmpty(unitId) ) {
+						if ( vl == 10 ) {
+							Matcher m = ptDate.matcher(value);
+							if ( m.matches() ) {
+								xt = XbrlFactDataType.date;
+							}
+						} else if ( "true".equals(value) || "false".equals(value) ) {
+							xt = XbrlFactDataType.bool;
+						} 
+					} else {
+						xt = XbrlFactDataType.number;
+					}
+					
+					if ( xt == XbrlFactDataType.string ) {
+						value = DustUtils.csvEscape(value, true);
+					}
+
+					dc.add("Loaded fact " + xt);
+
+					DustUtils.sbAppend(sbLine, "\t", true, DustUtils.csvEscape(valOrig, true), unit, "", "", dec, "", xt, value, safeErr);
+					psData.println(sbLine);
+
+					if ( empty ) {
+						empty = false;
+						dc.add("Loaded file");
+					}
+				}
 			}
 		}
 	}

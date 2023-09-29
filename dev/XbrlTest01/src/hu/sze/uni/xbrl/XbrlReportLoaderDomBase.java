@@ -308,7 +308,7 @@ public abstract class XbrlReportLoaderDomBase implements XbrlConsts {
 				if ( first ) {
 					String lang = e.getAttribute("xml:lang");
 					if ( DustUtils.isEmpty(lang) ) {
-						lang = Dust.access(xbrlElements, MindAccess.Set, null, XbrlElements.DefLang);
+						lang = Dust.access(xbrlElements, MindAccess.Peek, null, XbrlElements.DefLang);
 					}
 					ps.print("\t" + lang + "\t\"");
 					sbTxtFrag.setLength(0);
