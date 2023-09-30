@@ -6,6 +6,7 @@ import java.io.FileFilter;
 import java.io.FileReader;
 import java.io.PrintStream;
 import java.io.Reader;
+import java.math.BigDecimal;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Collection;
@@ -125,7 +126,7 @@ public class XbrlEdgarCars implements XbrlEdgarConsts {
 		
 		boolean unitAware = false;
 		String selAccn = null;
-		selAccn = "0000950123-11-073440";
+//		selAccn = "0001193125-11-191732";
 		
 		try (PrintStream ps = new PrintStream("work/cars.csv"); BufferedReader br = new BufferedReader(new FileReader(edgarSource.fSubmissionIndex))) {
 
@@ -297,19 +298,14 @@ public class XbrlEdgarCars implements XbrlEdgarConsts {
 																}
 
 																if ( match ) {
-																	String vVal = (String) val.get("Value");
-																	String cfVal = trcf.get(rowcf, "Value");
-
+																	Object vVal = val.get("Value");
+																	Object cfVal = trcf.get(rowcf, "Value");
+																	
 																	String type = trv.get(rowv, "Type");
-
-																	if ( (null != vVal) && vVal.contains(".") && vVal.endsWith("0") ) {
-																		vVal = vVal.replaceAll("(0+)$", "");
-																		if ( vVal.endsWith(".") ) {
-																			vVal = vVal.substring(0, vVal.length() - 1);
-																		}
-																	}
-																	if ( (null != vVal) && cfVal.contains(".") && cfVal.endsWith("0") ) {
-																		cfVal = cfVal.replaceAll("(0+)$", "");
+																	
+																	if ( "number".equals(type)) {
+																		vVal = new BigDecimal((String) vVal).stripTrailingZeros();
+																		cfVal = new BigDecimal((String) cfVal).stripTrailingZeros();
 																	}
 
 																	if ( DustUtils.isEqual(vVal, cfVal) ) {
@@ -325,6 +321,8 @@ public class XbrlEdgarCars implements XbrlEdgarConsts {
 																		break;
 //																	} else {
 //																		dc.add("Fact DIFF " + accn);
+//																	} else {
+//																		DustUtils.breakpoint();
 																	}
 																}
 															}
@@ -351,10 +349,6 @@ public class XbrlEdgarCars implements XbrlEdgarConsts {
 
 									}
 								}
-
-//								if ( !reports.isEmpty() ) {
-//									DustUtils.breakpoint();
-//								}
 							}
 						}
 					}
@@ -372,16 +366,9 @@ public class XbrlEdgarCars implements XbrlEdgarConsts {
 
 	private final String[] DATEFLDS = new String[] { "Instant", "StartDate", "EndDate" };
 	private final SimpleDateFormat DFISO = new SimpleDateFormat("yyyy-MM-dd");
-	private static final long PERIODRANGE = 1000 * 60 * 60 * 24 * 4;
+	private static final long PERIODRANGE = 1000 * 60 * 60 * 24 * 8;
 	
 	private boolean matchPeriod(Map<String, Object> val, TableReader trcf, String[] rowcf) throws Exception {
-		
-		String vsd = (String) val.get("StartDate");
-		if ( !DustUtils.isEmpty(vsd) && DustUtils.isEqual(vsd, val.get("EndDate")) && !DustUtils.isEmpty(trcf.get(rowcf, "Instant"))) {
-			val.remove("StartDate");
-			val.remove("EndDate");
-			val.put("Instant", vsd);
-		}
 		
 		for ( String k : DATEFLDS ) {
 			String d1 = (String) val.get(k);

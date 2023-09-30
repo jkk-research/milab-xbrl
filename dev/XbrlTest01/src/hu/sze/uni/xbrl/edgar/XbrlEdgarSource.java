@@ -7,6 +7,8 @@ import java.io.FileReader;
 import java.io.PrintStream;
 import java.io.PrintWriter;
 import java.io.Reader;
+import java.math.BigDecimal;
+import java.math.RoundingMode;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
@@ -203,7 +205,7 @@ public class XbrlEdgarSource implements XbrlEdgarConsts {
 		int dimCount = 0;
 
 		Element eRoot = doc.getDocumentElement();
-		String[] tt = null; 
+		String[] tt = null;
 		String defNS = null;
 
 		String defLang = eRoot.getAttribute("xml:lang");
@@ -216,11 +218,11 @@ public class XbrlEdgarSource implements XbrlEdgarConsts {
 
 		for (int idx = 0; idx < nodeCount; ++idx) {
 			Element e = (Element) nl.item(idx);
-			
+
 			tt = e.getTagName().split(":");
 			String tagName = tt[0];
 			String locNS = null;
-			
+
 			if ( tt.length > 1 ) {
 				locNS = eRoot.getAttribute("xmlns:" + tt[0]);
 				tagName = tt[1];
@@ -234,9 +236,16 @@ public class XbrlEdgarSource implements XbrlEdgarConsts {
 				String ctxId = e.getAttribute("id");
 				Dust.access(xbrlElements, MindAccess.Set, cd, XbrlElements.Context, ctxId);
 
-				DustUtilsXml.optLoadTagText(cd, e, defNS, "startDate");
+				boolean sdLoaded = DustUtilsXml.optLoadTagText(cd, e, defNS, "startDate");
 				DustUtilsXml.optLoadTagText(cd, e, defNS, "endDate");
 				DustUtilsXml.optLoadTagText(cd, e, defNS, "instant");
+
+				String d;
+				if ( sdLoaded && DustUtils.isEqual(d = cd.get("startDate"), cd.get("endDate")) ) {
+					cd.put("instant", d);
+					cd.remove("startDate");
+					cd.remove("endDate");
+				}
 
 				Element eS = null;
 
@@ -353,11 +362,24 @@ public class XbrlEdgarSource implements XbrlEdgarConsts {
 							}
 						} else if ( "true".equals(value) || "false".equals(value) ) {
 							xt = XbrlFactDataType.bool;
-						} 
+						}
 					} else {
 						xt = XbrlFactDataType.number;
+						
+						BigDecimal dVal = new BigDecimal(value);
+
+						if ( !DustUtils.isEmpty(dec) && !"0".equals(dec) && !"INF".equals(dec) ) {
+							dVal = dVal.setScale(Integer.valueOf(dec), RoundingMode.FLOOR);
+						}
+						
+						dVal = dVal.stripTrailingZeros();
+						value = dVal.toPlainString();
+						
+//						if ( value.contains(".") && value.endsWith("0") ) {
+//							value = value.replaceAll("(\\.?0+)$", "");
+//						}
 					}
-					
+
 					if ( xt == XbrlFactDataType.string ) {
 						value = DustUtils.csvEscape(value, true);
 					}
