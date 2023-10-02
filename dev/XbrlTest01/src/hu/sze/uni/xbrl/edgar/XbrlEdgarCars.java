@@ -123,15 +123,23 @@ public class XbrlEdgarCars implements XbrlEdgarConsts {
 		DustUtilsData.TableReader trSubIdx = null;
 
 		XbrlReportLoaderDomBase.DELETE_ON_ERROR = false;
-		
+
 		boolean unitAware = false;
 		String selAccn = null;
-//		selAccn = "0001193125-11-191732";
-		
-		try (PrintStream ps = new PrintStream("work/cars.csv"); BufferedReader br = new BufferedReader(new FileReader(edgarSource.fSubmissionIndex))) {
+//		selAccn = "0000808450-12-000067";
+
+		try (PrintStream ps = new PrintStream("work/cars.csv");
+				PrintStream psDiff = new PrintStream("work/carsDiff.csv");
+				BufferedReader br = new BufferedReader(new FileReader(edgarSource.fSubmissionIndex))) {
+
+			String compFactHeader = "cik\tform\taccn\tfiled\tfp\tfy\tframe\tTaxonomy\tConcept\tUnit\tInstant\tStartDate\tEndDate\tValue";
+			String[] rowcf = compFactHeader.split("\t");
+			DustUtilsData.TableReader trcf = new DustUtilsData.TableReader(rowcf);
 
 			ps.println(
 					"CIK\tCompany Name\tForm Type\tReport Date\tFiling Date\tAccession Number\tFile Size\tDocument name\tFactRefs\tDirectory\tData file\tData lines\tData valid\tMatch\tFactMiss\tDataMiss");
+
+			psDiff.println("Directory\t" + compFactHeader);
 
 			for (String line; (line = br.readLine()) != null;) {
 
@@ -174,9 +182,6 @@ public class XbrlEdgarCars implements XbrlEdgarConsts {
 							}
 						}
 
-						String[] rowcf = "cik,form,accn,filed,fp,fy,frame,Taxonomy,Concept,Unit,Instant,StartDate,EndDate,Value".split(",");
-						DustUtilsData.TableReader trcf = new DustUtilsData.TableReader(rowcf);
-
 						File fSubs = new File(edgarSource.fSubmissionRoot, trSubIdx.get(row, EdgarHeadFields.__PathPrefix.name()) + ".csv");
 						if ( fSubs.isFile() ) {
 							try (BufferedReader brf = new BufferedReader(new FileReader(fSubs))) {
@@ -195,7 +200,7 @@ public class XbrlEdgarCars implements XbrlEdgarConsts {
 
 										String accn = trf.get(rowf, EdgarSubmissionAtt.accessionNumber.name());
 
-										if ( !DustUtils.isEmpty(selAccn) && !selAccn.equals(accn)) {
+										if ( !DustUtils.isEmpty(selAccn) && !selAccn.equals(accn) ) {
 											continue;
 										}
 
@@ -300,10 +305,10 @@ public class XbrlEdgarCars implements XbrlEdgarConsts {
 																if ( match ) {
 																	Object vVal = val.get("Value");
 																	Object cfVal = trcf.get(rowcf, "Value");
-																	
+
 																	String type = trv.get(rowv, "Type");
-																	
-																	if ( "number".equals(type)) {
+
+																	if ( "number".equals(type) ) {
 																		vVal = new BigDecimal((String) vVal).stripTrailingZeros();
 																		cfVal = new BigDecimal((String) cfVal).stripTrailingZeros();
 																	}
@@ -340,7 +345,14 @@ public class XbrlEdgarCars implements XbrlEdgarConsts {
 												if ( 0 < dmiss ) {
 													dc.add("Fact not found in Data", dmiss);
 													dc.add("Fact not found in Data " + accn, dmiss);
+
+													for (String cf : compFacts) {
+														psDiff.println(dirName + "\t" + cf);
+													}
+													
+													psDiff.flush();
 												}
+												
 												DustUtils.sbAppend(sbLog, "\t", true, cntLine, cntData, cntMatch, compFacts.size(), cntMiss);
 											}
 										}
@@ -367,13 +379,13 @@ public class XbrlEdgarCars implements XbrlEdgarConsts {
 	private final String[] DATEFLDS = new String[] { "Instant", "StartDate", "EndDate" };
 	private final SimpleDateFormat DFISO = new SimpleDateFormat("yyyy-MM-dd");
 	private static final long PERIODRANGE = 1000 * 60 * 60 * 24 * 8;
-	
+
 	private boolean matchPeriod(Map<String, Object> val, TableReader trcf, String[] rowcf) throws Exception {
-		
-		for ( String k : DATEFLDS ) {
+
+		for (String k : DATEFLDS) {
 			String d1 = (String) val.get(k);
 			String d2 = trcf.get(rowcf, k);
-			
+
 			if ( DustUtils.isEmpty(d1) ) {
 				if ( !DustUtils.isEmpty(d2) ) {
 					return false;
@@ -383,14 +395,14 @@ public class XbrlEdgarCars implements XbrlEdgarConsts {
 					return false;
 				} else {
 					long diff = DFISO.parse(d1).getTime() - DFISO.parse(d2).getTime();
-					
-					if ( (diff < -PERIODRANGE) || ( PERIODRANGE < diff )) {
+
+					if ( (diff < -PERIODRANGE) || (PERIODRANGE < diff) ) {
 						return false;
 					}
 				}
 			}
 		}
-		
+
 		return true;
 	}
 }
