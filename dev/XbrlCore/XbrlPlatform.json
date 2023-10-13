@@ -39,7 +39,7 @@
 			"id": "hu.sze.milab.xbrl.Platform:HttpServer",
 			"attributes": {
 				"hu.sze.milab.NET:HOST_PORT": 8090,
-				"hu.sze.milab.STREAM:STREAM_PATH": "/admin"
+				"hu.sze.milab.TEXT:NAMED_NAME": "/admin"
 			},
 			"relationships": {
 				"hu.sze.milab.MIND:AGENT_LOGIC": {
@@ -53,6 +53,14 @@
 						{
 							"type": "hu.sze.milab.MIND:AGENT",
 							"id": "hu.sze.milab.xbrl.Platform:HttpServer"
+						},
+						{
+							"type": "hu.sze.milab.MIND:AGENT",
+							"id": "hu.sze.milab.xbrl.Platform:JsonAPI"
+						},
+						{
+							"type": "hu.sze.milab.MIND:AGENT",
+							"id": "hu.sze.milab.xbrl.Platform:Webroot"
 						}
 					]
 				},
@@ -60,6 +68,52 @@
 					"data": {
 						"type": "hu.sze.milab.MIND:AGENT",
 						"id": "hu.sze.milab.xbrl.Platform:HttpServer"
+					}
+				}
+			}
+		},
+		{
+			"type": "hu.sze.milab.MIND:AGENT",
+			"id": "hu.sze.milab.xbrl.Platform:Webroot",
+			"attributes": {
+				"hu.sze.milab.TEXT:NAMED_NAME": "/",
+				"hu.sze.milab.STREAM:STREAM_PATH": "webroot",
+				"hu.sze.milab.MISC:GEN_ALIAS": {
+					"/favicon.ico": "logo.png"
+				}
+			},
+			"relationships": {
+				"hu.sze.milab.MIND:AGENT_LOGIC": {
+					"data": {
+						"type": "hu.sze.milab.MIND:LOGIC",
+						"id": "hu.sze.milab.NET:SVCFILES"
+					}
+				},
+				"hu.sze.milab.MIND:KNOWLEDGE_LISTENERS": {
+					"data": {
+						"type": "hu.sze.milab.MIND:AGENT",
+						"id": "hu.sze.milab.xbrl.Platform:Webroot"
+					}
+				}
+			}
+		},
+		{
+			"type": "hu.sze.milab.MIND:AGENT",
+			"id": "hu.sze.milab.xbrl.Platform:JsonAPI",
+			"attributes": {
+				"hu.sze.milab.TEXT:NAMED_NAME": "/data"
+			},
+			"relationships": {
+				"hu.sze.milab.MIND:AGENT_LOGIC": {
+					"data": {
+						"type": "hu.sze.milab.MIND:LOGIC",
+						"id": "hu.sze.milab.NET:SVCJSONAPI"
+					}
+				},
+				"hu.sze.milab.MIND:KNOWLEDGE_LISTENERS": {
+					"data": {
+						"type": "hu.sze.milab.MIND:AGENT",
+						"id": "hu.sze.milab.xbrl.Platform:JsonAPI"
 					}
 				}
 			}
