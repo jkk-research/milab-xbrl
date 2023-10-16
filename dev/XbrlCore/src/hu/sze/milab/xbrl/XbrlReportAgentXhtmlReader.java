@@ -42,7 +42,7 @@ public class XbrlReportAgentXhtmlReader implements XbrlConsts, DustConsts.MindAg
 
 	@Override
 	public MindStatus agentExecAction(MindAction action) throws Exception {
-		String name = Dust.access(MindContext.Message, MindAccess.Peek, null, TEXT_ATT_NAMED_NAME);
+		String name = Dust.access(MindContext.Message, MindAccess.Peek, null, TEXT_ATT_NAME);
 		String strVal;
 
 		switch ( action ) {

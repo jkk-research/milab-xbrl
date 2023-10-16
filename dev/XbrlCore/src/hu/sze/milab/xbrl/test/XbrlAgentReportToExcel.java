@@ -82,7 +82,7 @@ public class XbrlAgentReportToExcel implements XbrlConsts, DustConsts.MindAgent 
 	@Override
 	public MindStatus agentExecAction(MindAction action) throws Exception {
 		int idx;
-		String name = Dust.access(hTarget, MindAccess.Peek, null, TEXT_ATT_NAMED_NAME);
+		String name = Dust.access(hTarget, MindAccess.Peek, null, TEXT_ATT_NAME);
 
 		switch ( action ) {
 		case Begin:

@@ -39,7 +39,7 @@
 			"id": "hu.sze.milab.xbrl.Platform:HttpServer",
 			"attributes": {
 				"hu.sze.milab.NET:HOST_PORT": 8090,
-				"hu.sze.milab.TEXT:NAMED_NAME": "/admin"
+				"hu.sze.milab.TEXT:NAME": "/admin"
 			},
 			"relationships": {
 				"hu.sze.milab.MIND:AGENT_LOGIC": {
@@ -76,9 +76,9 @@
 			"type": "hu.sze.milab.MIND:AGENT",
 			"id": "hu.sze.milab.xbrl.Platform:Webroot",
 			"attributes": {
-				"hu.sze.milab.TEXT:NAMED_NAME": "/",
+				"hu.sze.milab.TEXT:NAME": "/",
 				"hu.sze.milab.STREAM:STREAM_PATH": "webroot",
-				"hu.sze.milab.MISC:GEN_ALIAS": {
+				"hu.sze.milab.MISC:ALIAS": {
 					"/favicon.ico": "logo.png"
 				}
 			},
@@ -101,7 +101,7 @@
 			"type": "hu.sze.milab.MIND:AGENT",
 			"id": "hu.sze.milab.xbrl.Platform:JsonAPI",
 			"attributes": {
-				"hu.sze.milab.TEXT:NAMED_NAME": "/data"
+				"hu.sze.milab.TEXT:NAME": "/data"
 			},
 			"relationships": {
 				"hu.sze.milab.MIND:AGENT_LOGIC": {
@@ -114,6 +114,49 @@
 					"data": {
 						"type": "hu.sze.milab.MIND:AGENT",
 						"id": "hu.sze.milab.xbrl.Platform:JsonAPI"
+					}
+				},
+				"hu.sze.milab.MISC:CONN_TARGET": {
+					"data": {
+						"type": "hu.sze.milab.MIND:AGENT",
+						"id": "hu.sze.milab.xbrl.Platform:XbrlSource"
+					}
+				}
+			}
+		},
+		{
+			"type": "hu.sze.milab.MIND:AGENT_LOGIC",
+			"id": "hu.sze.milab.xbrl.Platform:EdgarJsonapi",
+			"attributes": {
+				"hu.sze.milab.DUST:NATIVE_IMPLEMENTATION": "hu.sze.milab.xbrl.edgar.XbrlEdgarAgentJsonapi"
+			}
+		},
+		{
+			"type": "hu.sze.milab.MIND:AGENT",
+			"id": "hu.sze.milab.xbrl.Platform:XbrlSource",
+			"attributes": {
+				"hu.sze.milab.MISC:CUSTOM": {
+					"jsonapi:version": "1.1",
+					"jsonapi:ext": [
+						"https://jsonapi.org/ext/atomic"
+					],
+					"jsonapi:profile": [
+						"http://example.com/profiles/flexible-pagination",
+						"http://example.com/profiles/resource-versioning"
+					]
+				}
+			},
+			"relationships": {
+				"hu.sze.milab.MIND:AGENT_LOGIC": {
+					"data": {
+						"type": "hu.sze.milab.MIND:LOGIC",
+						"id": "hu.sze.milab.xbrl.Platform:EdgarJsonapi"
+					}
+				},
+				"hu.sze.milab.MIND:KNOWLEDGE_LISTENERS": {
+					"data": {
+						"type": "hu.sze.milab.MIND:AGENT",
+						"id": "hu.sze.milab.xbrl.Platform:XbrlSource"
 					}
 				}
 			}
