@@ -7,6 +7,12 @@ import hu.sze.milab.dust.stream.xml.DustStreamXmlConsts;
 public interface XbrlConsts extends DustMetaConsts, DustStreamXmlConsts {
 	
 	String PREFIX_XBRL = "hu.sze.milab.xbrl.";
+	
+	String TYPE_XBRL_ENTITIES = "xbrl:entities";
+	String TYPE_XBRL_REPORTS = "xbrl:reports";
+	String TYPE_XBRL_CONTEXTS = "xbrl:contexts";
+	String TYPE_XBRL_FACTS = "xbrl:facts";
+
 
 
 	enum XbrlInfoType {

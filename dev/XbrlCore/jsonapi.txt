@@ -1,0 +1,118 @@
+testing
+
+http://localhost:8090/data/blogs?include=owner.articles.revisions,owner.articles.ratings&filter=and(or(equals(title,'Technology'),has(owner.articles)),not(equals(owner.lastName,null)))&filter[owner.articles]=equals(caption,'Two')&filter[owner.articles.revisions]=greaterThan(publishTime,'2005-05-05')&fields[articles]=title,body&fields%5Bpeople%5D=name&sort=-created,title&page[offset]=0&page[limit]=10
+http://localhost:8090/data/xbrl:entity?filter=equals(sic,'3711')&fields[entity]=cik,name,exchanges,stateOfIncorporation,sic,entityType,category,description,ein,fiscalYearEnd,__FilingCount,__FormTypes&page[offset]=0&page[limit]=50
+
+1318605
+equals(sic,'3711')
+any(cik,'1318605','37996','1467858')
+1711012
+
+http://localhost:8090/data/xbrl:facts
+	?include=xbrl:context,xbrl:context.xbrl:entity,edgar:accession
+	&filter[xbrl:entity]=any(cik,'1711012')
+	&fields[xbrl:entities]=edgar:cik,name,edgar:stateOfIncorporation,edgar:sic,edgar:entityType,edgar:category,portal:__FilingCount,portal:__FormTypes
+	&fields[xbrl:reports]=edgar:accessionNumber,edgar:form,size,portal:reportDate,portal:filingDate,edgar:isXBRL,edgar:isInlineXBRL,edgar:primaryDocument,edgar:primaryDocDescription
+	&fields[xbrl:contexts]=start,end,instant
+	&fields[xbrl:facts]=frame,taxonomy,concept,unit,val
+	&page[offset]=0&page[limit]=50
+
+
+http://localhost:8090/data/xbrl:facts?filter[xbrl:entities]=any(cik,'1711012')&filter[xbrl:facts]=contains(concept,'Goodwill')&fields[xbrl:entities]=edgar:cik,name,edgar:stateOfIncorporation,edgar:sic,edgar:entityType,edgar:category,portal:__FilingCount,portal:__FormTypes&fields[xbrl:reports]=edgar:accessionNumber,edgar:form,size,portal:reportDate,portal:filingDate,edgar:isXBRL,edgar:isInlineXBRL,edgar:primaryDocument,edgar:primaryDocDescription&fields[xbrl:contexts]=start,end,instant&fields[xbrl:facts]=frame,taxonomy,concept,unit,val
+
+**** CORE ****
+https://jsonapi.org/format
+
+Object
+ http://localhost:8090/data/articles
+ http://localhost:8090/data/articles/1
+ http://localhost:8090/data/articles/1/author
+
+Include
+ http://localhost:8090/data/articles/1?include=comments
+ http://localhost:8090/data/articles/1?include=comments.author,ratings
+ http://localhost:8090/data/articles/1/relationships/comments?include=comments.author
+
+Fields
+ http://localhost:8090/data/articles?include=author&fields[articles]=title,body&fields[people]=name
+ http://localhost:8090/data/articles?include=author&fields[articles]=title,body&fields%5Bpeople%5D=name
+	%5Bpeople%5D
+	
+Sort
+ http://localhost:8090/data/articles?sort=-created,title
+
+Pagination 
+ http://localhost:8090/data/articles?page[offset]=0&page[limit]=10
+ 
+ 
+ 
+**** Filtering ****
+
+https://www.jsonapi.net/usage/reading/filtering.html
+
+Operation	Function	Example
+Equality	equals	?filter=equals(lastName,'Smith')
+Less than	lessThan	?filter=lessThan(age,'25')
+Less than or equal to	lessOrEqual	?filter=lessOrEqual(lastModified,'2001-01-01')
+Greater than	greaterThan	?filter=greaterThan(duration,'6:12:14')
+Greater than or equal to	greaterOrEqual	?filter=greaterOrEqual(percentage,'33.33')
+Contains text	contains	?filter=contains(description,'cooking')
+Starts with text	startsWith	?filter=startsWith(description,'The')
+Ends with text	endsWith	?filter=endsWith(description,'End')
+Equals one value from set	any	?filter=any(chapter,'Intro','Summary','Conclusion')
+Collection contains items	has	?filter=has(articles)
+Type-check derived type (v5)	isType	?filter=isType(,men)
+Negation	not	?filter=not(equals(lastName,null))
+Conditional logical OR	or	?filter=or(has(orders),has(invoices))
+Conditional logical AND	and	?filter=and(has(orders),has(invoices))
+
+
+Comparison operators compare an attribute against a constant value (between quotes), null or another attribute:
+ http://localhost:8090/data/users?filter=equals(displayName,'Brian O''Connor')
+ http://localhost:8090/data/users?filter=equals(displayName,null)
+ http://localhost:8090/data/users?filter=equals(displayName,lastName)
+ 
+Comparison operators can be combined with the count function, which acts on to-many relationships:
+ http://localhost:8090/data/blogs?filter=lessThan(count(owner.articles),'10')
+ http://localhost:8090/data/customers?filter=greaterThan(count(orders),count(invoices))
+ 
+When filters are used multiple times on the same resource, they are combined using an OR operator. 
+The next request returns all customers that have orders -or- whose last name is Smith.
+ http://localhost:8090/data/customers?filter=has(orders)&filter=equals(lastName,'Smith')
+ 
+Aside from filtering on the resource being requested (which would be blogs in /blogs and articles in /blogs/1/articles), 
+filtering on to-many relationships can be done using bracket notation:
+ http://localhost:8090/data/articles?include=author,tags&filter=equals(author.lastName,'Smith')&filter[tags]=any(label,'tech','design')
+ 
+In the above request, the first filter is applied on the collection of articles, while the second one is applied on the nested collection of tags.
+WARNING: The request above does not hide articles without any matching tags! Use the has function with a filter condition (see below) to accomplish that.
+
+Putting it all together, you can build quite complex filters, such as:
+
+ http://localhost:8090/data/blogs?include=owner.articles.revisions&filter=and(or(equals(title,'Technology'),has(owner.articles)),not(equals(owner.lastName,null)))&filter[owner.articles]=equals(caption,'Two')&filter[owner.articles.revisions]=greaterThan(publishTime,'2005-05-05')
+
+
+since v4.2
+
+The has function takes an optional filter condition as second parameter, for example:
+
+ http://localhost:8090/data/customers?filter=has(orders,not(equals(status,'Paid')))
+Which returns only customers that have at least one unpaid order.
+
+since v5.0
+
+Use the isType filter function to perform a type check on a derived type. You can pass a nested filter, where the derived fields are accessible.
+
+Only return men:
+ http://localhost:8090/data/humans?filter=isType(,men)
+ 
+Only return men with beards:
+ http://localhost:8090/data/humans?filter=isType(,men,equals(hasBeard,'true'))
+ 
+The first parameter of isType can be used to perform the type check on a to-one relationship path.
+
+Only return people whose best friend is a man with children:
+ http://localhost:8090/data/humans?filter=isType(bestFriend,men,has(children))
+ 
+Only return people who have at least one female married child:
+ http://localhost:8090/data/humans?filter=has(children,isType(,woman,not(equals(husband,null))))
