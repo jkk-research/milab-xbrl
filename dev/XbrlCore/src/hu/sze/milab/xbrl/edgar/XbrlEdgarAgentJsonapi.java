@@ -16,6 +16,7 @@ import hu.sze.milab.dust.net.DustNetConsts;
 import hu.sze.milab.dust.stream.DustStreamUtils;
 import hu.sze.milab.dust.stream.json.DustStreamJsonConsts;
 import hu.sze.milab.dust.stream.json.DustStreamJsonapiUtils;
+import hu.sze.milab.dust.utils.DustUtils;
 import hu.sze.milab.dust.utils.DustUtilsData;
 
 public class XbrlEdgarAgentJsonapi implements XbrlEdgarConsts, DustStreamJsonConsts, DustNetConsts, DustConsts.MindAgent {
@@ -42,9 +43,9 @@ public class XbrlEdgarAgentJsonapi implements XbrlEdgarConsts, DustStreamJsonCon
 				if ( fIdx.isFile() ) {
 					DustStreamUtils.PrintWriterProvider pwp = Dust.access(MindContext.LocalCtx, MindAccess.Peek, null, JsonApiMember.jsonapi, STREAM_ATT_STREAM_PROVIDER);
 					DustStreamJsonapiUtils.StreamWriter sw = new DustStreamJsonapiUtils.StreamWriter(pwp, TYPE_XBRL_ENTITIES, TYPE_XBRL_REPORTS, TYPE_XBRL_CONTEXTS, TYPE_XBRL_FACTS);
-					
+
 					String factFilter = Dust.access(MindContext.LocalCtx, MindAccess.Peek, null, JsonApiMember.jsonapi, JsonApiParam.filter, TYPE_XBRL_FACTS);
-					Object fxFacts = (null == factFilter) ? null : MVEL.compileExpression(factFilter);
+					Object fxFacts = DustUtils.isEmpty(factFilter) ? null : MVEL.compileExpression(factFilter);
 
 					try (BufferedReader brEntity = new BufferedReader(new FileReader(fIdx))) {
 
@@ -61,11 +62,11 @@ public class XbrlEdgarAgentJsonapi implements XbrlEdgarConsts, DustStreamJsonCon
 							} else {
 								trEntity.get(rEntity, mEntity);
 
-								if ( (boolean) MVEL.executeExpression(fxEntities, jf, mEntity) ) {
+								jf.load(mEntity);
+								if ( (boolean) MVEL.executeExpression(fxEntities, (Object) jf) ) {
 
 									String cik = (String) mEntity.get("cik");
 									String entityID = "edgar:" + cik;
-
 
 									Set<String> refAccn = new HashSet<>();
 									DustUtilsData.Indexer<String> ctxIdx = new DustUtilsData.Indexer<>();
@@ -75,7 +76,7 @@ public class XbrlEdgarAgentJsonapi implements XbrlEdgarConsts, DustStreamJsonCon
 									if ( fFacts.isFile() ) {
 										try (BufferedReader brFacts = new BufferedReader(new FileReader(fFacts))) {
 											DustUtilsData.TableReader trFact = null;
-											Map<String, Object> mFact = new TreeMap<>();
+//											Map<String, Object> mFact = new TreeMap<>();
 
 											int factCount = 0;
 
@@ -85,11 +86,6 @@ public class XbrlEdgarAgentJsonapi implements XbrlEdgarConsts, DustStreamJsonCon
 													trFact = new DustUtilsData.TableReader(rFact);
 												} else {
 													++factCount;
-													trFact.get(rFact, mFact);
-													
-													if ( (null != fxFacts) && !((boolean)MVEL.executeExpression(fxFacts, jf, mFact))) {
-														continue;
-													}
 
 													String ctxKey = trFact.format(rFact, ":", "instant", "start", "end");
 													int s = ctxIdx.getSize();
@@ -97,42 +93,53 @@ public class XbrlEdgarAgentJsonapi implements XbrlEdgarConsts, DustStreamJsonCon
 
 													String ctxId = "edgar:cfCtx_" + cik + "_" + ci;
 
+													if ( null != fxFacts ) {
+														jf.clear();
+														trFact.get(rFact, jf);
+														if ( !((boolean) MVEL.executeExpression(fxFacts, (Object) jf)) ) {
+															continue;
+														}
+													}
+
 													if ( s == ci ) {
 														sw.write(JsonApiMember.included, TYPE_XBRL_CONTEXTS, ctxId, trFact, rFact);
 													}
 
-													String accn = (String) mFact.get("accn");
+													String accn = trFact.get(rFact, "accn");
 													refAccn.add(accn);
 
 													sw.addRelationship("report", TYPE_XBRL_REPORTS, entityID + "_" + accn);
 													sw.addRelationship("context", TYPE_XBRL_CONTEXTS, ctxId);
 
 													sw.write(JsonApiMember.data, TYPE_XBRL_FACTS, "edgar:cfFact_" + cik + "_" + factCount, trFact, rFact);
-													
+
 													++count;
 												}
 											}
 										}
 									}
 
-									sw.write(JsonApiMember.included, TYPE_XBRL_ENTITIES, entityID, trEntity, rEntity);
+									if ( 0 < refAccn.size() ) {
 
-									File fAccn = new File(edgarRoot, "submissions/" + fPref + EXT_CSV);
-									if ( fAccn.isFile() ) {
-										try (BufferedReader brAccn = new BufferedReader(new FileReader(fAccn))) {
-											DustUtilsData.TableReader trAccn = null;
+										sw.write(JsonApiMember.included, TYPE_XBRL_ENTITIES, entityID, trEntity, rEntity);
 
-											for (String lAccn; (lAccn = brAccn.readLine()) != null;) {
-												String[] rAccn = lAccn.split("\t");
-												if ( null == trAccn ) {
-													trAccn = new DustUtilsData.TableReader(rAccn);
-												} else {
-													String accn = (String) trAccn.get(rAccn, "accessionNumber");
+										File fAccn = new File(edgarRoot, "submissions/" + fPref + EXT_CSV);
+										if ( fAccn.isFile() ) {
+											try (BufferedReader brAccn = new BufferedReader(new FileReader(fAccn))) {
+												DustUtilsData.TableReader trAccn = null;
 
-													if ( refAccn.contains(accn) ) {
-														sw.addRelationship("entity", TYPE_XBRL_ENTITIES, entityID);
+												for (String lAccn; (lAccn = brAccn.readLine()) != null;) {
+													String[] rAccn = lAccn.split("\t");
+													if ( null == trAccn ) {
+														trAccn = new DustUtilsData.TableReader(rAccn);
+													} else {
+														String accn = (String) trAccn.get(rAccn, "accessionNumber");
 
-														sw.write(JsonApiMember.included, TYPE_XBRL_REPORTS, entityID + "_" + accn, trAccn, rAccn);
+														if ( refAccn.contains(accn) ) {
+															sw.addRelationship("entity", TYPE_XBRL_ENTITIES, entityID);
+
+															sw.write(JsonApiMember.included, TYPE_XBRL_REPORTS, entityID + "_" + accn, trAccn, rAccn);
+														}
 													}
 												}
 											}

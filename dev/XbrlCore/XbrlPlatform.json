@@ -79,7 +79,8 @@
 				"hu.sze.milab.TEXT:NAME": "/",
 				"hu.sze.milab.STREAM:STREAM_PATH": "webroot",
 				"hu.sze.milab.MISC:ALIAS": {
-					"/favicon.ico": "logo.png"
+					"/favicon.ico": "img/logo.png",
+					"/": "index.html"
 				}
 			},
 			"relationships": {
