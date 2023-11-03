@@ -14,5 +14,5 @@
     <stringAttribute key="org.eclipse.jdt.launching.MAIN_TYPE" value="hu.sze.uni.xbrl.portal.XbrlTestPortal"/>
     <stringAttribute key="org.eclipse.jdt.launching.MODULE_NAME" value="XbrlTest01"/>
     <stringAttribute key="org.eclipse.jdt.launching.PROJECT_ATTR" value="XbrlTest01"/>
-    <stringAttribute key="org.eclipse.jdt.launching.VM_ARGUMENTS" value="-DClearGen=true"/>
+    <stringAttribute key="org.eclipse.jdt.launching.VM_ARGUMENTS" value="-DClearGen=true -DForceReload=false -DDownloadLimit=2000"/>
 </launchConfiguration>

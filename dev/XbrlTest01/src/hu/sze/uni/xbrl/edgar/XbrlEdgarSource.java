@@ -156,7 +156,7 @@ public class XbrlEdgarSource implements XbrlEdgarConsts {
 
 					createSplitCsvFromXml(f, dir, accn, TEXT_CUT_AT);
 				} else {
-					XbrlReportLoaderDomBase.createSplitCsv(f, dir, accn, TEXT_CUT_AT);
+					XbrlReportLoaderDomBase.createSplitCsv(f, dir, accn, null, TEXT_CUT_AT);
 				}
 			}
 		}

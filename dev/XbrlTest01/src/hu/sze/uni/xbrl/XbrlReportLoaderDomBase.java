@@ -27,10 +27,9 @@ import hu.sze.milab.xbrl.XbrlConsts.XbrlFactDataType;
 import hu.sze.milab.xbrl.XbrlCoreUtils;
 
 @SuppressWarnings("rawtypes")
-public abstract class XbrlReportLoaderDomBase implements XbrlConsts {
+public abstract class XbrlReportLoaderDomBase implements XbrlConstsEU {
 
 	public static boolean DELETE_ON_ERROR = true;
-
 
 	Map<XbrlFactDataInfo, String> cvtKeys = new HashMap<>();
 
@@ -43,7 +42,7 @@ public abstract class XbrlReportLoaderDomBase implements XbrlConsts {
 		cvtKeys.put(XbrlFactDataInfo.Sign, "sign");
 	}
 
-	public void load(File f) throws Exception {
+	public void load(File f, Map filing) throws Exception {
 		Throwable loadErr = null;
 		Map xbrlElements = new HashMap();
 
@@ -64,7 +63,18 @@ public abstract class XbrlReportLoaderDomBase implements XbrlConsts {
 
 			Element eHtml = doc.getDocumentElement();
 
-			String defLang = eHtml.getAttribute("xml:lang");
+			String defLang = Dust.access(filing, MindAccess.Peek, null, LANGFORCED);
+			if ( null == defLang ) {
+				 defLang = eHtml.getAttribute("xml:lang");
+			}
+
+			if ( DustUtils.isEmpty(defLang) ) {
+				defLang = Dust.access(filing, MindAccess.Peek, "", LANGCODE);
+				defLang = defLang.toLowerCase();
+				if ( DustUtils.isEmpty(defLang) ) {
+					DustUtils.breakpoint("missing default language");
+				}
+			}
 			Dust.access(xbrlElements, MindAccess.Set, defLang, XbrlElements.DefLang);
 
 			NodeList nl = eHtml.getElementsByTagName("*");
@@ -96,7 +106,7 @@ public abstract class XbrlReportLoaderDomBase implements XbrlConsts {
 					} else {
 						NodeList nn = e.getElementsByTagName("xbrli:entity");
 						if ( 0 < nl.getLength() ) {
-							String eid = getInfo( (Element) nn.item(0), "xbrli:identifier");
+							String eid = getInfo((Element) nn.item(0), "xbrli:identifier");
 							cd.putIfAbsent("xbrli:entity", eid);
 						}
 					}
@@ -186,7 +196,11 @@ public abstract class XbrlReportLoaderDomBase implements XbrlConsts {
 
 							if ( !last ) {
 								txtFrag = Dust.access(xbrlElements, MindAccess.Peek, null, XbrlElements.Continuation, contID.trim());
-								valOrig = txtFrag.getTextContent().trim();
+								if ( null == txtFrag ) {
+									break;
+								} else {
+									valOrig = txtFrag.getTextContent().trim();
+								}
 							}
 						} while (!last);
 					}
@@ -234,7 +248,7 @@ public abstract class XbrlReportLoaderDomBase implements XbrlConsts {
 		return false;
 	}
 
-	public static void createSplitCsv(File xhtml, File targetDir, String fnPrefix, int textCut) throws Exception {
+	public static void createSplitCsv(File xhtml, File targetDir, String fnPrefix, Map filing, int textCut) throws Exception {
 		XbrlReportLoaderDomBase loader = new XbrlReportLoaderDomBase() {
 			File fVal;
 			File fText;
@@ -305,11 +319,17 @@ public abstract class XbrlReportLoaderDomBase implements XbrlConsts {
 			protected void storeText(Object xbrlElements, Element e, Map<XbrlFactDataInfo, Object> data, boolean first, boolean last) throws Exception {
 				PrintStream ps = first ? startLine(xbrlElements, e, false) : psText;
 
+//				if ( first ) {
+				String lang = e.getAttribute("xml:lang");
+				if ( DustUtils.isEmpty(lang) ) {
+					lang = Dust.access(xbrlElements, MindAccess.Peek, null, XbrlElements.DefLang);
+				}
+
+				if ( DustUtils.isEmpty(lang) ) {
+					DustUtils.breakpoint("missing text language");
+				}
+
 				if ( first ) {
-					String lang = e.getAttribute("xml:lang");
-					if ( DustUtils.isEmpty(lang) ) {
-						lang = Dust.access(xbrlElements, MindAccess.Peek, null, XbrlElements.DefLang);
-					}
 					ps.print("\t" + lang + "\t\"");
 					sbTxtFrag.setLength(0);
 					txtLen = 0;
@@ -348,6 +368,8 @@ public abstract class XbrlReportLoaderDomBase implements XbrlConsts {
 						data.put(XbrlFactDataInfo.Value, "Txt len: " + txtLen);
 					}
 
+					data.put(XbrlFactDataInfo.Unit, lang);
+
 					storeValue(xbrlElements, e, data);
 				}
 			}
@@ -356,7 +378,7 @@ public abstract class XbrlReportLoaderDomBase implements XbrlConsts {
 			protected void storeValue(Object xbrlElements, Element e, Map<XbrlFactDataInfo, Object> data) throws Exception {
 				PrintStream ps = startLine(xbrlElements, e, true);
 
-				String unit = "-";
+				String unit = (String) data.getOrDefault(XbrlFactDataInfo.Unit, "-"); // "-";
 
 				String unitId = e.getAttribute("unitRef");
 				if ( !DustUtils.isEmpty(unitId) ) {
@@ -428,7 +450,7 @@ public abstract class XbrlReportLoaderDomBase implements XbrlConsts {
 
 		};
 
-		loader.load(xhtml);
+		loader.load(xhtml, filing);
 	}
 
 }

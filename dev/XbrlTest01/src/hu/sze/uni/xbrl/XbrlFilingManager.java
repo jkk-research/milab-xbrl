@@ -7,6 +7,8 @@ import java.io.FileReader;
 import java.io.FileWriter;
 import java.io.FilenameFilter;
 import java.io.IOException;
+import java.nio.file.Files;
+import java.nio.file.StandardCopyOption;
 import java.text.MessageFormat;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
@@ -35,18 +37,11 @@ import hu.sze.milab.dust.utils.DustUtilsData;
 import hu.sze.uni.xbrl.portal.XbrlTestPortalUtils;
 
 @SuppressWarnings({ "rawtypes", "unchecked" })
-public class XbrlFilingManager implements XbrlConsts, DustUtilsConsts {
+public class XbrlFilingManager implements XbrlConstsEU, DustUtilsConsts {
 	public static final String ALL_REPORTS = "allReports.json";
 //	public static final String OVERRIDE = "filings.xbrl.org.override.json";
 
 	public static final String XBRL_ORG_ADDR = "https://filings.xbrl.org";
-	public static final String ENTITY_NAME = "__EntityName";
-	public static final String ENTITY_ID = "__EntityId";
-	public static final String LANGUAGE = "__Language";
-	public static final String LOCAL_DIR = "__LocalDir";
-	public static final String REPORT_DATE = "__ReportDate";
-	public static final String REPORT_ID = "__ReportId";
-	public static final String REPORT_FILE = "__ReportFile";
 
 	private class FactIter implements Iterable<String[]>, Iterator<String[]> {
 		BufferedReader br;
@@ -121,6 +116,9 @@ public class XbrlFilingManager implements XbrlConsts, DustUtilsConsts {
 
 	Set<Map> downloaded = new HashSet<>();
 	boolean downloadOnly = true;
+	int downloadLimit = 1000;
+
+	boolean forceReload = false;
 
 	Pattern PT_FXO = Pattern.compile("(?<eid>\\w+)-(?<date>\\d+-\\d+-\\d+)-(?<extra>.*)");
 
@@ -139,6 +137,9 @@ public class XbrlFilingManager implements XbrlConsts, DustUtilsConsts {
 
 		String mm = System.getProperty("MinMem", "true");
 		allFactsByRep = "true".equalsIgnoreCase(mm) ? null : new HashMap<>();
+
+		forceReload = "true".equalsIgnoreCase(System.getProperty("ForceReload", "false"));
+		downloadLimit = Integer.parseInt(System.getProperty("DownloadLimit", "1000"));
 
 //		File override = new File(OVERRIDE);
 //		urlOverride = override.isFile() ? (Map<String, Map>) parser.parse(new FileReader(override)) : new HashMap<>();
@@ -244,6 +245,7 @@ public class XbrlFilingManager implements XbrlConsts, DustUtilsConsts {
 
 		entities = new TreeMap<>();
 		Map lang = new TreeMap<>();
+		Map langCode = new TreeMap<>();
 		List<Map> included = XbrlUtils.access(allFilings, AccessCmd.Peek, null, "included");
 		for (Map i : included) {
 			String inclType = XbrlUtils.access(i, AccessCmd.Peek, null, "type");
@@ -255,6 +257,7 @@ public class XbrlFilingManager implements XbrlConsts, DustUtilsConsts {
 				break;
 			case "language":
 				lang.put(id, XbrlUtils.access(i, AccessCmd.Peek, null, "attributes", "name"));
+				langCode.put(id, XbrlUtils.access(i, AccessCmd.Peek, null, "attributes", "code"));
 				break;
 			}
 		}
@@ -269,6 +272,7 @@ public class XbrlFilingManager implements XbrlConsts, DustUtilsConsts {
 			String lRef = XbrlUtils.access(filing, AccessCmd.Peek, null, "relationships", "language", "data", "id");
 			if ( null != lRef ) {
 				XbrlUtils.access(fAtts, AccessCmd.Set, lang.get(lRef), LANGUAGE);
+				XbrlUtils.access(fAtts, AccessCmd.Set, langCode.get(lRef), LANGCODE);
 			}
 
 			String xoid = XbrlUtils.access(fAtts, AccessCmd.Peek, null, "fxo_id");
@@ -434,7 +438,6 @@ public class XbrlFilingManager implements XbrlConsts, DustUtilsConsts {
 	}
 
 	int segmentSize = 10;
-	int downloadLimit = 1000;
 	long tsStart = -1;
 	long tsSeg = -1;
 
@@ -472,29 +475,33 @@ public class XbrlFilingManager implements XbrlConsts, DustUtilsConsts {
 			break;
 		}
 
+		boolean uaifrs = false;
 		if ( null != genFileName ) {
 			fLoaded = new File(dir, genFileName);
-			if ( fLoaded.isFile() ) {
+			uaifrs = genFileName.contains("UAIFRS");
+			if ( fLoaded.isFile() && !forceReload ) 
+//			if ( fLoaded.isFile() && !forceReload && !uaifrs ) 
+			{
 				return fLoaded;
 			}
 		}
 
+		boolean directReport = false;
 		String repUrl = XbrlUtils.access(filing, AccessCmd.Peek, null, (repType == XbrlReportType.Json) ? "json_url" : "package_url");
-
 		if ( null == repUrl ) {
-//			System.out.println("NO remote file available for report: " + genFilePrefix + " type: " + repType);
-			return null;
+			// fallback if only report url is given
+			repUrl = XbrlUtils.access(filing, AccessCmd.Peek, null, "report_url");
+			if ( null == repUrl ) {
+				return null;
+			} else {
+				directReport = true;
+			}
 		}
 
 		String url = XBRL_ORG_ADDR + repUrl;
 		int sep = url.lastIndexOf('/');
 		String fName = url.substring(sep + 1);
 		String retFileName = fName;
-
-//		if ( repType == XbrlReportType.Package ) {
-//			sep = fName.lastIndexOf('.');
-//			retFileName = fName.substring(0, sep);
-//		}
 
 		ret = new File(dir, retFileName);
 
@@ -584,21 +591,36 @@ public class XbrlFilingManager implements XbrlConsts, DustUtilsConsts {
 						if ( !DustUtils.isEmpty(repUrl) ) {
 							String pkgUrl = XbrlUtils.access(filing, AccessCmd.Peek, null, "package_url");
 
-							sep = pkgUrl.lastIndexOf("/");
-							String repName = repUrl.substring(sep + 1);
+							if ( DustUtils.isEmpty(pkgUrl) ) {
+								if ( directReport ) {
+									System.out.println("Copy file " + ret + " to " + fRep);
+//									ret.renameTo(fRep);
+									Files.copy(ret.toPath(), fRep.toPath(), StandardCopyOption.REPLACE_EXISTING);
+								}
 
-							XbrlTestPortalUtils.extractWithApacheZipFile(fSrc, fRep, repName);
+							} else {
+								sep = pkgUrl.lastIndexOf("/");
+								String repName = repUrl.substring(sep + 1);
+
+								XbrlTestPortalUtils.extractWithApacheZipFile(fSrc, fRep, repName);
+							}
 						}
-						
+
 						// repUrl extraction fails in some old cases, safety fallback
 						if ( !fRep.isFile() ) {
 							XbrlTestPortalUtils.extractWithApacheZipFile(fSrc, fRep, reportFilter);
 						}
 					}
-					if ( (null != fRep ) && fRep.isFile()) {
+					if ( (null != fRep) && fRep.isFile() ) {
 						try {
-							XbrlReportLoaderDomBase.createSplitCsv(fRep, dir, genFilePrefix, TEXT_CUT_AT);
-							fRep.delete();
+							if ( uaifrs ) {
+								filing.put(LANGFORCED, "uk");
+							}							
+							XbrlReportLoaderDomBase.createSplitCsv(fRep, dir, genFilePrefix, filing, TEXT_CUT_AT);
+//							if ( !uaifrs ) 
+							{
+								fRep.delete();
+							}
 							ret = fLoaded;
 						} catch (Throwable t) {
 							DustException.swallow(t, "reading xhtml report", fRep.getCanonicalPath());
@@ -634,7 +656,7 @@ public class XbrlFilingManager implements XbrlConsts, DustUtilsConsts {
 		String[] genFiles = { "extractedJson.json", "Report_Val.csv", "Report_Txt.csv" };
 
 		int count = 0;
-		
+
 		for (Map.Entry<String, Map> e : reportData.entrySet()) {
 			if ( 0 == (++count % 100) ) {
 				System.out.println("Count " + count);
@@ -660,6 +682,10 @@ public class XbrlFilingManager implements XbrlConsts, DustUtilsConsts {
 				File f = getReport(repSrc, XbrlReportType.ContentVal, true);
 				if ( (null != f) && f.isFile() ) {
 					dc.add("Report loaded");
+				} else {
+					dc.add("Missing report from " + repSrc.get("country"));
+					dc.add("Missing report date " + ((String) repSrc.get("date_added")).split(" ")[0]);
+					System.out.println("Missing report " + repSrc);
 				}
 			} catch (Throwable err) {
 				DustException.swallow(err);
