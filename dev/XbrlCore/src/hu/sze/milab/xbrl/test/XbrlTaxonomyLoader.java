@@ -1,55 +1,30 @@
 package hu.sze.milab.xbrl.test;
 
 import java.io.File;
-import java.io.FileOutputStream;
 import java.net.URL;
 import java.nio.file.Paths;
-import java.util.ArrayList;
-import java.util.Comparator;
 import java.util.HashSet;
-import java.util.Iterator;
 import java.util.Map;
 import java.util.Set;
 import java.util.TreeMap;
 import java.util.TreeSet;
 
-import org.apache.poi.ss.usermodel.Cell;
-import org.apache.poi.ss.usermodel.CellStyle;
-import org.apache.poi.ss.usermodel.CreationHelper;
-import org.apache.poi.ss.usermodel.Hyperlink;
-import org.apache.poi.ss.usermodel.Row;
-import org.apache.poi.ss.usermodel.Sheet;
-import org.apache.poi.ss.usermodel.Workbook;
-import org.apache.poi.xssf.usermodel.XSSFWorkbook;
+import org.w3c.dom.Attr;
 import org.w3c.dom.Element;
 import org.w3c.dom.NamedNodeMap;
-import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
 
 import hu.sze.milab.dust.Dust;
 import hu.sze.milab.dust.dev.DustDevCounter;
-import hu.sze.milab.dust.stream.DustStreamUtils;
+import hu.sze.milab.dust.dev.DustDevFolderCoverage;
 import hu.sze.milab.dust.stream.xml.DustStreamXmlConsts;
 import hu.sze.milab.dust.stream.xml.DustStreamXmlDocumentGraphLoader;
 import hu.sze.milab.dust.utils.DustUtils;
 import hu.sze.milab.dust.utils.DustUtils.QueueContainer;
-import hu.sze.milab.dust.utils.DustUtilsData;
 import hu.sze.milab.dust.utils.DustUtilsFactory;
 import hu.sze.milab.dust.utils.DustUtilsFile;
 
 class XbrlTaxonomyLoader implements DustStreamXmlDocumentGraphLoader.XmlDocumentProcessor, DustStreamXmlConsts {
-
-	interface CellUpdater {
-		String update(String oldVal, String val);
-	}
-
-	CellUpdater concat = new CellUpdater() {
-
-		@Override
-		public String update(String oldVal, String val) {
-			return oldVal.contains(val) ? oldVal : oldVal + "\n" + val;
-		}
-	};
 
 	class NamespaceData {
 		Element e;
@@ -76,7 +51,6 @@ class XbrlTaxonomyLoader implements DustStreamXmlDocumentGraphLoader.XmlDocument
 	}
 
 	DustDevCounter linkInfo = new DustDevCounter(true);
-	Set<String> allFiles = new TreeSet<>();
 
 	Map<String, NamespaceData> namespaces = new TreeMap<>();
 	Map<String, NamespaceData> nsByUrl = new TreeMap<>();
@@ -87,56 +61,99 @@ class XbrlTaxonomyLoader implements DustStreamXmlDocumentGraphLoader.XmlDocument
 
 	File root;
 	Map<String, String> uriRewrite;
-	
+
+	DustDevFolderCoverage folderCoverage;
+
 	public XbrlTaxonomyLoader(File root, Map<String, String> uriRewrite) {
 		this.root = root;
 		this.uriRewrite = uriRewrite;
 
-		allFiles.clear();
-		addFolder(root);
+		folderCoverage = new DustDevFolderCoverage(root);
 
-		Dust.dumpObs("Files to visit in folder", root.getName(), allFiles.size());		
+		Dust.dumpObs("Files to visit in folder", root.getName(), folderCoverage.countFilesToVisit());
 	}
 
-	void addFolder(File dir) {
-		for (File f : dir.listFiles()) {
-			if ( f.isFile() ) {
-				if ( f.getName().startsWith(".") ) {
-					continue;
-				}
-				try {
-					allFiles.add(f.getCanonicalPath());
-				} catch (Throwable e) {
-					e.printStackTrace();
-				}
-			} else if ( f.isDirectory() ) {
-				addFolder(f);
-			}
-		}
-	}
-
-	public void setSeen(File... files) throws Exception {
-		for (File f : files) {
-			allFiles.remove(f.getCanonicalPath());
-		}
+	public DustDevFolderCoverage getFolderCoverage() {
+		return folderCoverage;
 	}
 
 	public void dump() throws Exception {
-		if ( allFiles.isEmpty() ) {
-			Dust.dumpObs("All files visited");
-		} else {
-			Dust.dumpObs("Unseen files");
+		folderCoverage.dump();
 
-			for (String s : allFiles) {
-				Dust.dumpObs("   ", s);
+		Dust.dumpObs("namespaces", namespaces.size(), "nsByUrl", nsByUrl.size());
+
+		DustDevCounter dc = new DustDevCounter(true);
+
+		Map<String, Object> ifrsDefs = new TreeMap<>();
+
+		for (NamespaceData nd : namespaces.values()) {
+			String tns = nd.e.getAttribute("targetNamespace");
+
+			for (Element ee : nd.items.values()) {
+				String[] ii = ee.getAttribute("id").split("_");
+				String tn = ii[0];
+				dc.add("Taxonomy " + tns + ((1 == ii.length) ? "" : "::" + tn));
+
+				if ( "ifrs-full".equals(tn) ) {
+					dc.add("IFRS_FULL");
+					String[] tt = ee.getAttribute("type").split(":");
+					dc.add("Types " + tt[1]);
+
+					String cn = ii[1];
+					NamedNodeMap nma = ee.getAttributes();
+					for (int i = nma.getLength(); i-- > 0;) {
+						Attr a = (Attr) nma.item(i);
+						String an = a.getName();
+						an = DustUtils.getPostfix(an, ":");
+
+						switch ( an ) {
+						case "name":
+						case "id":
+							break;
+						default:
+							String val = a.getValue();
+							val = DustUtils.getPostfix(val, ":");
+							Dust.access(ifrsDefs, MindAccess.Set, val, cn, an);
+							
+							dc.add("Values " + an + ": " + val);
+							break;
+						}
+					}
+
+//					Element prev = ifrsDefs.put(cn, ee);
+//					if ( null != prev ) {
+//						Dust.dumpObs("Duplicate", cn, prev, ee);
+//					}
+//					Dust.dumpObs(ii[1], ee.getAttribute("type"));
+				}
 			}
 		}
+		
+		for (LinkData ld : allLinks ) {
+			Element el = ld.link;
+			
+			String tn = el.getTagName();
+			
+			switch ( tn ) {
+			case "link:presentationArc":
+				String fromId = ld.from.getAttribute("xlink:href");
+				fromId = DustUtils.getPostfix(fromId, "#");
+				String toId = ld.to.getAttribute("xlink:href");
+				toId = DustUtils.getPostfix(toId, "#");
+				Dust.dumpObs("arc from", fromId, "to", toId);
+				break;
+			}
+			
+			dc.add("LinkTag " + tn);
+		}
+
+		dc.dump("Counts");
 
 		Set<String> skipUrl = new TreeSet<>();
 
 		for (String conceptRef : locLinks.keys()) {
 			String[] ref = conceptRef.split("#");
-			
+
 			NamespaceData nsd = nsByUrl.get(ref[0]);
 			if ( null == nsd ) {
 				skipUrl.add(ref[0]);
@@ -152,313 +169,53 @@ class XbrlTaxonomyLoader implements DustStreamXmlDocumentGraphLoader.XmlDocument
 			Dust.dumpObs("Referred url not found", uu);
 		}
 
-		linkInfo.dump();
+		linkInfo.dump("Links");
 	}
-
-	DustUtilsData.Indexer<String> attCols = new DustUtilsData.Indexer<String>();
-	private static final String[] KNOWN_ATT_COLS = { "name", "id", "type", "substitutionGroup", "xbrli:periodType", "Parent", "Children", "http://www.xbrl.org/2003/role/label",
-//			"abstract", "nillable", "xbrli:balance", "cyclesAllowed", "roleURI", "arcroleURI",
-//			"http://www.xbrl.org/2003/role/label", "http://www.xbrl.org/2003/role/documentation" 
-	};
-
-	private Workbook wb;
-	CellStyle csLabel;
-	CellStyle csHeader;
-
-	private int colCount;
 
 	public void save(File dir, String taxName) throws Exception {
-		for (String a : KNOWN_ATT_COLS) {
-			attCols.getIndex(a);
-		}
-		colCount = attCols.getSize();
-
-		wb = new XSSFWorkbook();
-
-		CreationHelper hlpCreate = wb.getCreationHelper();
-
-		csLabel = wb.createCellStyle();
-		csLabel.setWrapText(true);
-
-		csHeader = wb.createCellStyle();
-		csHeader.setAlignment(CellStyle.ALIGN_CENTER);
-		csHeader.setVerticalAlignment(CellStyle.VERTICAL_CENTER);
-
-		Sheet sheet;
-		Row row;
-		ArrayList<String> sheetNames = new ArrayList<>();
-
-		for (Map.Entry<String, NamespaceData> ne : namespaces.entrySet()) {
-			String nsOrig = ne.getKey();
-			String ns = DustStreamUtils.cutExcelSheetName(nsOrig);
-
-			Dust.dumpObs("  Creating sheet", ns, "for namespace", nsOrig);
-			sheet = wb.createSheet(ns);
-			sheetNames.add(ns);
-
-			int rc = 0;
-
-			row = sheet.createRow(rc++);
-			for (String an : attCols.keys()) {
-				Cell c;
-				int ax = attCols.getIndex(an);
-
-				if ( an.startsWith("http:") ) {
-					int sep = an.lastIndexOf("/");
-					if ( -1 != sep ) {
-						an = an.substring(sep + 1);
-					}
-
-					if ( !"deprecatedDateLabel".equals(an) ) {
-						sheet.setColumnWidth(ax, 80 * 256);
-					}
-				}
-
-				c = row.createCell(ax);
-				c.setCellValue(an);
-				c.setCellStyle(csHeader);
-			}
-
-			NamespaceData nd = ne.getValue();
-			String url = (String) nd.e.getUserData(XML_DATA_DOCURL);
-
-			for (Map.Entry<String, Element> ie : nd.items.entrySet()) {
-				Element e = ie.getValue();
-				row = sheet.createRow(rc++);
-
-				NamedNodeMap atts = e.getAttributes();
-				int ac = atts.getLength();
-				for (int ai = 0; ai < ac; ++ai) {
-					Node a = atts.item(ai);
-					storeValue(row, a.getNodeName(), a.getNodeValue(), concat);
-				}
-
-				String eid = ie.getKey();
-				String id = url + "#" + eid;
-
-				Set<LinkData> lds = locLinks.peek(id);
-
-				if ( null != lds ) {
-					for (LinkData ld : lds) {
-
-						String arcType = ld.link.getTagName();
-						String role = null;
-						String val = null;
-						CellStyle cs = csLabel;
-						String uri = null;
-						String co = null;
-
-						NodeList enl;
-						int sep;
-						CellUpdater u = concat;
-
-						switch ( arcType ) {
-						case "X link:labelArc":
-							role = ld.to.getAttribute("xlink:role");
-							val = ld.to.getTextContent();
-							break;
-						case "link:referenceArc":
-							role = ld.to.getAttribute("xlink:role");
-
-							enl = ld.to.getChildNodes();
-							StringBuilder sb = new StringBuilder();
-
-							for (int i = 0; i < enl.getLength(); ++i) {
-								Node item = enl.item(i);
-								if ( item instanceof Element ) {
-									Element ce = (Element) item;
-									String ceVal = ce.getTextContent();
-									if ( !DustUtils.isEmpty(ceVal) ) {
-										String cetn = ce.getTagName();
-										if ( cetn.endsWith(":URI") ) {
-											uri = ceVal;
-										} else {
-											sb.append(cetn).append(": ").append(ceVal).append(", ");
-										}
-									}
-								}
-							}
-							val = sb.toString();
-							break;
-						case "link:presentationArc":
-							if ( ld.to.getAttribute("xlink:href").endsWith(eid) ) {
-								role = "Parent";
-								val = ld.from.getAttribute("xlink:href");
-							} else if ( ld.from.getAttribute("xlink:href").endsWith(eid) ) {
-								co = ld.link.getAttribute("order");
-								role = "Children";
-								val = ld.to.getAttribute("xlink:href");
-							} else {
-								Dust.dumpObs("huh?");
-							}
-
-							break;
-						case "link:definitionArc":
-							role = ld.link.getAttribute("xlink:arcrole");
-							if ( ld.to.getAttribute("xlink:href").endsWith(eid) ) {
-								role = role + " parent";
-								val = ld.from.getAttribute("xlink:href");
-							} else if ( ld.from.getAttribute("xlink:href").endsWith(eid) ) {
-								role = role + " child";
-								val = ld.to.getAttribute("xlink:href");
-							} else {
-								Dust.dumpObs("huh?");
-							}
-
-							break;
-						default:
-							continue;
-						}
-
-						if ( null != role ) {
-							sep = val.indexOf("#");
-							if ( -1 != sep ) {
-								val = val.substring(sep + 1);
-							}
-
-							if ( null != co ) {
-								val = co + " " + val;
-							}
-							Cell c = storeValue(row, role, val, u);
-							if ( null != cs ) {
-								c.setCellStyle(csLabel);
-							}
-
-							if ( null != uri ) {
-								Hyperlink link = hlpCreate.createHyperlink(Hyperlink.LINK_URL);
-								uri = uri.replace(" ", "%20");
-								link.setAddress(uri);
-								c.setHyperlink(link);
-							}
-						}
-					}
-				}
-			}
-
-			sheet.createFreezePane(1, 1);
-		}
-
-		sheetNames.sort(new Comparator<String>() {
-			@Override
-			public int compare(String o1, String o2) {
-				return wb.getSheet(o2).getLastRowNum() - wb.getSheet(o1).getLastRowNum();
-			}
-		});
-
-		for (int i = 0; i < sheetNames.size(); ++i) {
-			wb.setSheetOrder(sheetNames.get(i), i);
-		}
-
-		File f = new File(dir, taxName + ".xlsx");
-		FileOutputStream fileOut = new FileOutputStream(f);
-
-		wb.write(fileOut);
-		fileOut.flush();
-		fileOut.close();
-
-		wb.close();
-	}
-
-	public Cell storeValue(Row row, String colName, String value, CellUpdater updater) {
-		Cell c;
-		int ax = attCols.getIndex(colName);
-
-		if ( ax >= colCount ) {
-			addAttCol(colName);
-			colCount = ax + 1;
-		}
-
-		c = row.getCell(ax);
-
-		if ( null == c ) {
-			c = row.createCell(ax);
-		} else {
-			value = updater.update(c.getStringCellValue(), value);
-		}
-		if ( value.length() > 32767 ) {
-			value = value.substring(0, 32700) + " ... [truncated!]";
-		}
-		c.setCellValue(value);
-
-		return c;
-	}
-
-	private void addAttCol(String an) {
-		int cw = 0;
-
-//		if ( an.startsWith("http:") ) 
-		{
-			int sep = an.lastIndexOf("/");
-			if ( -1 != sep ) {
-				an = an.substring(sep + 1);
-				if ( !"deprecatedDateLabel".equals(an) ) {
-					cw = 80 * 256;
-				}
-			}
-
-		}
-
-		for (Iterator<Sheet> it = wb.sheetIterator(); it.hasNext();) {
-			Sheet sheet = it.next();
-			Cell c = sheet.getRow(0).createCell(colCount);
-			c.setCellValue(an);
-			c.setCellStyle(csHeader);
-
-			if ( 0 < cw ) {
-				sheet.setColumnWidth(colCount, cw);
-			}
-		}
 	}
 
 	@Override
 	public void documentLoaded(Element root, QueueContainer<String> loader) {
 		NodeList el;
 
-//		String url = root.getAttribute(XML_ATT_REF);
 		String url = (String) root.getUserData(XML_DATA_DOCURL);
 
 		if ( url.startsWith("file") ) {
 			try {
 				File f = Paths.get(new URL(url).toURI()).toFile();
-				setSeen(f);
+				folderCoverage.setSeen(f);
 			} catch (Throwable e) {
 				// TODO Auto-generated catch block
 				e.printStackTrace();
 			}
 		}
 
-//		Dust.dumpObs("  Reading url", url);
+		NamespaceData nsd = null;
 
-//		if ( root.getTagName().endsWith(":schema") ) 
-		{
-			NamespaceData nsd = null;
+		el = root.getElementsByTagName("*");
+		for (int ei = el.getLength(); ei-- > 0;) {
+			Element e = (Element) el.item(ei);
 
-			el = root.getElementsByTagName("*");
-			for (int ei = el.getLength(); ei-- > 0;) {
-				Element e = (Element) el.item(ei);
-
-				String id = e.getAttribute("id");
-				if ( !DustUtils.isEmpty(id) ) {
-					if ( null == nsd ) {
-						nsd = new NamespaceData(root);
-						String ns = root.getAttribute("targetNamespace");
-						if ( !DustUtils.isEmpty(ns) ) {
-							namespaces.put(ns, nsd);
-							Dust.dumpObs("      Registered namespace", ns);
-						}
-						nsByUrl.put(url, nsd);
+			String id = e.getAttribute("id");
+			if ( !DustUtils.isEmpty(id) ) {
+				if ( null == nsd ) {
+					nsd = new NamespaceData(root);
+					String ns = root.getAttribute("targetNamespace");
+					if ( !DustUtils.isEmpty(ns) ) {
+						namespaces.put(ns, nsd);
+//						Dust.dumpObs("      Registered namespace", ns);
+					} else {
+						Dust.dumpObs("No target namespace given", url);
 					}
-
-					nsd.items.put(id, e);
+					nsByUrl.put(url, nsd);
 				}
+
+				nsd.items.put(id, e);
 			}
 		}
 
-		if ( root.getTagName().endsWith("linkbase") )
-
-		{
-//			Dust.dumpObs("      Linkbase found", url);
-
+		if ( root.getTagName().endsWith("linkbase") ) {
 			Map<String, Element> labeledLinks = new TreeMap<>();
 
 			String[] LINK_ATTS = { "xlink:type", "xlink:role", "xlink:arcrole" };

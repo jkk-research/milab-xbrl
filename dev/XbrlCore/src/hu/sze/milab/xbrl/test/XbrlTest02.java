@@ -41,14 +41,14 @@ public class XbrlTest02 implements XbrlConsts, DustDevConsts, DustNetConsts {
 		in = new File("in");
 		in.mkdirs();
 
-		readReports(new String[] { 
-			"in/volkswagenag/reports/VWAGAbschlussAnhang_IFRS_Konzern-2022-12-31-de.xhtml",
-			});
-//		readTaxonomy(new String[] { 
+//		readReports(new String[] { 
+//			"in/volkswagenag/reports/VWAGAbschlussAnhang_IFRS_Konzern-2022-12-31-de.xhtml",
+//			});
+		readTaxonomy(new String[] { 
 //				"EFRAG-ESRS-2022-PoC-Taxonomy", 
-//				"IFRSAT-2022-03-24", 
+				"IFRSAT-2022-03-24", 
 //				"esef_taxonomy_2022",
-//				});
+				});
 
 //		readJsons(new String[] { 
 //				"jsonapi_01",
@@ -71,7 +71,7 @@ public class XbrlTest02 implements XbrlConsts, DustDevConsts, DustNetConsts {
 	}
 
 	public static void readTaxonomy(String[] args) throws Exception {
-		DustStreamUrlCache c = new DustStreamUrlCache(new File(dataDir, "urlCache"), false);
+		DustStreamUrlCache urlCache = new DustStreamUrlCache(new File(dataDir, "urlCache"), false);
 
 		DocumentBuilderFactory dbf = DocumentBuilderFactory.newInstance();
 		DocumentBuilder db = dbf.newDocumentBuilder();
@@ -94,10 +94,10 @@ public class XbrlTest02 implements XbrlConsts, DustDevConsts, DustNetConsts {
 				uriRewrite.put(atts.getNamedItem("uriStartString").getNodeValue(), atts.getNamedItem("rewritePrefix").getNodeValue());
 			}
 
-			DustStreamXmlDocumentGraphLoader xmlLoader = new DustStreamXmlDocumentGraphLoader(c);
+			DustStreamXmlDocumentGraphLoader xmlLoader = new DustStreamXmlDocumentGraphLoader(urlCache);
 
 			XbrlTaxonomyLoader taxonomyCollector = new XbrlTaxonomyLoader(fRoot, uriRewrite);
-			taxonomyCollector.setSeen(fCat, fTaxPack);
+			taxonomyCollector.getFolderCoverage().setSeen(fCat, fTaxPack);
 
 			nl = taxPack.getElementsByTagName("tp:entryPointDocument");
 			for (int ni = 0; ni < nl.getLength(); ++ni) {
