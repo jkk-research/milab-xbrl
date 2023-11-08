@@ -12,6 +12,7 @@ import org.mvel2.MVEL;
 
 import hu.sze.milab.dust.Dust;
 import hu.sze.milab.dust.DustConsts;
+import hu.sze.milab.dust.dev.DustDevCounter;
 import hu.sze.milab.dust.net.DustNetConsts;
 import hu.sze.milab.dust.stream.DustStreamUtils;
 import hu.sze.milab.dust.stream.json.DustStreamJsonConsts;
@@ -36,6 +37,8 @@ public class XbrlEdgarAgentJsonapi implements XbrlEdgarConsts, DustStreamJsonCon
 
 			if ( null != entityFilter ) {
 				Object fxEntities = MVEL.compileExpression(entityFilter);
+				
+				DustDevCounter cnt = new DustDevCounter(true);
 
 				File edgarRoot = new File(System.getProperty("user.home") + "/work/xbrl/data/sources/edgar");
 
@@ -61,6 +64,17 @@ public class XbrlEdgarAgentJsonapi implements XbrlEdgarConsts, DustStreamJsonCon
 								trEntity = new DustUtilsData.TableReader(rEntity);
 							} else {
 								trEntity.get(rEntity, mEntity);
+								cnt.add("Company <ALL>");
+								
+								int cc = Integer.parseInt( trEntity.get(rEntity, "__FilingCount") );
+								
+								if ( 0 == cc ) {
+									cnt.add("Company <Register only>");									
+								} else {
+									cnt.add("CompanyFileCount", (cc/1000) + 1);									
+									cnt.add("FormCount", cc);
+								}
+								
 
 								jf.load(mEntity);
 								if ( (boolean) MVEL.executeExpression(fxEntities, (Object) jf) ) {
@@ -74,11 +88,12 @@ public class XbrlEdgarAgentJsonapi implements XbrlEdgarConsts, DustStreamJsonCon
 									String fPref = trEntity.get(rEntity, "__PathPrefix");
 									File fFacts = new File(edgarRoot, "companyfacts/" + fPref + EXT_CSV);
 									if ( fFacts.isFile() ) {
+										int factCount = 0;
+										int ctxCount = 0;
+
 										try (BufferedReader brFacts = new BufferedReader(new FileReader(fFacts))) {
 											DustUtilsData.TableReader trFact = null;
 //											Map<String, Object> mFact = new TreeMap<>();
-
-											int factCount = 0;
 
 											for (String lFact; (lFact = brFacts.readLine()) != null;) {
 												String[] rFact = lFact.split("\t");
@@ -88,7 +103,6 @@ public class XbrlEdgarAgentJsonapi implements XbrlEdgarConsts, DustStreamJsonCon
 													++factCount;
 
 													String ctxKey = trFact.format(rFact, ":", "instant", "start", "end");
-													int s = ctxIdx.getSize();
 													int ci = ctxIdx.getIndex(ctxKey);
 
 													String ctxId = "edgar:cfCtx_" + cik + "_" + ci;
@@ -101,8 +115,9 @@ public class XbrlEdgarAgentJsonapi implements XbrlEdgarConsts, DustStreamJsonCon
 														}
 													}
 
-													if ( s == ci ) {
+													if ( ctxCount == ci ) {
 														sw.write(JsonApiMember.included, TYPE_XBRL_CONTEXTS, ctxId, trFact, rFact);
+														ctxCount = ctxIdx.getSize();
 													}
 
 													String accn = trFact.get(rFact, "accn");
@@ -117,9 +132,17 @@ public class XbrlEdgarAgentJsonapi implements XbrlEdgarConsts, DustStreamJsonCon
 												}
 											}
 										}
+										
+										cnt.add("DataFactCount", factCount);
+										cnt.add("DataContextCount", ctxCount);
+										
 									}
+									
+									int refCount = refAccn.size();
 
-									if ( 0 < refAccn.size() ) {
+									if ( 0 < refCount ) {
+										
+										cnt.add("FormRefCount", refCount);
 
 										sw.write(JsonApiMember.included, TYPE_XBRL_ENTITIES, entityID, trEntity, rEntity);
 
@@ -154,6 +177,8 @@ public class XbrlEdgarAgentJsonapi implements XbrlEdgarConsts, DustStreamJsonCon
 				} else {
 					Dust.dumpObs("File not found", fIdx.getCanonicalPath());
 				}
+				
+				cnt.dump("JSON:API request stats");
 			}
 			Dust.access(MindContext.LocalCtx, MindAccess.Set, count, JsonApiMember.jsonapi, MISC_ATT_COUNT);
 			break;
