@@ -27,12 +27,14 @@ import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
 
 import hu.sze.milab.dust.Dust;
+import hu.sze.milab.dust.DustException;
 import hu.sze.milab.dust.dev.DustDevCounter;
 import hu.sze.milab.dust.stream.DustStreamUtils;
 import hu.sze.milab.dust.stream.xml.DustStreamXmlConsts;
 import hu.sze.milab.dust.stream.xml.DustStreamXmlDocumentGraphLoader;
 import hu.sze.milab.dust.utils.DustUtils;
 import hu.sze.milab.dust.utils.DustUtils.QueueContainer;
+import hu.sze.milab.dust.utils.DustUtilsConsts.DustUrlResolver;
 import hu.sze.milab.dust.utils.DustUtilsData;
 import hu.sze.milab.dust.utils.DustUtilsFactory;
 import hu.sze.milab.dust.utils.DustUtilsFile;
@@ -96,6 +98,11 @@ class XbrlTaxonomyLoaderExcel implements DustStreamXmlDocumentGraphLoader.XmlDoc
 		addFolder(root);
 
 		Dust.dumpObs("Files to visit in folder", root.getName(), allFiles.size());		
+	}
+	
+	@Override
+	public DustUrlResolver getUrlResolver() {
+		return DustException.wrap(null, "refactor broke this");
 	}
 
 	void addFolder(File dir) {

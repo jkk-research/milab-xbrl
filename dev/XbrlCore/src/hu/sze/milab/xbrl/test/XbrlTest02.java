@@ -1,24 +1,14 @@
 package hu.sze.milab.xbrl.test;
 
 import java.io.File;
-import java.util.Map;
-import java.util.TreeMap;
-
-import javax.xml.parsers.DocumentBuilder;
-import javax.xml.parsers.DocumentBuilderFactory;
-
-import org.w3c.dom.Document;
-import org.w3c.dom.Element;
-import org.w3c.dom.NamedNodeMap;
-import org.w3c.dom.NodeList;
 
 import hu.sze.milab.dust.Dust;
 import hu.sze.milab.dust.dev.DustDevConsts;
 import hu.sze.milab.dust.net.DustNetConsts;
 import hu.sze.milab.dust.stream.DustStreamUrlCache;
 import hu.sze.milab.dust.stream.xml.DustStreamXmlAgentParser;
-import hu.sze.milab.dust.stream.xml.DustStreamXmlDocumentGraphLoader;
 import hu.sze.milab.xbrl.XbrlConsts;
+import hu.sze.milab.xbrl.XbrlCoreUtils;
 import hu.sze.milab.xbrl.XbrlReportAgentXhtmlReader;
 
 public class XbrlTest02 implements XbrlConsts, DustDevConsts, DustNetConsts {
@@ -46,7 +36,8 @@ public class XbrlTest02 implements XbrlConsts, DustDevConsts, DustNetConsts {
 //			});
 		readTaxonomy(new String[] { 
 //				"EFRAG-ESRS-2022-PoC-Taxonomy", 
-				"IFRSAT-2022-03-24", 
+//				"IFRSAT-2022-03-24", 
+				"IFRSAT-2023-03-23", 
 //				"esef_taxonomy_2022",
 				});
 
@@ -72,43 +63,53 @@ public class XbrlTest02 implements XbrlConsts, DustDevConsts, DustNetConsts {
 
 	public static void readTaxonomy(String[] args) throws Exception {
 		DustStreamUrlCache urlCache = new DustStreamUrlCache(new File(dataDir, "urlCache"), false);
-
-		DocumentBuilderFactory dbf = DocumentBuilderFactory.newInstance();
-		DocumentBuilder db = dbf.newDocumentBuilder();
-
+		
 		for (String taxRoot : args) {
-			Dust.dumpObs("Reading taxonomy", taxRoot);
-
 			File fRoot = new File(in, taxRoot);
-			File txMeta = new File(fRoot, "META-INF");
 
-			File fCat = new File(txMeta, "catalog.xml");
-			Document catalog = db.parse(fCat);
-			File fTaxPack = new File(txMeta, "taxonomyPackage.xml");
-			Element taxPack = db.parse(fTaxPack).getDocumentElement();
-
-			Map<String, String> uriRewrite = new TreeMap<>();
-			NodeList nl = catalog.getElementsByTagName("rewriteURI");
-			for (int ni = nl.getLength(); ni-- > 0;) {
-				NamedNodeMap atts = nl.item(ni).getAttributes();
-				uriRewrite.put(atts.getNamedItem("uriStartString").getNodeValue(), atts.getNamedItem("rewritePrefix").getNodeValue());
-			}
-
-			DustStreamXmlDocumentGraphLoader xmlLoader = new DustStreamXmlDocumentGraphLoader(urlCache);
-
-			XbrlTaxonomyLoader taxonomyCollector = new XbrlTaxonomyLoader(fRoot, uriRewrite);
-			taxonomyCollector.getFolderCoverage().setSeen(fCat, fTaxPack);
-
-			nl = taxPack.getElementsByTagName("tp:entryPointDocument");
-			for (int ni = 0; ni < nl.getLength(); ++ni) {
-				String url = nl.item(ni).getAttributes().getNamedItem("href").getNodeValue();
-				xmlLoader.loadDocument(txMeta, url, taxonomyCollector, uriRewrite);
-			}
-
+			XbrlTaxonomyLoader taxonomyCollector = XbrlCoreUtils.readTaxonomy(urlCache, fRoot);
+			taxonomyCollector.collectData();
 			taxonomyCollector.dump();
-
-			taxonomyCollector.save(out, taxRoot + "_refs");
 		}
+
+//		DocumentBuilderFactory dbf = DocumentBuilderFactory.newInstance();
+//		DocumentBuilder db = dbf.newDocumentBuilder();
+//
+//		for (String taxRoot : args) {
+//			Dust.dumpObs("Reading taxonomy", taxRoot);
+//
+//			File fRoot = new File(in, taxRoot);
+//			File txMeta = new File(fRoot, "META-INF");
+//
+//			File fCat = new File(txMeta, "catalog.xml");
+//			Document catalog = db.parse(fCat);
+//			File fTaxPack = new File(txMeta, "taxonomyPackage.xml");
+//			Element taxPack = db.parse(fTaxPack).getDocumentElement();
+//
+////			Map<String, String> uriRewrite = new TreeMap<>();
+//			DustUrlResolver urlResolver = new DustUrlResolver(txMeta);
+//			NodeList nl = catalog.getElementsByTagName("rewriteURI");
+//			for (int ni = nl.getLength(); ni-- > 0;) {
+//				NamedNodeMap atts = nl.item(ni).getAttributes();
+//				String urlStart = atts.getNamedItem("uriStartString").getNodeValue();
+//				String prefix = atts.getNamedItem("rewritePrefix").getNodeValue();
+//				urlResolver.uriRewrite.put(urlStart, prefix);
+//			}
+//
+//			DustStreamXmlDocumentGraphLoader xmlLoader = new DustStreamXmlDocumentGraphLoader(urlCache);
+//
+//			XbrlTaxonomyLoader taxonomyCollector = new XbrlTaxonomyLoader(urlResolver);
+//			taxonomyCollector.getFolderCoverage().setSeen(fCat, fTaxPack);
+//
+//			nl = taxPack.getElementsByTagName("tp:entryPointDocument");
+//			for (int ni = 0; ni < nl.getLength(); ++ni) {
+//				String url = nl.item(ni).getAttributes().getNamedItem("href").getNodeValue();
+//				xmlLoader.loadDocument(url, taxonomyCollector);
+////				xmlLoader.loadDocument(txMeta, url, taxonomyCollector, uriRewrite);
+//			}
+//
+//			taxonomyCollector.dump();
+//		}
 	}
 
 	public static void readJsons(String[] args) throws Exception {

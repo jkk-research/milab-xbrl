@@ -4,6 +4,7 @@ import java.io.File;
 import java.net.URL;
 import java.nio.file.Paths;
 import java.util.HashSet;
+import java.util.Iterator;
 import java.util.Map;
 import java.util.Set;
 import java.util.TreeMap;
@@ -22,9 +23,9 @@ import hu.sze.milab.dust.stream.xml.DustStreamXmlDocumentGraphLoader;
 import hu.sze.milab.dust.utils.DustUtils;
 import hu.sze.milab.dust.utils.DustUtils.QueueContainer;
 import hu.sze.milab.dust.utils.DustUtilsFactory;
-import hu.sze.milab.dust.utils.DustUtilsFile;
+import hu.sze.milab.xbrl.XbrlConsts;
 
-class XbrlTaxonomyLoader implements DustStreamXmlDocumentGraphLoader.XmlDocumentProcessor, DustStreamXmlConsts {
+public class XbrlTaxonomyLoader implements DustStreamXmlDocumentGraphLoader.XmlDocumentProcessor, DustStreamXmlConsts, XbrlConsts {
 
 	class NamespaceData {
 		Element e;
@@ -59,17 +60,18 @@ class XbrlTaxonomyLoader implements DustStreamXmlDocumentGraphLoader.XmlDocument
 	@SuppressWarnings({ "unchecked", "rawtypes" })
 	DustUtilsFactory<String, Set<LinkData>> locLinks = new DustUtilsFactory.Simple(true, HashSet.class);
 
-	File root;
-	Map<String, String> uriRewrite;
-
+	public final DustUrlResolver urlResolver;
 	DustDevFolderCoverage folderCoverage;
 
-	public XbrlTaxonomyLoader(File root, Map<String, String> uriRewrite) {
-		this.root = root;
-		this.uriRewrite = uriRewrite;
+	Map<String, Object> ifrsDefs = new TreeMap<>();
+	Set<String> rootItems = new TreeSet<>();
+
+	public XbrlTaxonomyLoader(DustUrlResolver urlResolver) {
+		this.urlResolver = urlResolver;
+
+		File root = urlResolver.getRoot().getParentFile();
 
 		folderCoverage = new DustDevFolderCoverage(root);
-
 		Dust.dumpObs("Files to visit in folder", root.getName(), folderCoverage.countFilesToVisit());
 	}
 
@@ -77,77 +79,85 @@ class XbrlTaxonomyLoader implements DustStreamXmlDocumentGraphLoader.XmlDocument
 		return folderCoverage;
 	}
 
+	@Override
+	public DustUrlResolver getUrlResolver() {
+		return urlResolver;
+	}
+
+	public <RetType> RetType peek(Object val, Object... path) {
+		return Dust.access(ifrsDefs, MindAccess.Peek, val, path);
+	}
+
 	public void dump() throws Exception {
+//		collectData();
+
 		folderCoverage.dump();
 
 		Dust.dumpObs("namespaces", namespaces.size(), "nsByUrl", nsByUrl.size());
 
 		DustDevCounter dc = new DustDevCounter(true);
 
-		Map<String, Object> ifrsDefs = new TreeMap<>();
+		@SuppressWarnings("unchecked")
+		Map<String, Map<String, Object>> defs = (Map<String, Map<String, Object>>) ifrsDefs.get("item");
 
-		for (NamespaceData nd : namespaces.values()) {
-			String tns = nd.e.getAttribute("targetNamespace");
-
-			for (Element ee : nd.items.values()) {
-				String[] ii = ee.getAttribute("id").split("_");
-				String tn = ii[0];
-				dc.add("Taxonomy " + tns + ((1 == ii.length) ? "" : "::" + tn));
-
-				if ( "ifrs-full".equals(tn) ) {
-					dc.add("IFRS_FULL");
-					String[] tt = ee.getAttribute("type").split(":");
-					dc.add("Types " + tt[1]);
-
-					String cn = ii[1];
-					NamedNodeMap nma = ee.getAttributes();
-					for (int i = nma.getLength(); i-- > 0;) {
-						Attr a = (Attr) nma.item(i);
-						String an = a.getName();
-						an = DustUtils.getPostfix(an, ":");
-
-						switch ( an ) {
-						case "name":
-						case "id":
-							break;
-						default:
-							String val = a.getValue();
-							val = DustUtils.getPostfix(val, ":");
-							Dust.access(ifrsDefs, MindAccess.Set, val, cn, an);
-							
-							dc.add("Values " + an + ": " + val);
-							break;
-						}
-					}
-
-//					Element prev = ifrsDefs.put(cn, ee);
-//					if ( null != prev ) {
-//						Dust.dumpObs("Duplicate", cn, prev, ee);
-//					}
-//					Dust.dumpObs(ii[1], ee.getAttribute("type"));
+		for (Map<String, Object> md : defs.values()) {
+			for (Map.Entry<String, Object> ee : md.entrySet()) {
+				String an = ee.getKey();
+				if ( !"name".equals(an) ) {
+					dc.add("Values " + an + ": " + ee.getValue());
 				}
 			}
 		}
-		
-		for (LinkData ld : allLinks ) {
+
+		DustDevCounter dcFrom = new DustDevCounter(true);
+		DustDevCounter dcTo = new DustDevCounter(true);
+
+		for (LinkData ld : allLinks) {
 			Element el = ld.link;
-			
+
 			String tn = el.getTagName();
-			
+			String fromId = ld.from.getAttribute("xlink:href");
+			fromId = DustUtils.getPostfix(fromId, "#");
+			fromId = DustUtils.getPostfix(fromId, "_");
+			String toId = ld.to.getAttribute("xlink:href");
+			toId = DustUtils.getPostfix(toId, "#");
+			toId = DustUtils.getPostfix(toId, "_");
+
+			Object from = Dust.access(ifrsDefs, MindAccess.Peek, null, "item", fromId);
+			Object to = Dust.access(ifrsDefs, MindAccess.Peek, null, "item", toId);
+
 			switch ( tn ) {
 			case "link:presentationArc":
-				String fromId = ld.from.getAttribute("xlink:href");
-				fromId = DustUtils.getPostfix(fromId, "#");
-				String toId = ld.to.getAttribute("xlink:href");
-				toId = DustUtils.getPostfix(toId, "#");
-				Dust.dumpObs("arc from", fromId, "to", toId);
+				if ( (null != from) && (null != to) ) {
+					dcFrom.add(fromId);
+					dcTo.add(toId);
+				}
 				break;
+
+			case "link:labelArc":
+//				if ( "label".equals(toRole) ) 
+				if ( null != from ) {
+//					String txt = ld.to.getTextContent();
+//					Dust.dumpObs(fromId, toRole, txt);
+				}
+				break;
+
 			}
-			
 			dc.add("LinkTag " + tn);
 		}
 
+		Dust.dumpObs("---- Root items ---");
+		for (String ri : rootItems) {
+			Dust.dumpObs(ri, Dust.access(ifrsDefs, MindAccess.Peek, "???", "res", "en", ri, "label"));
+		}
+		Dust.dumpObs("-------");
+
+//		dcFrom.dump("From");
+//		dcTo.dump("To");
+
 		dc.dump("Counts");
+
+		linkInfo.dump("Links");
 
 		Set<String> skipUrl = new TreeSet<>();
 
@@ -168,11 +178,119 @@ class XbrlTaxonomyLoader implements DustStreamXmlDocumentGraphLoader.XmlDocument
 		for (String uu : skipUrl) {
 			Dust.dumpObs("Referred url not found", uu);
 		}
-
-		linkInfo.dump("Links");
 	}
 
-	public void save(File dir, String taxName) throws Exception {
+	public void collectData() {
+		for (NamespaceData nd : namespaces.values()) {
+			for (Element ee : nd.items.values()) {
+				String[] ii = ee.getAttribute("id").split("_");
+				String tn = ii[0];
+
+				if ( "ifrs-full".equals(tn) ) {
+					String cn = ii[1];
+					NamedNodeMap nma = ee.getAttributes();
+
+					String group = null;
+					Map<String, Object> md = new TreeMap<>();
+
+					for (int i = nma.getLength(); i-- > 0;) {
+						Attr a = (Attr) nma.item(i);
+						String an = a.getName();
+						an = DustUtils.getPostfix(an, ":");
+						String val = a.getValue();
+						val = DustUtils.getPostfix(val, ":");
+
+						switch ( an ) {
+						case "id":
+							continue;
+						case "type": {
+							XbrlFactDataType fdt = null;
+
+							switch ( val ) {
+							case "durationItemType":
+							case "dateItemType":
+								fdt = XbrlFactDataType.date;
+								break;
+							case "stringItemType":
+								fdt = XbrlFactDataType.string;
+								break;
+							case "textBlockItemType":
+								fdt = XbrlFactDataType.text;
+								break;
+							case "domainItemType":
+								fdt = null;
+								break;
+
+							default:
+								fdt = XbrlFactDataType.number;
+								break;
+							}
+
+							md.put(ATT_FACT_DATA_TYPE, fdt);
+						}
+
+							break;
+						case "substitutionGroup":
+							group = val;
+							break;
+						case "name":
+							rootItems.add(val);
+							break;
+						default:
+							break;
+						}
+
+						md.put(an, val);
+					}
+
+					if ( null != group ) {
+						Dust.access(ifrsDefs, MindAccess.Set, md, group, cn);
+					}
+				}
+			}
+		}
+
+		Set<String> dcFrom = new HashSet<>();
+
+		for (LinkData ld : allLinks) {
+			Element el = ld.link;
+
+			String tn = el.getTagName();
+			String fromId = ld.from.getAttribute("xlink:href");
+			fromId = DustUtils.getPostfix(fromId, "#");
+			fromId = DustUtils.getPostfix(fromId, "_");
+			String toId = ld.to.getAttribute("xlink:href");
+			toId = DustUtils.getPostfix(toId, "#");
+			toId = DustUtils.getPostfix(toId, "_");
+
+			String toRole = DustUtils.getPostfix(ld.to.getAttribute("xlink:role"), "/");
+
+			Object from = Dust.access(ifrsDefs, MindAccess.Peek, null, "item", fromId);
+			Object to = Dust.access(ifrsDefs, MindAccess.Peek, null, "item", toId);
+
+			switch ( tn ) {
+			case "link:presentationArc":
+				if ( (null != from) && (null != to) ) {
+					dcFrom.add(fromId);
+				}
+				rootItems.remove(toId);
+				break;
+
+			case "link:labelArc":
+				if ( null != from ) {
+					String txt = ld.to.getTextContent();
+					Dust.access(ifrsDefs, MindAccess.Set, txt, "res", ld.to.getAttribute("xml:lang"), fromId, toRole);
+				}
+				break;
+			}
+		}
+
+		for (Iterator<String> itRoot = rootItems.iterator(); itRoot.hasNext();) {
+			String id = itRoot.next();
+			if ( !dcFrom.contains(id) ) {
+				itRoot.remove();
+			}
+		}
 	}
 
 	@Override
@@ -255,12 +373,12 @@ class XbrlTaxonomyLoader implements DustStreamXmlDocumentGraphLoader.XmlDocument
 
 					String ref = ld.from.getAttribute("xlink:href");
 					if ( !DustUtils.isEmpty(ref) ) {
-						ref = optLocalizeUrl(ref, url);
+						ref = urlResolver.optLocalizeUrl(ref, url);
 						locLinks.get(ref).add(ld);
 					}
 					ref = ld.to.getAttribute("xlink:href");
 					if ( !DustUtils.isEmpty(ref) ) {
-						ref = optLocalizeUrl(ref, url);
+						ref = urlResolver.optLocalizeUrl(ref, url);
 						locLinks.get(ref).add(ld);
 					}
 				}
@@ -270,34 +388,9 @@ class XbrlTaxonomyLoader implements DustStreamXmlDocumentGraphLoader.XmlDocument
 		el = root.getElementsByTagName("link:linkbaseRef");
 		for (int ei = el.getLength(); ei-- > 0;) {
 			String href = ((Element) el.item(ei)).getAttribute("xlink:href");
-			String refUrl = optLocalizeUrl(href, url);
+			String refUrl = urlResolver.optLocalizeUrl(href, url);
 			loader.enqueue(href, refUrl);
 		}
-	}
 
-	public String optLocalizeUrl(String href, String url) {
-		String refUrl = href;
-
-		if ( !href.contains(":") ) {
-			refUrl = DustUtils.replacePostfix(url, "/", href);
-		} else {
-			for (Map.Entry<String, String> e : uriRewrite.entrySet()) {
-				String prefix = e.getKey();
-				if ( url.startsWith(prefix) ) {
-					File f = new File(root, e.getValue());
-					f = new File(f, url.substring(prefix.length()));
-					try {
-						refUrl = f.toURI().toURL().toString();
-					} catch (Throwable e1) {
-						e1.printStackTrace();
-					}
-					break;
-				}
-			}
-		}
-
-		refUrl = DustUtilsFile.optRemoveUpFromPath(refUrl);
-
-		return refUrl;
 	}
 }

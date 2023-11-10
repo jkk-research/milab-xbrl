@@ -3,8 +3,9 @@ package hu.sze.milab.xbrl;
 import hu.sze.milab.dust.Dust;
 import hu.sze.milab.dust.DustMetaConsts;
 import hu.sze.milab.dust.stream.xml.DustStreamXmlConsts;
+import hu.sze.milab.dust.utils.DustUtilsConsts;
 
-public interface XbrlConsts extends DustMetaConsts, DustStreamXmlConsts {
+public interface XbrlConsts extends DustMetaConsts, DustStreamXmlConsts, DustUtilsConsts {
 	
 	String PREFIX_XBRL = "hu.sze.milab.xbrl.";
 	
@@ -12,6 +13,8 @@ public interface XbrlConsts extends DustMetaConsts, DustStreamXmlConsts {
 	String TYPE_XBRL_REPORTS = "xbrl:reports";
 	String TYPE_XBRL_CONTEXTS = "xbrl:contexts";
 	String TYPE_XBRL_FACTS = "xbrl:facts";
+
+	String ATT_FACT_DATA_TYPE = "factDataType";
 
 
 

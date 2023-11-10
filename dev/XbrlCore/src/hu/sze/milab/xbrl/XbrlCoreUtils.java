@@ -1,5 +1,6 @@
 package hu.sze.milab.xbrl;
 
+import java.io.File;
 import java.math.BigDecimal;
 import java.math.RoundingMode;
 import java.text.SimpleDateFormat;
@@ -9,7 +10,19 @@ import java.util.Map;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
+import javax.xml.parsers.DocumentBuilder;
+import javax.xml.parsers.DocumentBuilderFactory;
+
+import org.w3c.dom.Document;
+import org.w3c.dom.Element;
+import org.w3c.dom.NamedNodeMap;
+import org.w3c.dom.NodeList;
+
+import hu.sze.milab.dust.Dust;
+import hu.sze.milab.dust.stream.DustStreamUrlCache;
+import hu.sze.milab.dust.stream.xml.DustStreamXmlDocumentGraphLoader;
 import hu.sze.milab.dust.utils.DustUtils;
+import hu.sze.milab.xbrl.test.XbrlTaxonomyLoader;
 
 public class XbrlCoreUtils implements XbrlConsts {
 
@@ -23,7 +36,7 @@ public class XbrlCoreUtils implements XbrlConsts {
 
 			String fmtCode = (String) data.get(XbrlFactDataInfo.Format);
 			fmtCode = DustUtils.getPostfix(fmtCode, ":");
-			
+
 			if ( fmtCode.startsWith("num") ) {
 				ft = XbrlFactDataType.number;
 				String scale = (String) data.get(XbrlFactDataInfo.Scale);
@@ -205,7 +218,7 @@ public class XbrlCoreUtils implements XbrlConsts {
 				if ( "-".equals(sign) ) {
 					dVal = dVal.negate();
 				}
-				
+
 				if ( !DustUtils.isEmpty(decimals) && !"0".equals(decimals) && !"INF".equals(decimals) ) {
 					dVal = dVal.setScale(Integer.valueOf(decimals), RoundingMode.FLOOR);
 				}
@@ -213,5 +226,39 @@ public class XbrlCoreUtils implements XbrlConsts {
 		}
 
 		return dVal;
+	}
+
+	public static XbrlTaxonomyLoader readTaxonomy(DustStreamUrlCache urlCache, File taxFolder) throws Exception {
+		DocumentBuilderFactory dbf = DocumentBuilderFactory.newInstance();
+		DocumentBuilder db = dbf.newDocumentBuilder();
+
+		Dust.dumpObs("Reading taxonomy", taxFolder.getName());
+
+		File txMeta = new File(taxFolder, "META-INF");
+
+		File fCat = new File(txMeta, "catalog.xml");
+		Document catalog = db.parse(fCat);
+		File fTaxPack = new File(txMeta, "taxonomyPackage.xml");
+		Element taxPack = db.parse(fTaxPack).getDocumentElement();
+
+		DustUrlResolver urlResolver = new DustUrlResolver(txMeta);
+		NodeList nl = catalog.getElementsByTagName("rewriteURI");
+		for (int ni = nl.getLength(); ni-- > 0;) {
+			NamedNodeMap atts = nl.item(ni).getAttributes();
+			urlResolver.uriRewrite.put(atts.getNamedItem("uriStartString").getNodeValue(), atts.getNamedItem("rewritePrefix").getNodeValue());
+		}
+
+		DustStreamXmlDocumentGraphLoader xmlLoader = new DustStreamXmlDocumentGraphLoader(urlCache);
+
+		XbrlTaxonomyLoader taxonomyCollector = new XbrlTaxonomyLoader(urlResolver);
+		taxonomyCollector.getFolderCoverage().setSeen(fCat, fTaxPack);
+
+		nl = taxPack.getElementsByTagName("tp:entryPointDocument");
+		for (int ni = 0; ni < nl.getLength(); ++ni) {
+			String url = nl.item(ni).getAttributes().getNamedItem("href").getNodeValue();
+			xmlLoader.loadDocument(url, taxonomyCollector);
+		}
+
+		return taxonomyCollector;
 	}
 }
