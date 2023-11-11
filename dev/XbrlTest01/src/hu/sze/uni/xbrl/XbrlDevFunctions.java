@@ -5,6 +5,7 @@ import java.io.File;
 import java.io.FileReader;
 import java.io.PrintStream;
 import java.io.PrintWriter;
+import java.util.Arrays;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Set;
@@ -127,7 +128,6 @@ public class XbrlDevFunctions implements XbrlConsts {
 			}
 		};
 		DustUtilsData.Indexer<String> expCols = new DustUtilsData.Indexer<>();
-		int row = 0;
 
 		if ( fTxt.isFile() ) {
 			XbrlFilingManager filings = new XbrlFilingManager(dataRoot, true);
@@ -136,19 +136,26 @@ public class XbrlDevFunctions implements XbrlConsts {
 			DustUtilsData.TableReader tr = null;
 			Iterable<String[]> repFacts = null;
 
-			try (BufferedReader br = new BufferedReader(new FileReader(fTxt))) {
+			try (BufferedReader br = new BufferedReader(new FileReader(fTxt)); PrintStream psOut = new PrintStream("work/test01.csv")) {
+				Set<String> axes = new TreeSet<>();
+				Set<String> cols = new TreeSet<>();
+
+				int repIdx = 0;
+
+				psOut.print("Concept\tTotalCount");
+
 				for (String line; (line = br.readLine()) != null;) {
 					String id = line.trim();
-					++row;
+					++repIdx;
+
+					axes.clear();
+					cols.clear();
 
 					tr = filings.getTableReader(id);
 					repFacts = filings.getFacts(id);
 
 					int diStart = tr.getColIdx("Instant");
 					int diEnd = tr.getColIdx("OrigValue");
-
-					Set<String> axes = new TreeSet<>();
-					Set<String> cols = new TreeSet<>();
 
 					for (String[] rf : repFacts) {
 						String taxonomy = tr.get(rf, "Taxonomy");
@@ -173,45 +180,93 @@ public class XbrlDevFunctions implements XbrlConsts {
 
 						String axisId = axes.isEmpty() ? "" : (" " + axes.toString());
 						countConcepts.add(concept + axisId);
-						
-						String cellId = "(" + time + ")" + axisId;
+
+						String cellId = repIdx + " (" + time + ")" + axisId;
 						cols.add(cellId);
 
-						data.get(concept).add(row + " " + cellId);
+						data.get(concept).add(cellId);
 					}
 
+					boolean first = true;
 					for (String cellId : cols) {
-						expCols.getIndex(row + " " + cellId);
+						psOut.print("\t");
+						if ( first ) {
+							first = false;
+							psOut.print(repIdx + ": " + id);
+						}
+						expCols.getIndex(cellId);
 					}
+				}
+
+				int cc = 0;
+				for (String col : expCols.keys()) {
+					if ( 0 == (cc++) ) {
+						psOut.println();
+						psOut.print("\t");
+					}
+
+					psOut.print("\t");
+					psOut.print(col);
+				}
+
+				psOut.println();
+				psOut.flush();
+
+				Long[] vals = new Long[cc];
+
+				DustStreamUrlCache urlCache = new DustStreamUrlCache(new File(dataRoot, "urlCache"), false);
+				File taxonomyRoot = new File(dataRoot, "taxonomies");
+				File fRoot = new File(taxonomyRoot, "IFRSAT-2023-03-23");
+				XbrlTaxonomyLoader taxonomyCollector = XbrlCoreUtils.readTaxonomy(urlCache, fRoot);
+				taxonomyCollector.collectData();
+				Map<String, Object> concepts = taxonomyCollector.peek(null, "item");
+
+				for (String k : concepts.keySet()) 
+//				for (String k : data.keys()) 
+				{
+					psOut.print(k);
+
+					psOut.print("\t");
+					psOut.print(DustUtils.toString(countConcepts.peek(k)));
+
+					Arrays.fill(vals, null);
+					DustDevCounter dc = data.peek(k);
+					if ( null != dc ) {
+						for (Map.Entry<Object, Long> e : dc) {
+							String cellId = (String) e.getKey();
+							int colIdx = expCols.peekIndex(cellId);
+							vals[colIdx] = e.getValue();
+						}
+					}
+
+					for (int i = 0; i < cc; ++i) {
+						psOut.print("\t");
+						Long l = vals[i];
+						if ( null != l ) {
+							psOut.print(l);
+						}
+					}
+
+					psOut.println();
+					psOut.flush();
 				}
 			}
 		}
 
-		countConcepts.dump("Concept stats");
-
-		Dust.dumpObs("Collected data");
-		for (String k : data.keys()) {
-			DustDevCounter dc = data.peek(k);
-
-			Dust.dumpObs(k);
-			for (Map.Entry<Object, Long> e : dc) {
-				String cellId = (String) e.getKey();
-				int colIdx = expCols.peekIndex(cellId);
-
-				Dust.dumpObs("  ", cellId, colIdx, e.getValue());
-			}
-		}
-
-		if ( 0 < row ) {
-			return;
-		}
-
-		DustStreamUrlCache urlCache = new DustStreamUrlCache(new File(dataRoot, "urlCache"), false);
-		File taxonomyRoot = new File(dataRoot, "taxonomies");
-		File fRoot = new File(taxonomyRoot, "IFRSAT-2023-03-23");
-		XbrlTaxonomyLoader taxonomyCollector = XbrlCoreUtils.readTaxonomy(urlCache, fRoot);
-		taxonomyCollector.collectData();
-//		Map<String, Object> concepts = taxonomyCollector.peek(null, "item");
+//		countConcepts.dump("Concept stats");
+//
+//		Dust.dumpObs("Collected data");
+//		for (String k : data.keys()) {
+//			DustDevCounter dc = data.peek(k);
+//
+//			Dust.dumpObs(k);
+//			for (Map.Entry<Object, Long> e : dc) {
+//				String cellId = (String) e.getKey();
+//				int colIdx = expCols.peekIndex(cellId);
+//
+//				Dust.dumpObs("  ", cellId, colIdx, e.getValue());
+//			}
+//		}
 
 	}
 
