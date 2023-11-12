@@ -228,7 +228,7 @@ public class XbrlCoreUtils implements XbrlConsts {
 		return dVal;
 	}
 
-	public static XbrlTaxonomyLoader readTaxonomy(DustStreamUrlCache urlCache, File taxFolder) throws Exception {
+	public static XbrlTaxonomyLoader readTaxonomy(DustStreamUrlCache urlCache, File taxFolder, String targetTaxonomy) throws Exception {
 		DocumentBuilderFactory dbf = DocumentBuilderFactory.newInstance();
 		DocumentBuilder db = dbf.newDocumentBuilder();
 
@@ -250,7 +250,7 @@ public class XbrlCoreUtils implements XbrlConsts {
 
 		DustStreamXmlDocumentGraphLoader xmlLoader = new DustStreamXmlDocumentGraphLoader(urlCache);
 
-		XbrlTaxonomyLoader taxonomyCollector = new XbrlTaxonomyLoader(urlResolver);
+		XbrlTaxonomyLoader taxonomyCollector = new XbrlTaxonomyLoader(urlResolver, targetTaxonomy);
 		taxonomyCollector.getFolderCoverage().setSeen(fCat, fTaxPack);
 
 		nl = taxPack.getElementsByTagName("tp:entryPointDocument");

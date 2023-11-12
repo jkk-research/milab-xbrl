@@ -1,59 +1,29 @@
 package hu.sze.uni.xbrl;
 
-import java.io.BufferedInputStream;
-import java.io.File;
-import java.io.FileInputStream;
-import java.io.FileOutputStream;
-import java.io.IOException;
-import java.io.InputStream;
-import java.io.OutputStream;
-import java.net.HttpURLConnection;
-import java.net.URL;
-import java.nio.file.Files;
+import java.io.PrintWriter;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.HashMap;
 import java.util.Map;
-import java.util.zip.GZIPInputStream;
-import java.util.zip.ZipEntry;
-import java.util.zip.ZipInputStream;
+import java.util.Set;
+import java.util.TreeSet;
 
-import org.apache.commons.compress.utils.IOUtils;
+import hu.sze.milab.dust.Dust;
+import hu.sze.milab.dust.dev.DustDevCounter;
+import hu.sze.milab.dust.utils.DustUtils;
+import hu.sze.milab.dust.utils.DustUtilsData;
+import hu.sze.milab.dust.utils.DustUtilsFactory;
 
 @SuppressWarnings({ "rawtypes", "unchecked" })
 public class XbrlUtils implements XbrlConsts {
 	public static final Map<String, String> XML_TRANSLATE = new HashMap<>();
+	
+	public static int MAX_TAX_COL_COUNT = 600;
 
 	static {
 		XML_TRANSLATE.put("contextRef", "period");
 		XML_TRANSLATE.put("unitRef", "unit");
 		XML_TRANSLATE.put("name", "concept");
-	}
-
-	public static StringBuilder sbAppend(StringBuilder sb, Object sep, boolean strict, Object... objects) {
-		for (Object ob : objects) {
-			String str = toString(ob);
-
-			if ( strict || (0 < str.length()) ) {
-				if ( null == sb ) {
-					sb = new StringBuilder(str);
-				} else {
-					if ( 0 < sb.length() ) {
-						sb.append(sep);
-					}
-					sb.append(str);
-				}
-			}
-		}
-
-		return sb;
-	}
-
-	public static void dump(Object sep, boolean strict, Object... objects) {
-		StringBuilder sb = sbAppend(null, sep, strict, objects);
-
-		if ( null != sb ) {
-			System.out.println(sb);
-		}
 	}
 
 	public static <RetType> RetType access(Object root, AccessCmd cmd, Object val, Object... path) {
@@ -91,111 +61,157 @@ public class XbrlUtils implements XbrlConsts {
 		return (RetType) ret;
 	}
 
-	public static File searchByName(File f, String name) {
-		File ret = null;
-
-		if ( null != f ) {
-			if ( name.toLowerCase().equals(f.getName().toLowerCase()) ) {
-				return f;
-			} else if ( f.isDirectory() ) {
-				for (File ff : f.listFiles()) {
-					ret = searchByName(ff, name);
-					if ( null != ret ) {
-						break;
+	public static void exportConceptCoverage(PrintWriter psOut, XbrlFilingManager filings, Iterable<String> ids, Iterable<String> concepts) throws Exception {
+			DustDevCounter countConcepts = new DustDevCounter(true);
+			DustUtilsFactory<String, DustDevCounter> data = new DustUtilsFactory<String, DustDevCounter>(true) {
+				@Override
+				protected DustDevCounter create(String key, Object... hints) {
+					return new DustDevCounter(true);
+				}
+			};
+			DustUtilsData.Indexer<String> expCols = new DustUtilsData.Indexer<>();
+	
+			DustUtilsData.TableReader tr = null;
+			Iterable<String[]> repFacts = null;
+	
+			Set<String> axes = new TreeSet<>();
+			Set<String> cols = new TreeSet<>();
+	
+			int repIdx = 0;
+	
+			psOut.print("Concept\tTotalCount");
+	
+			for (String line : ids) {
+				String id = line.trim();
+				++repIdx;
+	
+				axes.clear();
+				cols.clear();
+	
+				tr = filings.getTableReader(id);
+				repFacts = filings.getFacts(id);
+	
+				int diStart = tr.getColIdx("Instant");
+				int diEnd = tr.getColIdx("OrigValue");
+	
+				for (String[] rf : repFacts) {
+					String taxonomy = tr.get(rf, "Taxonomy");
+					if ( !DustUtils.isEqual("ifrs-full", taxonomy) ) {
+						continue;
 					}
-				}
-			}
-		}
-
-		return ret;
-	}
-
-	public static void download(String url, File file, String... headers) throws Exception {
-		HttpURLConnection conn = (HttpURLConnection) new URL(url).openConnection();
-
-		for (String h : headers) {
-			int s = h.indexOf(":");
-			String key = h.substring(0, s).trim();
-			String val = h.substring(s + 1).trim();
-			conn.setRequestProperty(key, val);
-		}
-
-		InputStream is = conn.getInputStream();
-
-		if ( "gzip".equals(conn.getContentEncoding()) ) {
-			try (GZIPInputStream i = new GZIPInputStream(is)) {
-				OutputStream o = Files.newOutputStream(file.toPath());
-				IOUtils.copy(i, o);
-			}
-		} else {
-			try (BufferedInputStream in = new BufferedInputStream(is); FileOutputStream fileOutputStream = new FileOutputStream(file)) {
-				byte dataBuffer[] = new byte[1024];
-				int bytesRead;
-				while ((bytesRead = in.read(dataBuffer, 0, 1024)) != -1) {
-					fileOutputStream.write(dataBuffer, 0, bytesRead);
-				}
-			}
-		}
-	}
-
-	public static String getHashName(String dirName) {
-		int hash = dirName.hashCode();
-
-		int mask = 255;
-		int firstDir = hash & mask;
-		int secondDir = (hash >> 8) & mask;
-
-		return String.format("%02x%s%02x%s%s", firstDir, File.separator, secondDir, File.separator, dirName);
-	}
-
-	public static File getHashDir(File root, String dirName) {
-		String path = getHashName(dirName);
-
-		File f = new File(root, path);
-
-		f.mkdirs();
-
-		return f;
-	}
-
-	public static void unzip(File fromFile, File destDir) throws Exception {
-		byte[] buffer = new byte[1024];
-
-		try (ZipInputStream zis = new ZipInputStream(new FileInputStream(fromFile))) {
-			for (ZipEntry zipEntry = zis.getNextEntry(); zipEntry != null; zipEntry = zis.getNextEntry()) {
-				File newFile = new File(destDir, zipEntry.getName());
-
-				String destDirPath = destDir.getCanonicalPath();
-				String destFilePath = newFile.getCanonicalPath();
-
-				if ( !destFilePath.startsWith(destDirPath + File.separator) ) {
-					throw new IOException("Entry is outside of the target dir: " + zipEntry.getName());
-				}
-
-				if ( zipEntry.isDirectory() ) {
-					if ( !newFile.isDirectory() && !newFile.mkdirs() ) {
-						throw new IOException("Failed to create directory " + newFile);
+	
+					String concept = tr.get(rf, "Concept");
+	
+					String time = tr.get(rf, "Instant");
+					if ( DustUtils.isEmpty(time) ) {
+						time = tr.format(rf, " / ", "StartDate", "EndDate");
 					}
+	
+					axes.clear();
+					for (int i = diStart + 1; i < diEnd; i += 2) {
+						String aVal = rf[i];
+						if ( !DustUtils.isEmpty(aVal) ) {
+							axes.add(aVal);
+						}
+					}
+	
+					String axisId = axes.isEmpty() ? "" : (" " + axes.toString());
+					countConcepts.add(concept + axisId);
+	
+					String cellId = repIdx + " (" + time + ")" + axisId;
+					cols.add(cellId);
+	
+					data.get(concept).add(cellId);
+				}
+	
+				boolean first = true;
+				for (String cellId : cols) {
+					psOut.print("\t");
+					if ( first ) {
+						first = false;
+						psOut.print(repIdx + ": " + id);
+					}
+					expCols.getIndex(cellId);
+				}
+				
+				if ( MAX_TAX_COL_COUNT < expCols.getSize()) {
+					break;
+				}
+			}
+	
+			int cc = 0;
+			for (String col : expCols.keys()) {
+				if ( 0 == (cc++) ) {
+					psOut.println();
+					psOut.print("\t");
+				}
+	
+				psOut.print("\t");
+				psOut.print(col);
+			}
+	
+			psOut.println();
+			psOut.flush();
+	
+			Long[] vals = new Long[cc];
+	
+			StringBuilder sbEmpty = new StringBuilder();
+			for (int i = 0; i < cc; ++i) {
+				sbEmpty.append("\t");
+			}
+			String empty = sbEmpty.toString();
+	
+			long ts = System.currentTimeMillis();
+			
+			Iterable<String> rows = (null == concepts ) ? data.keys() : concepts;
+	
+			for (String k : rows)	{
+				psOut.print(k);
+	
+				psOut.print("\t");
+				psOut.print(DustUtils.toString(countConcepts.peek(k)));
+	
+				DustDevCounter dc = data.peek(k);
+	
+				if ( null == dc ) {
+					psOut.println(empty);
 				} else {
-					File parent = newFile.getParentFile();
-					if ( !parent.isDirectory() && !parent.mkdirs() ) {
-						throw new IOException("Failed to create directory " + parent);
+					Arrays.fill(vals, null);
+					for (Map.Entry<Object, Long> e : dc) {
+						String cellId = (String) e.getKey();
+						int colIdx = expCols.peekIndex(cellId);
+						vals[colIdx] = e.getValue();
 					}
-
-					FileOutputStream oo = new FileOutputStream(newFile);
-					int len;
-					while ((len = zis.read(buffer)) > 0) {
-						oo.write(buffer, 0, len);
+	
+					for (int i = 0; i < cc; ++i) {
+						psOut.print("\t");
+						Long l = vals[i];
+						if ( null != l ) {
+							psOut.print(l);
+						}
 					}
-					oo.close();
+					psOut.println();
 				}
+				psOut.flush();
 			}
-
-			zis.closeEntry();
+	
+			Dust.dumpObs("time", System.currentTimeMillis() - ts, "msec.");
+	
+	//		countConcepts.dump("Concept stats");
+	//
+	//		Dust.dumpObs("Collected data");
+	//		for (String k : data.keys()) {
+	//			DustDevCounter dc = data.peek(k);
+	//
+	//			Dust.dumpObs(k);
+	//			for (Map.Entry<Object, Long> e : dc) {
+	//				String cellId = (String) e.getKey();
+	//				int colIdx = expCols.peekIndex(cellId);
+	//
+	//				Dust.dumpObs("  ", cellId, colIdx, e.getValue());
+	//			}
+	//		}
+	
 		}
-	}
 
-	public static String toString(Object ob) {
-		return (null == ob) ? "" : ob.toString();
-	}
 }

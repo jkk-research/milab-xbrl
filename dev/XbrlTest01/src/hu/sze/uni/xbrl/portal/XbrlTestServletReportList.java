@@ -1,6 +1,7 @@
 package hu.sze.uni.xbrl.portal;
 
 import java.io.BufferedReader;
+import java.io.Closeable;
 import java.io.File;
 import java.io.FileReader;
 import java.io.PrintWriter;
@@ -26,6 +27,7 @@ import hu.sze.milab.xbrl.tools.XbrlToolsCurrencyConverter;
 import hu.sze.uni.http.DustHttpServlet;
 import hu.sze.uni.xbrl.XbrlConsts.XbrlReportType;
 import hu.sze.uni.xbrl.XbrlFilingManager;
+import hu.sze.uni.xbrl.XbrlUtils;
 import hu.sze.uni.xbrl.XbrlUtilsCounter;
 import hu.sze.uni.xbrl.portal.XbrlTestPortalConsts.ListColumns;
 
@@ -133,14 +135,12 @@ class XbrlTestServletReportList extends DustHttpServlet {
 	}
 
 	private XbrlFilingManager filings;
-//		ArrayList<String[]> allFacts = new ArrayList<>();
-//	Map<String, ArrayList<String[]>> allFactsByRep = new HashMap<>();
-//	Map<String, DustUtilsData.TableReader> headers = new HashMap<>();
+	private Iterable<String> ifrsConcepts;
 
 	public XbrlTestServletReportList(XbrlTestPortal portal) {
 		this.filings = portal.filings;
-//		this.allFactsByRep = portal.allFactsByRep;
-//		this.headers = portal.headers;
+		Map<String, Object> cm = portal.taxonomyCollector.peek(null, "item");
+		ifrsConcepts = cm.keySet();
 	}
 
 	String insert(String line, int at, String str) {
@@ -176,6 +176,7 @@ class XbrlTestServletReportList extends DustHttpServlet {
 		String pageNum = Dust.access(data, MindAccess.Peek, "1", ServletData.Parameter, "page[number]");
 
 		boolean inEUR = "on".equals(Dust.access(data, MindAccess.Peek, "off", ServletData.Parameter, "inEUR"));
+		boolean allIFRS = "on".equals(Dust.access(data, MindAccess.Peek, "off", ServletData.Parameter, "allIFRS"));
 
 		boolean loadFacts = !DustUtils.isEmpty(exprFact);
 
@@ -208,16 +209,22 @@ class XbrlTestServletReportList extends DustHttpServlet {
 					repFacts = filings.getFacts(id);
 				}
 
-				if ( exprSvc.test(repSrc, rep, tr, repFacts) ) {
-					res.add(rep);
+				try {
+					if ( exprSvc.test(repSrc, rep, tr, repFacts) ) {
+						res.add(rep);
 
-					if ( csvOut ) {
-						if ( (null == trMax) || (trMax.getSize() < tr.getSize()) ) {
-							trMax = tr;
+						if ( csvOut ) {
+							if ( (null == trMax) || (trMax.getSize() < tr.getSize()) ) {
+								trMax = tr;
+							}
 						}
-					}
 
-					rep = null;
+						rep = null;
+					}
+				} finally {
+					if ( repFacts instanceof Closeable ) {
+						((Closeable) repFacts).close();
+					}
 				}
 			}
 
@@ -248,145 +255,160 @@ class XbrlTestServletReportList extends DustHttpServlet {
 		HttpServletResponse resp = Dust.access(data, MindAccess.Peek, null, ServletData.Response);
 
 		if ( csvOut ) {
-			boolean filtered = "Filtered".equals(mode) && (null != exprSvc.factExpr);
 			String fn = Dust.access(data, MindAccess.Peek, "ReportData", ServletData.Parameter, "fName");
 			fn += ("_" + mode + "_" + new SimpleDateFormat(DustConsts.FMT_TIMESTAMP).format(new Date()) + ".csv");
 			resp.setHeader("Content-Disposition", "attachment; filename=" + fn);
 			resp.setContentType(CONTENT_CSV + "; filename=" + fn);
-			Map currFact = new HashMap<>();
-
-			XbrlToolsCurrencyConverter cCvt = inEUR ? new XbrlToolsCurrencyConverter("EUR", "params/excRate_5yr_v2.csv", ";") : null;
-			Map<String, Object> mapFacts = new HashMap<>();
 
 			PrintWriter out = getWriter(data);
 
-			String[] repCols = {};
-			int repColCount = 0;
-
-			if ( !DustUtils.isEmpty(repColStr) ) {
-				repCols = repColStr.split(",");
-				repColCount = repCols.length;
-				for (int i = 0; i < repColCount; ++i) {
-					repCols[i] = repCols[i].trim();
-					out.print(repCols[i]);
-					out.print("\t");
+			if ( "Taxonomy".equals(mode) ) {
+				ArrayList<String> ids = new ArrayList<>();
+				for (Map r : res) {
+					ids.add((String) r.get("Report"));
 				}
-			}
 
-			if ( "Text".equals(mode) ) {
-				trMax.writeHeadPart(out, "\t", trMax.getColIdx("OrigValue"));
-				out.println("\tLanguage\tValue");
+				XbrlUtils.exportConceptCoverage(out, filings, ids, allIFRS ? ifrsConcepts : null);
+
 			} else {
-				if ( inEUR ) {
-					trMax.writeHeadPart(out, "\t", Integer.MAX_VALUE);
-					out.println("\tcvtEurValue\tcvtEurStatus\tcvtEurCount");
-				} else {
-					trMax.writeHead(out, "\t");
-				}
-			}
+				boolean filtered = "Filtered".equals(mode) && (null != exprSvc.factExpr);
+				XbrlToolsCurrencyConverter cCvt = inEUR ? new XbrlToolsCurrencyConverter("EUR", "params/excRate_5yr_v2.csv", ";") : null;
 
-			for (Map r : res) {
-				String id = (String) r.get("Report");
+				Map currFact = new HashMap<>();
+				Map<String, Object> mapFacts = new HashMap<>();
 
-				tr = filings.getTableReader(id);
-				int ts = tr.getSize();
-				int diff = trMax.getSize() - ts;
-				int ovi = -1;
+				String[] repCols = {};
+				int repColCount = 0;
 
-				StringBuilder fill = null;
-				if ( 0 < diff ) {
-					fill = new StringBuilder();
-					for (int i = 0; i < diff; ++i) {
-						fill.append("\t");
+				if ( !DustUtils.isEmpty(repColStr) ) {
+					repCols = repColStr.split(",");
+					repColCount = repCols.length;
+					for (int i = 0; i < repColCount; ++i) {
+						repCols[i] = repCols[i].trim();
+						out.print(repCols[i]);
+						out.print("\t");
 					}
-					ovi = tr.getColIdx("OrigValue");
 				}
-
-				StringBuilder sbRepHead = null;
-				for (int i = 0; i < repColCount; ++i) {
-					sbRepHead = DustUtils.sbAppend(sbRepHead, "\t", true, r.get(repCols[i]));
-				}
-				String repHead = DustUtils.toString(sbRepHead);
 
 				if ( "Text".equals(mode) ) {
-					Map repSrc = filings.getReportData().get(id);
-					File fTxt = filings.getReport(repSrc, XbrlReportType.ContentTxt, true);
+					trMax.writeHeadPart(out, "\t", trMax.getColIdx("OrigValue"));
+					out.println("\tLanguage\tValue");
+				} else {
+					if ( inEUR ) {
+						trMax.writeHeadPart(out, "\t", Integer.MAX_VALUE);
+						out.println("\tcvtEurValue\tcvtEurStatus\tcvtEurCount");
+					} else {
+						trMax.writeHead(out, "\t");
+					}
+				}
 
-					if ( fTxt.isFile() ) {
-						boolean firstLine = true;
-						try (BufferedReader br = new BufferedReader(new FileReader(fTxt))) {
-							for (String line; (line = br.readLine()) != null;) {
-								if ( firstLine ) {
-									firstLine = false;
-									continue;
-								}
+				for (Map r : res) {
+					String id = (String) r.get("Report");
 
-								if ( 0 < diff ) {
-									int insertIdx = 0;
-									for (int i = 0; i < ovi; ++i) {
-										insertIdx = line.indexOf("\t", insertIdx + 1);
+					tr = filings.getTableReader(id);
+					int ts = tr.getSize();
+					int diff = trMax.getSize() - ts;
+					int ovi = -1;
+
+					StringBuilder fill = null;
+					if ( 0 < diff ) {
+						fill = new StringBuilder();
+						for (int i = 0; i < diff; ++i) {
+							fill.append("\t");
+						}
+						ovi = tr.getColIdx("OrigValue");
+					}
+
+					StringBuilder sbRepHead = null;
+					for (int i = 0; i < repColCount; ++i) {
+						sbRepHead = DustUtils.sbAppend(sbRepHead, "\t", true, r.get(repCols[i]));
+					}
+					String repHead = DustUtils.toString(sbRepHead);
+
+					if ( "Text".equals(mode) ) {
+						Map repSrc = filings.getReportData().get(id);
+						File fTxt = filings.getReport(repSrc, XbrlReportType.ContentTxt, true);
+
+						if ( fTxt.isFile() ) {
+							boolean firstLine = true;
+							try (BufferedReader br = new BufferedReader(new FileReader(fTxt))) {
+								for (String line; (line = br.readLine()) != null;) {
+									if ( firstLine ) {
+										firstLine = false;
+										continue;
 									}
-									line = line.substring(0, insertIdx) + fill + line.substring(insertIdx);
+
+									if ( 0 < diff ) {
+										int insertIdx = 0;
+										for (int i = 0; i < ovi; ++i) {
+											insertIdx = line.indexOf("\t", insertIdx + 1);
+										}
+										line = line.substring(0, insertIdx) + fill + line.substring(insertIdx);
+									}
+									out.print(repHead);
+									out.print("\t");
+									out.println(line);
 								}
-								out.print(repHead);
-								out.print("\t");
-								out.println(line);
 							}
 						}
-					}
-				} else {
+					} else {
 
-					repFacts = filings.getFacts(id);
+						repFacts = filings.getFacts(id);
 
-					if ( null != repFacts ) {
+						if ( null != repFacts ) {
+							try {
+								for (String[] rf : repFacts) {
+									if ( filtered ) {
+										tr.getUntil(rf, currFact, null);
 
-						for (String[] rf : repFacts) {
-							if ( filtered ) {
-								tr.getUntil(rf, currFact, null);
-
-								if ( !exprSvc.postFilter(r, null, currFact) ) {
+										if ( !exprSvc.postFilter(r, null, currFact) ) {
 //							if ( !(boolean) MVEL.executeExpression(exprSvc.factExpr, this, currFact) ) {
-									continue;
+											continue;
+										}
+
+										currFact.clear();
+									}
+
+									for (int i = 0; i < repColCount; ++i) {
+										if ( 0 < i ) {
+											out.print("\t");
+										}
+										Object rv = r.get(repCols[i]);
+										if ( null != rv ) {
+											out.print(rv);
+										}
+									}
+
+									for (int i = 0; i < rf.length; ++i) {
+										out.print("\t");
+										if ( i == ovi ) {
+											out.print(fill);
+										}
+										out.print(rf[i]);
+									}
+
+									for (int i = rf.length; i < tr.getSize(); ++i) {
+										out.print("\t");
+									}
+
+									if ( inEUR ) {
+										mapFacts.clear();
+										tr.get(rf, mapFacts);
+										cCvt.optConvert(mapFacts);
+										out.print("\t" + mapFacts.get("cvtValue") + "\t" + mapFacts.get("cvtStatus") + "\t" + mapFacts.get("cvtCount"));
+									}
+
+									out.println();
 								}
-
-								currFact.clear();
-							}
-
-							for (int i = 0; i < repColCount; ++i) {
-								if ( 0 < i ) {
-									out.print("\t");
-								}
-								Object rv = r.get(repCols[i]);
-								if ( null != rv ) {
-									out.print(rv);
+							} finally {
+								if ( repFacts instanceof Closeable ) {
+									((Closeable) repFacts).close();
 								}
 							}
-
-							for (int i = 0; i < rf.length; ++i) {
-								out.print("\t");
-								if ( i == ovi ) {
-									out.print(fill);
-								}
-								out.print(rf[i]);
-							}
-
-							for (int i = rf.length; i < tr.getSize(); ++i) {
-								out.print("\t");
-							}
-
-							if ( inEUR ) {
-								mapFacts.clear();
-								tr.get(rf, mapFacts);
-								cCvt.optConvert(mapFacts);
-								out.print("\t" + mapFacts.get("cvtValue") + "\t" + mapFacts.get("cvtStatus") + "\t" + mapFacts.get("cvtCount"));
-							}
-
-							out.println();
 						}
 					}
 				}
 			}
-
 		} else {
 			resp.setContentType(CONTENT_HTML);
 			PrintWriter out = getWriter(data);
@@ -417,6 +439,10 @@ class XbrlTestServletReportList extends DustHttpServlet {
 						str = "value=\"" + pageNum + "\" ";
 					} else if ( -1 != (idx = optGetIdxAfter(line, "name=\"inEUR\" ", pageNum)) ) {
 						if ( inEUR ) {
+							str = "checked ";
+						}
+					} else if ( -1 != (idx = optGetIdxAfter(line, "name=\"allIFRS\" ", pageNum)) ) {
+						if ( allIFRS ) {
 							str = "checked ";
 						}
 					} else if ( -1 != (idx = optGetIdxAfter(line, "Row count: ", " ")) ) {
@@ -490,5 +516,7 @@ class XbrlTestServletReportList extends DustHttpServlet {
 			}
 			out.println("</body>\n</html>");
 		}
+		
+		Dust.dumpObs("FactIter open files", filings.getOpenIterCount());
 	}
 }

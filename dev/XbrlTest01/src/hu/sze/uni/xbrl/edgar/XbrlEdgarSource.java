@@ -42,7 +42,6 @@ import hu.sze.milab.dust.utils.DustUtilsFile;
 import hu.sze.milab.dust.utils.DustUtilsXml;
 import hu.sze.milab.xbrl.XbrlConsts.XbrlFactDataType;
 import hu.sze.uni.xbrl.XbrlReportLoaderDomBase;
-import hu.sze.uni.xbrl.XbrlUtils;
 import hu.sze.uni.xbrl.XbrlUtilsCounter;
 
 @SuppressWarnings({ "unchecked", "rawtypes" })
@@ -90,7 +89,7 @@ public class XbrlEdgarSource implements XbrlEdgarConsts {
 		}
 
 		tsLastDownload = System.currentTimeMillis();
-		XbrlUtils.download(url, file, EDGAR_APIHDR_USER, EDGAR_APIHDR_ENCODING /* , EDGAR_APIHDR_HOST */);
+		DustUtilsFile.download(url, file, EDGAR_APIHDR_USER, EDGAR_APIHDR_ENCODING /* , EDGAR_APIHDR_HOST */);
 	}
 
 	public static void mainX(String[] args) throws Exception {

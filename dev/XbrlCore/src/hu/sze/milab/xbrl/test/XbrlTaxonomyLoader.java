@@ -51,6 +51,8 @@ public class XbrlTaxonomyLoader implements DustStreamXmlDocumentGraphLoader.XmlD
 		}
 	}
 
+	private final String targetTaxonomy;
+
 	DustDevCounter linkInfo = new DustDevCounter(true);
 
 	Map<String, NamespaceData> namespaces = new TreeMap<>();
@@ -66,8 +68,9 @@ public class XbrlTaxonomyLoader implements DustStreamXmlDocumentGraphLoader.XmlD
 	Map<String, Object> ifrsDefs = new TreeMap<>();
 	Set<String> rootItems = new TreeSet<>();
 
-	public XbrlTaxonomyLoader(DustUrlResolver urlResolver) {
+	public XbrlTaxonomyLoader(DustUrlResolver urlResolver, String targetTaxonomy) {
 		this.urlResolver = urlResolver;
+		this.targetTaxonomy = targetTaxonomy;
 
 		File root = urlResolver.getRoot().getParentFile();
 
@@ -186,7 +189,7 @@ public class XbrlTaxonomyLoader implements DustStreamXmlDocumentGraphLoader.XmlD
 				String[] ii = ee.getAttribute("id").split("_");
 				String tn = ii[0];
 
-				if ( "ifrs-full".equals(tn) ) {
+				if ( targetTaxonomy.equals(tn) ) {
 					String cn = ii[1];
 					NamedNodeMap nma = ee.getAttributes();
 

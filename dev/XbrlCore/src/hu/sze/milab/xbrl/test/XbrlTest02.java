@@ -67,7 +67,7 @@ public class XbrlTest02 implements XbrlConsts, DustDevConsts, DustNetConsts {
 		for (String taxRoot : args) {
 			File fRoot = new File(in, taxRoot);
 
-			XbrlTaxonomyLoader taxonomyCollector = XbrlCoreUtils.readTaxonomy(urlCache, fRoot);
+			XbrlTaxonomyLoader taxonomyCollector = XbrlCoreUtils.readTaxonomy(urlCache, fRoot, "ifrs-full");
 			taxonomyCollector.collectData();
 			taxonomyCollector.dump();
 		}

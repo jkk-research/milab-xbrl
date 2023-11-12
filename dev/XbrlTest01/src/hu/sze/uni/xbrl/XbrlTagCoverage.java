@@ -36,6 +36,8 @@ import org.xml.sax.XMLReader;
 import org.xml.sax.helpers.DefaultHandler;
 import org.xml.sax.helpers.XMLReaderFactory;
 
+import hu.sze.milab.dust.utils.DustUtils;
+
 @SuppressWarnings({ "rawtypes", "unchecked" })
 public class XbrlTagCoverage implements XbrlConsts, XbrlListener {
 	public static final String NAME = "name";
@@ -286,13 +288,13 @@ public class XbrlTagCoverage implements XbrlConsts, XbrlListener {
 
 			for (int i = 0; i < cols.length; ++i) {
 				c = row.createCell(i);
-				String value = XbrlUtils.toString(XbrlUtils.access(key, AccessCmd.Peek, null, paths[i]));
+				String value = DustUtils.toString(XbrlUtils.access(key, AccessCmd.Peek, null, paths[i]));
 				c.setCellValue(value);
 			}
 			
 			int idx = 1;
 			link = hlpCreate.createHyperlink(Hyperlink.LINK_URL);
-		  link.setAddress(XbrlFilingManager.XBRL_ORG_ADDR + "/filing/" + XbrlUtils.toString(XbrlUtils.access(key, AccessCmd.Peek, null, paths[idx])));
+		  link.setAddress(XbrlFilingManager.XBRL_ORG_ADDR + "/filing/" + DustUtils.toString(XbrlUtils.access(key, AccessCmd.Peek, null, paths[idx])));
 		  row.getCell(idx).setHyperlink(link);
 		  
 		  key.put(CELL_ADDRESS, "'Filings'!B" + rowCount);

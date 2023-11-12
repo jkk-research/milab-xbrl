@@ -5,6 +5,8 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.Stack;
 
+import hu.sze.milab.dust.utils.DustUtils;
+
 @SuppressWarnings({ "rawtypes", "unchecked" })
 public class XbrlUtilsDataCollector implements XbrlConsts {
 
@@ -68,7 +70,7 @@ public class XbrlUtilsDataCollector implements XbrlConsts {
 	
 	@Override
 	public String toString() {
-		return XbrlUtils.toString(currContainer);
+		return DustUtils.toString(currContainer);
 	}
 
 	public ContainerType getCt() {

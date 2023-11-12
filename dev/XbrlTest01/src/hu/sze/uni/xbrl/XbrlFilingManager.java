@@ -34,6 +34,7 @@ import hu.sze.milab.dust.DustException;
 import hu.sze.milab.dust.utils.DustUtils;
 import hu.sze.milab.dust.utils.DustUtilsConsts;
 import hu.sze.milab.dust.utils.DustUtilsData;
+import hu.sze.milab.dust.utils.DustUtilsFile;
 import hu.sze.uni.xbrl.portal.XbrlTestPortalUtils;
 
 @SuppressWarnings({ "rawtypes", "unchecked" })
@@ -43,7 +44,10 @@ public class XbrlFilingManager implements XbrlConstsEU, DustUtilsConsts {
 
 	public static final String XBRL_ORG_ADDR = "https://filings.xbrl.org";
 
-	private class FactIter implements Iterable<String[]>, Iterator<String[]> {
+	int openIterCount = 0;
+
+	private class FactIter implements DustCloseableWalker<String[]> {
+		FileReader fr;
 		BufferedReader br;
 		String repId;
 		String sep;
@@ -61,9 +65,11 @@ public class XbrlFilingManager implements XbrlConstsEU, DustUtilsConsts {
 			this.repId = repId;
 
 			File csvVal = getFactFile(repId);
-			br = new BufferedReader(new FileReader(csvVal));
+			br = new BufferedReader(fr = new FileReader(csvVal));
 			line = br.readLine();// skip head!
 			line = br.readLine();
+
+			++openIterCount;
 		}
 
 		@Override
@@ -78,6 +84,10 @@ public class XbrlFilingManager implements XbrlConstsEU, DustUtilsConsts {
 			try {
 				++row;
 				line = br.readLine();
+
+				if ( null == line ) {
+					close();
+				}
 			} catch (Throwable e) {
 				line = null;
 				DustException.wrap(e, repId, row);
@@ -89,6 +99,19 @@ public class XbrlFilingManager implements XbrlConstsEU, DustUtilsConsts {
 		@Override
 		public Iterator<String[]> iterator() {
 			return this;
+		}
+
+		@Override
+		public void close() throws IOException {
+			if ( null != fr ) {
+				br.close();
+				fr.close();
+
+				--openIterCount;
+				
+				fr = null;
+				br = null;
+			}
 		}
 
 	}
@@ -201,7 +224,7 @@ public class XbrlFilingManager implements XbrlConstsEU, DustUtilsConsts {
 
 				System.out.println("Ping for new data URL: " + url);
 
-				XbrlUtils.download(url, fPing);
+				DustUtilsFile.download(url, fPing);
 
 				Object ret = parser.parse(new FileReader(fPing));
 				long count = XbrlUtils.access(ret, AccessCmd.Peek, 0L, "meta", "count");
@@ -215,7 +238,7 @@ public class XbrlFilingManager implements XbrlConstsEU, DustUtilsConsts {
 
 					System.out.println("Get update URL: " + u2);
 
-					XbrlUtils.download(u2, f);
+					DustUtilsFile.download(u2, f);
 					loadReports(f);
 					saveFile = true;
 				}
@@ -285,14 +308,15 @@ public class XbrlFilingManager implements XbrlConstsEU, DustUtilsConsts {
 
 				XbrlUtils.access(fAtts, AccessCmd.Set, date, REPORT_DATE);
 
-				StringBuilder sb = XbrlUtils.sbAppend(null, File.separator, true, "reports", date.substring(0, 4), XBRL_SOURCE_FILINGS, XbrlUtils.getHashName(eid), extra);
+				StringBuilder sb = DustUtils.sbAppend(null, File.separator, true, "reports", date.substring(0, 4), XBRL_SOURCE_FILINGS, DustUtilsFile.getHashName(eid), extra);
+//				StringBuilder sb = XbrlUtils.sbAppend(null, File.separator, true, "reports", date.substring(0, 4), XBRL_SOURCE_FILINGS, XbrlUtils.getHashName(eid), extra);
 				String localDir = sb.toString();
 				XbrlUtils.access(fAtts, AccessCmd.Set, localDir, LOCAL_DIR);
 				if ( new File(getRepoRoot(), localDir).exists() ) {
 					downloaded.add(fAtts);
 				}
 
-				sb = XbrlUtils.sbAppend(null, IDSEP, true, XBRL_ENTITYID_LEI, eid, date, XBRL_SOURCE_FILINGS, extra);
+				sb = DustUtils.sbAppend(null, IDSEP, true, XBRL_ENTITYID_LEI, eid, date, XBRL_SOURCE_FILINGS, extra);
 				String internalId = sb.toString();
 				XbrlUtils.access(fAtts, AccessCmd.Set, internalId, REPORT_ID);
 
@@ -479,7 +503,7 @@ public class XbrlFilingManager implements XbrlConstsEU, DustUtilsConsts {
 		if ( null != genFileName ) {
 			fLoaded = new File(dir, genFileName);
 			uaifrs = genFileName.contains("UAIFRS");
-			if ( fLoaded.isFile() && !forceReload ) 
+			if ( fLoaded.isFile() && !forceReload )
 //			if ( fLoaded.isFile() && !forceReload && !uaifrs ) 
 			{
 				return fLoaded;
@@ -525,7 +549,7 @@ public class XbrlFilingManager implements XbrlConstsEU, DustUtilsConsts {
 				if ( --downloadLimit < 0 ) {
 					return null;
 				}
-				XbrlUtils.download(url, remoteFile);
+				DustUtilsFile.download(url, remoteFile);
 
 				long s = remoteFile.length();
 				sizeAll += s;
@@ -615,7 +639,7 @@ public class XbrlFilingManager implements XbrlConstsEU, DustUtilsConsts {
 						try {
 							if ( uaifrs ) {
 								filing.put(LANGFORCED, "uk");
-							}							
+							}
 							XbrlReportLoaderDomBase.createSplitCsv(fRep, dir, genFilePrefix, filing, TEXT_CUT_AT);
 //							if ( !uaifrs ) 
 							{
@@ -695,4 +719,7 @@ public class XbrlFilingManager implements XbrlConstsEU, DustUtilsConsts {
 		dc.dump("ESEF init summary");
 	}
 
+	public int getOpenIterCount() {
+		return openIterCount;
+	}
 }
