@@ -147,7 +147,7 @@ public class XbrlFilingManager implements XbrlConstsEU, DustUtilsConsts {
 
 	Map<String, DustUtilsData.TableReader> contentReaders = new HashMap<>();
 	Map<String, DustUtilsData.TableReader> headers = new HashMap<>();
-	Map<String, ArrayList<String[]>> allFactsByRep;
+//	Map<String, ArrayList<String[]>> allFactsByRep;
 
 	DustFileFilter reportFilter = new DustFileFilter(true, StringMatch.EndsWith, "xhtml", "html");
 
@@ -158,8 +158,8 @@ public class XbrlFilingManager implements XbrlConstsEU, DustUtilsConsts {
 	public XbrlFilingManager(File repoRoot, boolean doUpdate) throws Exception {
 		this.repoRoot = repoRoot;
 
-		String mm = System.getProperty("MinMem", "true");
-		allFactsByRep = "true".equalsIgnoreCase(mm) ? null : new HashMap<>();
+//		String mm = System.getProperty("MinMem", "true");
+//		allFactsByRep = "true".equalsIgnoreCase(mm) ? null : new HashMap<>();
 
 		forceReload = "true".equalsIgnoreCase(System.getProperty("ForceReload", "false"));
 		downloadLimit = Integer.parseInt(System.getProperty("DownloadLimit", "1000"));
@@ -173,7 +173,8 @@ public class XbrlFilingManager implements XbrlConstsEU, DustUtilsConsts {
 			srcRoot.mkdirs();
 		}
 
-		System.out.println("Starting filing manager in folder " + srcRoot.getCanonicalPath() + ((null == allFactsByRep) ? " MinMem mode" : ""));
+//		System.out.println("Starting filing manager in folder " + srcRoot.getCanonicalPath() + ((null == allFactsByRep) ? " MinMem mode" : ""));
+		System.out.println("Starting filing manager in folder " + srcRoot.getCanonicalPath());
 
 		File updates = new File(srcRoot, "updates");
 		if ( !updates.exists() ) {
@@ -332,8 +333,9 @@ public class XbrlFilingManager implements XbrlConstsEU, DustUtilsConsts {
 		return headers.get(repId);
 	}
 
-	public Iterable<String[]> getFacts(String repId) throws Exception {
-		return optLoadFacts(repId) ? (null == allFactsByRep) ? new FactIter(repId) : allFactsByRep.get(repId) : null;
+	public DustCloseableWalker<String[]> getFacts(String repId) throws Exception {
+//		return optLoadFacts(repId) ? (null == allFactsByRep) ? new FactIter(repId) : allFactsByRep.get(repId) : null;
+		return optLoadFacts(repId) ? new FactIter(repId) : null;
 	}
 
 	public boolean optLoadFacts(String repId) throws Exception {
@@ -346,7 +348,7 @@ public class XbrlFilingManager implements XbrlConstsEU, DustUtilsConsts {
 		if ( (null != f) && f.isFile() ) {
 			try (BufferedReader br = new BufferedReader(new FileReader(f))) {
 				DustUtilsData.TableReader tr = null;
-				ArrayList<String[]> allFacts = null;
+//				ArrayList<String[]> allFacts = null;
 
 				for (String line; (line = br.readLine()) != null;) {
 					if ( !DustUtils.isEmpty(line) ) {
@@ -360,14 +362,14 @@ public class XbrlFilingManager implements XbrlConstsEU, DustUtilsConsts {
 							}
 							headers.put(repId, tr);
 
-							if ( null == allFactsByRep ) {
+//							if ( null == allFactsByRep ) {
 								return true;
-							} else {
-								allFacts = new ArrayList<>();
-								allFactsByRep.put(repId, allFacts);
-							}
-						} else {
-							allFacts.add(data);
+//							} else {
+//								allFacts = new ArrayList<>();
+//								allFactsByRep.put(repId, allFacts);
+//							}
+//						} else {
+//							allFacts.add(data);
 						}
 					}
 				}

@@ -12,6 +12,7 @@ import java.util.Map;
 import hu.sze.milab.dust.Dust;
 import hu.sze.milab.dust.stream.DustStreamUrlCache;
 import hu.sze.milab.dust.utils.DustUtils;
+import hu.sze.milab.dust.utils.DustUtilsConsts.DustCloseableWalker;
 import hu.sze.milab.dust.utils.DustUtilsData;
 import hu.sze.milab.xbrl.XbrlCoreUtils;
 import hu.sze.milab.xbrl.test.XbrlTaxonomyLoader;
@@ -53,7 +54,8 @@ public class XbrlDevFunctions implements XbrlConsts {
 					continue;
 				}
 
-				for (String[] rf : filings.getFacts(id)) {
+				DustCloseableWalker<String[]> facts = filings.getFacts(id);
+				for (String[] rf : facts) {
 
 					fact.clear();
 
