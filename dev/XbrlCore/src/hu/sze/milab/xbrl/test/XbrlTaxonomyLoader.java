@@ -3,6 +3,7 @@ package hu.sze.milab.xbrl.test;
 import java.io.File;
 import java.net.URL;
 import java.nio.file.Paths;
+import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.Iterator;
 import java.util.Map;
@@ -13,6 +14,7 @@ import java.util.TreeSet;
 import org.w3c.dom.Attr;
 import org.w3c.dom.Element;
 import org.w3c.dom.NamedNodeMap;
+import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
 
 import hu.sze.milab.dust.Dust;
@@ -24,7 +26,9 @@ import hu.sze.milab.dust.utils.DustUtils;
 import hu.sze.milab.dust.utils.DustUtils.QueueContainer;
 import hu.sze.milab.dust.utils.DustUtilsFactory;
 import hu.sze.milab.xbrl.XbrlConsts;
+import hu.sze.milab.xbrl.XbrlCoreUtils;
 
+@SuppressWarnings({ "unchecked", "rawtypes" })
 public class XbrlTaxonomyLoader implements DustStreamXmlDocumentGraphLoader.XmlDocumentProcessor, DustStreamXmlConsts, XbrlConsts {
 
 	class NamespaceData {
@@ -41,6 +45,9 @@ public class XbrlTaxonomyLoader implements DustStreamXmlDocumentGraphLoader.XmlD
 		Element from;
 		Element to;
 
+		String fromId;
+		String toId;
+
 		public LinkData(Element link, Map<String, Element> links) {
 			this.link = link;
 
@@ -48,6 +55,9 @@ public class XbrlTaxonomyLoader implements DustStreamXmlDocumentGraphLoader.XmlD
 			this.from = links.get(ref);
 			ref = link.getAttribute("xlink:to");
 			this.to = links.get(ref);
+
+			fromId = XbrlCoreUtils.getTaxonomyItemID(from);
+			toId = XbrlCoreUtils.getTaxonomyItemID(to);
 		}
 	}
 
@@ -59,7 +69,6 @@ public class XbrlTaxonomyLoader implements DustStreamXmlDocumentGraphLoader.XmlD
 	Map<String, NamespaceData> nsByUrl = new TreeMap<>();
 
 	Set<LinkData> allLinks = new HashSet<>();
-	@SuppressWarnings({ "unchecked", "rawtypes" })
 	DustUtilsFactory<String, Set<LinkData>> locLinks = new DustUtilsFactory.Simple(true, HashSet.class);
 
 	public final DustUrlResolver urlResolver;
@@ -100,7 +109,6 @@ public class XbrlTaxonomyLoader implements DustStreamXmlDocumentGraphLoader.XmlD
 
 		DustDevCounter dc = new DustDevCounter(true);
 
-		@SuppressWarnings("unchecked")
 		Map<String, Map<String, Object>> defs = (Map<String, Map<String, Object>>) ifrsDefs.get("item");
 
 		for (Map<String, Object> md : defs.values()) {
@@ -119,21 +127,21 @@ public class XbrlTaxonomyLoader implements DustStreamXmlDocumentGraphLoader.XmlD
 			Element el = ld.link;
 
 			String tn = el.getTagName();
-			String fromId = ld.from.getAttribute("xlink:href");
-			fromId = DustUtils.getPostfix(fromId, "#");
-			fromId = DustUtils.getPostfix(fromId, "_");
-			String toId = ld.to.getAttribute("xlink:href");
-			toId = DustUtils.getPostfix(toId, "#");
-			toId = DustUtils.getPostfix(toId, "_");
+//			String fromId = ld.from.getAttribute("xlink:href");
+//			fromId = DustUtils.getPostfix(fromId, "#");
+//			fromId = DustUtils.getPostfix(fromId, "_");
+//			String toId = ld.to.getAttribute("xlink:href");
+//			toId = DustUtils.getPostfix(toId, "#");
+//			toId = DustUtils.getPostfix(toId, "_");
 
-			Object from = Dust.access(ifrsDefs, MindAccess.Peek, null, "item", fromId);
-			Object to = Dust.access(ifrsDefs, MindAccess.Peek, null, "item", toId);
+			Object from = Dust.access(ifrsDefs, MindAccess.Peek, null, "item", ld.fromId);
+			Object to = Dust.access(ifrsDefs, MindAccess.Peek, null, "item", ld.toId);
 
 			switch ( tn ) {
 			case "link:presentationArc":
 				if ( (null != from) && (null != to) ) {
-					dcFrom.add(fromId);
-					dcTo.add(toId);
+					dcFrom.add(ld.fromId);
+					dcTo.add(ld.toId);
 				}
 				break;
 
@@ -259,30 +267,26 @@ public class XbrlTaxonomyLoader implements DustStreamXmlDocumentGraphLoader.XmlD
 			Element el = ld.link;
 
 			String tn = el.getTagName();
-			String fromId = ld.from.getAttribute("xlink:href");
-			fromId = DustUtils.getPostfix(fromId, "#");
-			fromId = DustUtils.getPostfix(fromId, "_");
-			String toId = ld.to.getAttribute("xlink:href");
-			toId = DustUtils.getPostfix(toId, "#");
-			toId = DustUtils.getPostfix(toId, "_");
+//			String fromId = getItemID(ld.from);
+//			String toId = getItemID(ld.to);
 
 			String toRole = DustUtils.getPostfix(ld.to.getAttribute("xlink:role"), "/");
 
-			Object from = Dust.access(ifrsDefs, MindAccess.Peek, null, "item", fromId);
-			Object to = Dust.access(ifrsDefs, MindAccess.Peek, null, "item", toId);
+			Object from = Dust.access(ifrsDefs, MindAccess.Peek, null, "item", ld.fromId);
+			Object to = Dust.access(ifrsDefs, MindAccess.Peek, null, "item", ld.toId);
 
 			switch ( tn ) {
 			case "link:presentationArc":
 				if ( (null != from) && (null != to) ) {
-					dcFrom.add(fromId);
+					dcFrom.add(ld.fromId);
 				}
-				rootItems.remove(toId);
+				rootItems.remove(ld.toId);
 				break;
 
 			case "link:labelArc":
 				if ( null != from ) {
 					String txt = ld.to.getTextContent();
-					Dust.access(ifrsDefs, MindAccess.Set, txt, "res", ld.to.getAttribute("xml:lang"), fromId, toRole);
+					Dust.access(ifrsDefs, MindAccess.Set, txt, "res", ld.to.getAttribute("xml:lang"), ld.fromId, toRole);
 				}
 				break;
 			}
@@ -293,6 +297,186 @@ public class XbrlTaxonomyLoader implements DustStreamXmlDocumentGraphLoader.XmlD
 			if ( !dcFrom.contains(id) ) {
 				itRoot.remove();
 			}
+		}
+	}
+
+	public void taxonomyBlocks(String... conceptIDs) {
+
+		DustUtilsFactory<String, Set> blockLinks = new DustUtilsFactory.Simple(false, HashSet.class);
+		DustUtilsFactory<String, Set> blockParents = new DustUtilsFactory.Simple(false, TreeSet.class);
+
+		Set<String> toProcess = new HashSet<>();
+		Set<Element> blocks = new HashSet<>();
+
+		for (String cID : conceptIDs) {
+			Object c = Dust.access(ifrsDefs, MindAccess.Peek, null, "item", cID);
+			if ( null != c ) {
+				toProcess.add(cID);
+			}
+		}
+
+		Dust.dumpObs("Looking for blocks of", toProcess);
+
+		for (LinkData ld : allLinks) {
+			Element el = ld.link;
+
+			if ( toProcess.contains(ld.fromId) || toProcess.contains(ld.toId) ) {
+				if ( "parent-child".equals(DustUtils.getPostfix(el.getAttribute("xlink:arcrole"), "/")) ) {
+					Element parent = (Element) el.getParentNode();
+					String pr = DustUtils.getPostfix(parent.getAttribute("xlink:role"), "/");
+					if ( !pr.contains("for_smes") ) {
+						blocks.add(parent);
+					}
+				}
+			}
+		}
+		
+		for (LinkData ld : allLinks) {
+			Element parent = (Element) ld.link.getParentNode();
+
+			if ( blocks.contains(parent) ) {
+				String pr = DustUtils.getPostfix(parent.getAttribute("xlink:role"), "/");
+				blockLinks.get(pr).add(ld);
+				blockParents.get(pr).add(ld.fromId);
+			}
+		}
+
+		
+		Set<String> neighbors = new TreeSet<>();
+		
+		for ( String blockId : blockLinks.keys() ) {
+			Dust.dumpObs("Processing block", blockId);
+
+			Set parents = blockParents.peek(blockId);			
+			DustUtilsFactory<String, ArrayList> children = new DustUtilsFactory.Simple(false, ArrayList.class);
+			
+			Set<LinkData> links = (Set<LinkData>)  blockLinks.peek(blockId);
+
+			for (LinkData ld : links ) {
+				parents.remove(ld.toId);
+				children.get(ld.fromId).add(ld);
+				
+				neighbors.add(ld.fromId);
+				neighbors.add(ld.toId);
+			}
+			
+			Dust.dumpObs("Roots", parents);
+
+		}
+		
+		for (LinkData ld : allLinks) {
+			Element el = ld.link;
+
+			if ( blocks.contains(el.getParentNode()) ) {
+				neighbors.add(ld.fromId);
+				neighbors.add(ld.toId);
+			}
+		}
+
+
+		for (Node n : blocks) {
+			Dust.dumpObs("Blocks", ((Element) n).getAttribute("xlink:role"));
+
+			
+		}
+	}
+
+	public void taxonomyTree(String... conceptIDs) {
+		long ts = System.currentTimeMillis();
+//		taxonomyTreeOb(conceptIDs);
+//		Dust.dumpObs("Ob based time", System.currentTimeMillis() - ts);
+//		ts = System.currentTimeMillis();
+
+		DustUtilsFactory<String, Set> obLinks = new DustUtilsFactory.Simple(false, HashSet.class);
+
+		Set<String> toProcess = new HashSet<>();
+		Set<String> newItems = new HashSet<>();
+		Set<String> seen = new HashSet<>();
+
+		for (String cID : conceptIDs) {
+			Object c = Dust.access(ifrsDefs, MindAccess.Peek, null, "item", cID);
+			if ( null != c ) {
+				toProcess.add(cID);
+			}
+		}
+
+		Dust.dumpObs("Looking for", toProcess);
+
+		while (!toProcess.isEmpty()) {
+			Dust.dumpObs("Item count to process", toProcess.size(), "Processed count", obLinks.size());
+			for (LinkData ld : allLinks) {
+				Element el = ld.link;
+
+				Object from = Dust.access(ifrsDefs, MindAccess.Peek, null, "item", ld.fromId);
+				Object to = Dust.access(ifrsDefs, MindAccess.Peek, null, "item", ld.toId);
+
+				if ( toProcess.contains(ld.fromId) ) {
+					obLinks.get(ld.fromId).add(el);
+					if ( (null != to) && !seen.contains(ld.toId) && !toProcess.contains(ld.toId) ) {
+						newItems.add(ld.toId);
+					}
+				}
+				if ( toProcess.contains(ld.toId) ) {
+					obLinks.get(ld.toId).add(el);
+					if ( (null != from) && !seen.contains(ld.fromId) && !toProcess.contains(ld.fromId) ) {
+						newItems.add(ld.fromId);
+					}
+				}
+			}
+
+			seen.addAll(toProcess);
+			toProcess.clear();
+			toProcess.addAll(newItems);
+			newItems.clear();
+		}
+
+		Dust.dumpObs("String based time", System.currentTimeMillis() - ts);
+
+	}
+
+	public void taxonomyTreeOb(String... conceptIDs) {
+		DustUtilsFactory<Object, Set> obLinks = new DustUtilsFactory.Simple(false, HashSet.class);
+
+		Set<Object> toProcess = new HashSet<>();
+		Set<Object> newItems = new HashSet<>();
+		Set<String> seen = new HashSet<>();
+
+		for (String cID : conceptIDs) {
+			Object c = Dust.access(ifrsDefs, MindAccess.Peek, null, "item", cID);
+			if ( null != c ) {
+				toProcess.add(c);
+			}
+		}
+
+		while (!toProcess.isEmpty()) {
+			Dust.dumpObs("Item count to process", toProcess.size(), "Processed count", obLinks.size());
+			for (LinkData ld : allLinks) {
+				Element el = ld.link;
+
+				Object from = Dust.access(ifrsDefs, MindAccess.Peek, null, "item", ld.fromId);
+				Object to = Dust.access(ifrsDefs, MindAccess.Peek, null, "item", ld.toId);
+
+				if ( toProcess.contains(from) ) {
+					obLinks.get(from).add(el);
+					if ( (null != to) && !seen.contains(ld.toId) && !toProcess.contains(to) ) {
+						newItems.add(to);
+					}
+				}
+				if ( toProcess.contains(to) ) {
+					obLinks.get(to).add(el);
+					if ( (null != from) && !seen.contains(ld.fromId) && !toProcess.contains(from) ) {
+						newItems.add(from);
+					}
+				}
+			}
+
+			for (Object o : toProcess) {
+				String id = Dust.access(o, MindAccess.Peek, null, "name");
+				seen.add(id);
+			}
+			toProcess.clear();
+			toProcess.addAll(newItems);
+			newItems.clear();
 		}
 	}
 

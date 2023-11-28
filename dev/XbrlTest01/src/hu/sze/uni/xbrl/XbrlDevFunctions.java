@@ -110,10 +110,10 @@ public class XbrlDevFunctions implements XbrlConsts {
 	public static void main(String[] args) throws Exception {
 		Dust.main(args);
 
-		taxonomyTest();
+		taxonomyTest(true);
 	}
 
-	public static void taxonomyTest() throws Exception {
+	public static void taxonomyTest(boolean dumpOnly) throws Exception {
 		File dataRoot = new File(System.getProperty("user.home") + "/work/xbrl/data");
 
 		XbrlFilingManager filings = new XbrlFilingManager(dataRoot, true);
@@ -124,23 +124,33 @@ public class XbrlDevFunctions implements XbrlConsts {
 		File fRoot = new File(taxonomyRoot, "IFRSAT-2023-03-23");
 		XbrlTaxonomyLoader taxonomyCollector = XbrlCoreUtils.readTaxonomy(urlCache, fRoot, "ifrs-full");
 		taxonomyCollector.collectData();
-		Map<String, Object> concepts = taxonomyCollector.peek(null, "item");
 
-		ArrayList<String> ids = new ArrayList<>();
-		File fTxt = new File("params/report_list_auto45.txt");
-		if ( fTxt.isFile() ) {
-			try (BufferedReader br = new BufferedReader(new FileReader(fTxt))) {
-				for (String line; (line = br.readLine()) != null;) {
-					String id = line.trim();
-					if ( !DustUtils.isEmpty(id) ) {
-						ids.add(id);
+		if ( dumpOnly ) {
+//			taxonomyCollector.taxonomyBlocks("DisclosureOfGeographicalAreasLineItems");
+			taxonomyCollector.taxonomyBlocks("Revenue");
+//			taxonomyCollector.taxonomyTree("Revenue");
+//			taxonomyCollector.taxonomyTree("BenefitsPaidOrPayable");
+			
+//			taxonomyCollector.dump();
+		} else {
+			Map<String, Object> concepts = taxonomyCollector.peek(null, "item");
+
+			ArrayList<String> ids = new ArrayList<>();
+			File fTxt = new File("params/report_list_auto45.txt");
+			if ( fTxt.isFile() ) {
+				try (BufferedReader br = new BufferedReader(new FileReader(fTxt))) {
+					for (String line; (line = br.readLine()) != null;) {
+						String id = line.trim();
+						if ( !DustUtils.isEmpty(id) ) {
+							ids.add(id);
+						}
 					}
 				}
 			}
-		}
 
-		try (PrintWriter psOut = new PrintWriter("work/test01.csv")) {
-			XbrlUtils.exportConceptCoverage(psOut, filings, ids, concepts.keySet());
+			try (PrintWriter psOut = new PrintWriter("work/test01.csv")) {
+				XbrlUtils.exportConceptCoverage(psOut, filings, ids, concepts.keySet());
+			}
 		}
 	}
 

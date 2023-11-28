@@ -228,6 +228,13 @@ public class XbrlCoreUtils implements XbrlConsts {
 		return dVal;
 	}
 
+	public static String getTaxonomyItemID(Element e) {
+		String fromId = e.getAttribute("xlink:href");
+		fromId = DustUtils.getPostfix(fromId, "#");
+		fromId = DustUtils.getPostfix(fromId, "_");
+		return fromId;
+	}
+
 	public static XbrlTaxonomyLoader readTaxonomy(DustStreamUrlCache urlCache, File taxFolder, String targetTaxonomy) throws Exception {
 		DocumentBuilderFactory dbf = DocumentBuilderFactory.newInstance();
 		DocumentBuilder db = dbf.newDocumentBuilder();
