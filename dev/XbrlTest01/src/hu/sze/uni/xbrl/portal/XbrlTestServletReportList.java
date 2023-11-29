@@ -262,13 +262,21 @@ class XbrlTestServletReportList extends DustHttpServlet {
 
 			PrintWriter out = getWriter(data);
 
-			if ( "Taxonomy".equals(mode) ) {
+			if ( "TaxonomyCoverage".equals(mode) ) {
 				ArrayList<String> ids = new ArrayList<>();
 				for (Map r : res) {
 					ids.add((String) r.get("Report"));
 				}
 
 				XbrlUtils.exportConceptCoverage(out, filings, ids, allIFRS ? ifrsConcepts : null);
+
+			} else if ( "TaxonomyData".equals(mode) ) {
+				ArrayList<String> ids = new ArrayList<>();
+				for (Map r : res) {
+					ids.add((String) r.get("Report"));
+				}
+
+				XbrlUtils.exportConceptCoverage(out, filings, ids, ifrsConcepts);
 
 			} else {
 				boolean filtered = "Filtered".equals(mode) && (null != exprSvc.factExpr);

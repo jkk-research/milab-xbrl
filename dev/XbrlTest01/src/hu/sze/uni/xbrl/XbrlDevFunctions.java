@@ -127,7 +127,15 @@ public class XbrlDevFunctions implements XbrlConsts {
 
 		if ( dumpOnly ) {
 //			taxonomyCollector.taxonomyBlocks("DisclosureOfGeographicalAreasLineItems");
-			taxonomyCollector.taxonomyBlocks("Revenue");
+			ArrayList<ArrayList<String>> ret = taxonomyCollector.taxonomyBlocks("Revenue");
+			
+			try (PrintWriter out = new PrintWriter("work/TaxOutRevenue.csv")) {
+				for ( ArrayList<String> row : ret) {
+					out.println(DustUtils.sbAppend(null, ",", true, row.toArray()));
+				}
+				out.flush();
+			}
+			
 //			taxonomyCollector.taxonomyTree("Revenue");
 //			taxonomyCollector.taxonomyTree("BenefitsPaidOrPayable");
 			

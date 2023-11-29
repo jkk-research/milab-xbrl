@@ -14,7 +14,6 @@ import java.util.TreeSet;
 import org.w3c.dom.Attr;
 import org.w3c.dom.Element;
 import org.w3c.dom.NamedNodeMap;
-import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
 
 import hu.sze.milab.dust.Dust;
@@ -40,13 +39,15 @@ public class XbrlTaxonomyLoader implements DustStreamXmlDocumentGraphLoader.XmlD
 		}
 	}
 
-	class LinkData {
+	class LinkData implements Comparable<LinkData> {
 		Element link;
 		Element from;
 		Element to;
 
 		String fromId;
 		String toId;
+
+		Double weight;
 
 		public LinkData(Element link, Map<String, Element> links) {
 			this.link = link;
@@ -58,6 +59,14 @@ public class XbrlTaxonomyLoader implements DustStreamXmlDocumentGraphLoader.XmlD
 
 			fromId = XbrlCoreUtils.getTaxonomyItemID(from);
 			toId = XbrlCoreUtils.getTaxonomyItemID(to);
+
+			String w = link.getAttribute("order");
+			weight = DustUtils.isEmpty(w) ? Double.MAX_VALUE : Double.valueOf(w);
+		}
+
+		@Override
+		public int compareTo(LinkData o) {
+			return weight.compareTo(o.weight);
 		}
 	}
 
@@ -300,7 +309,7 @@ public class XbrlTaxonomyLoader implements DustStreamXmlDocumentGraphLoader.XmlD
 		}
 	}
 
-	public void taxonomyBlocks(String... conceptIDs) {
+	public ArrayList<ArrayList<String>> taxonomyBlocks(String... conceptIDs) {
 
 		DustUtilsFactory<String, Set> blockLinks = new DustUtilsFactory.Simple(false, HashSet.class);
 		DustUtilsFactory<String, Set> blockParents = new DustUtilsFactory.Simple(false, TreeSet.class);
@@ -330,7 +339,7 @@ public class XbrlTaxonomyLoader implements DustStreamXmlDocumentGraphLoader.XmlD
 				}
 			}
 		}
-		
+
 		for (LinkData ld : allLinks) {
 			Element parent = (Element) ld.link.getParentNode();
 
@@ -341,43 +350,73 @@ public class XbrlTaxonomyLoader implements DustStreamXmlDocumentGraphLoader.XmlD
 			}
 		}
 
-		
 		Set<String> neighbors = new TreeSet<>();
+
+		ArrayList<ArrayList<String>> headTable = new ArrayList<ArrayList<String>>();
 		
-		for ( String blockId : blockLinks.keys() ) {
-			Dust.dumpObs("Processing block", blockId);
+		ArrayList<String> row = new ArrayList<>();
+		for (String hdr: "BlockID,depth,index,Name,path,ID".split(",")) {
+			row.add(hdr);
+		}
+		headTable.add(row);
+		
+		for (String blockId : blockLinks.keys()) {
+			row = new ArrayList<>();
+			row.add(blockId);
+			row.add("0");
+			row.add("");
+			String name = Dust.access(ifrsDefs, MindAccess.Peek, "<< " + blockId + " >>", "roleDefs", blockId);
+			row.add(DustUtils.csvEscape(name, true));
+			row.add("");
+			row.add("");
 
-			Set parents = blockParents.peek(blockId);			
+			headTable.add(row);
+
+			Set<String> parents = blockParents.peek(blockId);
 			DustUtilsFactory<String, ArrayList> children = new DustUtilsFactory.Simple(false, ArrayList.class);
-			
-			Set<LinkData> links = (Set<LinkData>)  blockLinks.peek(blockId);
 
-			for (LinkData ld : links ) {
+			Set<LinkData> links = (Set<LinkData>) blockLinks.peek(blockId);
+
+			for (LinkData ld : links) {
 				parents.remove(ld.toId);
 				children.get(ld.fromId).add(ld);
-				
+
 				neighbors.add(ld.fromId);
 				neighbors.add(ld.toId);
 			}
-			
-			Dust.dumpObs("Roots", parents);
 
+			int i = 0;
+			for (String root : parents) {
+				walk(headTable, blockId, "/", 1, ++i, root, children);
+			}
 		}
 		
-		for (LinkData ld : allLinks) {
-			Element el = ld.link;
+		return headTable;
+	}
 
-			if ( blocks.contains(el.getParentNode()) ) {
-				neighbors.add(ld.fromId);
-				neighbors.add(ld.toId);
+	public void walk(ArrayList<ArrayList<String>> headTable, String blockId, String prefix, int depth, int idx, String itemID, DustUtilsFactory<String, ArrayList> allChildren) {
+		ArrayList<String> row = new ArrayList<>();
+		row.add(blockId);
+		row.add(Integer.toString(depth));
+		row.add(Integer.toString(idx));
+
+		String name = Dust.access(ifrsDefs, MindAccess.Peek, "<< " + itemID + " >>", "res", "en", itemID, "label");
+		row.add(DustUtils.csvEscape(name, true));
+
+		row.add(prefix);
+		row.add(itemID);
+		
+		headTable.add(row);
+
+		ArrayList<LinkData> children = allChildren.peek(itemID);
+		if ( null != children ) {
+			children.sort(null);
+			String p1 = prefix + itemID + "/";
+			++depth;
+			int i = 0;
+			for (LinkData ld : children) {
+				walk(headTable, blockId, p1, depth, ++i, ld.toId, allChildren);
 			}
-		}
-
-
-		for (Node n : blocks) {
-			Dust.dumpObs("Blocks", ((Element) n).getAttribute("xlink:role"));
-
-			
 		}
 	}
 
@@ -567,6 +606,17 @@ public class XbrlTaxonomyLoader implements DustStreamXmlDocumentGraphLoader.XmlD
 					if ( !DustUtils.isEmpty(ref) ) {
 						ref = urlResolver.optLocalizeUrl(ref, url);
 						locLinks.get(ref).add(ld);
+					}
+				}
+			}
+		} else {
+			el = root.getElementsByTagName("*");
+			for (int ei = el.getLength(); ei-- > 0;) {
+				Element e = (Element) el.item(ei);
+				if ( "link:definition".equals(e.getTagName())) {
+					Element p = (Element) e.getParentNode();
+					if ( "link:roleType".equals(p.getTagName())) {
+						Dust.access(ifrsDefs, MindAccess.Set, e.getTextContent(), "roleDefs", p.getAttribute("id"));
 					}
 				}
 			}
