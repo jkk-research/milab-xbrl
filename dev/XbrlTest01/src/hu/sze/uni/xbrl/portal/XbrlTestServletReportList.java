@@ -13,6 +13,7 @@ import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Map;
 import java.util.Set;
+import java.util.TreeSet;
 
 import javax.servlet.http.HttpServletResponse;
 
@@ -22,13 +23,16 @@ import hu.sze.milab.dust.Dust;
 import hu.sze.milab.dust.DustConsts;
 import hu.sze.milab.dust.DustConsts.MindAccess;
 import hu.sze.milab.dust.utils.DustUtils;
+import hu.sze.milab.dust.utils.DustUtilsConsts.DustCloseableWalker;
 import hu.sze.milab.dust.utils.DustUtilsData;
+import hu.sze.milab.xbrl.test.XbrlTaxonomyLoader;
 import hu.sze.milab.xbrl.tools.XbrlToolsCurrencyConverter;
 import hu.sze.uni.http.DustHttpServlet;
 import hu.sze.uni.xbrl.XbrlConsts.XbrlReportType;
 import hu.sze.uni.xbrl.XbrlFilingManager;
 import hu.sze.uni.xbrl.XbrlUtils;
 import hu.sze.uni.xbrl.XbrlUtilsCounter;
+import hu.sze.uni.xbrl.XbrlUtilsTaxonomyDataCollector;
 import hu.sze.uni.xbrl.portal.XbrlTestPortalConsts.ListColumns;
 
 @SuppressWarnings({ "rawtypes" })
@@ -135,11 +139,14 @@ class XbrlTestServletReportList extends DustHttpServlet {
 	}
 
 	private XbrlFilingManager filings;
+	private XbrlTaxonomyLoader taxonomyCollector;
 	private Iterable<String> ifrsConcepts;
 
 	public XbrlTestServletReportList(XbrlTestPortal portal) {
 		this.filings = portal.filings;
-		Map<String, Object> cm = portal.taxonomyCollector.peek(null, "item");
+		this.taxonomyCollector = portal.taxonomyCollector;
+
+		Map<String, Object> cm = taxonomyCollector.peek(null, "item");
 		ifrsConcepts = cm.keySet();
 	}
 
@@ -177,6 +184,7 @@ class XbrlTestServletReportList extends DustHttpServlet {
 
 		boolean inEUR = "on".equals(Dust.access(data, MindAccess.Peek, "off", ServletData.Parameter, "inEUR"));
 		boolean allIFRS = "on".equals(Dust.access(data, MindAccess.Peek, "off", ServletData.Parameter, "allIFRS"));
+		String txConcepts = Dust.access(data, MindAccess.Peek, null, ServletData.Parameter, "txConcepts");
 
 		boolean loadFacts = !DustUtils.isEmpty(exprFact);
 
@@ -188,7 +196,7 @@ class XbrlTestServletReportList extends DustHttpServlet {
 		ArrayList<Map> res = new ArrayList<>();
 
 		DustUtilsData.TableReader tr = null;
-		Iterable<String[]> repFacts = null;
+		DustCloseableWalker<String[]> repFacts = null;
 
 		Set<Map> loadErr = new HashSet<>();
 
@@ -255,6 +263,8 @@ class XbrlTestServletReportList extends DustHttpServlet {
 		HttpServletResponse resp = Dust.access(data, MindAccess.Peek, null, ServletData.Response);
 
 		if ( csvOut ) {
+			XbrlToolsCurrencyConverter cCvt = inEUR ? new XbrlToolsCurrencyConverter("EUR", "params/excRate_5yr_v2.csv", ";") : null;
+
 			String fn = Dust.access(data, MindAccess.Peek, "ReportData", ServletData.Parameter, "fName");
 			fn += ("_" + mode + "_" + new SimpleDateFormat(DustConsts.FMT_TIMESTAMP).format(new Date()) + ".csv");
 			resp.setHeader("Content-Disposition", "attachment; filename=" + fn);
@@ -262,25 +272,64 @@ class XbrlTestServletReportList extends DustHttpServlet {
 
 			PrintWriter out = getWriter(data);
 
+			ArrayList<String> ids = new ArrayList<>();
+			for (Map r : res) {
+				ids.add((String) r.get("Report"));
+			}
+
 			if ( "TaxonomyCoverage".equals(mode) ) {
-				ArrayList<String> ids = new ArrayList<>();
-				for (Map r : res) {
-					ids.add((String) r.get("Report"));
-				}
-
 				XbrlUtils.exportConceptCoverage(out, filings, ids, allIFRS ? ifrsConcepts : null);
-
 			} else if ( "TaxonomyData".equals(mode) ) {
-				ArrayList<String> ids = new ArrayList<>();
-				for (Map r : res) {
-					ids.add((String) r.get("Report"));
+				ArrayList<ArrayList<String>> txTree = taxonomyCollector.taxonomyBlocks(txConcepts.split(","));
+				Set<String> cc = new TreeSet<>();
+
+				int txRowCount = txTree.size();
+
+				for (int i = 1; i < txRowCount; ++i) {
+					String c = txTree.get(i).get(5);
+					if ( !DustUtils.isEmpty(c) ) {
+						cc.add(c);
+					}
 				}
+
+				XbrlUtilsTaxonomyDataCollector txDc = new XbrlUtilsTaxonomyDataCollector(filings, ids, 100, "ifrs-full", cc, cCvt);
+				int txColCount = txDc.getColumnCount();
+
+				boolean first = true;
+				for (ArrayList<String> row : txTree) {
+					out.print(DustUtils.sbAppend(null, ",", true, row.toArray()));
+
+					if ( first ) {
+						first = false;
+						for (int i = 0; i < txColCount; ++i) {
+							out.print(",");
+							out.print(txDc.getColumnHead(i, false));
+						}
+						out.println();
+						for (int i = 1; i < row.size(); ++i) {
+							out.print(",");
+						}
+						for (int i = 0; i < txColCount; ++i) {
+							out.print(",");
+							out.print(txDc.getColumnHead(i, true));
+						}
+					} else {
+						String concept = row.get(5);
+
+						for (int i = 0; i < txColCount; ++i) {
+							out.print(",");
+							out.print(txDc.getValue(i, concept));
+						}
+
+					}
+					out.println();
+				}
+				out.flush();
 
 				XbrlUtils.exportConceptCoverage(out, filings, ids, ifrsConcepts);
 
 			} else {
 				boolean filtered = "Filtered".equals(mode) && (null != exprSvc.factExpr);
-				XbrlToolsCurrencyConverter cCvt = inEUR ? new XbrlToolsCurrencyConverter("EUR", "params/excRate_5yr_v2.csv", ";") : null;
 
 				Map currFact = new HashMap<>();
 				Map<String, Object> mapFacts = new HashMap<>();
@@ -445,6 +494,8 @@ class XbrlTestServletReportList extends DustHttpServlet {
 						str = "value=\"" + pageSize + "\" ";
 					} else if ( -1 != (idx = optGetIdxAfter(line, "name=\"page[number]\" ", pageNum)) ) {
 						str = "value=\"" + pageNum + "\" ";
+					} else if ( -1 != (idx = optGetIdxAfter(line, "name=\"txConcepts\" ", txConcepts)) ) {
+						str = "value=\"" + txConcepts + "\" ";
 					} else if ( -1 != (idx = optGetIdxAfter(line, "name=\"inEUR\" ", pageNum)) ) {
 						if ( inEUR ) {
 							str = "checked ";
@@ -524,7 +575,7 @@ class XbrlTestServletReportList extends DustHttpServlet {
 			}
 			out.println("</body>\n</html>");
 		}
-		
+
 		Dust.dumpObs("FactIter open files", filings.getOpenIterCount());
 	}
 }

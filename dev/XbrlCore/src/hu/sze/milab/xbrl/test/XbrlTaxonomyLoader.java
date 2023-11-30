@@ -318,6 +318,7 @@ public class XbrlTaxonomyLoader implements DustStreamXmlDocumentGraphLoader.XmlD
 		Set<Element> blocks = new HashSet<>();
 
 		for (String cID : conceptIDs) {
+			cID = cID.trim();
 			Object c = Dust.access(ifrsDefs, MindAccess.Peek, null, "item", cID);
 			if ( null != c ) {
 				toProcess.add(cID);
