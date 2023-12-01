@@ -71,6 +71,9 @@ public class XbrlUtilsTaxonomyDataCollector {
 
 						String value = tr.get(rf, "Value");
 						if ( null != cCvt ) {
+//							if ("ShareOfProfitLossOfAssociatesAndJointVenturesAccountedForUsingEquityMethod".equals(concept)) {
+//								DustUtils.breakpoint();
+//							}
 							tr.get(rf, mFact);
 							Double cv = cCvt.optConvert(mFact);
 

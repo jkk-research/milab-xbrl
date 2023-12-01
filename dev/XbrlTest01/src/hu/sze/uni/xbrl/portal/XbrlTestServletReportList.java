@@ -286,7 +286,7 @@ class XbrlTestServletReportList extends DustHttpServlet {
 				int txRowCount = txTree.size();
 
 				for (int i = 1; i < txRowCount; ++i) {
-					String c = txTree.get(i).get(5);
+					String c = txTree.get(i).get(XbrlTaxonomyLoader.BLOCK_ID_COLIDX);
 					if ( !DustUtils.isEmpty(c) ) {
 						cc.add(c);
 					}
@@ -297,27 +297,32 @@ class XbrlTestServletReportList extends DustHttpServlet {
 
 				boolean first = true;
 				for (ArrayList<String> row : txTree) {
-					out.print(DustUtils.sbAppend(null, ",", true, row.toArray()));
+					out.print(DustUtils.sbAppend(null, "\t", true, row.toArray()));
 
 					if ( first ) {
 						first = false;
+						out.print("\tTotalCount");
+
 						for (int i = 0; i < txColCount; ++i) {
-							out.print(",");
+							out.print("\t");
 							out.print(txDc.getColumnHead(i, false));
 						}
 						out.println();
 						for (int i = 1; i < row.size(); ++i) {
-							out.print(",");
+							out.print("\t");
 						}
+						out.print("\t");
 						for (int i = 0; i < txColCount; ++i) {
-							out.print(",");
+							out.print("\t");
 							out.print(txDc.getColumnHead(i, true));
 						}
 					} else {
-						String concept = row.get(5);
+						String concept = row.get(XbrlTaxonomyLoader.BLOCK_ID_COLIDX);
+						out.print("\t");
+						out.print(txDc.getTotalCount(concept));
 
 						for (int i = 0; i < txColCount; ++i) {
-							out.print(",");
+							out.print("\t");
 							out.print(txDc.getValue(i, concept));
 						}
 
@@ -325,9 +330,6 @@ class XbrlTestServletReportList extends DustHttpServlet {
 					out.println();
 				}
 				out.flush();
-
-				XbrlUtils.exportConceptCoverage(out, filings, ids, ifrsConcepts);
-
 			} else {
 				boolean filtered = "Filtered".equals(mode) && (null != exprSvc.factExpr);
 

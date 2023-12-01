@@ -308,6 +308,8 @@ public class XbrlTaxonomyLoader implements DustStreamXmlDocumentGraphLoader.XmlD
 			}
 		}
 	}
+	
+	public static final int BLOCK_ID_COLIDX = 5;
 
 	public ArrayList<ArrayList<String>> taxonomyBlocks(String... conceptIDs) {
 
