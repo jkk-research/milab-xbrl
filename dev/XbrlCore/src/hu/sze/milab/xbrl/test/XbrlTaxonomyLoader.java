@@ -114,7 +114,7 @@ public class XbrlTaxonomyLoader implements DustStreamXmlDocumentGraphLoader.XmlD
 
 		folderCoverage.dump();
 
-		Dust.dumpObs("namespaces", namespaces.size(), "nsByUrl", nsByUrl.size());
+		Dust.dumpObs("namespaces", namespaces.size(), "nsByUrl", nsByUrl.size(), "link count", allLinks.size());
 
 		DustDevCounter dc = new DustDevCounter(true);
 

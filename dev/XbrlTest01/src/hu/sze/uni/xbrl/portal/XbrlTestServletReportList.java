@@ -292,7 +292,8 @@ class XbrlTestServletReportList extends DustHttpServlet {
 					}
 				}
 
-				XbrlUtilsTaxonomyDataCollector txDc = new XbrlUtilsTaxonomyDataCollector(filings, ids, 100, "ifrs-full", cc, cCvt);
+				XbrlUtilsTaxonomyDataCollector txDc = new XbrlUtilsTaxonomyDataCollector(filings, ids, Integer.MAX_VALUE, "ifrs-full", cc, cCvt);
+//				XbrlUtilsTaxonomyDataCollector txDc = new XbrlUtilsTaxonomyDataCollector(filings, ids, 100, "ifrs-full", cc, cCvt);
 				int txColCount = txDc.getColumnCount();
 
 				boolean first = true;

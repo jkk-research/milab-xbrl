@@ -12,6 +12,7 @@ import java.nio.file.StandardCopyOption;
 import java.text.MessageFormat;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.HashSet;
@@ -108,7 +109,7 @@ public class XbrlFilingManager implements XbrlConstsEU, DustUtilsConsts {
 				fr.close();
 
 				--openIterCount;
-				
+
 				fr = null;
 				br = null;
 			}
@@ -128,6 +129,7 @@ public class XbrlFilingManager implements XbrlConstsEU, DustUtilsConsts {
 //https://www.random.org/integer-sets/?sets=1&num=100&min=0&max=6939&commas=on&sort=on&order=index&format=plain&rnd=new
 
 	File repoRoot;
+	File srcRoot;
 	File allReports;
 
 	JSONParser parser = new JSONParser();
@@ -167,7 +169,7 @@ public class XbrlFilingManager implements XbrlConstsEU, DustUtilsConsts {
 //		File override = new File(OVERRIDE);
 //		urlOverride = override.isFile() ? (Map<String, Map>) parser.parse(new FileReader(override)) : new HashMap<>();
 
-		File srcRoot = new File(repoRoot, "sources/xbrl.org");
+		srcRoot = new File(repoRoot, "sources/xbrl.org");
 
 		if ( !srcRoot.exists() ) {
 			srcRoot.mkdirs();
@@ -207,6 +209,11 @@ public class XbrlFilingManager implements XbrlConstsEU, DustUtilsConsts {
 				}
 			}
 		} else {
+//		File fr = new File(repoRoot, "reports");
+//		DustUtilsFile.deleteRec(fr, true);
+//			File fr = new File(srcRoot, "reports");
+//			DustUtilsFile.deleteRec(fr, true);
+
 			for (File resp : updates.listFiles(FF_JSON)) {
 				loadReports(resp);
 			}
@@ -300,6 +307,11 @@ public class XbrlFilingManager implements XbrlConstsEU, DustUtilsConsts {
 			}
 
 			String xoid = XbrlUtils.access(fAtts, AccessCmd.Peek, null, "fxo_id");
+
+			if ( xoid.contains("31570412") ) {
+				DustUtils.breakpoint(xoid);
+			}
+
 			Matcher m = PT_FXO.matcher(xoid);
 
 			if ( m.matches() ) {
@@ -312,12 +324,87 @@ public class XbrlFilingManager implements XbrlConstsEU, DustUtilsConsts {
 				StringBuilder sb = DustUtils.sbAppend(null, File.separator, true, "reports", date.substring(0, 4), XBRL_SOURCE_FILINGS, DustUtilsFile.getHashName(eid), extra);
 //				StringBuilder sb = XbrlUtils.sbAppend(null, File.separator, true, "reports", date.substring(0, 4), XBRL_SOURCE_FILINGS, XbrlUtils.getHashName(eid), extra);
 				String localDir = sb.toString();
-				XbrlUtils.access(fAtts, AccessCmd.Set, localDir, LOCAL_DIR);
-				if ( new File(getRepoRoot(), localDir).exists() ) {
-					downloaded.add(fAtts);
+				File oldFile = new File(repoRoot, localDir);
+
+				String idSrc = XBRL_ENTITYID_LEI;
+
+				date = XbrlUtils.access(fAtts, AccessCmd.Peek, date, "period_end");
+
+				int dateIdx = xoid.indexOf(date);
+
+				if ( -1 != dateIdx ) {
+					String prefix = xoid.substring(0, dateIdx - 1);
+					String[] pp = prefix.split("-");
+
+					if ( 1 < pp.length ) {
+						idSrc = pp[0].toLowerCase();
+						eid = pp[1];
+					}
+				} else {
+					DustUtils.breakpoint("oops");
 				}
 
-				sb = DustUtils.sbAppend(null, IDSEP, true, XBRL_ENTITYID_LEI, eid, date, XBRL_SOURCE_FILINGS, extra);
+				if ( localDir.contains(XBRLEU_UAIFRS) ) {
+					extra = XBRLEU_UAIFRS + DustUtils.getPostfix(extra, XBRLEU_UAIFRS);
+//					DustUtils.breakpoint(localDir);
+				}
+
+				sb = DustUtils.sbAppend(null, File.separator, true, "reports", DustUtilsFile.getHashName(eid), extra);
+				localDir = sb.toString();
+				File newFile = new File(getFilingRoot(), localDir);
+
+				sb = DustUtils.sbAppend(null, File.separator, true, "reports", idSrc, DustUtilsFile.getHashName(eid), extra);
+				localDir = sb.toString();
+				File newFile2 = new File(getFilingRoot(), localDir);
+
+				if ( newFile2.exists() ) {
+					downloaded.add(fAtts);
+				} else {
+					if ( newFile.exists() ) {
+						newFile2.getParentFile().mkdirs();
+
+						List<String> ol = Arrays.asList(newFile.list(DustUtilsFile.FF_NOMAC));
+//					String[] oldList = newFile.list(DustUtilsFile.FF_NOMAC);
+
+						if ( !newFile2.exists() ) {
+							Files.move(newFile.toPath(), newFile2.toPath());
+						} else {
+							for (String l : ol) {
+								File of = new File(newFile, l);
+								File nf = new File(newFile2, l);
+								if ( nf.exists() ) {
+									of.delete();
+								} else {
+									Files.move(of.toPath(), nf.toPath());
+								}
+							}
+//						Files.copy(newFile.toPath(), newFile2.toPath());						
+						}
+
+//					String[] newList = newFile2.list(DustUtilsFile.FF_NOMAC);
+						List<String> nl = Arrays.asList(newFile2.list(DustUtilsFile.FF_NOMAC));
+
+						if ( nl.containsAll(ol) ) {
+//					if ( (0 == oldList.length) || (newList.length == oldList.length) ) {
+							newFile.delete();
+						}
+						downloaded.add(fAtts);
+					} else {
+						if ( oldFile.exists() ) {
+							DustUtils.breakpoint("would move", oldFile.getCanonicalPath(), newFile.getCanonicalPath());
+							newFile2.getParentFile().mkdirs();
+							Files.move(oldFile.toPath(), newFile2.toPath(), StandardCopyOption.REPLACE_EXISTING);
+//						Files.copy(oldFile.toPath(), newFile.toPath(), StandardCopyOption.REPLACE_EXISTING);
+							downloaded.add(fAtts);
+						} else {
+							DustUtils.breakpoint("missing old file");
+						}
+					}
+				}
+				
+				XbrlUtils.access(fAtts, AccessCmd.Set, localDir, LOCAL_DIR);
+
+				sb = DustUtils.sbAppend(null, IDSEP, true, idSrc, eid, date, XBRL_SOURCE_FILINGS, extra);
 				String internalId = sb.toString();
 				XbrlUtils.access(fAtts, AccessCmd.Set, internalId, REPORT_ID);
 
@@ -363,7 +450,7 @@ public class XbrlFilingManager implements XbrlConstsEU, DustUtilsConsts {
 							headers.put(repId, tr);
 
 //							if ( null == allFactsByRep ) {
-								return true;
+							return true;
 //							} else {
 //								allFacts = new ArrayList<>();
 //								allFactsByRep.put(repId, allFacts);
@@ -385,7 +472,7 @@ public class XbrlFilingManager implements XbrlConstsEU, DustUtilsConsts {
 		String lDir = Dust.access(mapFiling, MindAccess.Peek, null, XbrlFilingManager.LOCAL_DIR);
 		String fId = XbrlUtils.access(mapFiling, AccessCmd.Peek, null, "fxo_id");
 		String fileName = lDir + "/" + fId + XbrlReportLoaderDomBase.POSTFIX_VAL;
-		File f = new File(repoRoot, fileName);
+		File f = new File(getFilingRoot(), fileName);
 		return f;
 	}
 
@@ -474,7 +561,7 @@ public class XbrlFilingManager implements XbrlConstsEU, DustUtilsConsts {
 		File ret = null;
 
 		String repDir = XbrlUtils.access(filing, AccessCmd.Peek, null, LOCAL_DIR);
-		File dir = new File(getRepoRoot(), repDir);
+		File dir = new File(getFilingRoot(), repDir);
 		dir.mkdirs();
 
 		File fLoaded = null;
@@ -511,6 +598,12 @@ public class XbrlFilingManager implements XbrlConstsEU, DustUtilsConsts {
 				return fLoaded;
 			}
 		}
+		
+//		if ( !uaifrs ) {
+//			DustUtils.breakpoint("Missing LEI report", dir.getCanonicalPath(), genFileName);
+//		}
+//		
+//		downloadMissing = false;
 
 		boolean directReport = false;
 		String repUrl = XbrlUtils.access(filing, AccessCmd.Peek, null, (repType == XbrlReportType.Json) ? "json_url" : "package_url");
@@ -663,8 +756,9 @@ public class XbrlFilingManager implements XbrlConstsEU, DustUtilsConsts {
 		return reportData;
 	}
 
-	public File getRepoRoot() {
-		return repoRoot;
+	public File getFilingRoot() {
+		return srcRoot;
+//		return repoRoot;
 	}
 
 	public void loadAllData() throws Exception {
@@ -692,7 +786,7 @@ public class XbrlFilingManager implements XbrlConstsEU, DustUtilsConsts {
 
 			if ( clearGen ) {
 				String repDirName = XbrlUtils.access(repSrc, AccessCmd.Peek, null, LOCAL_DIR);
-				File repDir = new File(getRepoRoot(), repDirName);
+				File repDir = new File(getFilingRoot(), repDirName);
 
 				for (String gf : genFiles) {
 					File f = new File(repDir, gf);
@@ -711,7 +805,7 @@ public class XbrlFilingManager implements XbrlConstsEU, DustUtilsConsts {
 				} else {
 					dc.add("Missing report from " + repSrc.get("country"));
 					dc.add("Missing report date " + ((String) repSrc.get("date_added")).split(" ")[0]);
-					System.out.println("Missing report " + repSrc);
+//					System.out.println("Missing report " + repSrc);
 				}
 			} catch (Throwable err) {
 				DustException.swallow(err);

@@ -10,4 +10,7 @@ public interface XbrlConstsEU extends XbrlConsts {
 	String REPORT_DATE = "__ReportDate";
 	String REPORT_ID = "__ReportId";
 	String REPORT_FILE = "__ReportFile";
+	
+	String XBRLEU_UAIFRS = "UAIFRS";
+
 }

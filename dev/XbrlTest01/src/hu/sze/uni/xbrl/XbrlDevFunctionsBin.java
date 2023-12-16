@@ -364,7 +364,7 @@ public class XbrlDevFunctionsBin implements XbrlConsts {
 			String id = e.getKey();
 			Map repSrc = e.getValue();
 			String repDirName = XbrlUtils.access(repSrc, AccessCmd.Peek, null, XbrlFilingManager.LOCAL_DIR);
-			File repDir = new File(filings.getRepoRoot(), repDirName);
+			File repDir = new File(filings.getFilingRoot(), repDirName);
 
 			if ( !id.contains("21380031XTLI9X5MTY92") ) {
 ////			if ( (null != filter) && !filter.contains(id) ) {
