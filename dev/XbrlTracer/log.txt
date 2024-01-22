@@ -1,0 +1,9 @@
+/Volumes/T7-JKK-XBRL/xbrl/edgar/download/20230909/submissions.zip, Open time, 62365, File count, 857552
+/Users/lkedves/work/xbrl/data/sources/edgar/submissions.zip, Open time, 48755, File count, 857552
+/Users/lkedves/work/xbrl/data/sources/edgar/submissions.zip, Open time, 22079, File count, 857552
+/Volumes/T7-JKK-XBRL/xbrl/edgar/download/20230909/submissions.zip, Open time, 63142, File count, 857552
+/Users/lkedves/work/xbrl/data/sources/edgar/submissions.zip, Open time, 49648, File count, 857552
+
+  ?????????
+  
+  
