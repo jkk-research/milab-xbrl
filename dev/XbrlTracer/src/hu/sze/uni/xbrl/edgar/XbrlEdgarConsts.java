@@ -11,6 +11,8 @@ public interface XbrlEdgarConsts extends DustMetaConsts, DustUtilsConsts {
 	String EDGAR_APIHDR_USER = "User-Agent: Szechenyi Istvan University kedves.lorand.laszlo@sze.hu";
 	String EDGAR_APIHDR_ENCODING = "Accept-Encoding: gzip, deflate";
 	String EDGAR_APIHDR_HOST = "Host: www.sec.gov";
+	
+	String EDGAR_COMPANY_INDEX = "companies.json";
 
 	enum EdgarSubmissionAtt {
 		CIK, accessionNumber, form, size, reportDate, filingDate, acceptanceDateTime,
