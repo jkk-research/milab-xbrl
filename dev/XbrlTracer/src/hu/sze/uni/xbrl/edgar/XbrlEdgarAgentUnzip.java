@@ -8,17 +8,15 @@ import hu.sze.milab.dust.Dust;
 import hu.sze.milab.dust.DustAgent;
 import hu.sze.milab.dust.dev.DustDevCounter;
 import hu.sze.milab.dust.utils.DustUtils;
-import hu.sze.milab.dust.utils.DustUtilsFile;
 
 public class XbrlEdgarAgentUnzip extends DustAgent implements XbrlEdgarConsts {
 	
 	DustDevCounter cntMulti = new DustDevCounter("Multi-files", true);
 
 	@Override
-	public MindHandle agentBegin() throws Exception {
-		File fDataRoot = DustUtilsFile.getFile(MIND_TAG_CONTEXT_SELF, MISC_ATT_CONN_TARGET, RESOURCE_ATT_URL_PATH);
-		Dust.access(MIND_TAG_CONTEXT_SELF, MIND_TAG_ACCESS_SET, fDataRoot, MISC_ATT_CONN_TARGET, MISC_ATT_VARIANT_VALUE);
-		
+	public MindHandle agentBegin() throws Exception {		
+		Dust.access(MIND_TAG_CONTEXT_SELF, MIND_TAG_ACCESS_COMMIT, MIND_TAG_ACTION_PROCESS, MISC_ATT_CONN_TARGET);
+
 		return MIND_TAG_RESULT_READACCEPT;
 	}
 

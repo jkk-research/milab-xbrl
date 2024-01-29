@@ -138,12 +138,16 @@ public interface DustMetaConsts extends DustConsts {
 	public static MindHandle MISC_ASP_GEN = Dust.recall("3:11");
 	public static MindHandle MISC_ATT_GEN_COUNT = Dust.recall("3:12");
 
-	public static MindHandle MISC_TAG_GEN_EMPTY = Dust.recall("3:13");
+	public static MindHandle MISC_TAG_EMPTY = Dust.recall("3:13");
 
-	public static MindHandle MISC_TAG_GEN_ACTIVE = Dust.recall("3:14");
+	public static MindHandle MISC_TAG_ACTIVE = Dust.recall("3:14");
 
-	public static MindHandle MISC_ASP_VARIANT = Dust.recall("3:15");
-	public static MindHandle MISC_ATT_VARIANT_VALUE = Dust.recall("3:16");
+	public static MindHandle MISC_TAG_DIRECTION = Dust.recall("3:15");
+	public static MindHandle MISC_TAG_DIRECTION_IN = Dust.recall("3:16");
+	public static MindHandle MISC_TAG_DIRECTION_OUT = Dust.recall("3:17");
+
+	public static MindHandle MISC_ASP_VARIANT = Dust.recall("3:18");
+	public static MindHandle MISC_ATT_VARIANT_VALUE = Dust.recall("3:19");
 
 	public static MindHandle TEXT_UNIT = Dust.recall("4");
 
@@ -186,12 +190,24 @@ public interface DustMetaConsts extends DustConsts {
 	public static MindHandle RESOURCE_ASP_STREAM = Dust.recall("6:8");
 
 	public static MindHandle RESOURCE_TAG_STREAMTYPE = Dust.recall("6:9");
-	public static MindHandle RESOURCE_TAG_STREAMTYPE_ZIPENTRY = Dust.recall("6:10");
+	public static MindHandle RESOURCE_TAG_STREAMTYPE_RAW = Dust.recall("6:10");
+	public static MindHandle RESOURCE_TAG_STREAMTYPE_TEXT = Dust.recall("6:11");
+	public static MindHandle RESOURCE_TAG_STREAMTYPE_ZIPENTRY = Dust.recall("6:12");
+
+	public static MindHandle RESOURCE_ASP_PROCESSOR = Dust.recall("6:13");
+	public static MindHandle RESOURCE_ATT_PROCESSOR_STREAM = Dust.recall("6:14");
+	public static MindHandle RESOURCE_ATT_PROCESSOR_DATA = Dust.recall("6:15");
+
+	public static MindHandle RESOURCE_SRV_FILESYSTEM = Dust.recall("6:16");
+	public static MindHandle RESOURCE_AGT_ZIPREADER = Dust.recall("6:17");
+	public static MindHandle RESOURCE_AGT_JSON_DOM = Dust.recall("6:18");
 
 	public static MindHandle DEV_UNIT = Dust.recall("7");
 
 	public static MindHandle DEV_ATT_HINT = Dust.recall("7:1");
 
-	public static MindHandle L10N_UNIT = Dust.recall("8");
+	public static MindHandle DUSTJAVA_UNIT = Dust.recall("8");
+
+	public static MindHandle L10N_UNIT = Dust.recall("9");
 
 }

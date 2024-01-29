@@ -2,6 +2,7 @@ package hu.sze.uni.xbrl.edgar;
 
 import java.util.EnumSet;
 
+import hu.sze.milab.dust.Dust;
 import hu.sze.milab.dust.DustMetaConsts;
 import hu.sze.milab.dust.utils.DustUtils;
 import hu.sze.milab.dust.utils.DustUtilsConsts;
@@ -55,5 +56,9 @@ public interface XbrlEdgarConsts extends DustMetaConsts, DustUtilsConsts {
 
 	EnumSet<EdgarFactField> EDGAR_FACT_EXT = EnumSet.of(EdgarFactField.form, EdgarFactField.accn, EdgarFactField.filed, EdgarFactField.fp, EdgarFactField.fy, EdgarFactField.frame, EdgarFactField.start,
 			EdgarFactField.end, EdgarFactField.val);
+	
+	String EDGARMETA_UNIT = "0";
+	
+	public static MindHandle EDGARMETA_ATT_JSONDOM = Dust.recall(EDGARMETA_UNIT + DUST_SEP_ID);
 
 }
