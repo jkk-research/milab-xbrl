@@ -21,7 +21,7 @@ public class XbrlEdgarAgentProcessSubmissions extends DustAgent implements XbrlE
 		Collection updatedDirs = Dust.access(MIND_TAG_CONTEXT_TARGET, MIND_TAG_ACCESS_PEEK, null, MISC_ATT_CONN_MEMBERSET);
 
 		if ( null != updatedDirs ) {
-//			String path = Dust.access(MIND_TAG_CONTEXT_TARGET, MIND_TAG_ACCESS_PEEK, null, RESOURCE_ATT_URL_PATH);
+			String path = Dust.access(MIND_TAG_CONTEXT_TARGET, MIND_TAG_ACCESS_PEEK, null, RESOURCE_ATT_URL_PATH);
 			File fDataRoot = Dust.access(MIND_TAG_CONTEXT_TARGET, MIND_TAG_ACCESS_PEEK, null, MISC_ATT_VARIANT_VALUE);
 
 			for (Object idHash : updatedDirs) {
@@ -31,7 +31,7 @@ public class XbrlEdgarAgentProcessSubmissions extends DustAgent implements XbrlE
 				if ( fDir.isDirectory() ) {
 					ret = MIND_TAG_RESULT_READACCEPT;
 					File fc = new File(fDir, EDGAR_COMPANY_INDEX);
-					
+
 					Map compIdx = fromJson(fc);
 					if ( null == compIdx ) {
 						compIdx = new HashMap<>();
@@ -42,8 +42,9 @@ public class XbrlEdgarAgentProcessSubmissions extends DustAgent implements XbrlE
 							String fName = f.getName();
 							if ( fName.endsWith(DUST_EXT_JSON) && !(fName.contains("submissions")) && !(fName.equals(EDGAR_COMPANY_INDEX)) ) {
 								String fId = DustUtils.cutPostfix(fName, ".");
-								File fFilings = new File(fDir, fId + DUST_EXT_CSV);
-								Dust.access(MIND_TAG_CONTEXT_SELF, MIND_TAG_ACCESS_SET, fFilings, EDGARMETA_ATT_CSVSAX, RESOURCE_ATT_PROCESSOR_STREAM, MISC_ATT_VARIANT_VALUE);
+								String subPath = path + File.separator + idHash + File.separator;
+
+								Dust.access(MIND_TAG_CONTEXT_SELF, MIND_TAG_ACCESS_SET, subPath + fId + DUST_EXT_CSV, EDGARMETA_ATT_CSVSAX, RESOURCE_ATT_PROCESSOR_STREAM, RESOURCE_ATT_URL_PATH);
 								for (EdgarSubmissionAtt sa : EdgarSubmissionAtt.values()) {
 									Dust.access(MIND_TAG_CONTEXT_SELF, MIND_TAG_ACCESS_SET, sa.name(), EDGARMETA_ATT_CSVSAX, RESOURCE_ATT_PROCESSOR_DATA, MISC_ATT_CONN_MEMBERARR, KEY_ADD);
 								}
@@ -61,10 +62,10 @@ public class XbrlEdgarAgentProcessSubmissions extends DustAgent implements XbrlE
 									Collection subFiles = (Collection) filings.getOrDefault("files", Collections.EMPTY_LIST);
 									for (Object sfName : subFiles) {
 										File fSubFile = new File(fDir, (String) sfName);
-											Map subData2 = fromJson(fSubFile);
-											writeFilings(cik, subData2);
+										Map subData2 = fromJson(fSubFile);
+										writeFilings(cik, subData2);
 									}
-									
+
 								} finally {
 									Dust.access(MIND_TAG_CONTEXT_SELF, MIND_TAG_ACCESS_COMMIT, MIND_TAG_ACTION_END, EDGARMETA_ATT_CSVSAX, RESOURCE_ATT_PROCESSOR_STREAM);
 								}
@@ -73,7 +74,7 @@ public class XbrlEdgarAgentProcessSubmissions extends DustAgent implements XbrlE
 							}
 						}
 					}
-					
+
 					toJson(fc, compIdx);
 
 				} else {
