@@ -1,7 +1,6 @@
 package hu.sze.uni.xbrl.edgar;
 
 import java.io.File;
-import java.io.FileWriter;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
@@ -10,7 +9,6 @@ import java.util.Map;
 
 import hu.sze.milab.dust.Dust;
 import hu.sze.milab.dust.DustAgent;
-import hu.sze.milab.dust.stream.DustStreamUtils;
 import hu.sze.milab.dust.utils.DustUtils;
 
 @SuppressWarnings({ "rawtypes", "unchecked" })
@@ -45,30 +43,33 @@ public class XbrlEdgarAgentProcessSubmissions extends DustAgent implements XbrlE
 							if ( fName.endsWith(DUST_EXT_JSON) && !(fName.contains("submissions")) && !(fName.equals(EDGAR_COMPANY_INDEX)) ) {
 								String fId = DustUtils.cutPostfix(fName, ".");
 								File fFilings = new File(fDir, fId + DUST_EXT_CSV);
+								Dust.access(MIND_TAG_CONTEXT_SELF, MIND_TAG_ACCESS_SET, fFilings, EDGARMETA_ATT_CSVSAX, RESOURCE_ATT_PROCESSOR_STREAM, MISC_ATT_VARIANT_VALUE);
+								for (EdgarSubmissionAtt sa : EdgarSubmissionAtt.values()) {
+									Dust.access(MIND_TAG_CONTEXT_SELF, MIND_TAG_ACCESS_SET, sa.name(), EDGARMETA_ATT_CSVSAX, RESOURCE_ATT_PROCESSOR_DATA, MISC_ATT_CONN_MEMBERARR, KEY_ADD);
+								}
+								Dust.access(MIND_TAG_CONTEXT_SELF, MIND_TAG_ACCESS_COMMIT, MIND_TAG_ACTION_BEGIN, EDGARMETA_ATT_CSVSAX, RESOURCE_ATT_PROCESSOR_STREAM);
 
-								try (FileWriter fw = new FileWriter(fFilings)) {
+								try {
 									Map subData = fromJson(f);
 									Map filings = (Map) subData.remove("filings");
 
 									String cik = (String) subData.get("cik");
 									compIdx.put(cik, subData);
 
-									for (EdgarSubmissionAtt sa : EdgarSubmissionAtt.values()) {
-										fw.write(sa.name());
-										fw.write("\t");
-									}
-									fw.write("\n");
-									writeFilings(cik, fw, filings.get("recent"));
+									writeFilings(cik, filings.get("recent"));
 
 									Collection subFiles = (Collection) filings.getOrDefault("files", Collections.EMPTY_LIST);
 									for (Object sfName : subFiles) {
 										File fSubFile = new File(fDir, (String) sfName);
 											Map subData2 = fromJson(fSubFile);
-											writeFilings(cik, fw, subData2);
+											writeFilings(cik, subData2);
 									}
+									
+								} finally {
+									Dust.access(MIND_TAG_CONTEXT_SELF, MIND_TAG_ACCESS_COMMIT, MIND_TAG_ACTION_END, EDGARMETA_ATT_CSVSAX, RESOURCE_ATT_PROCESSOR_STREAM);
 								}
 
-								Dust.log(EVENT_TAG_TYPE_TRACE, "Would process", f.getCanonicalPath());
+								Dust.log(EVENT_TAG_TYPE_TRACE, "Processed", f.getCanonicalPath());
 							}
 						}
 					}
@@ -98,23 +99,18 @@ public class XbrlEdgarAgentProcessSubmissions extends DustAgent implements XbrlE
 		Dust.access(MIND_TAG_CONTEXT_SELF, MIND_TAG_ACCESS_COMMIT, MIND_TAG_ACTION_PROCESS, EDGARMETA_ATT_JSONDOM, RESOURCE_ATT_PROCESSOR_DATA);
 	}
 
-	private void writeFilings(String cik, FileWriter fw, Object data) throws Exception {
+	private void writeFilings(String cik, Object data) throws Exception {
 		Map<String, ArrayList> filingData = (Map<String, ArrayList>) data;
-
 		int l = filingData.get(EdgarSubmissionAtt.accessionNumber.name()).size();
 
 		for (int i = 0; i < l; ++i) {
 			for (EdgarSubmissionAtt sa : EdgarSubmissionAtt.values()) {
-				String val = EdgarSubmissionAtt.CIK.equals(sa) ? cik : filingData.get(sa.name()).get(i).toString();
-				if ( sa.str ) {
-					val = DustStreamUtils.csvEscape(val, true);
-				}
-				fw.write(val);
-				fw.write("\t");
+				String key = sa.name();
+				String val = EdgarSubmissionAtt.CIK.equals(sa) ? cik : filingData.get(key).get(i).toString();
+
+				Dust.access(MIND_TAG_CONTEXT_SELF, MIND_TAG_ACCESS_SET, val, EDGARMETA_ATT_CSVSAX, RESOURCE_ATT_PROCESSOR_DATA, MISC_ATT_CONN_MEMBERMAP, key);
 			}
-			fw.write("\n");
+			Dust.access(MIND_TAG_CONTEXT_SELF, MIND_TAG_ACCESS_COMMIT, MIND_TAG_ACTION_PROCESS, EDGARMETA_ATT_CSVSAX, RESOURCE_ATT_PROCESSOR_DATA);
 		}
-		
-		fw.flush();
 	}
 }

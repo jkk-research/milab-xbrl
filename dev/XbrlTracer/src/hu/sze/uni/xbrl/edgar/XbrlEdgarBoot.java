@@ -37,7 +37,7 @@ public class XbrlEdgarBoot implements XbrlEdgarConsts {
 		Dust.access(hAgtUnzip, MIND_TAG_ACCESS_SET, hTargetDir, MISC_ATT_CONN_TARGET);
 		Dust.access(hZipEntry, MIND_TAG_ACCESS_INSERT, hAgtUnzip, MIND_ATT_KNOWLEDGE_LISTENERS, KEY_ADD);
 
-		MindHandle hAgtJsonDOM = DustDevUtils.registerAgent(EDGARMETA_UNIT, RESOURCE_AGT_JSON_DOM);
+		MindHandle hAgtJsonDOM = DustDevUtils.registerAgent(EDGARMETA_UNIT, RESOURCE_AGT_JSONDOM);
 		MindHandle hJsonStream = DustDevUtils.registerHandle(EDGARMETA_UNIT, RESOURCE_ASP_STREAM);
 		MindHandle hJsonData = DustDevUtils.registerHandle(EDGARMETA_UNIT, MISC_ASP_VARIANT);
 		Dust.access(hAgtJsonDOM, MIND_TAG_ACCESS_SET, hJsonStream, RESOURCE_ATT_PROCESSOR_STREAM);
@@ -45,8 +45,18 @@ public class XbrlEdgarBoot implements XbrlEdgarConsts {
 		Dust.access(hJsonStream, MIND_TAG_ACCESS_INSERT, hAgtJsonDOM, MIND_ATT_KNOWLEDGE_LISTENERS, KEY_ADD);
 		Dust.access(hJsonData, MIND_TAG_ACCESS_INSERT, hAgtJsonDOM, MIND_ATT_KNOWLEDGE_LISTENERS, KEY_ADD);
 		
+		MindHandle hAgtCsvSax = DustDevUtils.registerAgent(EDGARMETA_UNIT, RESOURCE_AGT_CSVSAX);
+		MindHandle hCsvStream = DustDevUtils.registerHandle(EDGARMETA_UNIT, RESOURCE_ASP_STREAM);
+		MindHandle hCsvData = DustDevUtils.registerHandle(EDGARMETA_UNIT, MISC_ASP_VARIANT);
+		Dust.access(hAgtCsvSax, MIND_TAG_ACCESS_SET, hCsvStream, RESOURCE_ATT_PROCESSOR_STREAM);
+		Dust.access(hAgtCsvSax, MIND_TAG_ACCESS_SET, hCsvData, RESOURCE_ATT_PROCESSOR_DATA);
+		Dust.access(hCsvStream, MIND_TAG_ACCESS_INSERT, hAgtCsvSax, MIND_ATT_KNOWLEDGE_LISTENERS, KEY_ADD);
+		Dust.access(hCsvData, MIND_TAG_ACCESS_INSERT, hAgtCsvSax, MIND_ATT_KNOWLEDGE_LISTENERS, KEY_ADD);
+		
 		MindHandle hAgtSubProc = DustDevUtils.registerAgent(EDGARMETA_UNIT, hLogEdgarSubProc); 		
 		Dust.access(hAgtSubProc, MIND_TAG_ACCESS_SET, hAgtJsonDOM, EDGARMETA_ATT_JSONDOM);
+		Dust.access(hAgtSubProc, MIND_TAG_ACCESS_SET, hAgtCsvSax, EDGARMETA_ATT_CSVSAX);
+		
 		Dust.access(hTargetDir, MIND_TAG_ACCESS_INSERT, hAgtSubProc, MIND_ATT_KNOWLEDGE_LISTENERS, KEY_ADD);
 
 		Dust.access(APP_ASSEMBLY_MAIN, MIND_TAG_ACCESS_SET, hAgtZipReader, MIND_ATT_ASSEMBLY_STARTAGENTS, KEY_ADD);

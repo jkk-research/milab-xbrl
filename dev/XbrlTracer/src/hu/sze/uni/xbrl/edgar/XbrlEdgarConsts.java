@@ -60,5 +60,6 @@ public interface XbrlEdgarConsts extends DustMetaConsts, DustUtilsConsts {
 	String EDGARMETA_UNIT = "0";
 	
 	public static MindHandle EDGARMETA_ATT_JSONDOM = Dust.recall(EDGARMETA_UNIT + DUST_SEP_ID);
+	public static MindHandle EDGARMETA_ATT_CSVSAX = Dust.recall(EDGARMETA_UNIT + DUST_SEP_ID);
 
 }
