@@ -6,22 +6,30 @@ import java.io.FileReader;
 import java.io.PrintStream;
 import java.io.PrintWriter;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
+
+import org.json.simple.parser.JSONParser;
 
 import hu.sze.milab.dust.Dust;
 import hu.sze.milab.dust.stream.DustStreamUrlCache;
 import hu.sze.milab.dust.utils.DustUtils;
 import hu.sze.milab.dust.utils.DustUtilsConsts.DustCloseableWalker;
 import hu.sze.milab.dust.utils.DustUtilsData;
+import hu.sze.milab.dust.utils.DustUtilsFile;
 import hu.sze.milab.xbrl.XbrlCoreUtils;
 import hu.sze.milab.xbrl.test.XbrlTaxonomyLoader;
 import hu.sze.milab.xbrl.tools.XbrlToolsCurrencyConverter;
 
 @SuppressWarnings({ "rawtypes" })
-public class XbrlDevFunctions implements XbrlConsts {
+public class XbrlDevFunctions implements XbrlConstsEU {
 	static final Object VAL_EMPTY = new Object();
 	static final Object VAL_NOCHECK = new Object();
+	
+	static final File dataRoot = new File(System.getProperty("user.home") + "/work/xbrl/data");
+	static final File srcRoot = new File(dataRoot, "sources/xbrl.org");
 
 	public static void unitConvert() throws Exception {
 		File dataRoot = new File(System.getProperty("user.home") + "/work/xbrl/data");
@@ -110,11 +118,30 @@ public class XbrlDevFunctions implements XbrlConsts {
 	public static void main(String[] args) throws Exception {
 		Dust.main(args);
 
-		taxonomyTest(true);
+//		taxonomyTest(true);
+		moveCache(new File(srcRoot, "allReports1.json"));
+	}
+
+	@SuppressWarnings("unchecked")
+	public static void moveCache(File allReps) throws Exception {
+		JSONParser parser = new JSONParser();
+		Map<String, Map> reportData = (Map<String, Map>) parser.parse(new FileReader(allReps));
+		for (Map filing : reportData.values()) {
+			String xoid = XbrlUtils.access(filing, AccessCmd.Peek, null, "fxo_id");
+			String locDir = XbrlUtils.access(filing, AccessCmd.Peek, null, LOCAL_DIR);
+			String repId = XbrlUtils.access(filing, AccessCmd.Peek, null, REPORT_ID);
+
+			File oldDir = new File(dataRoot, locDir);
+			
+			if ( oldDir.isDirectory() ) {
+				List<String> ol = Arrays.asList(oldDir.list(DustUtilsFile.FF_NOMAC));
+				
+				
+			}
+		}
 	}
 
 	public static void taxonomyTest(boolean dumpOnly) throws Exception {
-		File dataRoot = new File(System.getProperty("user.home") + "/work/xbrl/data");
 
 		XbrlFilingManager filings = new XbrlFilingManager(dataRoot, true);
 		filings.setDownloadOnly(false);

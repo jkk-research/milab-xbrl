@@ -219,6 +219,20 @@ public class XbrlFilingManager implements XbrlConstsEU, DustUtilsConsts {
 			}
 		}
 
+		boolean moveCache = "true".equalsIgnoreCase(System.getProperty("MoveCache", "false"));
+
+		if ( moveCache ) {
+			for (Map filing : getReportData().values()) {
+				String xoid = XbrlUtils.access(filing, AccessCmd.Peek, null, "fxo_id");
+				String locDir = XbrlUtils.access(filing, AccessCmd.Peek, null, LOCAL_DIR);
+				String repId = XbrlUtils.access(filing, AccessCmd.Peek, null, REPORT_ID);
+
+				
+			}
+			
+			DustException.wrap(null, "No portal start");
+		}
+
 		if ( doUpdate ) {
 			File fPing = new File(srcRoot, "ping.json");
 
