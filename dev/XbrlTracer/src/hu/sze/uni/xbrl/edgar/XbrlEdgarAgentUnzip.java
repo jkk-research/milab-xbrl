@@ -14,18 +14,18 @@ public class XbrlEdgarAgentUnzip extends DustAgent implements XbrlEdgarConsts {
 	DustDevCounter cntMulti = new DustDevCounter("Multi-files", true);
 
 	@Override
-	public MindHandle agentBegin() throws Exception {		
-		Dust.access(MIND_TAG_CONTEXT_SELF, MIND_TAG_ACCESS_COMMIT, MIND_TAG_ACTION_PROCESS, MISC_ATT_CONN_TARGET);
+	protected MindHandle agentBegin() throws Exception {		
+		Dust.access(MindAccess.Commit, MIND_TAG_ACTION_PROCESS, MIND_TAG_CONTEXT_SELF, MISC_ATT_CONN_TARGET);
 
 		return MIND_TAG_RESULT_READACCEPT;
 	}
 
 	@Override
-	public MindHandle agentProcess() throws Exception {
-		String name = Dust.access(MIND_TAG_CONTEXT_TARGET, MIND_TAG_ACCESS_PEEK, "", RESOURCE_ATT_URL_PATH);
+	protected MindHandle agentProcess() throws Exception {
+		String name = Dust.access(MindAccess.Peek, "", MIND_TAG_CONTEXT_TARGET, RESOURCE_ATT_URL_PATH);
 
 		if ( name.endsWith(DUST_EXT_JSON) ) {
-			ZipArchiveEntry zipArchiveEntry = Dust.access(MIND_TAG_CONTEXT_TARGET, MIND_TAG_ACCESS_PEEK, null, RESOURCE_ASP_STREAM);
+			ZipArchiveEntry zipArchiveEntry = Dust.access(MindAccess.Peek, null, MIND_TAG_CONTEXT_TARGET, RESOURCE_ASP_STREAM);
 			
 			String fName = DustUtils.getPostfix(name, File.separator);
 			String id = DustUtils.cutPostfix(fName, ".");
@@ -38,7 +38,7 @@ public class XbrlEdgarAgentUnzip extends DustAgent implements XbrlEdgarConsts {
 			
 			String idHash = DustUtils.getHash2(id, File.separator);
 			
-			File fDataRoot = Dust.access(MIND_TAG_CONTEXT_SELF, MIND_TAG_ACCESS_PEEK, null, MISC_ATT_CONN_TARGET, MISC_ATT_VARIANT_VALUE);			
+			File fDataRoot = Dust.access(MindAccess.Peek, null, MIND_TAG_CONTEXT_SELF, MISC_ATT_CONN_TARGET, MISC_ATT_VARIANT_VALUE);			
 			File fDir = new File(fDataRoot, idHash);
 			File fData = new File(fDir, fName);
 			
@@ -53,7 +53,7 @@ public class XbrlEdgarAgentUnzip extends DustAgent implements XbrlEdgarConsts {
 //			ZipFile zipFile = Dust.access(MIND_TAG_CONTEXT_TARGET, MIND_TAG_ACCESS_PEEK, null, MISC_ATT_VARIANT_VALUE);
 //		DustUtilsApache.unzipEntry(zipFile, zipArchiveEntry, fData);
 			
-			Dust.access(MIND_TAG_CONTEXT_SELF, MIND_TAG_ACCESS_INSERT, idHash, MISC_ATT_CONN_TARGET, MISC_ATT_CONN_MEMBERSET);
+			Dust.access(MindAccess.Insert, idHash, MIND_TAG_CONTEXT_SELF, MISC_ATT_CONN_TARGET, MISC_ATT_CONN_MEMBERSET);
 			
 		}
 
@@ -61,9 +61,9 @@ public class XbrlEdgarAgentUnzip extends DustAgent implements XbrlEdgarConsts {
 	}
 	
 	@Override
-	public MindHandle agentEnd() throws Exception {
+	protected MindHandle agentEnd() throws Exception {
 		Dust.log(EVENT_TAG_TYPE_INFO, cntMulti);
-		Dust.access(MIND_TAG_CONTEXT_SELF, MIND_TAG_ACCESS_COMMIT, MIND_TAG_ACTION_PROCESS, MISC_ATT_CONN_TARGET);
+		Dust.access(MindAccess.Commit, MIND_TAG_ACTION_PROCESS, MIND_TAG_CONTEXT_SELF, MISC_ATT_CONN_TARGET);
 		return MIND_TAG_RESULT_ACCEPT;
 	}
 }
