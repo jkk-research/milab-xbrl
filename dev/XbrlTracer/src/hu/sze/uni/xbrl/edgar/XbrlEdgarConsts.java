@@ -3,11 +3,11 @@ package hu.sze.uni.xbrl.edgar;
 import java.util.EnumSet;
 
 import hu.sze.milab.dust.Dust;
-import hu.sze.milab.dust.DustMetaConsts;
+import hu.sze.milab.dust.dev.DustDevUtils;
 import hu.sze.milab.dust.utils.DustUtils;
-import hu.sze.milab.dust.utils.DustUtilsConsts;
+import hu.sze.uni.xbrl.XbrlConsts;
 
-public interface XbrlEdgarConsts extends DustMetaConsts, DustUtilsConsts {
+public interface XbrlEdgarConsts extends XbrlConsts {
 	String EDGAR_URL_DATA = "https://www.sec.gov/Archives/edgar/data/";
 	String EDGAR_APIHDR_USER = "User-Agent: Szechenyi Istvan University kedves.lorand.laszlo@sze.hu";
 	String EDGAR_APIHDR_ENCODING = "Accept-Encoding: gzip, deflate";
@@ -57,9 +57,9 @@ public interface XbrlEdgarConsts extends DustMetaConsts, DustUtilsConsts {
 	EnumSet<EdgarFactField> EDGAR_FACT_EXT = EnumSet.of(EdgarFactField.form, EdgarFactField.accn, EdgarFactField.filed, EdgarFactField.fp, EdgarFactField.fy, EdgarFactField.frame, EdgarFactField.start,
 			EdgarFactField.end, EdgarFactField.val);
 	
-	String EDGARMETA_UNIT = "0";
+	MindHandle EDGARMETA_UNIT = Dust.lookup(AUTHOR_XBRLDOCK + DUST_SEP_ID + "EDGAR");
 	
-	public static MindHandle EDGARMETA_ATT_JSONDOM = Dust.lookup(EDGARMETA_UNIT + DUST_SEP_ID);
-	public static MindHandle EDGARMETA_ATT_CSVSAX = Dust.lookup(EDGARMETA_UNIT + DUST_SEP_ID);
+	MindHandle EDGARMETA_ATT_JSONDOM = DustDevUtils.newHandle(EDGARMETA_UNIT, MIND_ASP_ATTRIBUTE);
+	MindHandle EDGARMETA_ATT_CSVSAX = DustDevUtils.newHandle(EDGARMETA_UNIT, MIND_ASP_ATTRIBUTE);
 
 }

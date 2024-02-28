@@ -7,3 +7,81 @@
   ?????????
   
   
+  
+https://filings.xbrl.org/api/filings?include=entity,language,message&filter=%5B%7B%22name%22%3A%22input_filing.filing_source.program%22%2C%22op%22%3A%22eq%22%2C%22val%22%3A%22ESEF%22%7D%5D&sort=-date_added&page%5Bsize%5D=20&page%5Bnumber%5D=2&_=1708499971220
+
+
+<html>
+  <head>
+        <meta charset="UTF-8">
+        <title>filings.xbrl.org filing index</title>
+        <link href="/static/css/style-v2.css%3Fq%3Df7c15" rel="stylesheet">
+        <script src="/static/js/list.min.js"></script>
+        <script crossorigin="anonymous" type="text/javascript" src="https://kit.fontawesome.com/be8f7a8eee.js" id="font-awesome-official-js"></script>
+        <script src="/static/js/jquery-3.6.0.min.js"></script>
+        <script src="/static/js/fxo.bundle.js%3Fq%3D356c4"></script>
+        
+
+    </head>
+    <body>
+        <header id="site-header">
+            <div class="inside">
+                <div class="logo">
+                    <a href="/"><img src="https://www.xbrl.org/wp-content/themes/xbrl/images/logoHeader.png"></a>
+                </div>
+                <div class="nav-holder">
+                    <ul class="nav">
+                        <li><a href="/docs/about">About</a></li>
+                    </ul>
+                </div>
+            </div>
+        </header>
+        <div class="site-main">
+            <div class="body-wrap">
+                
+<h1>
+    Validation Report
+</h1>
+<div class="subtitle">
+    <b><a class="plain-link" href="/filing/549300EW2KM4KROKQV31-2024-12-31-ESEF-FI-0">Tietoevry Oyj</b> filing to <b>Nasdaq</b> for period ending <b>31 Dec 2024</a></b>
+</div>
+
+<table class="list validation-messages">
+    <tr>
+        <th class="severity">Severity</th>
+        <th class="code">Code</th>
+        <th class="message">Message</th>
+    </tr>
+
+    
+        <tr>
+            <td class="severity">WARNING</td>
+            <td title="message:positive" class="code">message:positive</td>
+            <td class="message">Reported value is below 0</td>
+        </tr>
+    
+</table>
+
+
+            </div>
+        </div>
+	<div id="footer">
+            <div class="inside">	    
+                <p>
+		© 2021-23 XBRL All Rights Reserved.
+                </p>
+            </div>
+	</div>
+	<!-- Global site tag (gtag.js) - Google Analytics -->
+	<script async src="https://www.googletagmanager.com/gtag/js?id=G-G3TG6F53RM"></script>
+	<script>
+	  window.dataLayer = window.dataLayer || [];
+	  function gtag(){dataLayer.push(arguments);}
+	  gtag('js', new Date());
+
+	  gtag('config', 'G-G3TG6F53RM');
+	</script>
+    </body>
+</html>
+
+
