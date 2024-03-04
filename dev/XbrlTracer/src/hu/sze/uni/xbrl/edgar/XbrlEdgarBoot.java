@@ -2,12 +2,11 @@ package hu.sze.uni.xbrl.edgar;
 
 import hu.sze.milab.dust.Dust;
 import hu.sze.milab.dust.dev.DustDevUtils;
-import hu.sze.milab.dust.machine.DustMachineTempUtils;
 
 public class XbrlEdgarBoot implements XbrlEdgarConsts {
 	
 	public static void boot(String[] launchParams) throws Exception {
-		DustMachineTempUtils.test();
+//		DustMachineTempUtils.test();
 		
 		zipRead();
 	}
@@ -16,7 +15,7 @@ public class XbrlEdgarBoot implements XbrlEdgarConsts {
 		MindHandle hLogEdgarUnzip = DustDevUtils.registerLogic(EDGARMETA_UNIT, XbrlEdgarAgentUnzip.class.getCanonicalName());
 		MindHandle hLogEdgarSubProc = DustDevUtils.registerLogic(EDGARMETA_UNIT, XbrlEdgarAgentProcessSubmissions.class.getCanonicalName());
 		
-		MindHandle hLogFSRoot = DustDevUtils.registerAgent(XBRLTEST_UNIT, RESOURCE_AGT_FILESYSTEM);
+		MindHandle hLogFSRoot = DustDevUtils.registerAgent(XBRLTEST_UNIT, RESOURCE_LOG_FILESYSTEM);
 		Dust.access(MindAccess.Set, "work/xbrl/data/sources/edgar", hLogFSRoot, RESOURCE_ATT_URL_PATH);
 		
 		MindHandle hZipFile = DustDevUtils.newHandle(XBRLTEST_UNIT, RESOURCE_ASP_URL);
@@ -29,7 +28,7 @@ public class XbrlEdgarBoot implements XbrlEdgarConsts {
 						
 		MindHandle hZipEntry = DustDevUtils.newHandle(XBRLTEST_UNIT, RESOURCE_ASP_STREAM);
 		
-		MindHandle hAgtZipReader = DustDevUtils.registerAgent(XBRLTEST_UNIT, RESOURCE_AGT_ZIPREADER);
+		MindHandle hAgtZipReader = DustDevUtils.registerAgent(XBRLTEST_UNIT, RESOURCE_LOG_ZIPREADER);
 		Dust.access(MindAccess.Set, hZipFile, hAgtZipReader, MISC_ATT_CONN_SOURCE);
 		Dust.access(MindAccess.Set, hZipEntry, hAgtZipReader, MISC_ATT_CONN_TARGET);
 		
@@ -37,7 +36,7 @@ public class XbrlEdgarBoot implements XbrlEdgarConsts {
 		Dust.access(MindAccess.Set, hTargetDir, hAgtUnzip, MISC_ATT_CONN_TARGET);
 		Dust.access(MindAccess.Insert, hAgtUnzip, hZipEntry, MIND_ATT_KNOWLEDGE_LISTENERS, KEY_ADD);
 
-		MindHandle hAgtJsonDOM = DustDevUtils.registerAgent(XBRLTEST_UNIT, RESOURCE_AGT_JSONDOM);
+		MindHandle hAgtJsonDOM = DustDevUtils.registerAgent(XBRLTEST_UNIT, RESOURCE_LOG_JSONDOM);
 		MindHandle hJsonStream = DustDevUtils.newHandle(XBRLTEST_UNIT, RESOURCE_ASP_STREAM);
 		MindHandle hJsonData = DustDevUtils.newHandle(XBRLTEST_UNIT, MISC_ASP_VARIANT);
 		Dust.access(MindAccess.Set, hJsonStream, hAgtJsonDOM, RESOURCE_ATT_PROCESSOR_STREAM);
@@ -45,7 +44,7 @@ public class XbrlEdgarBoot implements XbrlEdgarConsts {
 		Dust.access(MindAccess.Insert, hAgtJsonDOM, hJsonStream, MIND_ATT_KNOWLEDGE_LISTENERS, KEY_ADD);
 		Dust.access(MindAccess.Insert, hAgtJsonDOM, hJsonData, MIND_ATT_KNOWLEDGE_LISTENERS, KEY_ADD);
 		
-		MindHandle hAgtCsvSax = DustDevUtils.registerAgent(XBRLTEST_UNIT, RESOURCE_AGT_CSVSAX);
+		MindHandle hAgtCsvSax = DustDevUtils.registerAgent(XBRLTEST_UNIT, RESOURCE_LOG_CSVSAX);
 		MindHandle hCsvStream = DustDevUtils.newHandle(XBRLTEST_UNIT, RESOURCE_ASP_STREAM);
 		MindHandle hCsvData = DustDevUtils.newHandle(XBRLTEST_UNIT, MISC_ASP_VARIANT);
 		Dust.access(MindAccess.Set, hCsvStream, hAgtCsvSax, RESOURCE_ATT_PROCESSOR_STREAM);
