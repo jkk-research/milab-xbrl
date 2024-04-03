@@ -59,7 +59,7 @@ public interface XbrlEdgarConsts extends XbrlConsts {
 	
 	MindHandle EDGARMETA_UNIT = Dust.lookup(AUTHOR_XBRLDOCK + DUST_SEP_ID + "EDGAR");
 	
-	MindHandle EDGARMETA_ATT_JSONDOM = DustDevUtils.newHandle(EDGARMETA_UNIT, MIND_ASP_ATTRIBUTE);
-	MindHandle EDGARMETA_ATT_CSVSAX = DustDevUtils.newHandle(EDGARMETA_UNIT, MIND_ASP_ATTRIBUTE);
+	MindHandle EDGARMETA_ATT_JSONDOM = DustDevUtils.newHandle(EDGARMETA_UNIT, MIND_ASP_ATTRIBUTE, "JsonDOM att");
+	MindHandle EDGARMETA_ATT_CSVSAX = DustDevUtils.newHandle(EDGARMETA_UNIT, MIND_ASP_ATTRIBUTE, "CsvSAX att");
 
 }

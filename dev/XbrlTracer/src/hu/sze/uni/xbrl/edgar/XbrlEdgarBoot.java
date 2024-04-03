@@ -12,21 +12,21 @@ public class XbrlEdgarBoot implements XbrlEdgarConsts {
 	}
 		
 	public static void zipRead() throws Exception {
-		MindHandle hLogEdgarUnzip = DustDevUtils.registerLogic(EDGARMETA_UNIT, XbrlEdgarAgentUnzip.class.getCanonicalName());
-		MindHandle hLogEdgarSubProc = DustDevUtils.registerLogic(EDGARMETA_UNIT, XbrlEdgarAgentProcessSubmissions.class.getCanonicalName());
+		MindHandle hLogEdgarUnzip = DustDevUtils.registerLogic(EDGARMETA_UNIT, XbrlEdgarAgentUnzip.class.getCanonicalName(), "unzip logic");
+		MindHandle hLogEdgarSubProc = DustDevUtils.registerLogic(EDGARMETA_UNIT, XbrlEdgarAgentProcessSubmissions.class.getCanonicalName(), "submission processor logic");
 		
 		MindHandle hLogFSRoot = DustDevUtils.registerAgent(XBRLTEST_UNIT, RESOURCE_LOG_FILESYSTEM);
 		Dust.access(MindAccess.Set, "work/xbrl/data/sources/edgar", hLogFSRoot, RESOURCE_ATT_URL_PATH);
 		
-		MindHandle hZipFile = DustDevUtils.newHandle(XBRLTEST_UNIT, RESOURCE_ASP_URL);
+		MindHandle hZipFile = DustDevUtils.newHandle(XBRLTEST_UNIT, RESOURCE_ASP_URL, "the zip file");
 		Dust.access(MindAccess.Insert, hLogFSRoot, hZipFile, MIND_ATT_KNOWLEDGE_LISTENERS, KEY_ADD);
 		Dust.access(MindAccess.Set, "submissions_00.zip", hZipFile, RESOURCE_ATT_URL_PATH);
 		
-		MindHandle hTargetDir = DustDevUtils.newHandle(XBRLTEST_UNIT, RESOURCE_ASP_URL);
+		MindHandle hTargetDir = DustDevUtils.newHandle(XBRLTEST_UNIT, RESOURCE_ASP_URL, "target dir");
 		Dust.access(MindAccess.Insert, hLogFSRoot, hTargetDir, MIND_ATT_KNOWLEDGE_LISTENERS, KEY_ADD);
 		Dust.access(MindAccess.Set, "submissions", hTargetDir, RESOURCE_ATT_URL_PATH);
 						
-		MindHandle hZipEntry = DustDevUtils.newHandle(XBRLTEST_UNIT, RESOURCE_ASP_STREAM);
+		MindHandle hZipEntry = DustDevUtils.newHandle(XBRLTEST_UNIT, RESOURCE_ASP_STREAM, "zip entry");
 		
 		MindHandle hAgtZipReader = DustDevUtils.registerAgent(XBRLTEST_UNIT, RESOURCE_LOG_ZIPREADER);
 		Dust.access(MindAccess.Set, hZipFile, hAgtZipReader, MISC_ATT_CONN_SOURCE);
@@ -37,16 +37,16 @@ public class XbrlEdgarBoot implements XbrlEdgarConsts {
 		Dust.access(MindAccess.Insert, hAgtUnzip, hZipEntry, MIND_ATT_KNOWLEDGE_LISTENERS, KEY_ADD);
 
 		MindHandle hAgtJsonDOM = DustDevUtils.registerAgent(XBRLTEST_UNIT, RESOURCE_LOG_JSONDOM);
-		MindHandle hJsonStream = DustDevUtils.newHandle(XBRLTEST_UNIT, RESOURCE_ASP_STREAM);
-		MindHandle hJsonData = DustDevUtils.newHandle(XBRLTEST_UNIT, MISC_ASP_VARIANT);
+		MindHandle hJsonStream = DustDevUtils.newHandle(XBRLTEST_UNIT, RESOURCE_ASP_STREAM, "JSON stream");
+		MindHandle hJsonData = DustDevUtils.newHandle(XBRLTEST_UNIT, MISC_ASP_VARIANT, "JSON data");
 		Dust.access(MindAccess.Set, hJsonStream, hAgtJsonDOM, RESOURCE_ATT_PROCESSOR_STREAM);
 		Dust.access(MindAccess.Set, hJsonData, hAgtJsonDOM, RESOURCE_ATT_PROCESSOR_DATA);
 		Dust.access(MindAccess.Insert, hAgtJsonDOM, hJsonStream, MIND_ATT_KNOWLEDGE_LISTENERS, KEY_ADD);
 		Dust.access(MindAccess.Insert, hAgtJsonDOM, hJsonData, MIND_ATT_KNOWLEDGE_LISTENERS, KEY_ADD);
 		
 		MindHandle hAgtCsvSax = DustDevUtils.registerAgent(XBRLTEST_UNIT, RESOURCE_LOG_CSVSAX);
-		MindHandle hCsvStream = DustDevUtils.newHandle(XBRLTEST_UNIT, RESOURCE_ASP_STREAM);
-		MindHandle hCsvData = DustDevUtils.newHandle(XBRLTEST_UNIT, MISC_ASP_VARIANT);
+		MindHandle hCsvStream = DustDevUtils.newHandle(XBRLTEST_UNIT, RESOURCE_ASP_STREAM, "CSV stream");
+		MindHandle hCsvData = DustDevUtils.newHandle(XBRLTEST_UNIT, MISC_ASP_VARIANT, "CSV data");
 		Dust.access(MindAccess.Set, hCsvStream, hAgtCsvSax, RESOURCE_ATT_PROCESSOR_STREAM);
 		Dust.access(MindAccess.Set, hCsvData, hAgtCsvSax, RESOURCE_ATT_PROCESSOR_DATA);
 		Dust.access(MindAccess.Set, MISC_TAG_DIRECTION_OUT, hCsvStream, MIND_ATT_KNOWLEDGE_TAGS, MISC_TAG_DIRECTION);
