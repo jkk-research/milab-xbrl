@@ -22,7 +22,7 @@ public class XbrlEsgIndiaBoot implements XbrlEsgIndiaConsts {
 		
 		MindHandle hDataCsvStream = DustDevUtils.newHandle(XBRLTEST_UNIT, RESOURCE_ASP_STREAM, "Report list CSV stream");
 
-		Dust.access(MindAccess.Set, "CF-BRSR-equities-16-Apr-2024.csv", hDataCsvStream, RESOURCE_ATT_URL_PATH);
+		Dust.access(MindAccess.Set, "CF-BRSR-equities-16-Apr-2024.csv", hDataCsvStream, TEXT_ATT_TOKEN);
 		DustDevUtils.setTag(hDataCsvStream, MISC_TAG_DIRECTION_IN, MISC_TAG_DIRECTION);
 		DustDevUtils.setTag(hDataCsvStream, RESOURCE_TAG_STREAMTYPE_TEXT, RESOURCE_TAG_STREAMTYPE);
 		
@@ -59,7 +59,7 @@ public class XbrlEsgIndiaBoot implements XbrlEsgIndiaConsts {
 
 		MindHandle hAgtReportCache = DustDevUtils.registerAgent(XBRLTEST_UNIT, RESOURCE_NAR_CACHE, "Report Cache");
 		DustDevUtils.setTag(hAgtReportCache, MISC_TAG_DBLHASH);
-		Dust.access(MindAccess.Set, hAgtCacheRoot, hAgtReportCache, MISC_ATT_CONN_SOURCE);
+//		Dust.access(MindAccess.Set, hAgtCacheRoot, hAgtReportCache, MISC_ATT_CONN_SOURCE);
 		Dust.access(MindAccess.Set, hDataWebRequest, hAgtReportCache, RESOURCE_ATT_CACHE_REQUEST);
 		Dust.access(MindAccess.Set, hDataReportDownloadStream, hAgtReportCache, MISC_ATT_CONN_TARGET);
 		Dust.access(MindAccess.Insert, hAgtReportCache, hDataCacheItem, MIND_ATT_KNOWLEDGE_LISTENERS, KEY_ADD);
