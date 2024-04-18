@@ -1,0 +1,50 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta http-equiv="content-type" content="text/html; charset=utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1"></meta>
+
+<link rel="stylesheet" href="/res/css/Dust.css" type="text/css" />
+
+<title>XbrlTracerTest</title>
+
+</head>
+<body>
+	<div id="montruWindow" class="montruMaxWidth">
+		<div class="montruMaxWidth" style="height: 200px; background: teal; font-size: 0;">
+			<div id="fetchParams" class=" montruMaxHeight montruInline" style="width: 30%;font-size: 12px; background: #FDF5E6 "></div>
+			<div id="srvResponse" class="montruScrollY montruMaxHeight montruInline"
+				style="width: 70%; max-height: 200px;font-size: 12px; background: #F0FFFF"></div>
+		</div>
+		<div class="montruMaxWidth" style="background: #FDF5E6">
+			<button id="btnGetData">Get data!</button>
+			<button id="btnStop" style="float: right; background-color: red;">Stop!</button>
+			<button id="btnInfo" style="float: right;">Server info</button>
+			<button id="btnTest" style="float: right;">Test</button>
+		</div>
+		<div id="graph" class="montruMaxWidth" style="height: 800px; background: #F0FFFF"></div>
+	</div>
+
+	<script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.7.1/jquery.min.js"></script>
+	<script src="/script/DustHandles.js"></script>
+	<script src="/script/DustBoot.js"></script>
+	<script src="/script/Dust.js"></script>
+
+	<script src="/script/DustComm.js"></script>
+
+	<script src="/script/DustMontru.js"></script>
+
+	<script src="https://cdnjs.cloudflare.com/ajax/libs/cytoscape/3.28.1/cytoscape.min.js"></script>
+	<script src="/script/DustGraphCytoscape.js"></script>
+
+	<script>
+	Dust.loadApp('jsonapi', 'test:1');
+	
+	Dust.access(MindAccess.Set, 'XBRLDock:1', DustBoot.dataSrvReq, DustHandles.TEXT_ATT_TOKEN);
+	Dust.access(MindAccess.Commit, MindAction.Process, DustBoot.dataSrvReq);
+
+	</script>
+</body>
+</html>
+

@@ -22,7 +22,7 @@ public class XbrlEdgarAgentProcessSubmissions extends DustAgent implements XbrlE
 
 		if ( null != updatedDirs ) {
 			String path = Dust.access(MindAccess.Peek, null, MIND_TAG_CONTEXT_TARGET, RESOURCE_ATT_URL_PATH);
-			File fDataRoot = Dust.access(MindAccess.Peek, null, MIND_TAG_CONTEXT_TARGET, MISC_ATT_VARIANT_VALUE);
+			File fDataRoot = Dust.access(MindAccess.Peek, null, MIND_TAG_CONTEXT_TARGET, DUST_ATT_IMPL_DATA);
 
 			for (Object idHash : updatedDirs) {
 //				String subPath = path + File.pathSeparator + idHash;
@@ -61,9 +61,13 @@ public class XbrlEdgarAgentProcessSubmissions extends DustAgent implements XbrlE
 
 									Collection subFiles = (Collection) filings.getOrDefault("files", Collections.EMPTY_LIST);
 									for (Object sfName : subFiles) {
-										File fSubFile = new File(fDir, (String) sfName);
-										Map subData2 = fromJson(fSubFile);
-										writeFilings(cik, subData2);
+										if ( sfName instanceof String ) {
+											File fSubFile = new File(fDir, (String) sfName);
+											Map subData2 = fromJson(fSubFile);
+											writeFilings(cik, subData2);
+										} else {
+											Dust.log(EVENT_TAG_TYPE_WARNING, "bad filings list", filings.toString());
+										}
 									}
 
 								} finally {
@@ -89,13 +93,13 @@ public class XbrlEdgarAgentProcessSubmissions extends DustAgent implements XbrlE
 	}
 
 	private <RetType> RetType fromJson(File f) throws Exception {
-		Dust.access(MindAccess.Set, f, MIND_TAG_CONTEXT_SELF, EDGARMETA_ATT_JSONDOM, RESOURCE_ATT_PROCESSOR_STREAM, MISC_ATT_VARIANT_VALUE);
+		Dust.access(MindAccess.Set, f, MIND_TAG_CONTEXT_SELF, EDGARMETA_ATT_JSONDOM, RESOURCE_ATT_PROCESSOR_STREAM, DUST_ATT_IMPL_DATA);
 		Dust.access(MindAccess.Commit, MIND_TAG_ACTION_PROCESS, MIND_TAG_CONTEXT_SELF, EDGARMETA_ATT_JSONDOM, RESOURCE_ATT_PROCESSOR_STREAM);
 		return Dust.access(MindAccess.Peek, null, MIND_TAG_CONTEXT_SELF, EDGARMETA_ATT_JSONDOM, RESOURCE_ATT_PROCESSOR_DATA, MISC_ATT_VARIANT_VALUE);
 	}
 
 	private void toJson(File f, Object data) throws Exception {
-		Dust.access(MindAccess.Set, f, MIND_TAG_CONTEXT_SELF, EDGARMETA_ATT_JSONDOM, RESOURCE_ATT_PROCESSOR_STREAM, MISC_ATT_VARIANT_VALUE);
+		Dust.access(MindAccess.Set, f, MIND_TAG_CONTEXT_SELF, EDGARMETA_ATT_JSONDOM, RESOURCE_ATT_PROCESSOR_STREAM, DUST_ATT_IMPL_DATA);
 		Dust.access(MindAccess.Set, data, MIND_TAG_CONTEXT_SELF, EDGARMETA_ATT_JSONDOM, RESOURCE_ATT_PROCESSOR_DATA, MISC_ATT_VARIANT_VALUE);
 		Dust.access(MindAccess.Commit, MIND_TAG_ACTION_PROCESS, MIND_TAG_CONTEXT_SELF, EDGARMETA_ATT_JSONDOM, RESOURCE_ATT_PROCESSOR_DATA);
 	}

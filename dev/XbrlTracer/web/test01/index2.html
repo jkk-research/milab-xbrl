@@ -1,0 +1,80 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta http-equiv="content-type" content="text/html; charset=utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1"></meta>
+
+<link rel="stylesheet" href="/res/css/Dust.css" />
+
+<title>DustJS Test01</title>
+
+</head>
+<body>
+	<h1>DustJS JSON:API test</h1>
+
+	<div class="dataTable maxWidth" id='fetchParams'></div>
+
+
+	<table class="dataTable maxWidth">
+		<tbody>
+			<tr>
+				<td class="dataTable" width="150px"><label for="path">Path</label></td>
+				<td><input style="width: 100%" id="path" value="test:0" /></td>
+			</tr>
+			<tr>
+				<td class="dataTable"><label for="include">include</label></td>
+				<td><input style="width: 100%" id="include" value="111" /></td>
+			</tr>
+			<tr>
+				<td class="dataTable"><label for="fields">fields[]*</label></td>
+				<td><input style="width: 100%" id="fields" value="222" /></td>
+			</tr>
+			<tr>
+				<td class="dataTable"><label for="filter">filter</label></td>
+				<td><input style="width: 100%" id="filter" value="333" /></td>
+			</tr>
+			<tr>
+				<td class="dataTable"><label for="sort">sort</label></td>
+				<td><input style="width: 100%" id="sort" value="" /></td>
+			</tr>
+			<tr>
+				<td class="dataTable"><label for="page[offset]">page[offset]</label></td>
+				<td><input style="width: 100%" id="page[offset]" value="" /></td>
+			</tr>
+			<tr>
+				<td class="dataTable"><label for="page[limit]">page[limit]</label></td>
+				<td><input style="width: 100%" id="page[limit]" value="444" /></td>
+			</tr>
+			<tr>
+				<td class="dataTable" colspan="2" width="800px"><button id="btnGetData">Get data!</button>
+					<button id="btnStop" style="float: right; background-color: red;">Stop!</button>
+					<button id="btnInfo" style="float: right;">Server info</button>
+					<button id="btnTest" style="float: right;">Test</button></td>
+			</tr>
+			<tr>
+				<td class="dataTable maxHeight"><div class="maxWidth montruScrollY" style="height: 800px" id='srvResponse'>
+					</div></td>
+				<td class="dataTable" width="80%"><div style="width: 100%; height: 800px; display: block;" id='graph'></div></td>
+			</tr>
+		</tbody>
+	</table>
+
+
+	<script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.7.1/jquery.min.js"></script>
+	<script src="/script/DustHandles.js"></script>
+	<script src="/script/DustBoot.js"></script>
+	<script src="/script/Dust.js"></script>
+
+	<script src="/script/DustComm.js"></script>
+
+	<script src="/script/DustMontru.js"></script>
+
+	<script src="https://cdnjs.cloudflare.com/ajax/libs/cytoscape/3.28.1/cytoscape.min.js"></script>
+	<script src="/script/DustGraphCytoscape.js"></script>
+
+	<script>
+		Dust.loadApp('jsonapi', 'test:1');
+	</script>
+</body>
+</html>
