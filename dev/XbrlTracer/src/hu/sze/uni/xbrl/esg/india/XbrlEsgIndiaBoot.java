@@ -77,13 +77,6 @@ public class XbrlEsgIndiaBoot implements XbrlEsgIndiaConsts {
 	  Dust.access(MindAccess.Insert, "cache-control: max-age=0", hAgtDownload, NET_ATT_SRVCALL_HEADERS, KEY_ADD);
 	  Dust.access(MindAccess.Insert, "referer: https://www.nseindia.com/", hAgtDownload, NET_ATT_SRVCALL_HEADERS, KEY_ADD);
 	  Dust.access(MindAccess.Insert, "cookie: ak_bmsc=3E075BE883D37300D9F9B6CAB07A4C27~000000000000000000000000000000~YAAQlHkmF0VcNvqOAQAAAdfg+heH7y0jBS78sPmivBJlRwfwJNp2/q8V8D+0ooWR/LVzLdha155NXnigDVyOmPpKsNvWOX/FiS4wwkjDhwS4pkb34Gu/bnI6R39b8JgSVV+urglmbp+OuX8NL3qY7fkgKY0KEMbg2msY1+mcqkCKd5pGr9D1ldKS/c6Am9oQTsvrLMszZN+FkiimB/6jMgpki5TvCXXY9ds7GFwG/SU+7k/rZ4e7EPD+G3m3myuUCJrFmk3REzFPKegjFHB5ePagp38tBi479SEH7O+9QKJ8g79X58/ilsfbMBRuOopS1Rj4cDhcInP6+dnp8HKZxzemcpb407E4spLLNO7UMk+X5yT+n/RSovx6AghURs+XLMgEsXKcNskhVQ==; AKA_A2=A; bm_mi=0595116DEA68C6EF2F0F03DA5CBFCE93~YAAQk3nKF7UNhcWOAQAAjbH2+hfjuuCFAfqHvK3Z1H++2Vc6AvrVy8Ne+kXij9Q1D9+S0OOWOoJPV6zyorrqhgFbAWBGIQa4ADt8i1YZfsNO1EC/cnRy2YhNO0/bZ18+d367M5H+UUMmpWt3ajusHpLwHerlibJLiiu6Qbctyf8xt+rB6bKzlp2tCzrLFEP5BsSqsnLr2UkxjeYk/oPH4++DpGU7doMxUNoIEOLDYAH1OXBTZgrt2GgKxtbRfCzLB2j2VXlDpJsNVXwh2rpZ2t9knq+dRlygVw2/4uZk3V2kCCQ039XdQQqFD75iYOkrobaf7w/wjO6Ne9edyo0shEue0Ks880rQ0ORXhZGAlIMnV9u23j2bxZPMbevvOI/MD/FycKkm+5fsJSxkFeLvdYU=~1; _abck=F582EA0B2C10F21D09513B6A46F1AFD6~0~YAAQk3nKFxAXhcWOAQAAqh34+gtN7EgYwHRb/0+O3YlvTpAkavqP/Tz+bXKXxpo9JVEi3qA6P9uaQzMrf5zTqy6KX4kWNOU6FjjqP6epi68Co3nCF4hCc/Mv2brEHvS8ffSJ+U2jN8U04a5ZGicCbqQfFnB0Vd+LEvk1yB7x366I40Vlj8/LcQGH2qbDShgVbZry0HuZmfo/VzU6cfqHtggJUlOwjmr8SzZW53P3SmDsLtjpsn/FO46fFb7ZISntVahe2PEiDIxqEQzIw1DGRBfDbweQtrE9sDfgUe1Igqe228Le5xwKYx29Lh+7K3qZWNBSd04UnLtwhEK6XE8nY2b00XfmVGMS2Zkl88fcLrlLocUnHI3oYFeagT6k2Hd+qavDL6VpedmjriBaxqqlvJ7qTrHP/SOoGOk=~-1~-1~-1; bm_sz=DFF6BBFDE6B174C273071A5F5BF9DE81~YAAQg3kmF5fUbvaOAQAAwyT4+hdZVLtIl1D0a9U2y3zouHL5aP3KzdQAKLC4A1PvtKMVQXLl6gM8N6ClnvJWUsQnQg5nMfzB5R7/DWBYGfOZlTexKp8WjSumTkx2Mb777r6zP6VADF6tfuANuV0VRAexrOoGZIo56oJEjNIWF4NjExZofeAo9gqssiJbJAb8vZhPT3BnEuXihzIgtP44NNfpkcXYRSnxCPQb4ZWbRltLQoKmf0us+Au9SOOJex1BL79n7rLRup1R5NOTnhVkf8TKeRBEFZpC8j0GCndFlMlPaGocH9B9de8gDUXxUniH+yj5hmU9gNlYgyzGILUxlh1nKaNl9WvEyAE7NOejkpKnDYmoUGc12R/vpV7WYq1XNX0UAlnPKpJrSix48gh/vhXcvNbF~3621185~4277558; bm_sv=98E6DAA975224DCED61825262F59194A~YAAQk3nKF7AXhcWOAQAAoCz4+he7oUA8W4JKoz+rubEnE3/0doYNG54eYzzA5MeXLgvLz5IsAE6f/1tpLSImPpAetGKzayowWnl0SS+c63Ky/2DzBZ8jKq8DmIeop/2qyfImuHwvonCsjhMLAzJS4MQVPYM6CIgvT0JW/aJ1yY0oCiAgaMRZ4TVvQR23nXOaQFxWGlvJVLiZJ1l7mxmpbPLFM2eRve6ddJTx8wi1Qu7yDj6JIpmaLBF5GGod+6tJdI3D~1", hAgtDownload, NET_ATT_SRVCALL_HEADERS, KEY_ADD);
-//  Dust.access(MindAccess.Insert, "cookie: _abck=F582EA0B2C10F21D09513B6A46F1AFD6~-1~YAAQzB0SAsaWxPSOAQAAURAa9wtNj1P0QtMMtYI5brcSrhziY7eGx8uMh8UCL0/ZxicKdJR2TOmR/AsDVZlJ6p2QcdAHqVAKBNqgzgX+nW9OgKKTHetyVbArqAkFnZBmAGjQ8YChEAn3IQW/SrTPPVdLr2gCEkNwQW0DnOD17aALKgxCcl9ngWRJ9HgwjaSgSA53RGVMLP53jx05fyiDUDdhkO8+ZCgkWhkSaerQT1CUNhkX+SmDrssR42wzvruUAFI3oHD+hJfAPlQV3IqmV9CbOirAelpvDzbBsMj7NbnhonXU8YkF0KyIVnMb6dmstFVvKhm22ZsknCYHGhMsdY40Sjph/Cv/YhvmrI/B164vOgZ9uBqrg22+eHnHDQ==~-1~-1~-1; ak_bmsc=2EA695D38482FB35A4F3B63D70596CF6~000000000000000000000000000000~YAAQzB0SAseWxPSOAQAAURAa9xesBUVx8Eh1mPzAUQR1O9fb/aVYn62Dzd3CXZvmlDQMM6N++CeVSg6SDR7FGhS8YbPNDHRzsvgeX3zSTAfWl/srQmtiP36egfTMGL7oxI7msOLkMPypyX6gBURr2sR0mQ4nOGP+mCWKI9LdmWFjRhIVXVaMY2RNj3zADfZqck3x16K8wNCiP7Tk0+6aCUDh3nLRF4w5utz7v8wbBpXncWYBAvSRnU8skt/cUe0vYzASMDlqL9nO0HDPrbxamHx7d5lIjiILh1Unn5qdSwrpOmGeSzxkzzOrJLik9f5GlOE5jaha/s2R6iU8tTcmXGZ4CNY7DtQxn3gMHfxipgIK6HQNVpJq/KD0EmbKD7lzZ2asuuruAbL3S+Wq; bm_sz=5BC387B8BEF4BCC5C71AA4648DFFB0DA~YAAQzB0SAsiWxPSOAQAAURAa9xf9thcAMwMeBwO3jGlFL9bwSkZZ6T/NlI05i58AQX1GSHa0dgNv2skvM/PUcVLMdRsTmguU+gWwIIIOQXBqb5b7nMDSzYQDUplbYc0nzE91KmhK31apnENYbaQnGlR7KxYMhX89o+k2fbck/ZdHs/7PxB6GWP3EFyMfU+XLroYLUu1yuCcIYoFbIe/mCvAzM5dAwioNyc9wGRI7byNXmZn06tbxjpx4lXVvTvzimCwQh9kjsfaiYMeMruuVHlmQMBWsF1Zl/9fP8oH9mAv4Aqg4TwkUS12XIa3YjJzjKfn2Sq6B5ormicEoi39dVyL3qlQCP+RyA8pfTN4r1/D3IUJ+JiN04ElUwypmEw/2HlmWsy9VU+lOZNkx4W8=~3421240~3682866", hAgtDownload, NET_ATT_SRVCALL_HEADERS, KEY_ADD);
-//	  Dust.access(MindAccess.Insert, "pragma: no-cache", hAgtDownload, NET_ATT_SRVCALL_HEADERS, KEY_ADD);
-//	  Dust.access(MindAccess.Insert, "sec-fetch-dest: document", hAgtDownload, NET_ATT_SRVCALL_HEADERS, KEY_ADD);
-//	  Dust.access(MindAccess.Insert, "sec-fetch-mode: navigate", hAgtDownload, NET_ATT_SRVCALL_HEADERS, KEY_ADD);
-//	  Dust.access(MindAccess.Insert, "sec-fetch-site: none", hAgtDownload, NET_ATT_SRVCALL_HEADERS, KEY_ADD);
-//	  Dust.access(MindAccess.Insert, "sec-fetch-user: ?1", hAgtDownload, NET_ATT_SRVCALL_HEADERS, KEY_ADD);
-
 		Dust.access(MindAccess.Insert, "Upgrade-Insecure-Requests: 1", hAgtDownload, NET_ATT_SRVCALL_HEADERS, KEY_ADD);
 		Dust.access(MindAccess.Insert, "User-Agent: Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/124.0.0.0 Safari/537.36", hAgtDownload, NET_ATT_SRVCALL_HEADERS, KEY_ADD);
 		Dust.access(MindAccess.Insert, "sec-ch-ua: \"Google Chrome\";v=\"124\", \"Not:A-Brand\";v=\"99\", \"Chromium\";v=\"124\"", hAgtDownload, NET_ATT_SRVCALL_HEADERS, KEY_ADD);
@@ -93,29 +86,6 @@ public class XbrlEsgIndiaBoot implements XbrlEsgIndiaConsts {
 		Dust.access(MindAccess.Insert, "sec-fetch-mode: navigate", hAgtDownload, NET_ATT_SRVCALL_HEADERS, KEY_ADD);
 		Dust.access(MindAccess.Insert, "sec-fetch-site: same-site", hAgtDownload, NET_ATT_SRVCALL_HEADERS, KEY_ADD);
 		Dust.access(MindAccess.Insert, "sec-fetch-user: ?1", hAgtDownload, NET_ATT_SRVCALL_HEADERS, KEY_ADD);
-		
-//	  -H 'accept: text/html,application/xhtml+xml,application/xml;q=0.9,image/avif,image/webp,image/apng,*/*;q=0.8,application/signed-exchange;v=b3;q=0.7' \
-//	  -H 'accept-language: en-US,en;q=0.9,hu-HU;q=0.8,hu;q=0.7' \
-//	  -H 'cache-control: max-age=0' \
-//	  -H 'cookie: ak_bmsc=3E075BE883D37300D9F9B6CAB07A4C27~000000000000000000000000000000~YAAQlHkmF0VcNvqOAQAAAdfg+heH7y0jBS78sPmivBJlRwfwJNp2/q8V8D+0ooWR/LVzLdha155NXnigDVyOmPpKsNvWOX/FiS4wwkjDhwS4pkb34Gu/bnI6R39b8JgSVV+urglmbp+OuX8NL3qY7fkgKY0KEMbg2msY1+mcqkCKd5pGr9D1ldKS/c6Am9oQTsvrLMszZN+FkiimB/6jMgpki5TvCXXY9ds7GFwG/SU+7k/rZ4e7EPD+G3m3myuUCJrFmk3REzFPKegjFHB5ePagp38tBi479SEH7O+9QKJ8g79X58/ilsfbMBRuOopS1Rj4cDhcInP6+dnp8HKZxzemcpb407E4spLLNO7UMk+X5yT+n/RSovx6AghURs+XLMgEsXKcNskhVQ==; AKA_A2=A; bm_mi=0595116DEA68C6EF2F0F03DA5CBFCE93~YAAQk3nKF7UNhcWOAQAAjbH2+hfjuuCFAfqHvK3Z1H++2Vc6AvrVy8Ne+kXij9Q1D9+S0OOWOoJPV6zyorrqhgFbAWBGIQa4ADt8i1YZfsNO1EC/cnRy2YhNO0/bZ18+d367M5H+UUMmpWt3ajusHpLwHerlibJLiiu6Qbctyf8xt+rB6bKzlp2tCzrLFEP5BsSqsnLr2UkxjeYk/oPH4++DpGU7doMxUNoIEOLDYAH1OXBTZgrt2GgKxtbRfCzLB2j2VXlDpJsNVXwh2rpZ2t9knq+dRlygVw2/4uZk3V2kCCQ039XdQQqFD75iYOkrobaf7w/wjO6Ne9edyo0shEue0Ks880rQ0ORXhZGAlIMnV9u23j2bxZPMbevvOI/MD/FycKkm+5fsJSxkFeLvdYU=~1; _abck=F582EA0B2C10F21D09513B6A46F1AFD6~0~YAAQk3nKFxAXhcWOAQAAqh34+gtN7EgYwHRb/0+O3YlvTpAkavqP/Tz+bXKXxpo9JVEi3qA6P9uaQzMrf5zTqy6KX4kWNOU6FjjqP6epi68Co3nCF4hCc/Mv2brEHvS8ffSJ+U2jN8U04a5ZGicCbqQfFnB0Vd+LEvk1yB7x366I40Vlj8/LcQGH2qbDShgVbZry0HuZmfo/VzU6cfqHtggJUlOwjmr8SzZW53P3SmDsLtjpsn/FO46fFb7ZISntVahe2PEiDIxqEQzIw1DGRBfDbweQtrE9sDfgUe1Igqe228Le5xwKYx29Lh+7K3qZWNBSd04UnLtwhEK6XE8nY2b00XfmVGMS2Zkl88fcLrlLocUnHI3oYFeagT6k2Hd+qavDL6VpedmjriBaxqqlvJ7qTrHP/SOoGOk=~-1~-1~-1; bm_sz=DFF6BBFDE6B174C273071A5F5BF9DE81~YAAQg3kmF5fUbvaOAQAAwyT4+hdZVLtIl1D0a9U2y3zouHL5aP3KzdQAKLC4A1PvtKMVQXLl6gM8N6ClnvJWUsQnQg5nMfzB5R7/DWBYGfOZlTexKp8WjSumTkx2Mb777r6zP6VADF6tfuANuV0VRAexrOoGZIo56oJEjNIWF4NjExZofeAo9gqssiJbJAb8vZhPT3BnEuXihzIgtP44NNfpkcXYRSnxCPQb4ZWbRltLQoKmf0us+Au9SOOJex1BL79n7rLRup1R5NOTnhVkf8TKeRBEFZpC8j0GCndFlMlPaGocH9B9de8gDUXxUniH+yj5hmU9gNlYgyzGILUxlh1nKaNl9WvEyAE7NOejkpKnDYmoUGc12R/vpV7WYq1XNX0UAlnPKpJrSix48gh/vhXcvNbF~3621185~4277558; bm_sv=98E6DAA975224DCED61825262F59194A~YAAQk3nKF7AXhcWOAQAAoCz4+he7oUA8W4JKoz+rubEnE3/0doYNG54eYzzA5MeXLgvLz5IsAE6f/1tpLSImPpAetGKzayowWnl0SS+c63Ky/2DzBZ8jKq8DmIeop/2qyfImuHwvonCsjhMLAzJS4MQVPYM6CIgvT0JW/aJ1yY0oCiAgaMRZ4TVvQR23nXOaQFxWGlvJVLiZJ1l7mxmpbPLFM2eRve6ddJTx8wi1Qu7yDj6JIpmaLBF5GGod+6tJdI3D~1' \
-//	  -H 'if-modified-since: Tue, 23 Jan 2024 06:29:29 GMT' \
-//	  -H 'if-none-match: W/"632125-1705991369000"' \
-//	  -H 'priority: u=0, i' \
-//	  -H 'referer: https://www.nseindia.com/' \
-//	  -H 'sec-ch-ua: "Chromium";v="124", "Google Chrome";v="124", "Not-A.Brand";v="99"' \
-//	  -H 'sec-ch-ua-mobile: ?0' \
-//	  -H 'sec-ch-ua-platform: "macOS"' \
-//	  -H 'sec-fetch-dest: document' \
-//	  -H 'sec-fetch-mode: navigate' \
-//	  -H 'sec-fetch-site: same-site' \
-//	  -H 'sec-fetch-user: ?1' \
-
-//	  curl 'https://nsearchives.nseindia.com/corporate/xbrl/BRSR_1081995_05042024090627_WEB.xml' \
-//	  -H 'Upgrade-Insecure-Requests: 1' \
-//	  -H 'User-Agent: Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/124.0.0.0 Safari/537.36' \
-//	  -H 'sec-ch-ua: "Chromium";v="124", "Google Chrome";v="124", "Not-A.Brand";v="99"' \
-//	  -H 'sec-ch-ua-mobile: ?0' \
-//	  -H 'sec-ch-ua-platform: "macOS"'
 
 		MindHandle hAgtReportCache = DustDevUtils.registerAgent(XBRLTEST_UNIT, RESOURCE_NAR_CACHE, "Report Cache");
 		DustDevUtils.setTag(hAgtReportCache, MISC_TAG_DBLHASH);
@@ -130,13 +100,6 @@ public class XbrlEsgIndiaBoot implements XbrlEsgIndiaConsts {
 		Dust.access(MindAccess.Insert, hAgtXmlDom, hDataReportContentStream, MIND_ATT_KNOWLEDGE_LISTENERS, KEY_ADD);
 
 		MindHandle hDataReportRowData = DustDevUtils.newHandle(XBRLTEST_UNIT, MISC_ASP_VARIANT, "Report CSV row data");
-		MindHandle hDataReportRowText = DustDevUtils.newHandle(XBRLTEST_UNIT, MISC_ASP_VARIANT, "Report CSV row text");
-
-		MindHandle hAgtXmlLoader = DustDevUtils.registerAgent(XBRLTEST_UNIT, XBRLDOCK_NAR_XMLLOADER, "XML loader");
-		Dust.access(MindAccess.Set, hDataReportRowData, hAgtXmlLoader, XBRLDOCK_ATT_XMLLOADER_ROWDATA);
-		Dust.access(MindAccess.Set, hDataReportRowText, hAgtXmlLoader, XBRLDOCK_ATT_XMLLOADER_ROWTEXT);
-		Dust.access(MindAccess.Insert, hAgtXmlLoader, hDataReportContent, MIND_ATT_KNOWLEDGE_LISTENERS, KEY_ADD);
-
 		MindHandle hDataReportStreamData = DustDevUtils.newHandle(XBRLTEST_UNIT, RESOURCE_ASP_STREAM, "Report Data CSV stream");
 		DustDevUtils.setTag(hDataReportStreamData, MISC_TAG_DIRECTION_OUT, MISC_TAG_DIRECTION);
 		DustDevUtils.setTag(hDataReportStreamData, RESOURCE_TAG_STREAMTYPE_TEXT, RESOURCE_TAG_STREAMTYPE);
@@ -147,6 +110,7 @@ public class XbrlEsgIndiaBoot implements XbrlEsgIndiaConsts {
 		Dust.access(MindAccess.Set, hDataReportRowData, hAgtCsvReportWriterData, RESOURCE_ATT_PROCESSOR_DATA);
 		Dust.access(MindAccess.Insert, hAgtCsvReportWriterData, hDataReportRowData, MIND_ATT_KNOWLEDGE_LISTENERS, KEY_ADD);
 
+		MindHandle hDataReportRowText = DustDevUtils.newHandle(XBRLTEST_UNIT, MISC_ASP_VARIANT, "Report CSV row text");
 		MindHandle hDataReportStreamText = DustDevUtils.newHandle(XBRLTEST_UNIT, RESOURCE_ASP_STREAM, "Report Text CSV stream");
 		DustDevUtils.setTag(hDataReportStreamText, MISC_TAG_DIRECTION_OUT, MISC_TAG_DIRECTION);
 		DustDevUtils.setTag(hDataReportStreamText, RESOURCE_TAG_STREAMTYPE_TEXT, RESOURCE_TAG_STREAMTYPE);
@@ -156,6 +120,11 @@ public class XbrlEsgIndiaBoot implements XbrlEsgIndiaConsts {
 		Dust.access(MindAccess.Set, hDataReportStreamText, hAgtCsvReportWriterText, RESOURCE_ATT_PROCESSOR_STREAM);
 		Dust.access(MindAccess.Set, hDataReportRowText, hAgtCsvReportWriterText, RESOURCE_ATT_PROCESSOR_DATA);
 		Dust.access(MindAccess.Insert, hAgtCsvReportWriterText, hDataReportRowText, MIND_ATT_KNOWLEDGE_LISTENERS, KEY_ADD);
+
+		MindHandle hAgtXmlLoader = DustDevUtils.registerAgent(XBRLTEST_UNIT, XBRLDOCK_NAR_XMLLOADER, "XML loader");
+		Dust.access(MindAccess.Set, hAgtCsvReportWriterData, hAgtXmlLoader, XBRLDOCK_ATT_XMLLOADER_ROWDATA);
+		Dust.access(MindAccess.Set, hAgtCsvReportWriterText, hAgtXmlLoader, XBRLDOCK_ATT_XMLLOADER_ROWTEXT);
+		Dust.access(MindAccess.Insert, hAgtXmlLoader, hDataReportContent, MIND_ATT_KNOWLEDGE_LISTENERS, KEY_ADD);
 
 		DustDevUtils.setTag(hDataCsvStream, MISC_TAG_TRANSACTION);
 		Dust.access(MindAccess.Set, hDataCsvStream, APP_ASSEMBLY_MAIN, MIND_ATT_ASSEMBLY_STARTCOMMITS, KEY_ADD);
