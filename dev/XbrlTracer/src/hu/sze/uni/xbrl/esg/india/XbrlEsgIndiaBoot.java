@@ -36,8 +36,8 @@ public class XbrlEsgIndiaBoot implements XbrlEsgIndiaConsts {
 		Dust.access(MindAccess.Set, hDataCsvRow, hAgtCsvSax, RESOURCE_ATT_PROCESSOR_DATA);
 		Dust.access(MindAccess.Insert, hAgtCsvSax, hDataCsvStream, MIND_ATT_KNOWLEDGE_LISTENERS, KEY_ADD);
 
-		MindHandle hAgtCacheRoot = DustDevUtils.registerAgent(XBRLTEST_UNIT, RESOURCE_NAR_FILESYSTEM, "Filesystem cache root");
-		Dust.access(MindAccess.Set, "/Users/lkedves/work/xbrl/20240416_ESG_India/store", hAgtCacheRoot, RESOURCE_ATT_URL_PATH);
+		MindHandle hAgtCacheRoot = DustDevUtils.registerAgent(XBRLTEST_UNIT, RESOURCE_NAR_FILESYSTEM, "Filesystem report cache root");
+		Dust.access(MindAccess.Set, "/Users/lkedves/work/xbrl/20240416_ESG_India/reports", hAgtCacheRoot, RESOURCE_ATT_URL_PATH);
 
 		MindHandle hDataReportContentStream = DustDevUtils.newHandle(XBRLTEST_UNIT, RESOURCE_ASP_STREAM, "Report content stream");
 		DustDevUtils.setTag(hDataReportContentStream, MISC_TAG_DIRECTION_IN, MISC_TAG_DIRECTION);
@@ -98,12 +98,15 @@ public class XbrlEsgIndiaBoot implements XbrlEsgIndiaConsts {
 		Dust.access(MindAccess.Set, hDataReportContentStream, hAgtXmlDom, RESOURCE_ATT_PROCESSOR_STREAM);
 		Dust.access(MindAccess.Set, hDataReportContent, hAgtXmlDom, RESOURCE_ATT_PROCESSOR_DATA);
 		Dust.access(MindAccess.Insert, hAgtXmlDom, hDataReportContentStream, MIND_ATT_KNOWLEDGE_LISTENERS, KEY_ADD);
+		
+		MindHandle hAgtDataCacheRoot = DustDevUtils.registerAgent(XBRLTEST_UNIT, RESOURCE_NAR_FILESYSTEM, "Filesystem DATA cache root");
+		Dust.access(MindAccess.Set, "/Users/lkedves/work/xbrl/20240416_ESG_India/data", hAgtDataCacheRoot, RESOURCE_ATT_URL_PATH);
 
 		MindHandle hDataReportRowData = DustDevUtils.newHandle(XBRLTEST_UNIT, MISC_ASP_VARIANT, "Report CSV row data");
 		MindHandle hDataReportStreamData = DustDevUtils.newHandle(XBRLTEST_UNIT, RESOURCE_ASP_STREAM, "Report Data CSV stream");
 		DustDevUtils.setTag(hDataReportStreamData, MISC_TAG_DIRECTION_OUT, MISC_TAG_DIRECTION);
 		DustDevUtils.setTag(hDataReportStreamData, RESOURCE_TAG_STREAMTYPE_TEXT, RESOURCE_TAG_STREAMTYPE);
-		Dust.access(MindAccess.Insert, hAgtCacheRoot, hDataReportStreamData, MIND_ATT_KNOWLEDGE_LISTENERS, KEY_ADD);
+		Dust.access(MindAccess.Insert, hAgtDataCacheRoot, hDataReportStreamData, MIND_ATT_KNOWLEDGE_LISTENERS, KEY_ADD);
 
 		MindHandle hAgtCsvReportWriterData = DustDevUtils.registerAgent(XBRLTEST_UNIT, RESOURCE_NAR_CSVSAX, "CSV Data writer");
 		Dust.access(MindAccess.Set, hDataReportStreamData, hAgtCsvReportWriterData, RESOURCE_ATT_PROCESSOR_STREAM);
@@ -114,7 +117,7 @@ public class XbrlEsgIndiaBoot implements XbrlEsgIndiaConsts {
 		MindHandle hDataReportStreamText = DustDevUtils.newHandle(XBRLTEST_UNIT, RESOURCE_ASP_STREAM, "Report Text CSV stream");
 		DustDevUtils.setTag(hDataReportStreamText, MISC_TAG_DIRECTION_OUT, MISC_TAG_DIRECTION);
 		DustDevUtils.setTag(hDataReportStreamText, RESOURCE_TAG_STREAMTYPE_TEXT, RESOURCE_TAG_STREAMTYPE);
-		Dust.access(MindAccess.Insert, hAgtCacheRoot, hDataReportStreamText, MIND_ATT_KNOWLEDGE_LISTENERS, KEY_ADD);
+		Dust.access(MindAccess.Insert, hAgtDataCacheRoot, hDataReportStreamText, MIND_ATT_KNOWLEDGE_LISTENERS, KEY_ADD);
 
 		MindHandle hAgtCsvReportWriterText = DustDevUtils.registerAgent(XBRLTEST_UNIT, RESOURCE_NAR_CSVSAX, "CSV Text writer");
 		Dust.access(MindAccess.Set, hDataReportStreamText, hAgtCsvReportWriterText, RESOURCE_ATT_PROCESSOR_STREAM);
@@ -125,6 +128,7 @@ public class XbrlEsgIndiaBoot implements XbrlEsgIndiaConsts {
 		Dust.access(MindAccess.Set, hAgtCsvReportWriterData, hAgtXmlLoader, XBRLDOCK_ATT_XMLLOADER_ROWDATA);
 		Dust.access(MindAccess.Set, hAgtCsvReportWriterText, hAgtXmlLoader, XBRLDOCK_ATT_XMLLOADER_ROWTEXT);
 		Dust.access(MindAccess.Insert, hAgtXmlLoader, hDataReportContent, MIND_ATT_KNOWLEDGE_LISTENERS, KEY_ADD);
+//		DustDevUtils.setTag(hAgtXmlLoader, DEV_TAG_TEST);
 
 		DustDevUtils.setTag(hDataCsvStream, MISC_TAG_TRANSACTION);
 		Dust.access(MindAccess.Set, hDataCsvStream, APP_ASSEMBLY_MAIN, MIND_ATT_ASSEMBLY_STARTCOMMITS, KEY_ADD);
