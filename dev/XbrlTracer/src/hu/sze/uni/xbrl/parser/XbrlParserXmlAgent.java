@@ -2,7 +2,6 @@ package hu.sze.uni.xbrl.parser;
 
 import java.io.File;
 import java.text.DecimalFormat;
-import java.text.SimpleDateFormat;
 import java.util.Map;
 import java.util.TreeMap;
 
@@ -99,9 +98,6 @@ public class XbrlParserXmlAgent extends DustAgent implements XbrlParserConsts {
 							}
 							cd.put(FactFldCommon.DimName_.name() + dc, dim);
 							cd.put(FactFldCommon.DimValue_.name() + dc, dVal);
-
-						} else {
-							Dust.log(EVENT_TAG_TYPE_WARNING, "  Not element in scenario?");
 						}
 					}
 				}
@@ -110,7 +106,7 @@ public class XbrlParserXmlAgent extends DustAgent implements XbrlParserConsts {
 			if ( contexts.isEmpty() ) {
 				Dust.log(EVENT_TAG_TYPE_WARNING, "  EMPTY contexts???");
 			} else {
-				Dust.log(EVENT_TAG_TYPE_TRACE, "  Contexts", contexts.size());
+//				Dust.log(EVENT_TAG_TYPE_TRACE, "  Contexts", contexts.size());
 			}
 
 			nl = eHtml.getElementsByTagName(XBRLTOKEN_UNIT);
@@ -131,7 +127,7 @@ public class XbrlParserXmlAgent extends DustAgent implements XbrlParserConsts {
 			if ( units.isEmpty() ) {
 				Dust.log(EVENT_TAG_TYPE_WARNING, "  EMPTY units???");
 			} else {
-				Dust.log(EVENT_TAG_TYPE_TRACE, "  Units", units.size());
+//				Dust.log(EVENT_TAG_TYPE_TRACE, "  Units", units.size());
 			}
 
 			nl = eHtml.getElementsByTagName(XBRLTOKEN_CONTINUATION);
@@ -141,15 +137,11 @@ public class XbrlParserXmlAgent extends DustAgent implements XbrlParserConsts {
 			}
 
 			if ( !test ) {
-				SimpleDateFormat fmtTimestamp = new SimpleDateFormat(DUST_FMT_TIMESTAMP);
-				long tsl = System.currentTimeMillis();
-				String ts = fmtTimestamp.format(tsl);
-
 				String fileId = DustUtils.cutPostfix(fileName, ".");
 				fileId = DustUtilsFile.addHash2(fileId);
 
-				hRowData = getOutRow(fileId, ts, true, maxDimNum);
-				hRowText = getOutRow(fileId, ts, false, maxDimNum);
+				hRowData = getOutRow(fileId, true, maxDimNum);
+				hRowText = getOutRow(fileId, false, maxDimNum);
 			}
 
 			nl = eHtml.getElementsByTagName("*");
@@ -257,7 +249,7 @@ public class XbrlParserXmlAgent extends DustAgent implements XbrlParserConsts {
 		Dust.access(MindAccess.Set, val, hRow, MISC_ATT_CONN_MEMBERMAP, key);
 	}
 
-	public MindHandle getOutRow(String fileId, String ts, boolean data, int ctxDepth) {
+	public MindHandle getOutRow(String fileId, boolean data, int ctxDepth) {
 		String postfix = data ? "_Data.csv" : "_Text.csv";
 
 		MindHandle hWriter = Dust.access(MindAccess.Peek, null, MIND_TAG_CONTEXT_SELF, data ? XBRLDOCK_ATT_XMLLOADER_ROWDATA : XBRLDOCK_ATT_XMLLOADER_ROWTEXT);
@@ -286,7 +278,7 @@ public class XbrlParserXmlAgent extends DustAgent implements XbrlParserConsts {
 			}
 		}
 		
-		Dust.access(MindAccess.Set, fileId + "_" + ts + postfix, hWriter, RESOURCE_ATT_PROCESSOR_STREAM, TEXT_ATT_TOKEN);
+		Dust.access(MindAccess.Set, fileId + postfix, hWriter, RESOURCE_ATT_PROCESSOR_STREAM, TEXT_ATT_TOKEN);
 		Dust.access(MindAccess.Commit, MIND_TAG_ACTION_PROCESS, hWriter, RESOURCE_ATT_PROCESSOR_STREAM);
 
 		Dust.access(MindAccess.Commit, MIND_TAG_ACTION_BEGIN, hRow);
