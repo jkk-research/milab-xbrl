@@ -194,13 +194,14 @@ public class XbrlEsgIndiaBoot implements XbrlEsgIndiaConsts {
 		Dust.access(MindAccess.Insert, "TagId", hAgtFilterCsvWriter, MISC_ATT_CONN_MEMBERARR, KEY_ADD);
 		Dust.access(MindAccess.Insert, "OrigValue", hAgtFilterCsvWriter, MISC_ATT_CONN_MEMBERARR, KEY_ADD);
 		Dust.access(MindAccess.Insert, "Error", hAgtFilterCsvWriter, MISC_ATT_CONN_MEMBERARR, KEY_ADD);
+//		DustDevUtils.setTag(hAgtFilterCsvWriter, DEV_TAG_TEST);
 
 		Dust.access(MindAccess.Insert, new MindCommitFilter(hAgtFilterCsvWriter, MIND_TAG_ACTION_PROCESS), hDataFactRow, MIND_ATT_KNOWLEDGE_LISTENERS, KEY_ADD);
-		Dust.access(MindAccess.Insert, new MindCommitFilter(hAgtFilterCsvWriter, MIND_TAG_ACTION_BEGIN, MIND_TAG_ACTION_END), hDataCsvRow, MIND_ATT_KNOWLEDGE_LISTENERS, KEY_ADD);
 
 		// connect listener to the input stream
 //		Dust.access(MindAccess.Insert, hAgtReportCacheInfoExpr, hDataCsvRow, MIND_ATT_KNOWLEDGE_LISTENERS, KEY_ADD);
-		Dust.access(MindAccess.Insert, hAgtFactCacheInfoExpr, hDataCsvRow, MIND_ATT_KNOWLEDGE_LISTENERS, KEY_ADD);
+	Dust.access(MindAccess.Insert, hAgtFactCacheInfoExpr, hDataCsvRow, MIND_ATT_KNOWLEDGE_LISTENERS, KEY_ADD);
+	Dust.access(MindAccess.Insert, new MindCommitFilter(hAgtFilterCsvWriter, MIND_TAG_ACTION_BEGIN, MIND_TAG_ACTION_END), hDataCsvRow, MIND_ATT_KNOWLEDGE_LISTENERS, KEY_ADD);
 
 		// initiate the process in the Machine
 		DustDevUtils.setTag(hDataCsvStream, MISC_TAG_TRANSACTION);
