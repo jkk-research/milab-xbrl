@@ -195,7 +195,8 @@ public class XbrlEsgIndiaBoot implements XbrlEsgIndiaConsts {
 		Dust.access(MindAccess.Insert, "OrigValue", hAgtFilterCsvWriter, MISC_ATT_CONN_MEMBERARR, KEY_ADD);
 		Dust.access(MindAccess.Insert, "Error", hAgtFilterCsvWriter, MISC_ATT_CONN_MEMBERARR, KEY_ADD);
 
-		Dust.access(MindAccess.Insert, hAgtFilterCsvWriter, hDataFactRow, MIND_ATT_KNOWLEDGE_LISTENERS, KEY_ADD);
+		Dust.access(MindAccess.Insert, new MindCommitFilter(hAgtFilterCsvWriter, MIND_TAG_ACTION_PROCESS), hDataFactRow, MIND_ATT_KNOWLEDGE_LISTENERS, KEY_ADD);
+		Dust.access(MindAccess.Insert, new MindCommitFilter(hAgtFilterCsvWriter, MIND_TAG_ACTION_BEGIN, MIND_TAG_ACTION_END), hDataCsvRow, MIND_ATT_KNOWLEDGE_LISTENERS, KEY_ADD);
 
 		// connect listener to the input stream
 //		Dust.access(MindAccess.Insert, hAgtReportCacheInfoExpr, hDataCsvRow, MIND_ATT_KNOWLEDGE_LISTENERS, KEY_ADD);
