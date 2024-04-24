@@ -16,6 +16,8 @@ public interface XbrlConsts extends DustHandles, DustUtilsConsts, DustXmlConsts 
 	MindHandle XBRLDOCK_ATT_XMLLOADER_ROWDATA = DustDevUtils.newHandle(XBRLDOCK_UNIT, MIND_ASP_ATTRIBUTE, "XML Loader target data");
 	MindHandle XBRLDOCK_ATT_XMLLOADER_ROWTEXT = DustDevUtils.newHandle(XBRLDOCK_UNIT, MIND_ASP_ATTRIBUTE, "XML Loader target text");
 
+	MindHandle XBRLDOCK_NAR_STATS = DustDevUtils.newHandle(XBRLDOCK_UNIT, MIND_ASP_ATTRIBUTE, "XBRL stat narrative");
+
 	String XBRLTOKEN_SCENARIO = "xbrli:scenario";
 	String XBRLTOKEN_CONTEXT = "xbrli:context";
 	String XBRLTOKEN_UNIT = "xbrli:unit";
@@ -31,7 +33,7 @@ public interface XbrlConsts extends DustHandles, DustUtilsConsts, DustXmlConsts 
 	
 
 	enum FactFldCommon {
-		File, EntityId, FactIdx, StartDate, EndDate, Instant, DimName_, DimValue_, TagNamespace, TagId, Format
+		File, EntityId, FactIdx, StartDate, EndDate, Instant, Dimensions, TagNamespace, TagId, Format
 	};
 
 	enum FactFldData {

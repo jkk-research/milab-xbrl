@@ -5,6 +5,7 @@ import java.text.DecimalFormat;
 import java.util.Map;
 import java.util.TreeMap;
 
+import org.json.simple.JSONValue;
 import org.w3c.dom.Attr;
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
@@ -64,8 +65,6 @@ public class XbrlParserXmlAgent extends DustAgent implements XbrlParserConsts {
 
 			NodeList nl;
 
-			int maxDimNum = 0;
-
 			Map<String, Element> continuation = new TreeMap<>();
 			Map<String, String> units = new TreeMap<>();
 			Map<String, Map<String, String>> contexts = new TreeMap<>();
@@ -83,7 +82,7 @@ public class XbrlParserXmlAgent extends DustAgent implements XbrlParserConsts {
 				Element eS = (Element) e.getElementsByTagName(XBRLTOKEN_SCENARIO).item(0);
 				if ( null != eS ) {
 					NodeList nlS = eS.getChildNodes();
-					int dc = 0;
+					Map<String, String> dims = null;
 
 					for (int i2 = 0; i2 < nlS.getLength(); ++i2) {
 						Node ii = nlS.item(i2);
@@ -93,13 +92,14 @@ public class XbrlParserXmlAgent extends DustAgent implements XbrlParserConsts {
 							String dim = m.getAttribute(XBRLTOKEN_DIMENSION);
 							String dVal = m.getTextContent().trim();
 
-							if ( (++dc) > maxDimNum ) {
-								maxDimNum = dc;
+							if ( null == dims ) {
+								dims = new TreeMap<>();
 							}
-							cd.put(FactFldCommon.DimName_.name() + dc, dim);
-							cd.put(FactFldCommon.DimValue_.name() + dc, dVal);
+							dims.put(dim, dVal);
 						}
 					}
+
+					cd.put(FactFldCommon.Dimensions.name(), (null == dims) ? "" : JSONValue.toJSONString(dims));
 				}
 			}
 
@@ -140,8 +140,8 @@ public class XbrlParserXmlAgent extends DustAgent implements XbrlParserConsts {
 				String fileId = DustUtils.cutPostfix(fileName, ".");
 				fileId = DustUtilsFile.addHash2(fileId);
 
-				hRowData = getOutRow(fileId, true, maxDimNum);
-				hRowText = getOutRow(fileId, false, maxDimNum);
+				hRowData = getOutRow(fileId, true);
+				hRowText = getOutRow(fileId, false);
 			}
 
 			nl = eHtml.getElementsByTagName("*");
@@ -249,7 +249,7 @@ public class XbrlParserXmlAgent extends DustAgent implements XbrlParserConsts {
 		Dust.access(MindAccess.Set, val, hRow, MISC_ATT_CONN_MEMBERMAP, key);
 	}
 
-	public MindHandle getOutRow(String fileId, boolean data, int ctxDepth) {
+	public MindHandle getOutRow(String fileId, boolean data) {
 		String postfix = data ? "_Data.csv" : "_Text.csv";
 
 		MindHandle hWriter = Dust.access(MindAccess.Peek, null, MIND_TAG_CONTEXT_SELF, data ? XBRLDOCK_ATT_XMLLOADER_ROWDATA : XBRLDOCK_ATT_XMLLOADER_ROWTEXT);
@@ -257,27 +257,14 @@ public class XbrlParserXmlAgent extends DustAgent implements XbrlParserConsts {
 
 		if ( null == Dust.access(MindAccess.Peek, null, hRow, MISC_ATT_CONN_MEMBERARR) ) {
 			for (FactFldCommon fcm : FactFldCommon.values()) {
-				switch ( fcm ) {
-				case DimName_:
-					for (int i = 1; i <= ctxDepth; ++i) {
-						Dust.access(MindAccess.Insert, FactFldCommon.DimName_.name() + i, hRow, MISC_ATT_CONN_MEMBERARR, KEY_ADD);
-						Dust.access(MindAccess.Insert, FactFldCommon.DimValue_.name() + i, hRow, MISC_ATT_CONN_MEMBERARR, KEY_ADD);
-					}
-					break;
-				case DimValue_:
-					// skip
-					break;
-				default:
-					Dust.access(MindAccess.Insert, fcm.name(), hRow, MISC_ATT_CONN_MEMBERARR, KEY_ADD);
-					break;
-				}
+				Dust.access(MindAccess.Insert, fcm.name(), hRow, MISC_ATT_CONN_MEMBERARR, KEY_ADD);
 			}
 
 			for (Enum<?> e : (data ? FactFldData.values() : FactFldText.values())) {
 				Dust.access(MindAccess.Insert, e.name(), hRow, MISC_ATT_CONN_MEMBERARR, KEY_ADD);
 			}
 		}
-		
+
 		Dust.access(MindAccess.Set, fileId + postfix, hWriter, RESOURCE_ATT_PROCESSOR_STREAM, TEXT_ATT_TOKEN);
 		Dust.access(MindAccess.Commit, MIND_TAG_ACTION_PROCESS, hWriter, RESOURCE_ATT_PROCESSOR_STREAM);
 

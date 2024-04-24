@@ -3,6 +3,7 @@ package hu.sze.uni.xbrl.esg.india;
 import hu.sze.milab.dust.Dust;
 import hu.sze.milab.dust.dev.DustDevUtils;
 import hu.sze.milab.dust.utils.DustUtils;
+import hu.sze.uni.xbrl.XbrlStatsAgent;
 import hu.sze.uni.xbrl.XbrlUtils;
 import hu.sze.uni.xbrl.parser.XbrlParserXmlAgent;
 
@@ -11,13 +12,14 @@ public class XbrlEsgIndiaBoot implements XbrlEsgIndiaConsts {
 	public static void boot(String[] launchParams) throws Exception {
 //		DustMachineTempUtils.test();
 
-		zipRead();
+		testNseIndia();
 	}
 
-	public static void zipRead() throws Exception {
+	public static void testNseIndia() throws Exception {
 //		DustTestBootSimple.boot(null);
 
-		DustDevUtils.registerNative(XBRLDOCK_NAR_XMLLOADER, XBRLDOCK_UNIT, APP_MODULE_MAIN, XbrlParserXmlAgent.class.getCanonicalName());
+		DustDevUtils.registerNative(XBRLDOCK_NAR_XMLLOADER, XBRLDOCK_UNIT, APP_MODULE_MAIN, XbrlParserXmlAgent.class.getName());
+		DustDevUtils.registerNative(XBRLDOCK_NAR_STATS, XBRLDOCK_UNIT, APP_MODULE_MAIN, XbrlStatsAgent.class.getName());
 
 		// reading the report list CSV
 
@@ -175,8 +177,8 @@ public class XbrlEsgIndiaBoot implements XbrlEsgIndiaConsts {
 		MindHandle hAgtFactFilterExpr = DustDevUtils.registerAgent(XBRLTEST_UNIT, EXPR_NAR_FILTER, "Fact filter");
 		Dust.access(MindAccess.Set, DustUtils.class, hAgtFactFilterExpr, EXPR_ATT_EXPRESSION_STATIC, "DustUtils");
 		Dust.access(MindAccess.Set, MISC_ATT_CONN_MEMBERMAP, hAgtFactFilterExpr, EXPR_ATT_POPULATE_ROOTATT);
-		Dust.access(MindAccess.Set, "!DustUtils.isEmpty(get('Error'))", hAgtFactFilterExpr, EXPR_ATT_EXPRESSION_STR);
-		Dust.access(MindAccess.Insert, hAgtFactFilterExpr, hDataFactRow, MIND_ATT_KNOWLEDGE_LISTENERS, KEY_ADD);
+//		Dust.access(MindAccess.Set, "!DustUtils.isEmpty(get('Error'))", hAgtFactFilterExpr, EXPR_ATT_EXPRESSION_STR);
+		Dust.access(MindAccess.Set, "!DustUtils.isEqual('EnergyConsumptionThroughOtherSourcesFromRenewableSources', get('TagId'))", hAgtFactFilterExpr, EXPR_ATT_EXPRESSION_STR);
 
 		MindHandle hDataFilteredStream = DustDevUtils.newHandle(XBRLTEST_UNIT, RESOURCE_ASP_STREAM, "Filtered out stream");
 		DustDevUtils.setTag(hDataFilteredStream, MISC_TAG_DIRECTION_OUT, MISC_TAG_DIRECTION);
@@ -192,17 +194,37 @@ public class XbrlEsgIndiaBoot implements XbrlEsgIndiaConsts {
 		Dust.access(MindAccess.Insert, "FactIdx", hAgtFilterCsvWriter, MISC_ATT_CONN_MEMBERARR, KEY_ADD);
 		Dust.access(MindAccess.Insert, "TagNamespace", hAgtFilterCsvWriter, MISC_ATT_CONN_MEMBERARR, KEY_ADD);
 		Dust.access(MindAccess.Insert, "TagId", hAgtFilterCsvWriter, MISC_ATT_CONN_MEMBERARR, KEY_ADD);
+		Dust.access(MindAccess.Insert, "Dimensions", hAgtFilterCsvWriter, MISC_ATT_CONN_MEMBERARR, KEY_ADD);
 		Dust.access(MindAccess.Insert, "OrigValue", hAgtFilterCsvWriter, MISC_ATT_CONN_MEMBERARR, KEY_ADD);
 		Dust.access(MindAccess.Insert, "Error", hAgtFilterCsvWriter, MISC_ATT_CONN_MEMBERARR, KEY_ADD);
 //		DustDevUtils.setTag(hAgtFilterCsvWriter, DEV_TAG_TEST);
+		
+		
+		
+		MindHandle hAgtFactStats = DustDevUtils.registerAgent(XBRLTEST_UNIT, XBRLDOCK_NAR_STATS, "Fact statistics");
 
-		Dust.access(MindAccess.Insert, new MindCommitFilter(hAgtFilterCsvWriter, MIND_TAG_ACTION_PROCESS), hDataFactRow, MIND_ATT_KNOWLEDGE_LISTENERS, KEY_ADD);
+
 
 		// connect listener to the input stream
-//		Dust.access(MindAccess.Insert, hAgtReportCacheInfoExpr, hDataCsvRow, MIND_ATT_KNOWLEDGE_LISTENERS, KEY_ADD);
-	Dust.access(MindAccess.Insert, hAgtFactCacheInfoExpr, hDataCsvRow, MIND_ATT_KNOWLEDGE_LISTENERS, KEY_ADD);
-	Dust.access(MindAccess.Insert, new MindCommitFilter(hAgtFilterCsvWriter, MIND_TAG_ACTION_BEGIN, MIND_TAG_ACTION_END), hDataCsvRow, MIND_ATT_KNOWLEDGE_LISTENERS, KEY_ADD);
-
+		int cmd = 1;
+		
+		switch (cmd) {
+		case 0: // generate csv files for reports
+			Dust.access(MindAccess.Insert, hAgtReportCacheInfoExpr, hDataCsvRow, MIND_ATT_KNOWLEDGE_LISTENERS, KEY_ADD);
+			break;
+		case 1: // execute expression filter
+			Dust.access(MindAccess.Insert, hAgtFactCacheInfoExpr, hDataCsvRow, MIND_ATT_KNOWLEDGE_LISTENERS, KEY_ADD);
+			Dust.access(MindAccess.Insert, hAgtFactFilterExpr, hDataFactRow, MIND_ATT_KNOWLEDGE_LISTENERS, KEY_ADD);
+			Dust.access(MindAccess.Insert, new MindCommitFilter(hAgtFilterCsvWriter, MIND_TAG_ACTION_PROCESS), hDataFactRow, MIND_ATT_KNOWLEDGE_LISTENERS, KEY_ADD);
+			Dust.access(MindAccess.Insert, new MindCommitFilter(hAgtFilterCsvWriter, MIND_TAG_ACTION_BEGIN, MIND_TAG_ACTION_END), hDataCsvRow, MIND_ATT_KNOWLEDGE_LISTENERS, KEY_ADD);
+			break;
+		case 2: // statistics
+			Dust.access(MindAccess.Insert, hAgtFactCacheInfoExpr, hDataCsvRow, MIND_ATT_KNOWLEDGE_LISTENERS, KEY_ADD);
+			Dust.access(MindAccess.Insert, new MindCommitFilter(hAgtFactStats, MIND_TAG_ACTION_PROCESS), hDataFactRow, MIND_ATT_KNOWLEDGE_LISTENERS, KEY_ADD);
+			Dust.access(MindAccess.Insert, new MindCommitFilter(hAgtFactStats, MIND_TAG_ACTION_BEGIN, MIND_TAG_ACTION_END), hDataCsvRow, MIND_ATT_KNOWLEDGE_LISTENERS, KEY_ADD);
+			break;
+		}
+		
 		// initiate the process in the Machine
 		DustDevUtils.setTag(hDataCsvStream, MISC_TAG_TRANSACTION);
 		Dust.access(MindAccess.Set, hDataCsvStream, APP_ASSEMBLY_MAIN, MIND_ATT_ASSEMBLY_STARTCOMMITS, KEY_ADD);
