@@ -31,17 +31,23 @@ public interface XbrlConsts extends DustHandles, DustUtilsConsts, DustXmlConsts 
 	
 	String XBRLTOKEN_ = "";
 	
+	int STRING_LIMIT = 100;
+	
 
 	enum FactFldCommon {
-		File, EntityId, FactIdx, StartDate, EndDate, Instant, Dimensions, TagNamespace, TagId, Format
+		File, EntityId, FactIdx, StartDate, EndDate, Instant, Dimensions, TagNamespace, TagId, Type, Format
 	};
 
 	enum FactFldData {
-		Unit, OrigValue, Sign, Dec, Scale, RealValue, Error
+		Unit, OrigValue, Sign, Dec, Scale, Value, Error
 	};
 
 	enum FactFldText {
 		Language, Value
+	};
+
+	enum FactType {
+		Numeric, String, Text
 	};
 
 }

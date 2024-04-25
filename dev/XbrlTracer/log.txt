@@ -1,8 +1,29 @@
 
 ESG India 
 
+===== 2024-04-25 =======
+Statistics:
+ file count: 1081
+ missing files: 3
+	https://nsearchives.nseindia.com/corporate/xbrl/BRSR_933057_22092023010429_WEB.xml
+	https://nsearchives.nseindia.com/corporate/xbrl/BRSR_923431_26082023082106_WEB.xml
+	https://nsearchives.nseindia.com/corporate/xbrl/BRSR_904319_31072023041411_WEB.xml
 
-2024-04-22T19_36_50
+ total record count: 1,671,774
+ 
+Conversion errors:
+UnitOfTotalScope1AndScope2EmissionsPerRupeeOfTurnover contains "decimal" attribute, should not. The value is in TotalScope1AndScope2EmissionsPerRupeeOfTurnover
+BRSR_898554_22072023044713_WEB.xml
+BRSR_893499_19072023071423_WEB.xml
+
+
+Optimization test on ThreadLocal / static dialog
+	ThreadLocal: 2024-04-25T11_13_22 [giskard:5:21] Total runtime: 72170 msec.
+	static: 2024-04-25T11_18_43 [giskard:5:21] Total runtime: 67472 msec.
+NO NEED.
+
+
+====== 2024-04-22 =========
 
 Full export
 Total runtime: 70581 msec.

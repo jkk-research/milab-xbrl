@@ -156,34 +156,21 @@ public class XbrlParserXmlAgent extends DustAgent implements XbrlParserConsts {
 					++factId;
 
 					String val = e.getTextContent().trim();
+					int vlen = val.length();
 					String dec = e.getAttribute("decimals");
-					String fmt = e.getAttribute("format");
 
-					boolean dataFact = !DustUtils.isEmpty(dec);
+					FactType factType = DustUtils.isEmpty(dec) ? (vlen < STRING_LIMIT) ? FactType.String : FactType.Text : FactType.Numeric;
 
-					MindHandle hRow = dataFact ? hRowData : hRowText;
-					Dust.access(MindAccess.Reset, null, hRow, MISC_ATT_CONN_MEMBERMAP);
-
-					String tagName = e.getTagName();
-					cntTags.add(tagName);
+//					MindHandle hRow = dataFact ? hRowData : hRowText;
 
 					Map<String, String> ctx = contexts.get(ctxId.trim());
 					if ( null == ctx ) {
 						Dust.log(EVENT_TAG_TYPE_WARNING, "  Referred context not found", ctxId);
-					} else {
-						for (Map.Entry<String, String> ce : ctx.entrySet()) {
-							setRowData(hRow, ce.getKey(), ce.getValue());
-						}
 					}
 
-					setRowData(hRow, FactFldCommon.File, fileName);
-					setRowData(hRow, FactFldCommon.FactIdx, DustUtils.toString(factId));
-					String[] tt = tagName.split(":");
-					setRowData(hRow, FactFldCommon.TagNamespace, tt[0]);
-					setRowData(hRow, FactFldCommon.TagId, tt[1]);
-					setRowData(hRow, FactFldCommon.Format, fmt);
+					initRow(hRowData, fileName, ctx, factId, factType, e);
 
-					if ( dataFact ) {
+					if ( FactType.Numeric == factType ) {
 						String unit = "-";
 
 						String unitId = e.getAttribute("unitRef");
@@ -195,35 +182,45 @@ public class XbrlParserXmlAgent extends DustAgent implements XbrlParserConsts {
 							}
 						}
 
-						setRowData(hRow, FactFldData.Unit, unit);
-						setRowData(hRow, FactFldData.OrigValue, DustStreamUtils.csvEscape(val, true));
-						setRowData(hRow, FactFldData.Dec, dec);
+						setRowData(hRowData, FactFldData.Unit, unit);
+						setRowData(hRowData, FactFldData.OrigValue, DustStreamUtils.csvEscape(val, true));
+						setRowData(hRowData, FactFldData.Dec, dec);
 
 						try {
 							Double dVal = Double.valueOf(val);
 							val = df.format(dVal);
-							setRowData(hRow, FactFldData.RealValue, val);
+							setRowData(hRowData, FactFldData.Value, val);
 						} catch (Throwable err) {
-							setRowData(hRow, FactFldData.Error, err.toString());
+							setRowData(hRowData, FactFldData.Error, err.toString());
 						}
 					} else {
-						String lang = e.getAttribute("xml:lang");
-						if ( !DustUtils.isEmpty(lang) ) {
-							cntLang.add(lang);
-							setRowData(hRow, FactFldText.Language, lang);
-						}
+						if ( FactType.Text == factType ) {
+							initRow(hRowText, fileName, ctx, factId, factType, e);
 
-						Element txtFrag = e;
-						for (String contID = txtFrag.getAttribute("continuedAt"); !DustUtils.isEmpty(contID); contID = txtFrag.getAttribute("continuedAt")) {
-							txtFrag = continuation.get(contID);
-							val = val + " " + txtFrag.getTextContent().trim();
-						}
+							String lang = e.getAttribute("xml:lang");
+							if ( !DustUtils.isEmpty(lang) ) {
+								cntLang.add(lang);
+								setRowData(hRowText, FactFldText.Language, lang);
+							}
 
-						String txt = DustStreamUtils.csvEscape(val, true);
-						setRowData(hRow, FactFldText.Value, txt);
+							Element txtFrag = e;
+							for (String contID = txtFrag.getAttribute("continuedAt"); !DustUtils.isEmpty(contID); contID = txtFrag.getAttribute("continuedAt")) {
+								txtFrag = continuation.get(contID);
+								val = val + " " + txtFrag.getTextContent().trim();
+							}
+
+//						String txt = DustStreamUtils.csvEscape(val, true);
+							setRowData(hRowText, FactFldText.Value, val);
+
+							Dust.access(MindAccess.Commit, MIND_TAG_ACTION_PROCESS, hRowText);
+						}
+						
+						String clipVal = (factType == FactType.Text) ? val.substring(0, STRING_LIMIT - 3) + "..." : val;
+						setRowData(hRowData, FactFldData.OrigValue, clipVal);
+						setRowData(hRowData, FactFldData.Value, Integer.toString(vlen));
 					}
 
-					Dust.access(MindAccess.Commit, MIND_TAG_ACTION_PROCESS, hRow);
+					Dust.access(MindAccess.Commit, MIND_TAG_ACTION_PROCESS, hRowData);
 				}
 			}
 		} catch (Throwable t) {
@@ -239,6 +236,27 @@ public class XbrlParserXmlAgent extends DustAgent implements XbrlParserConsts {
 		}
 
 		return MIND_TAG_RESULT_ACCEPT;
+	}
+
+	public void initRow(MindHandle hRow, String fileName, Map<String, String> ctx, int factId, FactType factType, Element e) {
+		String tagName = e.getTagName();
+		String[] tt = tagName.split(":");
+		String fmt = e.getAttribute("format");
+
+		Dust.access(MindAccess.Reset, null, hRow, MISC_ATT_CONN_MEMBERMAP);
+
+		if ( null != ctx ) {
+			for (Map.Entry<String, String> ce : ctx.entrySet()) {
+				setRowData(hRow, ce.getKey(), ce.getValue());
+			}
+		}
+
+		setRowData(hRow, FactFldCommon.File, fileName);
+		setRowData(hRow, FactFldCommon.FactIdx, DustUtils.toString(factId));
+		setRowData(hRow, FactFldCommon.TagNamespace, tt[0]);
+		setRowData(hRow, FactFldCommon.TagId, tt[1]);
+		setRowData(hRow, FactFldCommon.Type, factType.name());
+		setRowData(hRow, FactFldCommon.Format, fmt);
 	}
 
 	public void setRowData(MindHandle hRow, Enum<?> key, String val) {

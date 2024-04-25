@@ -178,7 +178,8 @@ public class XbrlEsgIndiaBoot implements XbrlEsgIndiaConsts {
 		Dust.access(MindAccess.Set, DustUtils.class, hAgtFactFilterExpr, EXPR_ATT_EXPRESSION_STATIC, "DustUtils");
 		Dust.access(MindAccess.Set, MISC_ATT_CONN_MEMBERMAP, hAgtFactFilterExpr, EXPR_ATT_POPULATE_ROOTATT);
 //		Dust.access(MindAccess.Set, "!DustUtils.isEmpty(get('Error'))", hAgtFactFilterExpr, EXPR_ATT_EXPRESSION_STR);
-		Dust.access(MindAccess.Set, "!DustUtils.isEqual('EnergyConsumptionThroughOtherSourcesFromRenewableSources', get('TagId'))", hAgtFactFilterExpr, EXPR_ATT_EXPRESSION_STR);
+		Dust.access(MindAccess.Set, "DustUtils.isEqual('EnergyConsumptionThroughOtherSourcesFromRenewableSources', get('TagId'))", hAgtFactFilterExpr, EXPR_ATT_EXPRESSION_STR);
+//		Dust.access(MindAccess.Set, "true", hAgtFactFilterExpr, EXPR_ATT_EXPRESSION_STR);
 
 		MindHandle hDataFilteredStream = DustDevUtils.newHandle(XBRLTEST_UNIT, RESOURCE_ASP_STREAM, "Filtered out stream");
 		DustDevUtils.setTag(hDataFilteredStream, MISC_TAG_DIRECTION_OUT, MISC_TAG_DIRECTION);
@@ -195,7 +196,9 @@ public class XbrlEsgIndiaBoot implements XbrlEsgIndiaConsts {
 		Dust.access(MindAccess.Insert, "TagNamespace", hAgtFilterCsvWriter, MISC_ATT_CONN_MEMBERARR, KEY_ADD);
 		Dust.access(MindAccess.Insert, "TagId", hAgtFilterCsvWriter, MISC_ATT_CONN_MEMBERARR, KEY_ADD);
 		Dust.access(MindAccess.Insert, "Dimensions", hAgtFilterCsvWriter, MISC_ATT_CONN_MEMBERARR, KEY_ADD);
+		Dust.access(MindAccess.Insert, "Type", hAgtFilterCsvWriter, MISC_ATT_CONN_MEMBERARR, KEY_ADD);
 		Dust.access(MindAccess.Insert, "OrigValue", hAgtFilterCsvWriter, MISC_ATT_CONN_MEMBERARR, KEY_ADD);
+		Dust.access(MindAccess.Insert, "Value", hAgtFilterCsvWriter, MISC_ATT_CONN_MEMBERARR, KEY_ADD);
 		Dust.access(MindAccess.Insert, "Error", hAgtFilterCsvWriter, MISC_ATT_CONN_MEMBERARR, KEY_ADD);
 //		DustDevUtils.setTag(hAgtFilterCsvWriter, DEV_TAG_TEST);
 		
@@ -206,7 +209,7 @@ public class XbrlEsgIndiaBoot implements XbrlEsgIndiaConsts {
 
 
 		// connect listener to the input stream
-		int cmd = 1;
+		int cmd = 2;
 		
 		switch (cmd) {
 		case 0: // generate csv files for reports
