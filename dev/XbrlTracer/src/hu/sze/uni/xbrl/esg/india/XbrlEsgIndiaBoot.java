@@ -178,7 +178,8 @@ public class XbrlEsgIndiaBoot implements XbrlEsgIndiaConsts {
 		Dust.access(MindAccess.Set, DustUtils.class, hAgtFactFilterExpr, EXPR_ATT_EXPRESSION_STATIC, "DustUtils");
 		Dust.access(MindAccess.Set, MISC_ATT_CONN_MEMBERMAP, hAgtFactFilterExpr, EXPR_ATT_POPULATE_ROOTATT);
 //		Dust.access(MindAccess.Set, "!DustUtils.isEmpty(get('Error'))", hAgtFactFilterExpr, EXPR_ATT_EXPRESSION_STR);
-		Dust.access(MindAccess.Set, "DustUtils.isEqual('EnergyConsumptionThroughOtherSourcesFromRenewableSources', get('TagId'))", hAgtFactFilterExpr, EXPR_ATT_EXPRESSION_STR);
+//		Dust.access(MindAccess.Set, "DustUtils.isEqual('EnergyConsumptionThroughOtherSourcesFromRenewableSources', get('TagId'))", hAgtFactFilterExpr, EXPR_ATT_EXPRESSION_STR);
+		Dust.access(MindAccess.Set, "DustUtils.isEqual('iso4217:INR', get('Unit')) || getOrDefault('Unit', '').toLowerCase().contains('inr')", hAgtFactFilterExpr, EXPR_ATT_EXPRESSION_STR);
 //		Dust.access(MindAccess.Set, "true", hAgtFactFilterExpr, EXPR_ATT_EXPRESSION_STR);
 
 		MindHandle hDataFilteredStream = DustDevUtils.newHandle(XBRLTEST_UNIT, RESOURCE_ASP_STREAM, "Filtered out stream");
@@ -197,6 +198,7 @@ public class XbrlEsgIndiaBoot implements XbrlEsgIndiaConsts {
 		Dust.access(MindAccess.Insert, "TagId", hAgtFilterCsvWriter, MISC_ATT_CONN_MEMBERARR, KEY_ADD);
 		Dust.access(MindAccess.Insert, "Dimensions", hAgtFilterCsvWriter, MISC_ATT_CONN_MEMBERARR, KEY_ADD);
 		Dust.access(MindAccess.Insert, "Type", hAgtFilterCsvWriter, MISC_ATT_CONN_MEMBERARR, KEY_ADD);
+		Dust.access(MindAccess.Insert, "Unit", hAgtFilterCsvWriter, MISC_ATT_CONN_MEMBERARR, KEY_ADD);
 		Dust.access(MindAccess.Insert, "OrigValue", hAgtFilterCsvWriter, MISC_ATT_CONN_MEMBERARR, KEY_ADD);
 		Dust.access(MindAccess.Insert, "Value", hAgtFilterCsvWriter, MISC_ATT_CONN_MEMBERARR, KEY_ADD);
 		Dust.access(MindAccess.Insert, "Error", hAgtFilterCsvWriter, MISC_ATT_CONN_MEMBERARR, KEY_ADD);
@@ -209,7 +211,7 @@ public class XbrlEsgIndiaBoot implements XbrlEsgIndiaConsts {
 
 
 		// connect listener to the input stream
-		int cmd = 2;
+		int cmd = 1;
 		
 		switch (cmd) {
 		case 0: // generate csv files for reports
