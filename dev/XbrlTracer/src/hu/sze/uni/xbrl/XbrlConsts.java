@@ -12,6 +12,8 @@ public interface XbrlConsts extends DustHandles, DustUtilsConsts, DustXmlConsts 
 	MindHandle XBRLDOCK_UNIT = Dust.lookup(AUTHOR_XBRLDOCK + DUST_SEP_ID + "0");
 	MindHandle XBRLTEST_UNIT = Dust.lookup(AUTHOR_XBRLDOCK + DUST_SEP_ID + "1");
 
+	MindHandle XBRLDOCK_NAR_CURRENCYCONVERTER = DustDevUtils.newHandle(XBRLDOCK_UNIT, MIND_ASP_ATTRIBUTE, "Currency converter");
+
 	MindHandle XBRLDOCK_NAR_XMLLOADER = DustDevUtils.newHandle(XBRLDOCK_UNIT, MIND_ASP_NARRATIVE, "XML Loader narrative");
 	MindHandle XBRLDOCK_ATT_XMLLOADER_ROWDATA = DustDevUtils.newHandle(XBRLDOCK_UNIT, MIND_ASP_ATTRIBUTE, "XML Loader target data");
 	MindHandle XBRLDOCK_ATT_XMLLOADER_ROWTEXT = DustDevUtils.newHandle(XBRLDOCK_UNIT, MIND_ASP_ATTRIBUTE, "XML Loader target text");

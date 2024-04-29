@@ -6,6 +6,7 @@ import hu.sze.milab.dust.utils.DustUtils;
 import hu.sze.uni.xbrl.XbrlStatsAgent;
 import hu.sze.uni.xbrl.XbrlUtils;
 import hu.sze.uni.xbrl.parser.XbrlParserXmlAgent;
+import hu.sze.uni.xbrl.utils.XbrlCurrencyConverterAgent;
 
 public class XbrlEsgIndiaBoot implements XbrlEsgIndiaConsts {
 
@@ -20,11 +21,56 @@ public class XbrlEsgIndiaBoot implements XbrlEsgIndiaConsts {
 
 		DustDevUtils.registerNative(XBRLDOCK_NAR_XMLLOADER, XBRLDOCK_UNIT, APP_MODULE_MAIN, XbrlParserXmlAgent.class.getName());
 		DustDevUtils.registerNative(XBRLDOCK_NAR_STATS, XBRLDOCK_UNIT, APP_MODULE_MAIN, XbrlStatsAgent.class.getName());
+		DustDevUtils.registerNative(XBRLDOCK_NAR_CURRENCYCONVERTER, XBRLDOCK_UNIT, APP_MODULE_MAIN, XbrlCurrencyConverterAgent.class.getName());
+		
 
-		// reading the report list CSV
+		// Set work root folder
 
 		MindHandle hAgtIndiaRoot = DustDevUtils.registerAgent(XBRLTEST_UNIT, RESOURCE_NAR_FILESYSTEM, "Filesystem India root");
 		Dust.access(MindAccess.Set, "/Users/lkedves/work/xbrl/20240416_ESG_India", hAgtIndiaRoot, RESOURCE_ATT_URL_PATH);
+		
+		
+
+
+		// reading the currency converter
+
+		MindHandle hDataCcvtCsvStream = DustDevUtils.newHandle(XBRLTEST_UNIT, RESOURCE_ASP_STREAM, "Currency converter CSV stream");
+
+		Dust.access(MindAccess.Set, "params/excRate_5yr_v2.csv", hDataCcvtCsvStream, TEXT_ATT_TOKEN);
+		DustDevUtils.setTag(hDataCcvtCsvStream, MISC_TAG_DIRECTION_IN, MISC_TAG_DIRECTION);
+		DustDevUtils.setTag(hDataCcvtCsvStream, RESOURCE_TAG_STREAMTYPE_TEXT, RESOURCE_TAG_STREAMTYPE);
+
+		Dust.access(MindAccess.Insert, hAgtIndiaRoot, hDataCcvtCsvStream, MIND_ATT_KNOWLEDGE_LISTENERS, KEY_ADD);
+
+		MindHandle hDataCcvtSpace = DustDevUtils.registerAgent(XBRLTEST_UNIT, MISC_ASP_SPACE, "Currency converter EAV item");
+		Dust.access(MindAccess.Insert, "Unit", hDataCcvtSpace, MISC_ATT_SPACE_DIMENSIONS, KEY_ADD);
+		Dust.access(MindAccess.Insert, "Date", hDataCcvtSpace, MISC_ATT_SPACE_DIMENSIONS, KEY_ADD);
+		
+		MindHandle hDataCcvtCsvRow = DustDevUtils.newHandle(XBRLTEST_UNIT, MISC_ASP_VARIANT, "Currency converter row");
+		Dust.access(MindAccess.Set, hDataCcvtSpace, hDataCcvtCsvRow, MISC_ATT_CONN_SPACE);
+
+		MindHandle hAgtCcvtCsvSax = DustDevUtils.registerAgent(XBRLTEST_UNIT, RESOURCE_NAR_CSVSAX, "Currency converter CSV reader");
+		Dust.access(MindAccess.Set, ";", hAgtCcvtCsvSax, MISC_ATT_GEN_SEP_ITEM);
+		Dust.access(MindAccess.Set, hDataCcvtCsvStream, hAgtCcvtCsvSax, RESOURCE_ATT_PROCESSOR_STREAM);
+		Dust.access(MindAccess.Set, hDataCcvtCsvRow, hAgtCcvtCsvSax, RESOURCE_ATT_PROCESSOR_DATA);
+		Dust.access(MindAccess.Insert, hAgtCcvtCsvSax, hDataCcvtCsvStream, MIND_ATT_KNOWLEDGE_LISTENERS, KEY_ADD);
+
+		MindHandle hDataCcvtReadItem = DustDevUtils.registerAgent(XBRLTEST_UNIT, MISC_ASP_VECTOR, "Currency converter EAV item");
+		Dust.access(MindAccess.Set, hDataCcvtSpace, hDataCcvtReadItem, MISC_ATT_CONN_SPACE);
+		Dust.access(MindAccess.Set, "yyyy.MM.dd", hDataCcvtReadItem, EVENT_ATT_EVENT_TIMEFORMAT);
+		
+		MindHandle hAgtCcvtLoader = DustDevUtils.registerAgent(XBRLTEST_UNIT, MISC_NAR_TABLE, "Currency converter loader");
+		Dust.access(MindAccess.Set, hDataCcvtSpace, hDataCcvtReadItem, MISC_ATT_CONN_SPACE);
+		Dust.access(MindAccess.Set, hDataCcvtReadItem, hAgtCcvtLoader, MISC_ATT_CONN_TARGET);
+		Dust.access(MindAccess.Insert, hAgtCcvtLoader, hDataCcvtCsvRow, MIND_ATT_KNOWLEDGE_LISTENERS, KEY_ADD);
+
+		MindHandle hAgtCcvt = DustDevUtils.registerAgent(XBRLTEST_UNIT, XBRLDOCK_NAR_CURRENCYCONVERTER, "Currency converter");
+		Dust.access(MindAccess.Set, hDataCcvtReadItem, hAgtCcvt, MISC_ATT_CONN_SOURCE);
+		Dust.access(MindAccess.Set, "yyyy-MM-dd", hAgtCcvt, EVENT_ATT_EVENT_TIMEFORMAT);
+		Dust.access(MindAccess.Insert, hAgtCcvt, hDataCcvtReadItem, MIND_ATT_KNOWLEDGE_LISTENERS, KEY_ADD);
+
+
+		// reading the report list CSV
 
 		MindHandle hDataCsvStream = DustDevUtils.newHandle(XBRLTEST_UNIT, RESOURCE_ASP_STREAM, "Report list CSV stream");
 
@@ -60,7 +106,7 @@ public class XbrlEsgIndiaBoot implements XbrlEsgIndiaConsts {
 		Dust.access(MindAccess.Set, DustUtils.class, hAgtReportCacheInfoExpr, EXPR_ATT_EXPRESSION_STATIC, "DustUtils");
 		Dust.access(MindAccess.Set, XbrlUtils.class, hAgtReportCacheInfoExpr, EXPR_ATT_EXPRESSION_STATIC, "XbrlUtils");
 		Dust.access(MindAccess.Set, hDataReportCacheItem, hAgtReportCacheInfoExpr, MISC_ATT_CONN_TARGET);
-		Dust.access(MindAccess.Set, MISC_ATT_CONN_MEMBERMAP, hAgtReportCacheInfoExpr, EXPR_ATT_POPULATE_ROOTATT);
+		Dust.access(MindAccess.Set, MISC_ATT_CONN_MEMBERMAP, hAgtReportCacheInfoExpr, MISC_ATT_GEN_TARGET_ATT);
 		Dust.access(MindAccess.Set, "get('**XBRL')", hAgtReportCacheInfoExpr, MISC_ATT_CONN_MEMBERMAP, RESOURCE_ATT_URL_PATH);
 		Dust.access(MindAccess.Set, "DustUtils.getPostfix(get('**XBRL'), '/')", hAgtReportCacheInfoExpr, MISC_ATT_CONN_MEMBERMAP, TEXT_ATT_TOKEN);
 
@@ -159,7 +205,7 @@ public class XbrlEsgIndiaBoot implements XbrlEsgIndiaConsts {
 		MindHandle hAgtFactCacheInfoExpr = DustDevUtils.registerAgent(XBRLTEST_UNIT, EXPR_NAR_POPULATE, "Fact cache item loader");
 		Dust.access(MindAccess.Set, DustUtils.class, hAgtFactCacheInfoExpr, EXPR_ATT_EXPRESSION_STATIC, "DustUtils");
 		Dust.access(MindAccess.Set, hDataFactCacheItem, hAgtFactCacheInfoExpr, MISC_ATT_CONN_TARGET);
-		Dust.access(MindAccess.Set, MISC_ATT_CONN_MEMBERMAP, hAgtFactCacheInfoExpr, EXPR_ATT_POPULATE_ROOTATT);
+		Dust.access(MindAccess.Set, MISC_ATT_CONN_MEMBERMAP, hAgtFactCacheInfoExpr, MISC_ATT_GEN_TARGET_ATT);
 		Dust.access(MindAccess.Set, "DustUtils.getPostfix(get('**XBRL'), '/').replace('.xml', '_Data.csv')", hAgtFactCacheInfoExpr, MISC_ATT_CONN_MEMBERMAP, TEXT_ATT_TOKEN);
 
 		MindHandle hAgtFactCache = DustDevUtils.registerAgent(XBRLTEST_UNIT, RESOURCE_NAR_CACHE, "Fact Cache");
@@ -176,7 +222,7 @@ public class XbrlEsgIndiaBoot implements XbrlEsgIndiaConsts {
 
 		MindHandle hAgtFactFilterExpr = DustDevUtils.registerAgent(XBRLTEST_UNIT, EXPR_NAR_FILTER, "Fact filter");
 		Dust.access(MindAccess.Set, DustUtils.class, hAgtFactFilterExpr, EXPR_ATT_EXPRESSION_STATIC, "DustUtils");
-		Dust.access(MindAccess.Set, MISC_ATT_CONN_MEMBERMAP, hAgtFactFilterExpr, EXPR_ATT_POPULATE_ROOTATT);
+		Dust.access(MindAccess.Set, MISC_ATT_CONN_MEMBERMAP, hAgtFactFilterExpr, MISC_ATT_GEN_TARGET_ATT);
 //		Dust.access(MindAccess.Set, "!DustUtils.isEmpty(get('Error'))", hAgtFactFilterExpr, EXPR_ATT_EXPRESSION_STR);
 //		Dust.access(MindAccess.Set, "DustUtils.isEqual('EnergyConsumptionThroughOtherSourcesFromRenewableSources', get('TagId'))", hAgtFactFilterExpr, EXPR_ATT_EXPRESSION_STR);
 		Dust.access(MindAccess.Set, "DustUtils.isEqual('iso4217:INR', get('Unit')) || getOrDefault('Unit', '').toLowerCase().contains('inr')", hAgtFactFilterExpr, EXPR_ATT_EXPRESSION_STR);
@@ -194,6 +240,10 @@ public class XbrlEsgIndiaBoot implements XbrlEsgIndiaConsts {
 		Dust.access(MindAccess.Insert, "File", hAgtFilterCsvWriter, MISC_ATT_CONN_MEMBERARR, KEY_ADD);
 		Dust.access(MindAccess.Insert, "EntityId", hAgtFilterCsvWriter, MISC_ATT_CONN_MEMBERARR, KEY_ADD);
 		Dust.access(MindAccess.Insert, "FactIdx", hAgtFilterCsvWriter, MISC_ATT_CONN_MEMBERARR, KEY_ADD);
+		Dust.access(MindAccess.Insert, "Instant", hAgtFilterCsvWriter, MISC_ATT_CONN_MEMBERARR, KEY_ADD);
+		Dust.access(MindAccess.Insert, "StartDate", hAgtFilterCsvWriter, MISC_ATT_CONN_MEMBERARR, KEY_ADD);
+		Dust.access(MindAccess.Insert, "EndDate", hAgtFilterCsvWriter, MISC_ATT_CONN_MEMBERARR, KEY_ADD);
+
 		Dust.access(MindAccess.Insert, "TagNamespace", hAgtFilterCsvWriter, MISC_ATT_CONN_MEMBERARR, KEY_ADD);
 		Dust.access(MindAccess.Insert, "TagId", hAgtFilterCsvWriter, MISC_ATT_CONN_MEMBERARR, KEY_ADD);
 		Dust.access(MindAccess.Insert, "Dimensions", hAgtFilterCsvWriter, MISC_ATT_CONN_MEMBERARR, KEY_ADD);
@@ -202,13 +252,16 @@ public class XbrlEsgIndiaBoot implements XbrlEsgIndiaConsts {
 		Dust.access(MindAccess.Insert, "OrigValue", hAgtFilterCsvWriter, MISC_ATT_CONN_MEMBERARR, KEY_ADD);
 		Dust.access(MindAccess.Insert, "Value", hAgtFilterCsvWriter, MISC_ATT_CONN_MEMBERARR, KEY_ADD);
 		Dust.access(MindAccess.Insert, "Error", hAgtFilterCsvWriter, MISC_ATT_CONN_MEMBERARR, KEY_ADD);
+		
+		Dust.access(MindAccess.Insert, "CvtValue", hAgtFilterCsvWriter, MISC_ATT_CONN_MEMBERARR, KEY_ADD);
+		Dust.access(MindAccess.Insert, "CvtStatus", hAgtFilterCsvWriter, MISC_ATT_CONN_MEMBERARR, KEY_ADD);
+		Dust.access(MindAccess.Insert, "CvtRate", hAgtFilterCsvWriter, MISC_ATT_CONN_MEMBERARR, KEY_ADD);
+		Dust.access(MindAccess.Insert, "CvtCount", hAgtFilterCsvWriter, MISC_ATT_CONN_MEMBERARR, KEY_ADD);
+		
 //		DustDevUtils.setTag(hAgtFilterCsvWriter, DEV_TAG_TEST);
 		
-		
-		
 		MindHandle hAgtFactStats = DustDevUtils.registerAgent(XBRLTEST_UNIT, XBRLDOCK_NAR_STATS, "Fact statistics");
-
-
+		
 
 		// connect listener to the input stream
 		int cmd = 1;
@@ -220,6 +273,7 @@ public class XbrlEsgIndiaBoot implements XbrlEsgIndiaConsts {
 		case 1: // execute expression filter
 			Dust.access(MindAccess.Insert, hAgtFactCacheInfoExpr, hDataCsvRow, MIND_ATT_KNOWLEDGE_LISTENERS, KEY_ADD);
 			Dust.access(MindAccess.Insert, hAgtFactFilterExpr, hDataFactRow, MIND_ATT_KNOWLEDGE_LISTENERS, KEY_ADD);
+			Dust.access(MindAccess.Insert, hAgtCcvt, hDataFactRow, MIND_ATT_KNOWLEDGE_LISTENERS, KEY_ADD);
 			Dust.access(MindAccess.Insert, new MindCommitFilter(hAgtFilterCsvWriter, MIND_TAG_ACTION_PROCESS), hDataFactRow, MIND_ATT_KNOWLEDGE_LISTENERS, KEY_ADD);
 			Dust.access(MindAccess.Insert, new MindCommitFilter(hAgtFilterCsvWriter, MIND_TAG_ACTION_BEGIN, MIND_TAG_ACTION_END), hDataCsvRow, MIND_ATT_KNOWLEDGE_LISTENERS, KEY_ADD);
 			break;
@@ -231,6 +285,9 @@ public class XbrlEsgIndiaBoot implements XbrlEsgIndiaConsts {
 		}
 		
 		// initiate the process in the Machine
+		DustDevUtils.setTag(hDataCcvtCsvStream, MISC_TAG_TRANSACTION);
+		Dust.access(MindAccess.Set, hDataCcvtCsvStream, APP_ASSEMBLY_MAIN, MIND_ATT_ASSEMBLY_STARTCOMMITS, KEY_ADD);
+		
 		DustDevUtils.setTag(hDataCsvStream, MISC_TAG_TRANSACTION);
 		Dust.access(MindAccess.Set, hDataCsvStream, APP_ASSEMBLY_MAIN, MIND_ATT_ASSEMBLY_STARTCOMMITS, KEY_ADD);
 	}
