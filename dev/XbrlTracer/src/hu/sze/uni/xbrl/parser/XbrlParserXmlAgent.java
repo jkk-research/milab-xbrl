@@ -3,7 +3,9 @@ package hu.sze.uni.xbrl.parser;
 import java.io.File;
 import java.text.DecimalFormat;
 import java.util.Map;
+import java.util.Set;
 import java.util.TreeMap;
+import java.util.TreeSet;
 
 import org.json.simple.JSONValue;
 import org.w3c.dom.Attr;
@@ -42,6 +44,7 @@ public class XbrlParserXmlAgent extends DustAgent implements XbrlParserConsts {
 		String fileName = DustUtils.getPostfix(filePath, File.separator);
 
 		boolean test = DustDevUtils.chkTag(MIND_TAG_CONTEXT_SELF, DEV_TAG_TEST);
+		boolean hash = DustDevUtils.chkTag(MIND_TAG_CONTEXT_SELF, MISC_TAG_DBLHASH);
 
 		DecimalFormat df = new DecimalFormat("#");
 		df.setMaximumFractionDigits(8);
@@ -64,10 +67,72 @@ public class XbrlParserXmlAgent extends DustAgent implements XbrlParserConsts {
 			}
 
 			NodeList nl;
+			NodeList nl1;
 
 			Map<String, Element> continuation = new TreeMap<>();
 			Map<String, String> units = new TreeMap<>();
 			Map<String, Map<String, String>> contexts = new TreeMap<>();
+
+			Map<String, String> dd = new TreeMap<>();
+			
+			nl = eHtml.getElementsByTagName("*");
+			for (int idx = 0; idx < nl.getLength(); ++idx) {
+				Element e = (Element) nl.item(idx);
+				String id = e.getAttribute(XML_ATT_ID);
+				Map<String, String> cd;
+
+				String tagName = e.getTagName();
+
+				tagName = DustUtils.getPostfix(tagName, ":");
+
+				switch ( tagName ) {
+				case "context":
+					nl1 = e.getElementsByTagName("*");
+					cd = new TreeMap<>();
+					dd.clear();
+
+					for (int ii = 0; ii < nl1.getLength(); ++ii) {
+						Element ec = (Element) nl1.item(ii);
+						String et = ec.getTagName();
+						et = DustUtils.getPostfix(et, ":");
+
+						switch ( et ) {
+						case "identifier":
+							et = "entity";
+							break;
+						case "startDate":
+						case "endDate":
+						case "instant":
+							break;
+
+						case "explicitMember":
+							dd.put(ec.getAttribute("dimension"), ec.getTextContent().trim());
+							break;
+
+						case "scenario":
+							break;
+
+						default:
+							continue;
+						}
+						
+						String ev = ec.getTextContent();
+
+						if ( null != ev ) {
+							ev = ev.trim();
+						}
+
+						if ( !DustUtils.isEmpty(ev) ) {
+							cd.put(et, ev);
+						}
+					}
+
+					contexts.put(id, cd);
+
+					break;
+				}
+
+			}
 
 			nl = eHtml.getElementsByTagName(XBRLTOKEN_CONTEXT);
 			for (int idx = 0; idx < nl.getLength(); ++idx) {
@@ -104,7 +169,7 @@ public class XbrlParserXmlAgent extends DustAgent implements XbrlParserConsts {
 			}
 
 			if ( contexts.isEmpty() ) {
-				Dust.log(EVENT_TAG_TYPE_WARNING, "  EMPTY contexts???");
+				Dust.log(EVENT_TAG_TYPE_WARNING, filePath, "EMPTY contexts???");
 			} else {
 //				Dust.log(EVENT_TAG_TYPE_TRACE, "  Contexts", contexts.size());
 			}
@@ -125,7 +190,7 @@ public class XbrlParserXmlAgent extends DustAgent implements XbrlParserConsts {
 			}
 
 			if ( units.isEmpty() ) {
-				Dust.log(EVENT_TAG_TYPE_WARNING, "  EMPTY units???");
+				Dust.log(EVENT_TAG_TYPE_WARNING, filePath, "EMPTY units???");
 			} else {
 //				Dust.log(EVENT_TAG_TYPE_TRACE, "  Units", units.size());
 			}
@@ -138,7 +203,9 @@ public class XbrlParserXmlAgent extends DustAgent implements XbrlParserConsts {
 
 			if ( !test ) {
 				String fileId = DustUtils.cutPostfix(fileName, ".");
-				fileId = DustUtilsFile.addHash2(fileId);
+				if ( hash ) {
+					fileId = DustUtilsFile.addHash2(fileId);
+				}
 
 				hRowData = getOutRow(fileId, true);
 				hRowText = getOutRow(fileId, false);
@@ -146,6 +213,8 @@ public class XbrlParserXmlAgent extends DustAgent implements XbrlParserConsts {
 
 			nl = eHtml.getElementsByTagName("*");
 			int factId = 0;
+			Set<String> missingCtx = new TreeSet<>();
+			Set<String> missingUnit = new TreeSet<>();
 			for (int idx = 0; idx < nl.getLength(); ++idx) {
 				Element e = (Element) nl.item(idx);
 
@@ -165,7 +234,7 @@ public class XbrlParserXmlAgent extends DustAgent implements XbrlParserConsts {
 
 					Map<String, String> ctx = contexts.get(ctxId.trim());
 					if ( null == ctx ) {
-						Dust.log(EVENT_TAG_TYPE_WARNING, "  Referred context not found", ctxId);
+						missingCtx.add(ctxId);
 					}
 
 					initRow(hRowData, fileName, ctx, factId, factType, e);
@@ -178,6 +247,7 @@ public class XbrlParserXmlAgent extends DustAgent implements XbrlParserConsts {
 							unit = units.get(unitId.trim());
 							if ( null == unit ) {
 								Dust.log(EVENT_TAG_TYPE_WARNING, "  Referred unit not found", unitId);
+								missingUnit.add(unitId);
 								unit = "-";
 							}
 						}
@@ -214,7 +284,7 @@ public class XbrlParserXmlAgent extends DustAgent implements XbrlParserConsts {
 
 							Dust.access(MindAccess.Commit, MIND_TAG_ACTION_PROCESS, hRowText);
 						}
-						
+
 						String clipVal = (factType == FactType.Text) ? val.substring(0, STRING_LIMIT - 3) + "..." : val;
 						setRowData(hRowData, FactFldData.OrigValue, clipVal);
 						setRowData(hRowData, FactFldData.Value, Integer.toString(vlen));
@@ -222,6 +292,13 @@ public class XbrlParserXmlAgent extends DustAgent implements XbrlParserConsts {
 
 					Dust.access(MindAccess.Commit, MIND_TAG_ACTION_PROCESS, hRowData);
 				}
+			}
+
+			if ( !missingCtx.isEmpty() ) {
+				Dust.log(EVENT_TAG_TYPE_WARNING, filePath, "Referred context not found", missingCtx);
+			}
+			if ( !missingUnit.isEmpty() ) {
+				Dust.log(EVENT_TAG_TYPE_WARNING, filePath, "Referred unit not found", missingUnit);
 			}
 		} catch (Throwable t) {
 			DustException.swallow(t, "reading xml", Dust.access(MindAccess.Peek, null, MIND_TAG_CONTEXT_TARGET, RESOURCE_ATT_URL_PATH));
