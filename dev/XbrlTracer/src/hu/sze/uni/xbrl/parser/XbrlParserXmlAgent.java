@@ -20,11 +20,9 @@ import hu.sze.milab.dust.DustAgent;
 import hu.sze.milab.dust.DustException;
 import hu.sze.milab.dust.dev.DustDevUtils;
 import hu.sze.milab.dust.stream.DustStreamUtils;
-import hu.sze.milab.dust.stream.xml.DustXmlUtils;
 import hu.sze.milab.dust.utils.DustUtils;
 import hu.sze.milab.dust.utils.DustUtilsFile;
 import hu.sze.milab.dust.utils.DustUtilsNarrative;
-import hu.sze.uni.xbrl.XbrlUtils;
 
 public class XbrlParserXmlAgent extends DustAgent implements XbrlParserConsts {
 
@@ -66,7 +64,7 @@ public class XbrlParserXmlAgent extends DustAgent implements XbrlParserConsts {
 				}
 			}
 
-			NodeList nl;
+			NodeList topNodes;
 			NodeList nl1;
 
 			Map<String, Element> continuation = new TreeMap<>();
@@ -74,99 +72,119 @@ public class XbrlParserXmlAgent extends DustAgent implements XbrlParserConsts {
 			Map<String, Map<String, String>> contexts = new TreeMap<>();
 
 			Map<String, String> dd = new TreeMap<>();
-			
-			nl = eHtml.getElementsByTagName("*");
-			for (int idx = 0; idx < nl.getLength(); ++idx) {
-				Element e = (Element) nl.item(idx);
-				String id = e.getAttribute(XML_ATT_ID);
-				Map<String, String> cd;
 
-				String tagName = e.getTagName();
+//			DustDevCounter cc = new DustDevCounter("html toc", true);
 
-				tagName = DustUtils.getPostfix(tagName, ":");
+			topNodes = eHtml.getChildNodes();
+			for (int idx = 0; idx < topNodes.getLength(); ++idx) {
+				Node item = topNodes.item(idx);
+				if ( item instanceof Element ) {
+					Element e = (Element) item;
+					String id = e.getAttribute(XML_ATT_ID);
+					Map<String, String> cd;
 
-				switch ( tagName ) {
-				case "context":
-					nl1 = e.getElementsByTagName("*");
-					cd = new TreeMap<>();
-					dd.clear();
+					String tagName = e.getTagName();
 
-					for (int ii = 0; ii < nl1.getLength(); ++ii) {
-						Element ec = (Element) nl1.item(ii);
-						String et = ec.getTagName();
-						et = DustUtils.getPostfix(et, ":");
+					tagName = DustUtils.getPostfix(tagName, ":");
 
-						switch ( et ) {
-						case "identifier":
-							et = "entity";
-							break;
-						case "startDate":
-						case "endDate":
-						case "instant":
-							break;
+//					cc.add(tagName);
 
-						case "explicitMember":
-							dd.put(ec.getAttribute("dimension"), ec.getTextContent().trim());
-							break;
+					switch ( tagName ) {
+					case "context":
+						nl1 = e.getElementsByTagName("*");
+						cd = new TreeMap<>();
+						dd.clear();
 
-						case "scenario":
-							break;
+						for (int ii = 0; ii < nl1.getLength(); ++ii) {
+							Element ec = (Element) nl1.item(ii);
+							String et = ec.getTagName();
+							et = DustUtils.getPostfix(et, ":");
+							
+							FactFldCommon ffc = null;
 
-						default:
-							continue;
-						}
-						
-						String ev = ec.getTextContent();
+							switch ( et ) {
+							case "identifier":
+								ffc = FactFldCommon.EntityId;
+								break;
+							case "startDate":
+								ffc = FactFldCommon.StartDate;
+								break;
+							case "endDate":
+								ffc = FactFldCommon.EndDate;
+								break;
+							case "instant":
+								ffc = FactFldCommon.Instant;
+								break;
 
-						if ( null != ev ) {
-							ev = ev.trim();
-						}
+							case "explicitMember":
+								dd.put(ec.getAttribute("dimension"), ec.getTextContent().trim());
+								continue;
 
-						if ( !DustUtils.isEmpty(ev) ) {
-							cd.put(et, ev);
-						}
-					}
-
-					contexts.put(id, cd);
-
-					break;
-				}
-
-			}
-
-			nl = eHtml.getElementsByTagName(XBRLTOKEN_CONTEXT);
-			for (int idx = 0; idx < nl.getLength(); ++idx) {
-				Element e = (Element) nl.item(idx);
-				Map<String, String> cd = new TreeMap<>();
-
-				String ctxId = e.getAttribute(XML_ATT_ID);
-				contexts.put(ctxId, cd);
-
-				XbrlUtils.loadCtxFields(e, cd);
-
-				Element eS = (Element) e.getElementsByTagName(XBRLTOKEN_SCENARIO).item(0);
-				if ( null != eS ) {
-					NodeList nlS = eS.getChildNodes();
-					Map<String, String> dims = null;
-
-					for (int i2 = 0; i2 < nlS.getLength(); ++i2) {
-						Node ii = nlS.item(i2);
-
-						if ( ii instanceof Element ) {
-							Element m = (Element) ii;
-							String dim = m.getAttribute(XBRLTOKEN_DIMENSION);
-							String dVal = m.getTextContent().trim();
-
-							if ( null == dims ) {
-								dims = new TreeMap<>();
+							default:
+								continue;
 							}
-							dims.put(dim, dVal);
-						}
-					}
 
-					cd.put(FactFldCommon.Dimensions.name(), (null == dims) ? "" : JSONValue.toJSONString(dims));
+							String ev = ec.getTextContent();
+
+							if ( null != ev ) {
+								ev = ev.trim();
+								if ( !DustUtils.isEmpty(ev) ) {
+									if ( null != ffc ) {
+										et = ffc.name();
+									}
+									cd.put(et, ev);
+								}
+							}
+						}
+
+						cd.put(FactFldCommon.Dimensions.name(), (dd.isEmpty()) ? "" : JSONValue.toJSONString(dd));
+						contexts.put(id, cd);
+
+						break;
+					case "unit":
+						nl1 = e.getElementsByTagName("*");
+						String meas = null;
+						String denom = null;
+
+						boolean readDenom = false;
+
+						for (int ii = 0; ii < nl1.getLength(); ++ii) {
+							Node ic = nl1.item(ii);
+							if ( ic instanceof Element ) {
+								Element ec = (Element) ic;
+								String et = ec.getTagName();
+								et = DustUtils.getPostfix(et, ":");
+
+								switch ( et ) {
+								case "unitDenominator":
+									readDenom = true;
+									break;
+								case "measure":
+									String ev = ec.getTextContent().trim();
+									ev = DustUtils.getPostfix(ev, ":");
+									if ( readDenom ) {
+										denom = ev;
+									} else {
+										meas = ev;
+									}
+									break;
+								}
+							}
+						}
+
+						if ( null != denom ) {
+							meas = meas + "/" + denom;
+						}
+						units.put(id, meas);
+
+						break;
+					case "continuation":
+						continuation.put(id, e);
+						break;
+					}
 				}
 			}
+//			Dust.log(EVENT_TAG_TYPE_TRACE, cc.toString());
 
 			if ( contexts.isEmpty() ) {
 				Dust.log(EVENT_TAG_TYPE_WARNING, filePath, "EMPTY contexts???");
@@ -174,31 +192,10 @@ public class XbrlParserXmlAgent extends DustAgent implements XbrlParserConsts {
 //				Dust.log(EVENT_TAG_TYPE_TRACE, "  Contexts", contexts.size());
 			}
 
-			nl = eHtml.getElementsByTagName(XBRLTOKEN_UNIT);
-			for (int idx = 0; idx < nl.getLength(); ++idx) {
-				Element e = (Element) nl.item(idx);
-
-				String val = DustXmlUtils.getInfo(e, XBRLTOKEN_UNIT_NUM);
-				if ( null != val ) {
-					String denom = DustXmlUtils.getInfo(e, XBRLTOKEN_UNIT_DENOM);
-					val = val + "/" + denom;
-				} else {
-					val = DustXmlUtils.getInfo(e, XBRLTOKEN_MEASURE);
-				}
-
-				units.put(e.getAttribute(XML_ATT_ID), val);
-			}
-
 			if ( units.isEmpty() ) {
 				Dust.log(EVENT_TAG_TYPE_WARNING, filePath, "EMPTY units???");
 			} else {
 //				Dust.log(EVENT_TAG_TYPE_TRACE, "  Units", units.size());
-			}
-
-			nl = eHtml.getElementsByTagName(XBRLTOKEN_CONTINUATION);
-			for (int idx = 0; idx < nl.getLength(); ++idx) {
-				Element e = (Element) nl.item(idx);
-				continuation.put(e.getAttribute(XML_ATT_ID), e);
 			}
 
 			if ( !test ) {
@@ -211,89 +208,95 @@ public class XbrlParserXmlAgent extends DustAgent implements XbrlParserConsts {
 				hRowText = getOutRow(fileId, false);
 			}
 
-			nl = eHtml.getElementsByTagName("*");
-			int factId = 0;
+			int factCount = 0;
 			Set<String> missingCtx = new TreeSet<>();
 			Set<String> missingUnit = new TreeSet<>();
-			for (int idx = 0; idx < nl.getLength(); ++idx) {
-				Element e = (Element) nl.item(idx);
+			for (int idx = 0; idx < topNodes.getLength(); ++idx) {
+				Node item = topNodes.item(idx);
+				if ( item instanceof Element ) {
+					Element e = (Element) topNodes.item(idx);
 
-//				String factId = e.getAttribute(XML_ATT_ID);
-				String ctxId = e.getAttribute("contextRef");
+					String ctxId = e.getAttribute("contextRef");
 
-				if ( !DustUtils.isEmpty(ctxId) ) {
-					++factId;
+					if ( !DustUtils.isEmpty(ctxId) ) {
+						++factCount;
 
-					String val = e.getTextContent().trim();
-					int vlen = val.length();
-					String dec = e.getAttribute("decimals");
+						String factId = e.getAttribute(XML_ATT_ID);
+						if ( DustUtils.isEmpty(factId) ) {
+							factId = "__" + factCount;
+						}
 
-					FactType factType = DustUtils.isEmpty(dec) ? (vlen < STRING_LIMIT) ? FactType.String : FactType.Text : FactType.Numeric;
+						String val = e.getTextContent().trim();
+						int vlen = val.length();
+						String dec = e.getAttribute("decimals");
 
-//					MindHandle hRow = dataFact ? hRowData : hRowText;
+						FactType factType = DustUtils.isEmpty(dec) ? (vlen < STRING_LIMIT) ? FactType.String : FactType.Text : FactType.Numeric;
 
-					Map<String, String> ctx = contexts.get(ctxId.trim());
-					if ( null == ctx ) {
-						missingCtx.add(ctxId);
+						Map<String, String> ctx = contexts.get(ctxId.trim());
+						if ( null == ctx ) {
+							missingCtx.add(ctxId);
+						}
+
+						initRow(hRowData, fileName, ctxId, ctx, factId, factType, e);
+
+						if ( FactType.Numeric == factType ) {
+							String unit = "-";
+
+							String unitId = e.getAttribute("unitRef");
+							if ( !DustUtils.isEmpty(unitId) ) {
+								unit = units.get(unitId.trim());
+								if ( null == unit ) {
+									Dust.log(EVENT_TAG_TYPE_WARNING, "  Referred unit not found", unitId);
+									missingUnit.add(unitId);
+									unit = "-";
+								}
+							}
+
+							setRowData(hRowData, FactFldData.UnitId, unitId);
+							setRowData(hRowData, FactFldData.Unit, unit);
+							setRowData(hRowData, FactFldData.OrigValue, DustStreamUtils.csvEscape(val, true));
+							setRowData(hRowData, FactFldData.Dec, dec);
+
+							try {
+								Double dVal = Double.valueOf(val);
+								val = df.format(dVal);
+								setRowData(hRowData, FactFldData.Value, val);
+							} catch (Throwable err) {
+								setRowData(hRowData, FactFldData.Error, err.toString());
+							}
+						} else {
+							if ( FactType.Text == factType ) {
+								initRow(hRowText, fileName, ctxId, ctx, factId, factType, e);
+
+								String lang = e.getAttribute("xml:lang");
+								if ( !DustUtils.isEmpty(lang) ) {
+									cntLang.add(lang);
+									setRowData(hRowText, FactFldText.Language, lang);
+								}
+
+								Element txtFrag = e;
+								for (String contID = txtFrag.getAttribute("continuedAt"); !DustUtils.isEmpty(contID); contID = txtFrag.getAttribute("continuedAt")) {
+									txtFrag = continuation.get(contID);
+									val = val + " " + txtFrag.getTextContent().trim();
+								}
+
+								setRowData(hRowText, FactFldText.Value, val);
+
+								Dust.access(MindAccess.Commit, MIND_TAG_ACTION_PROCESS, hRowText);
+							}
+
+							String clipVal = (factType == FactType.Text) ? val.substring(0, STRING_LIMIT - 3) + "..." : val;
+							setRowData(hRowData, FactFldData.OrigValue, clipVal);
+							setRowData(hRowData, FactFldData.Value, Integer.toString(vlen));
+						}
+
+						Dust.access(MindAccess.Commit, MIND_TAG_ACTION_PROCESS, hRowData);
 					}
-
-					initRow(hRowData, fileName, ctx, factId, factType, e);
-
-					if ( FactType.Numeric == factType ) {
-						String unit = "-";
-
-						String unitId = e.getAttribute("unitRef");
-						if ( !DustUtils.isEmpty(unitId) ) {
-							unit = units.get(unitId.trim());
-							if ( null == unit ) {
-								Dust.log(EVENT_TAG_TYPE_WARNING, "  Referred unit not found", unitId);
-								missingUnit.add(unitId);
-								unit = "-";
-							}
-						}
-
-						setRowData(hRowData, FactFldData.Unit, unit);
-						setRowData(hRowData, FactFldData.OrigValue, DustStreamUtils.csvEscape(val, true));
-						setRowData(hRowData, FactFldData.Dec, dec);
-
-						try {
-							Double dVal = Double.valueOf(val);
-							val = df.format(dVal);
-							setRowData(hRowData, FactFldData.Value, val);
-						} catch (Throwable err) {
-							setRowData(hRowData, FactFldData.Error, err.toString());
-						}
-					} else {
-						if ( FactType.Text == factType ) {
-							initRow(hRowText, fileName, ctx, factId, factType, e);
-
-							String lang = e.getAttribute("xml:lang");
-							if ( !DustUtils.isEmpty(lang) ) {
-								cntLang.add(lang);
-								setRowData(hRowText, FactFldText.Language, lang);
-							}
-
-							Element txtFrag = e;
-							for (String contID = txtFrag.getAttribute("continuedAt"); !DustUtils.isEmpty(contID); contID = txtFrag.getAttribute("continuedAt")) {
-								txtFrag = continuation.get(contID);
-								val = val + " " + txtFrag.getTextContent().trim();
-							}
-
-//						String txt = DustStreamUtils.csvEscape(val, true);
-							setRowData(hRowText, FactFldText.Value, val);
-
-							Dust.access(MindAccess.Commit, MIND_TAG_ACTION_PROCESS, hRowText);
-						}
-
-						String clipVal = (factType == FactType.Text) ? val.substring(0, STRING_LIMIT - 3) + "..." : val;
-						setRowData(hRowData, FactFldData.OrigValue, clipVal);
-						setRowData(hRowData, FactFldData.Value, Integer.toString(vlen));
-					}
-
-					Dust.access(MindAccess.Commit, MIND_TAG_ACTION_PROCESS, hRowData);
 				}
 			}
-
+			
+			Dust.log(EVENT_TAG_TYPE_INFO, filePath, "Fact count", factCount);
+			
 			if ( !missingCtx.isEmpty() ) {
 				Dust.log(EVENT_TAG_TYPE_WARNING, filePath, "Referred context not found", missingCtx);
 			}
@@ -315,7 +318,7 @@ public class XbrlParserXmlAgent extends DustAgent implements XbrlParserConsts {
 		return MIND_TAG_RESULT_ACCEPT;
 	}
 
-	public void initRow(MindHandle hRow, String fileName, Map<String, String> ctx, int factId, FactType factType, Element e) {
+	public void initRow(MindHandle hRow, String fileName, String ctxId, Map<String, String> ctx, Object factId, FactType factType, Element e) {
 		String tagName = e.getTagName();
 		String[] tt = tagName.split(":");
 		String fmt = e.getAttribute("format");
@@ -329,7 +332,8 @@ public class XbrlParserXmlAgent extends DustAgent implements XbrlParserConsts {
 		}
 
 		setRowData(hRow, FactFldCommon.File, fileName);
-		setRowData(hRow, FactFldCommon.FactIdx, DustUtils.toString(factId));
+		setRowData(hRow, FactFldCommon.CtxId, ctxId);
+		setRowData(hRow, FactFldCommon.FactId, DustUtils.toString(factId));
 		setRowData(hRow, FactFldCommon.TagNamespace, tt[0]);
 		setRowData(hRow, FactFldCommon.TagId, tt[1]);
 		setRowData(hRow, FactFldCommon.Type, factType.name());

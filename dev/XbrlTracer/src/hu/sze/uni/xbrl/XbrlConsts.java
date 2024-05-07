@@ -37,11 +37,11 @@ public interface XbrlConsts extends DustHandles, DustUtilsConsts, DustXmlConsts 
 	
 
 	enum FactFldCommon {
-		File, EntityId, FactIdx, StartDate, EndDate, Instant, Dimensions, TagNamespace, TagId, Type, Format
+		File, EntityId, CtxId, FactId, StartDate, EndDate, Instant, Dimensions, TagNamespace, TagId, Type, Format
 	};
 
 	enum FactFldData {
-		Unit, OrigValue, Sign, Dec, Scale, Value, Error
+		UnitId, Unit, OrigValue, Sign, Dec, Scale, Value, Error
 	};
 
 	enum FactFldText {
