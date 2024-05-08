@@ -1,0 +1,62 @@
+package hu.sze.uni.xbrl;
+
+import hu.sze.milab.dust.Dust;
+import hu.sze.milab.dust.DustConsts;
+
+public interface XbrlHandles extends DustConsts {
+	String AUTHOR_XBRLDOCK = "XBRLDock";
+	String UNITNAME_XBRLDOCK = AUTHOR_XBRLDOCK + DUST_SEP_ID + "0";
+	String XBRLDOCK_GEN = UNITNAME_XBRLDOCK + ":?";
+
+	MindHandle XBRLDOCK_UNIT = Dust.lookup(UNITNAME_XBRLDOCK);
+	MindHandle XBRLTEST_UNIT = Dust.lookup(AUTHOR_XBRLDOCK + DUST_SEP_ID + "1");
+	
+	MindHandle XBRLDOCK_ASP_POOL = Dust.lookup(XBRLDOCK_GEN);
+	MindHandle XBRLDOCK_ATT_POOL_CALENDAR = Dust.lookup(XBRLDOCK_GEN);
+	MindHandle XBRLDOCK_ATT_POOL_TAXONOMIES = Dust.lookup(XBRLDOCK_GEN);
+	MindHandle XBRLDOCK_ATT_POOL_ENTITIES = Dust.lookup(XBRLDOCK_GEN);
+	MindHandle XBRLDOCK_ATT_POOL_REPORTS = Dust.lookup(XBRLDOCK_GEN);
+	MindHandle XBRLDOCK_ATT_POOL_MEASUREUNITS = Dust.lookup(XBRLDOCK_GEN);
+
+	MindHandle XBRLDOCK_ASP_TAXONOMY = Dust.lookup(XBRLDOCK_GEN);
+	MindHandle XBRLDOCK_ATT_TAXONOMY_CONCEPTS = Dust.lookup(XBRLDOCK_GEN);
+
+	MindHandle XBRLDOCK_ASP_REPORT = Dust.lookup(XBRLDOCK_GEN);
+	MindHandle XBRLDOCK_ATT_REPORT_CONTEXTS = Dust.lookup(XBRLDOCK_GEN);
+	MindHandle XBRLDOCK_ATT_REPORT_UNITS = Dust.lookup(XBRLDOCK_GEN);
+	MindHandle XBRLDOCK_ATT_REPORT_TAXONOMIES = Dust.lookup(XBRLDOCK_GEN);
+
+	MindHandle XBRLDOCK_ASP_MEASUREUNIT = Dust.lookup(XBRLDOCK_GEN);
+
+	MindHandle XBRLDOCK_ASP_CONTEXT = Dust.lookup(XBRLDOCK_GEN);
+	MindHandle XBRLDOCK_ATT_CONTEXT_EVENT = Dust.lookup(XBRLDOCK_GEN);
+	MindHandle XBRLDOCK_ATT_CONTEXT_ENTITY = Dust.lookup(XBRLDOCK_GEN);
+	MindHandle XBRLDOCK_ATT_CONTEXT_DIMENSIONS = Dust.lookup(XBRLDOCK_GEN);
+
+	MindHandle XBRLDOCK_ASP_FACT = Dust.lookup(XBRLDOCK_GEN);
+	MindHandle XBRLDOCK_ATT_FACT_CONCEPT = Dust.lookup(XBRLDOCK_GEN);
+	MindHandle XBRLDOCK_ATT_FACT_CONTEXT = Dust.lookup(XBRLDOCK_GEN);
+	MindHandle XBRLDOCK_ATT_FACT_MEASUREUNIT = Dust.lookup(XBRLDOCK_GEN);
+	MindHandle XBRLDOCK_ATT_FACT_DECIMALS = Dust.lookup(XBRLDOCK_GEN);
+	MindHandle XBRLDOCK_ATT_FACT_SCALE = Dust.lookup(XBRLDOCK_GEN);
+
+	MindHandle XBRLDOCK_TAG_FACT_FORMAT = Dust.lookup(XBRLDOCK_GEN);
+
+
+	MindHandle XBRLDOCK_NAR_POOLLOADER = Dust.lookup(XBRLDOCK_GEN);
+
+	
+
+	MindHandle XBRLDOCK_NAR_XMLLOADER = Dust.lookup(XBRLDOCK_GEN);
+	MindHandle XBRLDOCK_ATT_XMLLOADER_ROWDATA = Dust.lookup(XBRLDOCK_GEN);
+	MindHandle XBRLDOCK_ATT_XMLLOADER_ROWTEXT = Dust.lookup(XBRLDOCK_GEN);
+
+	
+	
+	
+	
+	MindHandle XBRLDOCK_NAR_CURRENCYCONVERTER = Dust.lookup(XBRLDOCK_GEN);
+
+	MindHandle XBRLDOCK_NAR_STATS = Dust.lookup(XBRLDOCK_GEN);
+
+}

@@ -1,15 +1,29 @@
 package hu.sze.uni.xbrl.charles.t01blockgui;
 
 import hu.sze.milab.dust.Dust;
+import hu.sze.milab.dust.DustException;
 import hu.sze.milab.dust.dev.DustDevUtils;
+import hu.sze.milab.dust.machine.DustMachineTempUtils;
 import hu.sze.milab.dust.utils.DustUtils;
 import hu.sze.milab.dust.utils.DustUtilsFile;
 import hu.sze.uni.xbrl.XbrlConsts;
+import hu.sze.uni.xbrl.XbrlHandles;
+import hu.sze.uni.xbrl.XbrlPoolLoaderAgent;
 import hu.sze.uni.xbrl.parser.XbrlParserXmlAgent;
 
 public class T01BlockGuiBoot implements XbrlConsts {
-
+	
+	static {
+		try {
+			DustMachineTempUtils.initFromInterfaces(XbrlHandles.class);
+		} catch (IllegalAccessException e) {
+			DustException.wrap(e);
+		}
+	}
+	
 	public static void boot(String[] launchParams) throws Exception {
+		
+		
 		blockGui();
 	}
 
@@ -17,6 +31,7 @@ public class T01BlockGuiBoot implements XbrlConsts {
 //		DustTestBootSimple.boot(null);
 
 		DustDevUtils.registerNative(XBRLDOCK_NAR_XMLLOADER, XBRLDOCK_UNIT, APP_MODULE_MAIN, XbrlParserXmlAgent.class.getName());
+		DustDevUtils.registerNative(XBRLDOCK_NAR_POOLLOADER, XBRLDOCK_UNIT, APP_MODULE_MAIN, XbrlPoolLoaderAgent.class.getName());
 
 		// Set work root folder
 
@@ -126,6 +141,16 @@ public class T01BlockGuiBoot implements XbrlConsts {
 		Dust.access(MindAccess.Set, hAgtCsvFactWriterData, hAgtXmlLoader, XBRLDOCK_ATT_XMLLOADER_ROWDATA);
 		Dust.access(MindAccess.Set, hAgtCsvFactWriterText, hAgtXmlLoader, XBRLDOCK_ATT_XMLLOADER_ROWTEXT);
 		Dust.access(MindAccess.Insert, hAgtXmlLoader, hDataReportContent, MIND_ATT_KNOWLEDGE_LISTENERS, KEY_ADD);
+		
+
+		MindHandle hDataReportPool = DustDevUtils.newHandle(XBRLTEST_UNIT, XBRLDOCK_ASP_POOL, "Report pool");
+		MindHandle hDataPoolCalendar = DustDevUtils.newHandle(XBRLTEST_UNIT, EVENT_ASP_CALENDAR, "Pool calendar");
+		Dust.access(MindAccess.Set, hDataPoolCalendar, hDataReportPool, XBRLDOCK_ATT_POOL_CALENDAR);
+
+		MindHandle hAgtPoolLoader = DustDevUtils.registerAgent(XBRLTEST_UNIT, XBRLDOCK_NAR_POOLLOADER, "XML loader");
+		Dust.access(MindAccess.Set, hDataReportPool, hAgtPoolLoader, MISC_ATT_CONN_TARGET);
+		Dust.access(MindAccess.Insert, hAgtPoolLoader, hDataFactRowData, MIND_ATT_KNOWLEDGE_LISTENERS, KEY_ADD);
+
 //		DustDevUtils.setTag(hAgtXmlLoader, DEV_TAG_TEST);
 
 		boolean reportsCached = DustUtilsFile.exists(Dust.access(MindAccess.Peek, "", hAgtT01Root, RESOURCE_ATT_URL_PATH), Dust.access(MindAccess.Peek, "", hAgtReportCacheRoot, TEXT_ATT_TOKEN));
