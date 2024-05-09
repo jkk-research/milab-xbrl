@@ -149,7 +149,29 @@ public class T01BlockGuiBoot implements XbrlConsts {
 
 		MindHandle hAgtPoolLoader = DustDevUtils.registerAgent(XBRLTEST_UNIT, XBRLDOCK_NAR_POOLLOADER, "XML loader");
 		Dust.access(MindAccess.Set, hDataReportPool, hAgtPoolLoader, MISC_ATT_CONN_TARGET);
-		Dust.access(MindAccess.Insert, hAgtPoolLoader, hDataFactRowData, MIND_ATT_KNOWLEDGE_LISTENERS, KEY_ADD);
+		
+		Dust.access(MindAccess.Set, XBRLDOCK_ATT_FACT_DECIMALS, hAgtPoolLoader, XBRLDOCK_ATT_POOLLOADER_FACTMAP, "Dec");
+		Dust.access(MindAccess.Set, XBRLDOCK_ATT_FACT_SCALE, hAgtPoolLoader, XBRLDOCK_ATT_POOLLOADER_FACTMAP, "Scale");
+		Dust.access(MindAccess.Set, XBRLDOCK_TAG_FACT_FORMAT, hAgtPoolLoader, XBRLDOCK_ATT_POOLLOADER_FACTMAP, "Format");
+
+		Dust.access(MindAccess.Set, XBRLDOCK_ASP_REPORT, hAgtPoolLoader, XBRLDOCK_ATT_POOLLOADER_CONCEPTMAP, "dei:DocumentType");
+		Dust.access(MindAccess.Set, XBRLDOCK_ASP_REPORT, hAgtPoolLoader, XBRLDOCK_ATT_POOLLOADER_CONCEPTMAP, "dei:AmendmentFlag");
+		Dust.access(MindAccess.Set, XBRLDOCK_ASP_REPORT, hAgtPoolLoader, XBRLDOCK_ATT_POOLLOADER_CONCEPTMAP, "dei:DocumentPeriodEndDate");
+		Dust.access(MindAccess.Set, XBRLDOCK_ASP_REPORT, hAgtPoolLoader, XBRLDOCK_ATT_POOLLOADER_CONCEPTMAP, "dei:DocumentFiscalYearFocus");
+		Dust.access(MindAccess.Set, XBRLDOCK_ASP_REPORT, hAgtPoolLoader, XBRLDOCK_ATT_POOLLOADER_CONCEPTMAP, "dei:DocumentFiscalPeriodFocus");
+		Dust.access(MindAccess.Set, XBRLDOCK_ASP_REPORT, hAgtPoolLoader, XBRLDOCK_ATT_POOLLOADER_CONCEPTMAP, "dei:CurrentFiscalYearEndDate");
+
+		Dust.access(MindAccess.Set, XBRLDOCK_ASP_ENTITY, hAgtPoolLoader, XBRLDOCK_ATT_POOLLOADER_CONCEPTMAP, "dei:TradingSymbol");
+		Dust.access(MindAccess.Set, XBRLDOCK_ASP_ENTITY, hAgtPoolLoader, XBRLDOCK_ATT_POOLLOADER_CONCEPTMAP, "dei:EntityRegistrantName");
+		Dust.access(MindAccess.Set, XBRLDOCK_ASP_ENTITY, hAgtPoolLoader, XBRLDOCK_ATT_POOLLOADER_CONCEPTMAP, "dei:EntityCentralIndexKey");
+		Dust.access(MindAccess.Set, XBRLDOCK_ASP_ENTITY, hAgtPoolLoader, XBRLDOCK_ATT_POOLLOADER_CONCEPTMAP, "dei:EntityFilerCategory");
+		Dust.access(MindAccess.Set, XBRLDOCK_ASP_ENTITY, hAgtPoolLoader, XBRLDOCK_ATT_POOLLOADER_CONCEPTMAP, "dei:EntitySmallBusiness");
+		Dust.access(MindAccess.Set, XBRLDOCK_ASP_ENTITY, hAgtPoolLoader, XBRLDOCK_ATT_POOLLOADER_CONCEPTMAP, "dei:EntityEmergingGrowthCompany");
+		
+//		Dust.access(MindAccess.Insert, hAgtPoolLoader, hDataFactRowData, MIND_ATT_KNOWLEDGE_LISTENERS, KEY_ADD);
+		Dust.access(MindAccess.Insert, new MindCommitFilter(hAgtPoolLoader, MIND_TAG_ACTION_PROCESS), hDataFactRowData, MIND_ATT_KNOWLEDGE_LISTENERS, KEY_ADD);
+		Dust.access(MindAccess.Insert, new MindCommitFilter(hAgtPoolLoader, MIND_TAG_ACTION_END), hDataReportRow, MIND_ATT_KNOWLEDGE_LISTENERS, KEY_ADD);
+
 
 //		DustDevUtils.setTag(hAgtXmlLoader, DEV_TAG_TEST);
 

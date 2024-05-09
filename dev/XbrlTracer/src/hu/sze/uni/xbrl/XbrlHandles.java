@@ -18,6 +18,10 @@ public interface XbrlHandles extends DustConsts {
 	MindHandle XBRLDOCK_ATT_POOL_REPORTS = Dust.lookup(XBRLDOCK_GEN);
 	MindHandle XBRLDOCK_ATT_POOL_MEASUREUNITS = Dust.lookup(XBRLDOCK_GEN);
 
+	MindHandle XBRLDOCK_ASP_ENTITY = Dust.lookup(XBRLDOCK_GEN);
+
+	MindHandle XBRLDOCK_ASP_CONCEPT = Dust.lookup(XBRLDOCK_GEN);
+
 	MindHandle XBRLDOCK_ASP_TAXONOMY = Dust.lookup(XBRLDOCK_GEN);
 	MindHandle XBRLDOCK_ATT_TAXONOMY_CONCEPTS = Dust.lookup(XBRLDOCK_GEN);
 
@@ -44,6 +48,8 @@ public interface XbrlHandles extends DustConsts {
 
 
 	MindHandle XBRLDOCK_NAR_POOLLOADER = Dust.lookup(XBRLDOCK_GEN);
+	MindHandle XBRLDOCK_ATT_POOLLOADER_CONCEPTMAP = Dust.lookup(XBRLDOCK_GEN);
+	MindHandle XBRLDOCK_ATT_POOLLOADER_FACTMAP = Dust.lookup(XBRLDOCK_GEN);
 
 	
 
