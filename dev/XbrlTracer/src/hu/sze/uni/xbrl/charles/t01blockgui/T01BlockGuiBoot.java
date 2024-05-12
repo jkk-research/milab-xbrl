@@ -9,10 +9,11 @@ import hu.sze.milab.dust.utils.DustUtilsFile;
 import hu.sze.uni.xbrl.XbrlConsts;
 import hu.sze.uni.xbrl.XbrlHandles;
 import hu.sze.uni.xbrl.XbrlPoolLoaderAgent;
+import hu.sze.uni.xbrl.gui.XbrlGuiFrameAgent;
 import hu.sze.uni.xbrl.parser.XbrlParserXmlAgent;
 
 public class T01BlockGuiBoot implements XbrlConsts {
-	
+
 	static {
 		try {
 			DustMachineTempUtils.initFromInterfaces(XbrlHandles.class);
@@ -20,10 +21,9 @@ public class T01BlockGuiBoot implements XbrlConsts {
 			DustException.wrap(e);
 		}
 	}
-	
+
 	public static void boot(String[] launchParams) throws Exception {
-		
-		
+
 		blockGui();
 	}
 
@@ -32,6 +32,7 @@ public class T01BlockGuiBoot implements XbrlConsts {
 
 		DustDevUtils.registerNative(XBRLDOCK_NAR_XMLLOADER, XBRLDOCK_UNIT, APP_MODULE_MAIN, XbrlParserXmlAgent.class.getName());
 		DustDevUtils.registerNative(XBRLDOCK_NAR_POOLLOADER, XBRLDOCK_UNIT, APP_MODULE_MAIN, XbrlPoolLoaderAgent.class.getName());
+		DustDevUtils.registerNative(XBRLDOCK_NAR_GUI_FRAME, XBRLDOCK_UNIT, APP_MODULE_MAIN, XbrlGuiFrameAgent.class.getName());
 
 		// Set work root folder
 
@@ -124,7 +125,6 @@ public class T01BlockGuiBoot implements XbrlConsts {
 		MindHandle hAgtCsvFactWriterData = DustDevUtils.registerAgent(XBRLTEST_UNIT, RESOURCE_NAR_CSVSAX, "CSV Data writer");
 		Dust.access(MindAccess.Set, hDataFactStreamData, hAgtCsvFactWriterData, RESOURCE_ATT_PROCESSOR_STREAM);
 		Dust.access(MindAccess.Set, hDataFactRowData, hAgtCsvFactWriterData, RESOURCE_ATT_PROCESSOR_DATA);
-		Dust.access(MindAccess.Insert, hAgtCsvFactWriterData, hDataFactRowData, MIND_ATT_KNOWLEDGE_LISTENERS, KEY_ADD);
 
 		MindHandle hDataFactRowText = DustDevUtils.newHandle(XBRLTEST_UNIT, MISC_ASP_VARIANT, "Report CSV row text");
 		MindHandle hDataFactStreamText = DustDevUtils.newHandle(XBRLTEST_UNIT, RESOURCE_ASP_STREAM, "Report Text CSV stream");
@@ -141,7 +141,16 @@ public class T01BlockGuiBoot implements XbrlConsts {
 		Dust.access(MindAccess.Set, hAgtCsvFactWriterData, hAgtXmlLoader, XBRLDOCK_ATT_XMLLOADER_ROWDATA);
 		Dust.access(MindAccess.Set, hAgtCsvFactWriterText, hAgtXmlLoader, XBRLDOCK_ATT_XMLLOADER_ROWTEXT);
 		Dust.access(MindAccess.Insert, hAgtXmlLoader, hDataReportContent, MIND_ATT_KNOWLEDGE_LISTENERS, KEY_ADD);
-		
+
+		// Data csv loading
+
+		MindHandle hAgtDataLoaderExpr = DustDevUtils.registerAgent(XBRLTEST_UNIT, EXPR_NAR_POPULATE, "Init cache item");
+		Dust.access(MindAccess.Set, DustUtils.class, hAgtDataLoaderExpr, EXPR_ATT_EXPRESSION_STATIC, "DustUtils");
+		Dust.access(MindAccess.Set, hDataFactStreamData, hAgtDataLoaderExpr, MISC_ATT_CONN_TARGET);
+		Dust.access(MindAccess.Set, MISC_ATT_CONN_MEMBERMAP, hAgtDataLoaderExpr, MISC_ATT_GEN_TARGET_ATT);
+		Dust.access(MindAccess.Set, "DustUtils.getPostfix(get('ReportURL'), '/').replace('.xml', '_Data.csv')", hAgtDataLoaderExpr, MISC_ATT_CONN_MEMBERMAP, TEXT_ATT_TOKEN);
+
+		// Report pool
 
 		MindHandle hDataReportPool = DustDevUtils.newHandle(XBRLTEST_UNIT, XBRLDOCK_ASP_POOL, "Report pool");
 		MindHandle hDataPoolCalendar = DustDevUtils.newHandle(XBRLTEST_UNIT, EVENT_ASP_CALENDAR, "Pool calendar");
@@ -149,7 +158,7 @@ public class T01BlockGuiBoot implements XbrlConsts {
 
 		MindHandle hAgtPoolLoader = DustDevUtils.registerAgent(XBRLTEST_UNIT, XBRLDOCK_NAR_POOLLOADER, "XML loader");
 		Dust.access(MindAccess.Set, hDataReportPool, hAgtPoolLoader, MISC_ATT_CONN_TARGET);
-		
+
 		Dust.access(MindAccess.Set, XBRLDOCK_ATT_FACT_DECIMALS, hAgtPoolLoader, XBRLDOCK_ATT_POOLLOADER_FACTMAP, "Dec");
 		Dust.access(MindAccess.Set, XBRLDOCK_ATT_FACT_SCALE, hAgtPoolLoader, XBRLDOCK_ATT_POOLLOADER_FACTMAP, "Scale");
 		Dust.access(MindAccess.Set, XBRLDOCK_TAG_FACT_FORMAT, hAgtPoolLoader, XBRLDOCK_ATT_POOLLOADER_FACTMAP, "Format");
@@ -167,23 +176,32 @@ public class T01BlockGuiBoot implements XbrlConsts {
 		Dust.access(MindAccess.Set, XBRLDOCK_ASP_ENTITY, hAgtPoolLoader, XBRLDOCK_ATT_POOLLOADER_CONCEPTMAP, "dei:EntityFilerCategory");
 		Dust.access(MindAccess.Set, XBRLDOCK_ASP_ENTITY, hAgtPoolLoader, XBRLDOCK_ATT_POOLLOADER_CONCEPTMAP, "dei:EntitySmallBusiness");
 		Dust.access(MindAccess.Set, XBRLDOCK_ASP_ENTITY, hAgtPoolLoader, XBRLDOCK_ATT_POOLLOADER_CONCEPTMAP, "dei:EntityEmergingGrowthCompany");
-		
-//		Dust.access(MindAccess.Insert, hAgtPoolLoader, hDataFactRowData, MIND_ATT_KNOWLEDGE_LISTENERS, KEY_ADD);
+
 		Dust.access(MindAccess.Insert, new MindCommitFilter(hAgtPoolLoader, MIND_TAG_ACTION_PROCESS), hDataFactRowData, MIND_ATT_KNOWLEDGE_LISTENERS, KEY_ADD);
 		Dust.access(MindAccess.Insert, new MindCommitFilter(hAgtPoolLoader, MIND_TAG_ACTION_END), hDataReportRow, MIND_ATT_KNOWLEDGE_LISTENERS, KEY_ADD);
 
+		MindHandle hAgtGuiFrame = DustDevUtils.registerAgent(XBRLTEST_UNIT, XBRLDOCK_NAR_GUI_FRAME, "GUI frame");
+		Dust.access(MindAccess.Set, hDataReportPool, hAgtGuiFrame, MISC_ATT_CONN_SOURCE);
+		Dust.access(MindAccess.Insert, hAgtGuiFrame, hDataReportPool, MIND_ATT_KNOWLEDGE_LISTENERS, KEY_ADD);
 
 //		DustDevUtils.setTag(hAgtXmlLoader, DEV_TAG_TEST);
 
 		boolean reportsCached = DustUtilsFile.exists(Dust.access(MindAccess.Peek, "", hAgtT01Root, RESOURCE_ATT_URL_PATH), Dust.access(MindAccess.Peek, "", hAgtReportCacheRoot, TEXT_ATT_TOKEN));
-		
-		reportsCached = false;
-		
-		if ( !reportsCached ) {
+
+//		reportsCached = false;
+
+		if ( reportsCached ) {
+			Dust.access(MindAccess.Insert, hAgtDataLoaderExpr, hDataReportRow, MIND_ATT_KNOWLEDGE_LISTENERS, KEY_ADD);
+
+			DustDevUtils.setTag(hDataFactStreamData, MISC_TAG_DIRECTION_IN, MISC_TAG_DIRECTION);
+			Dust.access(MindAccess.Insert, hAgtCsvFactWriterData, hDataFactStreamData, MIND_ATT_KNOWLEDGE_LISTENERS, KEY_ADD);
+		} else {
 			Dust.access(MindAccess.Insert, hAgtReportCacheInfoExpr, hDataReportRow, MIND_ATT_KNOWLEDGE_LISTENERS, KEY_ADD);
-			DustDevUtils.setTag(hDataReportStream, MISC_TAG_TRANSACTION);
-			Dust.access(MindAccess.Set, hDataReportStream, APP_ASSEMBLY_MAIN, MIND_ATT_ASSEMBLY_STARTCOMMITS, KEY_ADD);
+			Dust.access(MindAccess.Insert, hAgtCsvFactWriterData, hDataFactRowData, MIND_ATT_KNOWLEDGE_LISTENERS, KEY_ADD);
 		}
+
+		DustDevUtils.setTag(hDataReportStream, MISC_TAG_TRANSACTION);
+		Dust.access(MindAccess.Set, hDataReportStream, APP_ASSEMBLY_MAIN, MIND_ATT_ASSEMBLY_STARTCOMMITS, KEY_ADD);
 
 	}
 

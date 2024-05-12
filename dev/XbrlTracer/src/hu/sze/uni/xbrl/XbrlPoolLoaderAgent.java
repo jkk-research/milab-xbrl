@@ -116,13 +116,9 @@ public class XbrlPoolLoaderAgent extends DustAgent implements XbrlConsts {
 	
 	@Override
 	protected MindHandle agentEnd() throws Exception {
-		MindHandle pool = Dust.access(MindAccess.Peek, null, MIND_TAG_CONTEXT_SELF, MISC_ATT_CONN_TARGET);
 
-		Map taxonomies =  Dust.access(MindAccess.Peek, null, pool, XBRLDOCK_ATT_POOL_TAXONOMIES);
-
-		Map dei =  Dust.access(MindAccess.Peek, null, taxonomies.get("dei"), XBRLDOCK_ATT_TAXONOMY_CONCEPTS);
-
-		// TODO Auto-generated method stub
+		Dust.access(MindAccess.Commit, MIND_TAG_ACTION_PROCESS, MIND_TAG_CONTEXT_SELF, MISC_ATT_CONN_TARGET);
+		
 		return super.agentEnd();
 	}
 
