@@ -4,6 +4,8 @@ import java.util.Collections;
 import java.util.HashMap;
 import java.util.Map;
 
+import org.json.simple.JSONValue;
+
 import hu.sze.milab.dust.Dust;
 import hu.sze.milab.dust.DustAgent;
 import hu.sze.milab.dust.dev.DustDevUtils;
@@ -11,6 +13,7 @@ import hu.sze.milab.dust.utils.DustUtils;
 
 public class XbrlPoolLoaderAgent extends DustAgent implements XbrlConsts {
 
+	@SuppressWarnings("unchecked")
 	@Override
 	protected MindHandle agentProcess() throws Exception {
 		MindHandle pool = Dust.access(MindAccess.Peek, null, MIND_TAG_CONTEXT_SELF, MISC_ATT_CONN_TARGET);
@@ -77,6 +80,27 @@ public class XbrlPoolLoaderAgent extends DustAgent implements XbrlConsts {
 			}
 		}
 
+		String dims = values.get(FactFldCommon.Dimensions);
+		if ( !DustUtils.isEmpty(dims) ) {
+			Map<String, String> dm = (Map<String, String>) JSONValue.parse(dims);
+			for (Map.Entry<String, String> de : dm.entrySet()) {
+				String dimId = de.getKey();
+				String taxId = DustUtils.cutPostfix(dimId, ":");
+				MindHandle tax = getItem(tm, pool, XBRLDOCK_ATT_POOL_TAXONOMIES, taxId, XBRLDOCK_ASP_TAXONOMY);
+				MindHandle hDim = getItem(null, tax, XBRLDOCK_ATT_TAXONOMY_DIMENSIONS, DustUtils.getPostfix(dimId, ":"), MIND_ASP_TAG);
+
+				String dimItemId = de.getValue();
+				taxId = DustUtils.cutPostfix(dimItemId, ":");
+				tax = getItem(tm, pool, XBRLDOCK_ATT_POOL_TAXONOMIES, taxId, XBRLDOCK_ASP_TAXONOMY);
+				MindHandle hDimItem = getItem(null, tax, XBRLDOCK_ATT_TAXONOMY_DIMITEMS, DustUtils.getPostfix(dimItemId, ":"), MIND_ASP_TAG);
+
+				Dust.access(MindAccess.Set, hDim, hDimItem, MISC_ATT_CONN_PARENT);
+				DustDevUtils.setTag(fact, hDim, hDimItem);
+			}
+		} else {
+			DustDevUtils.setTag(fact, MISC_TAG_ROOT);
+		}
+
 		String val = values.get(FactFldData.OrigValue);
 
 		if ( !DustUtils.isEmpty(val) ) {
@@ -113,12 +137,12 @@ public class XbrlPoolLoaderAgent extends DustAgent implements XbrlConsts {
 		}
 		return MIND_TAG_RESULT_READACCEPT;
 	}
-	
+
 	@Override
 	protected MindHandle agentEnd() throws Exception {
 
 		Dust.access(MindAccess.Commit, MIND_TAG_ACTION_PROCESS, MIND_TAG_CONTEXT_SELF, MISC_ATT_CONN_TARGET);
-		
+
 		return super.agentEnd();
 	}
 
@@ -134,10 +158,11 @@ public class XbrlPoolLoaderAgent extends DustAgent implements XbrlConsts {
 			ret = DustDevUtils.newHandle(XBRLTEST_UNIT, asp, "Report " + id);
 			Dust.access(MindAccess.Set, id, ret, TEXT_ATT_TOKEN);
 			Dust.access(MindAccess.Set, ret, parent, member, id);
+
+			if ( null != tm ) {
+				tm.put(asp, ret);
+			}
 		}
-
-		tm.put(asp, ret);
-
 		return ret;
 	}
 

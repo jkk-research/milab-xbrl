@@ -5,9 +5,7 @@ import java.net.URL;
 import java.util.Map;
 
 import javax.swing.ImageIcon;
-import javax.swing.JComboBox;
 import javax.swing.JFrame;
-import javax.swing.JLabel;
 import javax.swing.JPanel;
 import javax.swing.JScrollPane;
 import javax.swing.JSplitPane;
@@ -30,7 +28,7 @@ public class XbrlGuiFrameAgent extends DustAgent implements XbrlGuiConsts {
 		JFrame frame;
 		JTabbedPane tpBottom;
 		
-		JComboBox cbTaxonomySelector;
+//		JComboBox cbTaxonomySelector;
 		JTextField tfConceptFilter;
 		
 		Gui() {			

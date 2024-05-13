@@ -180,8 +180,15 @@ public class T01BlockGuiBoot implements XbrlConsts {
 		Dust.access(MindAccess.Insert, new MindCommitFilter(hAgtPoolLoader, MIND_TAG_ACTION_PROCESS), hDataFactRowData, MIND_ATT_KNOWLEDGE_LISTENERS, KEY_ADD);
 		Dust.access(MindAccess.Insert, new MindCommitFilter(hAgtPoolLoader, MIND_TAG_ACTION_END), hDataReportRow, MIND_ATT_KNOWLEDGE_LISTENERS, KEY_ADD);
 
-		MindHandle hAgtGuiFrame = DustDevUtils.registerAgent(XBRLTEST_UNIT, XBRLDOCK_NAR_GUI_FRAME, "GUI frame");
+//		MindHandle hAgtGuiFrame = DustDevUtils.registerAgent(XBRLTEST_UNIT, XBRLDOCK_NAR_GUI_FRAME, "GUI frame");
+		MindHandle hAgtGuiFrame = DustDevUtils.registerAgent(XBRLTEST_UNIT, MONTRU_NAR_WINDOW, "GUI frame");
 		Dust.access(MindAccess.Set, hDataReportPool, hAgtGuiFrame, MISC_ATT_CONN_SOURCE);
+
+		Dust.access(MindAccess.Set, "XBRLDock - Plain Report Viewer 0.1", hAgtGuiFrame, MONTRU_ATT_GEN_LABEL);
+		Dust.access(MindAccess.Insert, 10, hAgtGuiFrame, MONTRU_ATT_AREA_VECTORS, GEOMETRY_TAG_VECTOR_LOCATION, KEY_ADD);
+		Dust.access(MindAccess.Insert, 10, hAgtGuiFrame, MONTRU_ATT_AREA_VECTORS, GEOMETRY_TAG_VECTOR_LOCATION, KEY_ADD);
+		Dust.access(MindAccess.Insert, 1000, hAgtGuiFrame, MONTRU_ATT_AREA_VECTORS, GEOMETRY_TAG_VECTOR_SIZE, KEY_ADD);
+		Dust.access(MindAccess.Insert, 800, hAgtGuiFrame, MONTRU_ATT_AREA_VECTORS, GEOMETRY_TAG_VECTOR_SIZE, KEY_ADD);
 		Dust.access(MindAccess.Insert, hAgtGuiFrame, hDataReportPool, MIND_ATT_KNOWLEDGE_LISTENERS, KEY_ADD);
 
 //		DustDevUtils.setTag(hAgtXmlLoader, DEV_TAG_TEST);

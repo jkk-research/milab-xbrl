@@ -21,9 +21,12 @@ public interface XbrlHandles extends DustConsts {
 	MindHandle XBRLDOCK_ASP_ENTITY = Dust.lookup(XBRLDOCK_GEN);
 
 	MindHandle XBRLDOCK_ASP_CONCEPT = Dust.lookup(XBRLDOCK_GEN);
+	
 
 	MindHandle XBRLDOCK_ASP_TAXONOMY = Dust.lookup(XBRLDOCK_GEN);
 	MindHandle XBRLDOCK_ATT_TAXONOMY_CONCEPTS = Dust.lookup(XBRLDOCK_GEN);
+	MindHandle XBRLDOCK_ATT_TAXONOMY_DIMENSIONS = Dust.lookup(XBRLDOCK_GEN);
+	MindHandle XBRLDOCK_ATT_TAXONOMY_DIMITEMS = Dust.lookup(XBRLDOCK_GEN);
 
 	MindHandle XBRLDOCK_ASP_REPORT = Dust.lookup(XBRLDOCK_GEN);
 	MindHandle XBRLDOCK_ATT_REPORT_CONTEXTS = Dust.lookup(XBRLDOCK_GEN);
