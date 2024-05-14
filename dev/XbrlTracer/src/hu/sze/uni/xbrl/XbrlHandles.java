@@ -60,7 +60,7 @@ public interface XbrlHandles extends DustConsts {
 	MindHandle XBRLDOCK_ATT_XMLLOADER_ROWDATA = Dust.lookup(XBRLDOCK_GEN);
 	MindHandle XBRLDOCK_ATT_XMLLOADER_ROWTEXT = Dust.lookup(XBRLDOCK_GEN);
 
-	MindHandle XBRLDOCK_NAR_GUI_FRAME = Dust.lookup(XBRLDOCK_GEN);
+	MindHandle XBRLDOCK_NAR_GUI = Dust.lookup(XBRLDOCK_GEN);
 
 	
 	
