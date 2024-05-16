@@ -14,5 +14,5 @@
     <stringAttribute key="org.eclipse.jdt.launching.MAIN_TYPE" value="hu.sze.milab.dust.machine.DustMachineBoot"/>
     <stringAttribute key="org.eclipse.jdt.launching.MODULE_NAME" value="DustTracer"/>
     <stringAttribute key="org.eclipse.jdt.launching.PROJECT_ATTR" value="XbrlTracer"/>
-    <stringAttribute key="org.eclipse.jdt.launching.VM_ARGUMENTS" value="-DXmx2048M -DDustBootClass=hu.sze.uni.xbrl.charles.t01blockgui.T01BlockGuiBoot"/>
+    <stringAttribute key="org.eclipse.jdt.launching.VM_ARGUMENTS" value="-DXmx2048M -DDustBootClass=hu.sze.uni.xbrl.charles.t01blockgui.T01BlockGuiBoot -DDustSingleThreaded=true"/>
 </launchConfiguration>

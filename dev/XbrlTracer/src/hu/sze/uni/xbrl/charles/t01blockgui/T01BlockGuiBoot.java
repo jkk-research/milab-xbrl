@@ -197,7 +197,6 @@ public class T01BlockGuiBoot implements XbrlConsts {
 		MindHandle hAgtGuiMainPanel = DustDevUtils.registerAgent(XBRLTEST_UNIT, MONTRU_NAR_CONTAINER, "Main panel");
 		DustDevUtils.setTag(hAgtGuiMainPanel, MONTRU_TAG_LAYOUT_SPLIT, MONTRU_TAG_LAYOUT);
 		DustDevUtils.setTag(hAgtGuiMainPanel, GEOMETRY_TAG_VALTYPE_CARTESIAN_Y, GEOMETRY_TAG_VALTYPE);
-		Dust.access(MindAccess.Set, hAgtGuiMainPanel, hAgtGuiFrame, MONTRU_ATT_WINDOW_MAIN);
 
 		MindHandle hAgtGuiTopPanel = DustDevUtils.registerAgent(XBRLTEST_UNIT, MONTRU_NAR_CONTAINER, "Top panel");
 		DustDevUtils.setTag(hAgtGuiTopPanel, MONTRU_TAG_LAYOUT_SPLIT, MONTRU_TAG_LAYOUT);
@@ -206,7 +205,6 @@ public class T01BlockGuiBoot implements XbrlConsts {
 
 		MindHandle hAgtGuiConceptFilterPanel = DustDevUtils.registerAgent(XBRLTEST_UNIT, MONTRU_NAR_CONTAINER, "ConceptFilter panel");
 		DustDevUtils.setTag(hAgtGuiConceptFilterPanel, MONTRU_TAG_LAYOUT_PAGE, MONTRU_TAG_LAYOUT);
-		DustDevUtils.setTag(hAgtGuiConceptFilterPanel, GEOMETRY_TAG_VALTYPE_CARTESIAN_Y, GEOMETRY_TAG_VALTYPE);
 		Dust.access(MindAccess.Insert, hAgtGuiConceptFilterPanel, hAgtGuiTopPanel, MISC_ATT_CONN_MEMBERARR, KEY_ADD);
 
 		MindHandle hAgtGuiConceptFilterWidgetPanel = DustDevUtils.registerAgent(XBRLTEST_UNIT, MONTRU_NAR_CONTAINER, "ConceptFilter controls");
@@ -231,6 +229,7 @@ public class T01BlockGuiBoot implements XbrlConsts {
 		MindHandle hAgtBtnAddConcept = DustDevUtils.registerAgent(XBRLTEST_UNIT, MONTRU_NAR_WIDGET, "Concept add button");
 		DustDevUtils.setTag(hAgtBtnAddConcept, MONTRU_TAG_WIDGET_BUTTON, MONTRU_TAG_WIDGET);
 		DustDevUtils.setTag(hAgtBtnAddConcept, MONTRU_TAG_PAGE_FOOTER, MONTRU_TAG_PAGE);
+		Dust.access(MindAccess.Set, hDataReportPool, hAgtBtnAddConcept, MISC_ATT_CONN_TARGET);
 		Dust.access(MindAccess.Insert, hAgtBtnAddConcept, hAgtGuiConceptFilterPanel, MISC_ATT_CONN_MEMBERARR, KEY_ADD);
 
 		MindHandle hAgtGridSelFacts = DustDevUtils.registerAgent(XBRLTEST_UNIT, MONTRU_NAR_GRID, "Fact (main data) grid");
@@ -238,7 +237,6 @@ public class T01BlockGuiBoot implements XbrlConsts {
 
 		MindHandle hAgtGuiBottomPanel = DustDevUtils.registerAgent(XBRLTEST_UNIT, MONTRU_NAR_CONTAINER, "Bottom panel");
 		DustDevUtils.setTag(hAgtGuiBottomPanel, MONTRU_TAG_LAYOUT_TAB, MONTRU_TAG_LAYOUT);
-		DustDevUtils.setTag(hAgtGuiBottomPanel, MONTRU_TAG_PAGE_HEADER, MONTRU_TAG_PAGE);
 		Dust.access(MindAccess.Insert, hAgtGuiBottomPanel, hAgtGuiMainPanel, MISC_ATT_CONN_MEMBERARR, KEY_ADD);
 
 		MindHandle hAgtGridEntities = DustDevUtils.registerAgent(XBRLTEST_UNIT, MONTRU_NAR_GRID, "Entities grid");
@@ -250,6 +248,17 @@ public class T01BlockGuiBoot implements XbrlConsts {
 		Dust.access(MindAccess.Insert, XBRLDOCK_ATT_POOL_REPORTS, hAgtGridReports, MISC_ATT_REF_PATH, KEY_ADD);
 		Dust.access(MindAccess.Set, "Reports", hAgtGridReports, MONTRU_ATT_GEN_LABEL);
 		Dust.access(MindAccess.Insert, hAgtGridReports, hAgtGuiBottomPanel, MISC_ATT_CONN_MEMBERARR, KEY_ADD);
+
+		MindHandle hAgtTreeDims = DustDevUtils.registerAgent(XBRLTEST_UNIT, MONTRU_NAR_WIDGET, "Dimension tree");
+		DustDevUtils.setTag(hAgtTreeDims, MONTRU_TAG_WIDGET_TREE, MONTRU_TAG_WIDGET);
+		Dust.access(MindAccess.Insert, XBRLDOCK_ATT_POOL_TAXONOMIES, hAgtTreeDims, MISC_ATT_REF_PATH, KEY_ADD);
+		Dust.access(MindAccess.Set, "Dimensions", hAgtTreeDims, MONTRU_ATT_GEN_LABEL);
+		Dust.access(MindAccess.Insert, hAgtTreeDims, hAgtGuiBottomPanel, MISC_ATT_CONN_MEMBERARR, KEY_ADD);
+
+		
+		
+//		Dust.access(MindAccess.Set, hAgtGuiTopPanel, hAgtGuiFrame, MONTRU_ATT_WINDOW_MAIN);
+		Dust.access(MindAccess.Set, hAgtGuiMainPanel, hAgtGuiFrame, MONTRU_ATT_WINDOW_MAIN);
 
 //		DustDevUtils.setTag(hAgtXmlLoader, DEV_TAG_TEST);
 
@@ -267,7 +276,8 @@ public class T01BlockGuiBoot implements XbrlConsts {
 			Dust.access(MindAccess.Insert, hAgtCsvFactWriterData, hDataFactRowData, MIND_ATT_KNOWLEDGE_LISTENERS, KEY_ADD);
 		}
 
-		boolean guiOnly = true;
+		boolean guiOnly = false;
+//		boolean guiOnly = true;
 
 		if ( !guiOnly ) {
 			DustDevUtils.setTag(hDataReportStream, MISC_TAG_TRANSACTION);

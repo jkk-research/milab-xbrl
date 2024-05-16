@@ -132,6 +132,7 @@ public class XbrlPoolLoaderAgent extends DustAgent implements XbrlConsts {
 				Object t = tm.get(ta);
 				if ( null != t ) {
 					Dust.access(MindAccess.Set, val, t, MISC_ATT_GEN_EXTMAP, cid);
+//					Dust.log(EVENT_TAG_TYPE_TRACE, "Ext value", cid, val);
 				}
 			}
 		}
@@ -158,11 +159,11 @@ public class XbrlPoolLoaderAgent extends DustAgent implements XbrlConsts {
 			ret = DustDevUtils.newHandle(XBRLTEST_UNIT, asp, "Report " + id);
 			Dust.access(MindAccess.Set, id, ret, TEXT_ATT_TOKEN);
 			Dust.access(MindAccess.Set, ret, parent, member, id);
-
-			if ( null != tm ) {
-				tm.put(asp, ret);
-			}
 		}
+		if ( null != tm ) {
+			tm.put(asp, ret);
+		}
+
 		return ret;
 	}
 
