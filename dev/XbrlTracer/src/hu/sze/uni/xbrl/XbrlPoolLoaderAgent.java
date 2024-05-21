@@ -3,15 +3,20 @@ package hu.sze.uni.xbrl;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.regex.Pattern;
 
 import org.json.simple.JSONValue;
 
 import hu.sze.milab.dust.Dust;
 import hu.sze.milab.dust.DustAgent;
+import hu.sze.milab.dust.dev.DustDevCounter;
 import hu.sze.milab.dust.dev.DustDevUtils;
 import hu.sze.milab.dust.utils.DustUtils;
 
 public class XbrlPoolLoaderAgent extends DustAgent implements XbrlConsts {
+
+	Pattern pt = Pattern.compile("\\d{4}-\\d{2}-\\d{2}");
+	DustDevCounter reps = new DustDevCounter("reports", false);
 
 	@SuppressWarnings("unchecked")
 	@Override
@@ -24,10 +29,11 @@ public class XbrlPoolLoaderAgent extends DustAgent implements XbrlConsts {
 		Map<Object, Object> tm = new HashMap<>();
 		String id;
 
-		id = values.get(FactFldCommon.File);
+		String repId = id = values.get(FactFldCommon.File);
 		MindHandle report = getItem(tm, pool, XBRLDOCK_ATT_POOL_REPORTS, id, XBRLDOCK_ASP_REPORT);
+		reps.add(repId);
 
-		id = values.get(FactFldCommon.FactId);
+		String factId = id = values.get(FactFldCommon.FactId);
 		MindHandle fact = getItem(tm, report, MISC_ATT_CONN_MEMBERMAP, id, XBRLDOCK_ASP_FACT);
 		Dust.access(MindAccess.Set, report, fact, MISC_ATT_CONN_OWNER);
 
@@ -45,7 +51,7 @@ public class XbrlPoolLoaderAgent extends DustAgent implements XbrlConsts {
 			String d1 = values.get(FactFldCommon.Instant);
 			String d2 = null;
 			String eventId = d1;
-			if ( null == eventId ) {
+			if ( DustUtils.isEmpty(eventId) ) {
 				eventId = (d1 = values.get(FactFldCommon.StartDate)) + "/" + (d2 = values.get(FactFldCommon.EndDate));
 			}
 
@@ -54,9 +60,9 @@ public class XbrlPoolLoaderAgent extends DustAgent implements XbrlConsts {
 			if ( null == event ) {
 				event = getItem(tm, cal, MISC_ATT_CONN_MEMBERMAP, eventId, EVENT_ASP_EVENT);
 
-				setTime(event, d1, EVENT_ATT_EVENT_START);
+				setTime(repId, factId, event, d1, EVENT_ATT_EVENT_START);
 				if ( null != d2 ) {
-					setTime(event, d2, EVENT_ATT_EVENT_END);
+					setTime(repId, factId, event, d2, EVENT_ATT_EVENT_END);
 				}
 			}
 
@@ -141,16 +147,29 @@ public class XbrlPoolLoaderAgent extends DustAgent implements XbrlConsts {
 
 	@Override
 	protected MindHandle agentEnd() throws Exception {
-
 		Dust.access(MindAccess.Commit, MIND_TAG_ACTION_PROCESS, MIND_TAG_CONTEXT_SELF, MISC_ATT_CONN_TARGET);
 
 		return super.agentEnd();
 	}
 
-	public void setTime(MindHandle event, String d1, MindHandle hEvtMember) {
+	public boolean setTime(String repId, String factId, MindHandle event, String d1, MindHandle hEvtMember) {
+		if ( !pt.matcher(d1).matches() ) {
+			
+			Dust.log(EVENT_TAG_TYPE_WARNING, "Weird time value", repId, factId, d1);
+			
+			return false;
+		}
+		
+//		if ( d1.startsWith("203") ) {
+//			Dust.log(EVENT_TAG_TYPE_WARNING, "High time value", repId, factId, d1);
+//
+//		}
+		
 		MindHandle time = DustDevUtils.newHandle(XBRLTEST_UNIT, EVENT_ASP_TIME, d1);
 		Dust.access(MindAccess.Set, d1, time, TEXT_ATT_TOKEN);
 		Dust.access(MindAccess.Set, time, event, hEvtMember);
+		
+		return true;
 	}
 
 	public MindHandle getItem(Map<Object, Object> tm, MindHandle parent, MindHandle member, String id, MindHandle asp) {

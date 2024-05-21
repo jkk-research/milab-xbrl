@@ -39,7 +39,8 @@ public class XbrlParserXmlAgent extends DustAgent implements XbrlParserConsts {
 	@Override
 	protected MindHandle agentProcess() throws Exception {
 		String filePath = Dust.access(MindAccess.Peek, null, MIND_TAG_CONTEXT_TARGET, RESOURCE_ATT_URL_PATH);
-		String fileName = DustUtils.getPostfix(filePath, File.separator);
+		String sep = Dust.access(MindAccess.Peek, "", MIND_TAG_CONTEXT_SELF, MISC_ATT_GEN_SEP_ITEM) + File.separator;
+		String fileName = DustUtils.getPostfix(filePath, sep);
 
 		boolean test = DustDevUtils.chkTag(MIND_TAG_CONTEXT_SELF, DEV_TAG_TEST);
 		boolean hash = DustDevUtils.chkTag(MIND_TAG_CONTEXT_SELF, MISC_TAG_DBLHASH);
@@ -251,7 +252,7 @@ public class XbrlParserXmlAgent extends DustAgent implements XbrlParserConsts {
 									unit = "-";
 								}
 							}
-
+						
 							setRowData(hRowData, FactFldData.UnitId, unitId);
 							setRowData(hRowData, FactFldData.Unit, unit);
 							setRowData(hRowData, FactFldData.OrigValue, DustStreamUtils.csvEscape(val, true));
@@ -280,13 +281,13 @@ public class XbrlParserXmlAgent extends DustAgent implements XbrlParserConsts {
 									val = val + " " + txtFrag.getTextContent().trim();
 								}
 
-								setRowData(hRowText, FactFldText.Value, val);
+								setRowData(hRowText, FactFldText.Value, DustStreamUtils.csvEscape(val, true));
 
 								Dust.access(MindAccess.Commit, MIND_TAG_ACTION_PROCESS, hRowText);
 							}
 
 							String clipVal = (factType == FactType.Text) ? val.substring(0, STRING_LIMIT - 3) + "..." : val;
-							setRowData(hRowData, FactFldData.OrigValue, clipVal);
+							setRowData(hRowData, FactFldData.OrigValue, DustStreamUtils.csvEscape(clipVal, true));
 							setRowData(hRowData, FactFldData.Value, Integer.toString(vlen));
 						}
 

@@ -9,7 +9,7 @@ import hu.sze.milab.dust.utils.DustUtilsFile;
 import hu.sze.uni.xbrl.XbrlConsts;
 import hu.sze.uni.xbrl.XbrlHandles;
 import hu.sze.uni.xbrl.XbrlPoolLoaderAgent;
-import hu.sze.uni.xbrl.gui.XbrlGuiFrameAgent;
+import hu.sze.uni.xbrl.browser.XbrlBrowserDataNarrative;
 import hu.sze.uni.xbrl.parser.XbrlParserXmlAgent;
 
 public class T01BlockGuiBoot implements XbrlConsts {
@@ -32,18 +32,16 @@ public class T01BlockGuiBoot implements XbrlConsts {
 
 		DustDevUtils.registerNative(XBRLDOCK_NAR_XMLLOADER, XBRLDOCK_UNIT, APP_MODULE_MAIN, XbrlParserXmlAgent.class.getName());
 		DustDevUtils.registerNative(XBRLDOCK_NAR_POOLLOADER, XBRLDOCK_UNIT, APP_MODULE_MAIN, XbrlPoolLoaderAgent.class.getName());
-		DustDevUtils.registerNative(XBRLDOCK_NAR_GUI, XBRLDOCK_UNIT, APP_MODULE_MAIN, XbrlGuiFrameAgent.class.getName());
+		DustDevUtils.registerNative(XBRLDOCK_NAR_DATABROWSER, XBRLDOCK_UNIT, APP_MODULE_MAIN, XbrlBrowserDataNarrative.class.getName());
 
 		// Set work root folder
 
-		MindHandle hAgtT01Root = DustDevUtils.registerAgent(XBRLTEST_UNIT, RESOURCE_NAR_FILESYSTEM, "Test01 data root");
-		Dust.access(MindAccess.Set, "chd/t01", hAgtT01Root, RESOURCE_ATT_URL_PATH);
+		MindHandle hAgtT01Root = DustDevUtils.registerAgent(XBRLTEST_UNIT, RESOURCE_NAR_FILESYSTEM, "Test data root");
 
 		// reading the report list CSV
 
 		MindHandle hDataReportStream = DustDevUtils.newHandle(XBRLTEST_UNIT, RESOURCE_ASP_STREAM, "Report list stream");
 
-		Dust.access(MindAccess.Set, "MicrosoftReports.txt", hDataReportStream, TEXT_ATT_TOKEN);
 		DustDevUtils.setTag(hDataReportStream, MISC_TAG_DIRECTION_IN, MISC_TAG_DIRECTION);
 		DustDevUtils.setTag(hDataReportStream, RESOURCE_TAG_STREAMTYPE_TEXT, RESOURCE_TAG_STREAMTYPE);
 
@@ -138,6 +136,8 @@ public class T01BlockGuiBoot implements XbrlConsts {
 		Dust.access(MindAccess.Insert, hAgtCsvFactWriterText, hDataFactRowText, MIND_ATT_KNOWLEDGE_LISTENERS, KEY_ADD);
 
 		MindHandle hAgtXmlLoader = DustDevUtils.registerAgent(XBRLTEST_UNIT, XBRLDOCK_NAR_XMLLOADER, "XML loader");
+		String repRoot = Dust.access(MindAccess.Peek, "reports", hAgtReportCacheRoot, TEXT_ATT_TOKEN);
+		Dust.access(MindAccess.Set, repRoot, hAgtXmlLoader, MISC_ATT_GEN_SEP_ITEM);
 		Dust.access(MindAccess.Set, hAgtCsvFactWriterData, hAgtXmlLoader, XBRLDOCK_ATT_XMLLOADER_ROWDATA);
 		Dust.access(MindAccess.Set, hAgtCsvFactWriterText, hAgtXmlLoader, XBRLDOCK_ATT_XMLLOADER_ROWTEXT);
 		Dust.access(MindAccess.Insert, hAgtXmlLoader, hDataReportContent, MIND_ATT_KNOWLEDGE_LISTENERS, KEY_ADD);
@@ -148,7 +148,7 @@ public class T01BlockGuiBoot implements XbrlConsts {
 		Dust.access(MindAccess.Set, DustUtils.class, hAgtDataLoaderExpr, EXPR_ATT_EXPRESSION_STATIC, "DustUtils");
 		Dust.access(MindAccess.Set, hDataFactStreamData, hAgtDataLoaderExpr, MISC_ATT_CONN_TARGET);
 		Dust.access(MindAccess.Set, MISC_ATT_CONN_MEMBERMAP, hAgtDataLoaderExpr, MISC_ATT_GEN_TARGET_ATT);
-		Dust.access(MindAccess.Set, "DustUtils.getPostfix(get('ReportURL'), '/').replace('.xml', '_Data.csv')", hAgtDataLoaderExpr, MISC_ATT_CONN_MEMBERMAP, TEXT_ATT_TOKEN);
+		Dust.access(MindAccess.Set, "DustUtils.getPostfix(get('ReportURL'), 'data/').replace('.xml', '_Data.csv')", hAgtDataLoaderExpr, MISC_ATT_CONN_MEMBERMAP, TEXT_ATT_TOKEN);
 
 		// Report pool
 
@@ -179,13 +179,24 @@ public class T01BlockGuiBoot implements XbrlConsts {
 
 		Dust.access(MindAccess.Insert, new MindCommitFilter(hAgtPoolLoader, MIND_TAG_ACTION_PROCESS), hDataFactRowData, MIND_ATT_KNOWLEDGE_LISTENERS, KEY_ADD);
 		Dust.access(MindAccess.Insert, new MindCommitFilter(hAgtPoolLoader, MIND_TAG_ACTION_END), hDataReportRow, MIND_ATT_KNOWLEDGE_LISTENERS, KEY_ADD);
+		
+		
+		// Data browser
 
-		MindHandle hAgtGui = DustDevUtils.registerAgent(XBRLTEST_UNIT, XBRLDOCK_NAR_GUI, "XBRL GUI Narrative");
+		MindHandle hDataBrowserIn = DustDevUtils.registerAgent(XBRLTEST_UNIT, XBRLDOCK_ASP_DATABROWSERIN, "DataBrowser input");
+		MindHandle hDataBrowserOut = DustDevUtils.registerAgent(XBRLTEST_UNIT, XBRLDOCK_ASP_DATABROWSEROUT, "DataBrowser output");
 
-//		MindHandle hAgtGuiFrame = DustDevUtils.registerAgent(XBRLTEST_UNIT, XBRLDOCK_NAR_GUI_FRAME, "GUI frame");
+		MindHandle hAgtDataBrowser = DustDevUtils.registerAgent(XBRLTEST_UNIT, XBRLDOCK_NAR_DATABROWSER, "XBRL DataBrowser Narrative");
+		Dust.access(MindAccess.Set, hDataBrowserIn, hAgtDataBrowser, MISC_ATT_CONN_SOURCE);
+		Dust.access(MindAccess.Set, hDataBrowserOut, hAgtDataBrowser, MISC_ATT_CONN_TARGET);
+		Dust.access(MindAccess.Insert, hAgtDataBrowser, hDataBrowserIn, MIND_ATT_KNOWLEDGE_LISTENERS, KEY_ADD);
+		Dust.access(MindAccess.Insert, hAgtDataBrowser, hDataReportPool, MIND_ATT_KNOWLEDGE_LISTENERS, KEY_ADD);
+
+		// GUI
+		
 		MindHandle hAgtGuiFrame = DustDevUtils.registerAgent(XBRLTEST_UNIT, MONTRU_NAR_WINDOW, "GUI frame");
 		Dust.access(MindAccess.Set, hDataReportPool, hAgtGuiFrame, MISC_ATT_CONN_SOURCE);
-		Dust.access(MindAccess.Set, hAgtGui, hAgtGuiFrame, MISC_ATT_CONN_TARGET);
+		Dust.access(MindAccess.Set, "Nimbus", hAgtGuiFrame, MONTRU_ATT_GUI_THEME);
 
 		Dust.access(MindAccess.Set, "XBRLDock - Plain Report Viewer 0.1", hAgtGuiFrame, MONTRU_ATT_GEN_LABEL);
 		Dust.access(MindAccess.Insert, 10, hAgtGuiFrame, MONTRU_ATT_AREA_VECTORS, GEOMETRY_TAG_VECTOR_LOCATION, KEY_ADD);
@@ -203,9 +214,14 @@ public class T01BlockGuiBoot implements XbrlConsts {
 		DustDevUtils.setTag(hAgtGuiTopPanel, GEOMETRY_TAG_VALTYPE_CARTESIAN_X, GEOMETRY_TAG_VALTYPE);
 		Dust.access(MindAccess.Insert, hAgtGuiTopPanel, hAgtGuiMainPanel, MISC_ATT_CONN_MEMBERARR, KEY_ADD);
 
+		MindHandle hAgtPivotConfigTabs = DustDevUtils.registerAgent(XBRLTEST_UNIT, MONTRU_NAR_CONTAINER, "Pivot config panel");
+		DustDevUtils.setTag(hAgtPivotConfigTabs, MONTRU_TAG_LAYOUT_TAB, MONTRU_TAG_LAYOUT);
+		Dust.access(MindAccess.Insert, hAgtPivotConfigTabs, hAgtGuiTopPanel, MISC_ATT_CONN_MEMBERARR, KEY_ADD);
+
 		MindHandle hAgtGuiConceptFilterPanel = DustDevUtils.registerAgent(XBRLTEST_UNIT, MONTRU_NAR_CONTAINER, "ConceptFilter panel");
 		DustDevUtils.setTag(hAgtGuiConceptFilterPanel, MONTRU_TAG_LAYOUT_PAGE, MONTRU_TAG_LAYOUT);
-		Dust.access(MindAccess.Insert, hAgtGuiConceptFilterPanel, hAgtGuiTopPanel, MISC_ATT_CONN_MEMBERARR, KEY_ADD);
+		Dust.access(MindAccess.Set, "Concepts", hAgtGuiConceptFilterPanel, MONTRU_ATT_GEN_LABEL);
+		Dust.access(MindAccess.Insert, hAgtGuiConceptFilterPanel, hAgtPivotConfigTabs, MISC_ATT_CONN_MEMBERARR, KEY_ADD);
 
 		MindHandle hAgtGuiConceptFilterWidgetPanel = DustDevUtils.registerAgent(XBRLTEST_UNIT, MONTRU_NAR_CONTAINER, "ConceptFilter controls");
 		DustDevUtils.setTag(hAgtGuiConceptFilterWidgetPanel, MONTRU_TAG_LAYOUT_BOX, MONTRU_TAG_LAYOUT);
@@ -232,6 +248,11 @@ public class T01BlockGuiBoot implements XbrlConsts {
 		Dust.access(MindAccess.Set, hDataReportPool, hAgtBtnAddConcept, MISC_ATT_CONN_TARGET);
 		Dust.access(MindAccess.Insert, hAgtBtnAddConcept, hAgtGuiConceptFilterPanel, MISC_ATT_CONN_MEMBERARR, KEY_ADD);
 
+		MindHandle hAgtTreePivot = DustDevUtils.registerAgent(XBRLTEST_UNIT, MONTRU_NAR_WIDGET, "Pivot settings");
+		DustDevUtils.setTag(hAgtTreePivot, MONTRU_TAG_WIDGET_TREE, MONTRU_TAG_WIDGET);
+		Dust.access(MindAccess.Set, "Pivot settings", hAgtTreePivot, MONTRU_ATT_GEN_LABEL);
+		Dust.access(MindAccess.Insert, hAgtTreePivot, hAgtPivotConfigTabs, MISC_ATT_CONN_MEMBERARR, KEY_ADD);
+
 		MindHandle hAgtGridSelFacts = DustDevUtils.registerAgent(XBRLTEST_UNIT, MONTRU_NAR_GRID, "Fact (main data) grid");
 		Dust.access(MindAccess.Insert, hAgtGridSelFacts, hAgtGuiTopPanel, MISC_ATT_CONN_MEMBERARR, KEY_ADD);
 
@@ -249,20 +270,55 @@ public class T01BlockGuiBoot implements XbrlConsts {
 		Dust.access(MindAccess.Set, "Reports", hAgtGridReports, MONTRU_ATT_GEN_LABEL);
 		Dust.access(MindAccess.Insert, hAgtGridReports, hAgtGuiBottomPanel, MISC_ATT_CONN_MEMBERARR, KEY_ADD);
 
+		MindHandle hAgtGridEvents = DustDevUtils.registerAgent(XBRLTEST_UNIT, MONTRU_NAR_GRID, "Reports grid");
+		Dust.access(MindAccess.Insert, XBRLDOCK_ATT_POOL_CALENDAR, hAgtGridEvents, MISC_ATT_REF_PATH, KEY_ADD);
+		Dust.access(MindAccess.Insert, MISC_ATT_CONN_MEMBERMAP, hAgtGridEvents, MISC_ATT_REF_PATH, KEY_ADD);
+		Dust.access(MindAccess.Set, "Events", hAgtGridEvents, MONTRU_ATT_GEN_LABEL);
+		Dust.access(MindAccess.Insert, hAgtGridEvents, hAgtGuiBottomPanel, MISC_ATT_CONN_MEMBERARR, KEY_ADD);
+
 		MindHandle hAgtTreeDims = DustDevUtils.registerAgent(XBRLTEST_UNIT, MONTRU_NAR_WIDGET, "Dimension tree");
 		DustDevUtils.setTag(hAgtTreeDims, MONTRU_TAG_WIDGET_TREE, MONTRU_TAG_WIDGET);
 		Dust.access(MindAccess.Insert, XBRLDOCK_ATT_POOL_TAXONOMIES, hAgtTreeDims, MISC_ATT_REF_PATH, KEY_ADD);
 		Dust.access(MindAccess.Set, "Dimensions", hAgtTreeDims, MONTRU_ATT_GEN_LABEL);
 		Dust.access(MindAccess.Insert, hAgtTreeDims, hAgtGuiBottomPanel, MISC_ATT_CONN_MEMBERARR, KEY_ADD);
 
-		
-		
+		MindHandle hAgtGridFacts = DustDevUtils.registerAgent(XBRLTEST_UNIT, MONTRU_NAR_GRID, "Facts grid");
+		Dust.access(MindAccess.Set, "Facts", hAgtGridFacts, MONTRU_ATT_GEN_LABEL);
+		Dust.access(MindAccess.Insert, XBRLDOCK_ATT_POOL_REPORTS, hAgtGridFacts, MISC_ATT_REF_PATH, KEY_ADD);
+		Dust.access(MindAccess.Insert, "msft-20171231.xml", hAgtGridFacts, MISC_ATT_REF_PATH, KEY_ADD);
+		Dust.access(MindAccess.Insert, MISC_ATT_CONN_MEMBERMAP, hAgtGridFacts, MISC_ATT_REF_PATH, KEY_ADD);
+		Dust.access(MindAccess.Insert, hAgtGridFacts, hAgtGuiBottomPanel, MISC_ATT_CONN_MEMBERARR, KEY_ADD);
+
 //		Dust.access(MindAccess.Set, hAgtGuiTopPanel, hAgtGuiFrame, MONTRU_ATT_WINDOW_MAIN);
 		Dust.access(MindAccess.Set, hAgtGuiMainPanel, hAgtGuiFrame, MONTRU_ATT_WINDOW_MAIN);
 
 //		DustDevUtils.setTag(hAgtXmlLoader, DEV_TAG_TEST);
 
-		boolean reportsCached = DustUtilsFile.exists(Dust.access(MindAccess.Peek, "", hAgtT01Root, RESOURCE_ATT_URL_PATH), Dust.access(MindAccess.Peek, "", hAgtReportCacheRoot, TEXT_ATT_TOKEN));
+		int testIdx = 3;
+
+		switch ( testIdx ) {
+		case 1:
+			Dust.access(MindAccess.Set, "chd/t01", hAgtT01Root, RESOURCE_ATT_URL_PATH);
+			Dust.access(MindAccess.Set, "MicrosoftReports.txt", hDataReportStream, TEXT_ATT_TOKEN);
+			break;
+		case 2:
+			Dust.access(MindAccess.Set, "chd/t02", hAgtT01Root, RESOURCE_ATT_URL_PATH);
+			Dust.access(MindAccess.Set, "reports-softwareCompanies.txt", hDataReportStream, TEXT_ATT_TOKEN);
+			break;
+		case 3:
+			Dust.access(MindAccess.Set, "chd/t03", hAgtT01Root, RESOURCE_ATT_URL_PATH);
+			Dust.access(MindAccess.Set, "reports-ferc.txt", hDataReportStream, TEXT_ATT_TOKEN);
+			break;
+		}
+
+		MindHandle hAgtCounter = DustDevUtils.registerAgent(XBRLTEST_UNIT, MISC_NAR_COUNTER, "Report counter");
+		Dust.access(MindAccess.Set, "Report ref counts", hAgtCounter, TEXT_ATT_TOKEN);
+		DustDevUtils.setTag(hAgtCounter, MISC_TAG_SORTED);
+		Dust.access(MindAccess.Insert, MISC_ATT_CONN_MEMBERMAP, hAgtCounter, MISC_ATT_REF_PATH, KEY_ADD);
+		Dust.access(MindAccess.Insert, "ReportURL", hAgtCounter, MISC_ATT_REF_PATH, KEY_ADD);
+		Dust.access(MindAccess.Insert, hAgtCounter, hDataReportRow, MIND_ATT_KNOWLEDGE_LISTENERS, KEY_ADD);
+
+		boolean reportsCached = DustUtilsFile.exists(Dust.access(MindAccess.Peek, "", hAgtT01Root, RESOURCE_ATT_URL_PATH), Dust.access(MindAccess.Peek, "", hAgtFactCacheRoot, TEXT_ATT_TOKEN));
 
 //		reportsCached = false;
 
@@ -283,7 +339,7 @@ public class T01BlockGuiBoot implements XbrlConsts {
 			DustDevUtils.setTag(hDataReportStream, MISC_TAG_TRANSACTION);
 			Dust.access(MindAccess.Set, hDataReportStream, APP_ASSEMBLY_MAIN, MIND_ATT_ASSEMBLY_STARTCOMMITS, KEY_ADD);
 		}
-		
+
 		Dust.access(MindAccess.Set, hAgtGuiFrame, APP_ASSEMBLY_MAIN, MIND_ATT_ASSEMBLY_STARTAGENTS, KEY_ADD);
 
 	}
