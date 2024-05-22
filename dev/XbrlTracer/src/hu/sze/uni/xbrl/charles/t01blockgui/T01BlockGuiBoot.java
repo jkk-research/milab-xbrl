@@ -179,8 +179,7 @@ public class T01BlockGuiBoot implements XbrlConsts {
 
 		Dust.access(MindAccess.Insert, new MindCommitFilter(hAgtPoolLoader, MIND_TAG_ACTION_PROCESS), hDataFactRowData, MIND_ATT_KNOWLEDGE_LISTENERS, KEY_ADD);
 		Dust.access(MindAccess.Insert, new MindCommitFilter(hAgtPoolLoader, MIND_TAG_ACTION_END), hDataReportRow, MIND_ATT_KNOWLEDGE_LISTENERS, KEY_ADD);
-		
-		
+
 		// Data browser
 
 		MindHandle hDataBrowserIn = DustDevUtils.registerAgent(XBRLTEST_UNIT, XBRLDOCK_ASP_DATABROWSERIN, "DataBrowser input");
@@ -193,7 +192,7 @@ public class T01BlockGuiBoot implements XbrlConsts {
 		Dust.access(MindAccess.Insert, hAgtDataBrowser, hDataReportPool, MIND_ATT_KNOWLEDGE_LISTENERS, KEY_ADD);
 
 		// GUI
-		
+
 		MindHandle hAgtGuiFrame = DustDevUtils.registerAgent(XBRLTEST_UNIT, MONTRU_NAR_WINDOW, "GUI frame");
 		Dust.access(MindAccess.Set, hDataReportPool, hAgtGuiFrame, MISC_ATT_CONN_SOURCE);
 		Dust.access(MindAccess.Set, "Nimbus", hAgtGuiFrame, MONTRU_ATT_GUI_THEME);
@@ -203,7 +202,6 @@ public class T01BlockGuiBoot implements XbrlConsts {
 		Dust.access(MindAccess.Insert, 10, hAgtGuiFrame, MONTRU_ATT_AREA_VECTORS, GEOMETRY_TAG_VECTOR_LOCATION, KEY_ADD);
 		Dust.access(MindAccess.Insert, 1000, hAgtGuiFrame, MONTRU_ATT_AREA_VECTORS, GEOMETRY_TAG_VECTOR_SIZE, KEY_ADD);
 		Dust.access(MindAccess.Insert, 800, hAgtGuiFrame, MONTRU_ATT_AREA_VECTORS, GEOMETRY_TAG_VECTOR_SIZE, KEY_ADD);
-		Dust.access(MindAccess.Insert, hAgtGuiFrame, hDataReportPool, MIND_ATT_KNOWLEDGE_LISTENERS, KEY_ADD);
 
 		MindHandle hAgtGuiMainPanel = DustDevUtils.registerAgent(XBRLTEST_UNIT, MONTRU_NAR_CONTAINER, "Main panel");
 		DustDevUtils.setTag(hAgtGuiMainPanel, MONTRU_TAG_LAYOUT_SPLIT, MONTRU_TAG_LAYOUT);
@@ -294,7 +292,7 @@ public class T01BlockGuiBoot implements XbrlConsts {
 
 //		DustDevUtils.setTag(hAgtXmlLoader, DEV_TAG_TEST);
 
-		int testIdx = 3;
+		int testIdx = 1;
 
 		switch ( testIdx ) {
 		case 1:
@@ -340,8 +338,13 @@ public class T01BlockGuiBoot implements XbrlConsts {
 			Dust.access(MindAccess.Set, hDataReportStream, APP_ASSEMBLY_MAIN, MIND_ATT_ASSEMBLY_STARTCOMMITS, KEY_ADD);
 		}
 
-		Dust.access(MindAccess.Set, hAgtGuiFrame, APP_ASSEMBLY_MAIN, MIND_ATT_ASSEMBLY_STARTAGENTS, KEY_ADD);
+//		boolean gui = false;
+		boolean gui = false;
 
+		if ( gui ) {
+			Dust.access(MindAccess.Insert, hAgtGuiFrame, hDataReportPool, MIND_ATT_KNOWLEDGE_LISTENERS, KEY_ADD);
+			Dust.access(MindAccess.Set, hAgtGuiFrame, APP_ASSEMBLY_MAIN, MIND_ATT_ASSEMBLY_STARTAGENTS, KEY_ADD);
+		}
 	}
 
 }

@@ -1,8 +1,11 @@
 package hu.sze.uni.xbrl;
 
+import java.text.DecimalFormat;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.Set;
+import java.util.TreeMap;
 import java.util.regex.Pattern;
 
 import org.json.simple.JSONValue;
@@ -11,9 +14,11 @@ import hu.sze.milab.dust.Dust;
 import hu.sze.milab.dust.DustAgent;
 import hu.sze.milab.dust.dev.DustDevCounter;
 import hu.sze.milab.dust.dev.DustDevUtils;
+import hu.sze.milab.dust.mvel.DustMvelConsts;
+import hu.sze.milab.dust.mvel.DustMvelUtils;
 import hu.sze.milab.dust.utils.DustUtils;
 
-public class XbrlPoolLoaderAgent extends DustAgent implements XbrlConsts {
+public class XbrlPoolLoaderAgent extends DustAgent implements XbrlConsts, DustMvelConsts {
 
 	Pattern pt = Pattern.compile("\\d{4}-\\d{2}-\\d{2}");
 	DustDevCounter reps = new DustDevCounter("reports", false);
@@ -67,9 +72,34 @@ public class XbrlPoolLoaderAgent extends DustAgent implements XbrlConsts {
 			}
 
 			Dust.access(MindAccess.Set, event, ctx, XBRLDOCK_ATT_CONTEXT_EVENT);
+
+			Dust.access(MindAccess.Insert, ctx, report, XBRLDOCK_ATT_REPORT_CONTEXTTREE, event);
+
+			String dims = values.get(FactFldCommon.Dimensions);
+			if ( !DustUtils.isEmpty(dims) ) {
+				Map<String, String> dm = (Map<String, String>) JSONValue.parse(dims);
+				for (Map.Entry<String, String> de : dm.entrySet()) {
+					String dimId = de.getKey();
+					String taxId = DustUtils.cutPostfix(dimId, ":");
+					MindHandle tax = getItem(tm, pool, XBRLDOCK_ATT_POOL_TAXONOMIES, taxId, XBRLDOCK_ASP_TAXONOMY);
+					MindHandle hDim = getItem(null, tax, XBRLDOCK_ATT_TAXONOMY_DIMENSIONS, DustUtils.getPostfix(dimId, ":"), MIND_ASP_TAG);
+
+					String dimItemId = de.getValue();
+					taxId = DustUtils.cutPostfix(dimItemId, ":");
+					tax = getItem(tm, pool, XBRLDOCK_ATT_POOL_TAXONOMIES, taxId, XBRLDOCK_ASP_TAXONOMY);
+					MindHandle hDimItem = getItem(null, tax, XBRLDOCK_ATT_TAXONOMY_DIMITEMS, DustUtils.getPostfix(dimItemId, ":"), MIND_ASP_TAG);
+
+					Dust.access(MindAccess.Set, hDim, hDimItem, MISC_ATT_CONN_PARENT);
+					DustDevUtils.setTag(ctx, hDim, hDimItem);
+				}
+			} else {
+				DustDevUtils.setTag(ctx, MISC_TAG_ROOT);
+			}
 		} else {
 			event = Dust.access(MindAccess.Peek, null, ctx, XBRLDOCK_ATT_CONTEXT_EVENT);
 		}
+
+		Dust.access(MindAccess.Insert, fact, ctx, XBRLDOCK_ATT_CONTEXT_FACTS);
 
 		String ns = values.get(FactFldCommon.TagNamespace);
 		MindHandle taxonomy = getItem(tm, pool, XBRLDOCK_ATT_POOL_TAXONOMIES, ns, XBRLDOCK_ASP_TAXONOMY);
@@ -84,27 +114,6 @@ public class XbrlPoolLoaderAgent extends DustAgent implements XbrlConsts {
 			if ( !DustUtils.isEmpty(val) ) {
 				Dust.access(MindAccess.Set, val, fact, fe.getValue());
 			}
-		}
-
-		String dims = values.get(FactFldCommon.Dimensions);
-		if ( !DustUtils.isEmpty(dims) ) {
-			Map<String, String> dm = (Map<String, String>) JSONValue.parse(dims);
-			for (Map.Entry<String, String> de : dm.entrySet()) {
-				String dimId = de.getKey();
-				String taxId = DustUtils.cutPostfix(dimId, ":");
-				MindHandle tax = getItem(tm, pool, XBRLDOCK_ATT_POOL_TAXONOMIES, taxId, XBRLDOCK_ASP_TAXONOMY);
-				MindHandle hDim = getItem(null, tax, XBRLDOCK_ATT_TAXONOMY_DIMENSIONS, DustUtils.getPostfix(dimId, ":"), MIND_ASP_TAG);
-
-				String dimItemId = de.getValue();
-				taxId = DustUtils.cutPostfix(dimItemId, ":");
-				tax = getItem(tm, pool, XBRLDOCK_ATT_POOL_TAXONOMIES, taxId, XBRLDOCK_ASP_TAXONOMY);
-				MindHandle hDimItem = getItem(null, tax, XBRLDOCK_ATT_TAXONOMY_DIMITEMS, DustUtils.getPostfix(dimItemId, ":"), MIND_ASP_TAG);
-
-				Dust.access(MindAccess.Set, hDim, hDimItem, MISC_ATT_CONN_PARENT);
-				DustDevUtils.setTag(fact, hDim, hDimItem);
-			}
-		} else {
-			DustDevUtils.setTag(fact, MISC_TAG_ROOT);
 		}
 
 		String val = values.get(FactFldData.OrigValue);
@@ -122,6 +131,8 @@ public class XbrlPoolLoaderAgent extends DustAgent implements XbrlConsts {
 				id = values.get(FactFldData.UnitId);
 				MindHandle unit = getItem(tm, pool, XBRLDOCK_ATT_POOL_MEASUREUNITS, id, XBRLDOCK_ASP_MEASUREUNIT);
 				Dust.access(MindAccess.Set, unit, fact, XBRLDOCK_ATT_FACT_MEASUREUNIT);
+
+//				Dust.access(MindAccess.Insert, fact, ctx, XBRLDOCK_ATT_CONTEXT_FACTSBYUNITS, unit);
 
 				break;
 			case String:
@@ -145,8 +156,111 @@ public class XbrlPoolLoaderAgent extends DustAgent implements XbrlConsts {
 		return MIND_TAG_RESULT_READACCEPT;
 	}
 
+	class FactAccess implements MvelDataWrapper {
+		DecimalFormat df = new DecimalFormat("#");
+
+		String tax;
+		Map<Object, String> conceptMap = new HashMap<>();
+
+		Map<String, Object> factVals = new TreeMap<>();
+		Map<String, Object> asked = new TreeMap<>();
+		Boolean valid;
+
+		public FactAccess(String tax) {
+			this.tax = tax;
+
+			Map<String, Object> taxUsGaap = Dust.access(MindAccess.Peek, null, MIND_TAG_CONTEXT_SELF, MISC_ATT_CONN_TARGET, XBRLDOCK_ATT_POOL_TAXONOMIES, tax, XBRLDOCK_ATT_TAXONOMY_CONCEPTS);
+			for (Map.Entry<String, Object> eCon : taxUsGaap.entrySet()) {
+				conceptMap.put(eCon.getValue(), tax + ":" + eCon.getKey());
+			}
+			
+			df.setMaximumFractionDigits(8);
+		}
+
+		void reset(Set<Object> facts) {
+			factVals.clear();
+			asked.clear();
+
+			for (Object f : facts) {
+				Object con = Dust.access(MindAccess.Peek, "?", f, XBRLDOCK_ATT_FACT_CONCEPT);
+				String key = conceptMap.get(con);
+				if ( !DustUtils.isEmpty(key) ) {
+					factVals.put(key, f);
+				}
+			}
+
+			valid = null;
+		}
+
+		boolean isValid() {
+			return Boolean.TRUE.equals(valid);
+		}
+
+		@Override
+		public Number getNum(String conceptId) {
+			Object f = factVals.get(conceptId);
+			Number ret = Dust.access(MindAccess.Peek, null, f, MISC_ATT_VARIANT_VALUE);
+
+			if ( null == ret ) {
+				valid = false;
+				ret = 0;
+			} else if ( null == valid ) {
+				valid = true;
+			}
+
+			asked.put(conceptId, df.format(ret));
+
+			return ret;
+		}
+
+	};
+
 	@Override
 	protected MindHandle agentEnd() throws Exception {
+
+		Map<Object, Object> reports = Dust.access(MindAccess.Peek, Collections.EMPTY_MAP, MIND_TAG_CONTEXT_SELF, MISC_ATT_CONN_TARGET, XBRLDOCK_ATT_POOL_REPORTS);
+
+		FactAccess fa = new FactAccess("us-gaap");
+		// Assets = Liabilities and Equity
+		Object expr = DustMvelUtils.compile("getNum('us-gaap:AssetsCurrent') == getNum('us-gaap:LiabilitiesCurrent') + getNum('us-gaap:StockholdersEquity')");
+
+		for (Map.Entry<Object, Object> eRep : reports.entrySet()) {
+			Object report = eRep.getValue();
+			Map<Object, Set<Object>> mapEvtCtx = Dust.access(MindAccess.Peek, Collections.EMPTY_MAP, report, XBRLDOCK_ATT_REPORT_CONTEXTTREE);
+
+			for (Map.Entry<Object, Set<Object>> eec : mapEvtCtx.entrySet()) {
+				String date = Dust.access(MindAccess.Peek, "?", eec.getKey(), TEXT_ATT_TOKEN);
+
+				for (Object ctx : eec.getValue()) {
+					String ctxId = Dust.access(MindAccess.Peek, "?", ctx, TEXT_ATT_TOKEN);
+					Set<Object> facts = Dust.access(MindAccess.Peek, null, ctx, XBRLDOCK_ATT_CONTEXT_FACTS);
+					if ( null != facts ) {
+						fa.reset(facts);
+
+						Object ret = DustMvelUtils.evalCompiled(expr, fa);
+
+						if ( fa.isValid() ) {
+							Dust.log(EVENT_TAG_TYPE_TRACE, eRep.getKey(), date, ret, fa.asked, ctxId);
+						}
+					}
+//					Map<Object, Set<Object>> mapUnitFact = Dust.access(MindAccess.Peek, Collections.EMPTY_MAP, ctx, XBRLDOCK_ATT_CONTEXT_FACTSBYUNITS);
+//					
+//					for ( Map.Entry<Object, Set<Object>> euf : mapUnitFact.entrySet() ) {
+//						Object unit = Dust.access(MindAccess.Peek, null, euf.getKey(), TEXT_ATT_TOKEN);
+//						Set<Object> facts = euf.getValue();
+//						
+//						Dust.log(EVENT_TAG_TYPE_TRACE, eRep.getKey(), date, ctxId, unit, facts);
+//					}
+				}
+			}
+		}
+		
+		/*
+
+
+
+		 */
+
 		Dust.access(MindAccess.Commit, MIND_TAG_ACTION_PROCESS, MIND_TAG_CONTEXT_SELF, MISC_ATT_CONN_TARGET);
 
 		return super.agentEnd();
@@ -154,21 +268,21 @@ public class XbrlPoolLoaderAgent extends DustAgent implements XbrlConsts {
 
 	public boolean setTime(String repId, String factId, MindHandle event, String d1, MindHandle hEvtMember) {
 		if ( !pt.matcher(d1).matches() ) {
-			
+
 			Dust.log(EVENT_TAG_TYPE_WARNING, "Weird time value", repId, factId, d1);
-			
+
 			return false;
 		}
-		
+
 //		if ( d1.startsWith("203") ) {
 //			Dust.log(EVENT_TAG_TYPE_WARNING, "High time value", repId, factId, d1);
 //
 //		}
-		
+
 		MindHandle time = DustDevUtils.newHandle(XBRLTEST_UNIT, EVENT_ASP_TIME, d1);
 		Dust.access(MindAccess.Set, d1, time, TEXT_ATT_TOKEN);
 		Dust.access(MindAccess.Set, time, event, hEvtMember);
-		
+
 		return true;
 	}
 

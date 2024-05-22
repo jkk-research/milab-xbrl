@@ -32,6 +32,7 @@ public interface XbrlHandles extends DustConsts {
 	MindHandle XBRLDOCK_ATT_REPORT_CONTEXTS = Dust.lookup(XBRLDOCK_GEN);
 	MindHandle XBRLDOCK_ATT_REPORT_UNITS = Dust.lookup(XBRLDOCK_GEN);
 	MindHandle XBRLDOCK_ATT_REPORT_TAXONOMIES = Dust.lookup(XBRLDOCK_GEN);
+	MindHandle XBRLDOCK_ATT_REPORT_CONTEXTTREE = Dust.lookup(XBRLDOCK_GEN);
 
 	MindHandle XBRLDOCK_ASP_MEASUREUNIT = Dust.lookup(XBRLDOCK_GEN);
 
@@ -39,6 +40,10 @@ public interface XbrlHandles extends DustConsts {
 	MindHandle XBRLDOCK_ATT_CONTEXT_EVENT = Dust.lookup(XBRLDOCK_GEN);
 	MindHandle XBRLDOCK_ATT_CONTEXT_ENTITY = Dust.lookup(XBRLDOCK_GEN);
 	MindHandle XBRLDOCK_ATT_CONTEXT_DIMENSIONS = Dust.lookup(XBRLDOCK_GEN);
+	MindHandle XBRLDOCK_ATT_CONTEXT_ROLLUP_PARENTS = Dust.lookup(XBRLDOCK_GEN);
+	MindHandle XBRLDOCK_ATT_CONTEXT_ROLLUP_CHILDREN = Dust.lookup(XBRLDOCK_GEN);
+	MindHandle XBRLDOCK_ATT_CONTEXT_FACTS = Dust.lookup(XBRLDOCK_GEN);
+//	MindHandle XBRLDOCK_ATT_CONTEXT_FACTSBYUNITS = Dust.lookup(XBRLDOCK_GEN);
 
 	MindHandle XBRLDOCK_ASP_FACT = Dust.lookup(XBRLDOCK_GEN);
 	MindHandle XBRLDOCK_ATT_FACT_CONCEPT = Dust.lookup(XBRLDOCK_GEN);
