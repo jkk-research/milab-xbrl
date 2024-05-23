@@ -173,7 +173,7 @@ public class XbrlPoolLoaderAgent extends DustAgent implements XbrlConsts, DustMv
 			for (Map.Entry<String, Object> eCon : taxUsGaap.entrySet()) {
 				conceptMap.put(eCon.getValue(), tax + ":" + eCon.getKey());
 			}
-			
+
 			df.setMaximumFractionDigits(8);
 		}
 
@@ -222,14 +222,29 @@ public class XbrlPoolLoaderAgent extends DustAgent implements XbrlConsts, DustMv
 
 		FactAccess fa = new FactAccess("us-gaap");
 		// Assets = Liabilities and Equity
-		Object expr = DustMvelUtils.compile("getNum('us-gaap:AssetsCurrent') == getNum('us-gaap:LiabilitiesCurrent') + getNum('us-gaap:StockholdersEquity')");
+		Object expr = DustMvelUtils.compile("getNum('us-gaap:Assets') == getNum('us-gaap:Liabilities') + getNum('us-gaap:StockholdersEquity')");
+
+		Object deiDocumentPeriodEndDate = Dust.access(MindAccess.Peek, null, MIND_TAG_CONTEXT_SELF, MISC_ATT_CONN_TARGET, XBRLDOCK_ATT_POOL_TAXONOMIES, "dei", XBRLDOCK_ATT_TAXONOMY_CONCEPTS,
+				"DocumentPeriodEndDate");
 
 		for (Map.Entry<Object, Object> eRep : reports.entrySet()) {
 			Object report = eRep.getValue();
 			Map<Object, Set<Object>> mapEvtCtx = Dust.access(MindAccess.Peek, Collections.EMPTY_MAP, report, XBRLDOCK_ATT_REPORT_CONTEXTTREE);
 
+			String repPeriod = null;
+			Map<Object, Object> repFacts = Dust.access(MindAccess.Peek, Collections.EMPTY_SET, report, MISC_ATT_CONN_MEMBERMAP);
+			for (Object f : repFacts.values()) {
+				Object con = Dust.access(MindAccess.Peek, null, f, XBRLDOCK_ATT_FACT_CONCEPT);
+				if ( deiDocumentPeriodEndDate == con ) {
+					repPeriod = Dust.access(MindAccess.Peek, null, f, TEXT_ATT_TOKEN);
+					break;
+				}
+			}
+
+			boolean found = false;
+
 			for (Map.Entry<Object, Set<Object>> eec : mapEvtCtx.entrySet()) {
-				String date = Dust.access(MindAccess.Peek, "?", eec.getKey(), TEXT_ATT_TOKEN);
+				String ctxPeriod = Dust.access(MindAccess.Peek, "?", eec.getKey(), TEXT_ATT_TOKEN);
 
 				for (Object ctx : eec.getValue()) {
 					String ctxId = Dust.access(MindAccess.Peek, "?", ctx, TEXT_ATT_TOKEN);
@@ -240,26 +255,18 @@ public class XbrlPoolLoaderAgent extends DustAgent implements XbrlConsts, DustMv
 						Object ret = DustMvelUtils.evalCompiled(expr, fa);
 
 						if ( fa.isValid() ) {
-							Dust.log(EVENT_TAG_TYPE_TRACE, eRep.getKey(), date, ret, fa.asked, ctxId);
+							if ( DustUtils.isEqual(repPeriod, ctxPeriod) ) {
+								found = true;
+								Dust.log(EVENT_TAG_TYPE_TRACE, eRep.getKey(), repPeriod, ctxPeriod, ret, fa.asked, ctxId);
+							}
 						}
 					}
-//					Map<Object, Set<Object>> mapUnitFact = Dust.access(MindAccess.Peek, Collections.EMPTY_MAP, ctx, XBRLDOCK_ATT_CONTEXT_FACTSBYUNITS);
-//					
-//					for ( Map.Entry<Object, Set<Object>> euf : mapUnitFact.entrySet() ) {
-//						Object unit = Dust.access(MindAccess.Peek, null, euf.getKey(), TEXT_ATT_TOKEN);
-//						Set<Object> facts = euf.getValue();
-//						
-//						Dust.log(EVENT_TAG_TYPE_TRACE, eRep.getKey(), date, ctxId, unit, facts);
-//					}
-				}
+				}				
+			}
+			if ( !found ) {
+				Dust.log(EVENT_TAG_TYPE_TRACE, "Balance not found", eRep.getKey(), repPeriod);
 			}
 		}
-		
-		/*
-
-
-
-		 */
 
 		Dust.access(MindAccess.Commit, MIND_TAG_ACTION_PROCESS, MIND_TAG_CONTEXT_SELF, MISC_ATT_CONN_TARGET);
 
