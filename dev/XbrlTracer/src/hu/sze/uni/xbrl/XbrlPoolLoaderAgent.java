@@ -1,11 +1,8 @@
 package hu.sze.uni.xbrl;
 
-import java.text.DecimalFormat;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.Map;
-import java.util.Set;
-import java.util.TreeMap;
 import java.util.regex.Pattern;
 
 import org.json.simple.JSONValue;
@@ -15,7 +12,6 @@ import hu.sze.milab.dust.DustAgent;
 import hu.sze.milab.dust.dev.DustDevCounter;
 import hu.sze.milab.dust.dev.DustDevUtils;
 import hu.sze.milab.dust.mvel.DustMvelConsts;
-import hu.sze.milab.dust.mvel.DustMvelUtils;
 import hu.sze.milab.dust.utils.DustUtils;
 
 public class XbrlPoolLoaderAgent extends DustAgent implements XbrlConsts, DustMvelConsts {
@@ -131,9 +127,6 @@ public class XbrlPoolLoaderAgent extends DustAgent implements XbrlConsts, DustMv
 				id = values.get(FactFldData.UnitId);
 				MindHandle unit = getItem(tm, pool, XBRLDOCK_ATT_POOL_MEASUREUNITS, id, XBRLDOCK_ASP_MEASUREUNIT);
 				Dust.access(MindAccess.Set, unit, fact, XBRLDOCK_ATT_FACT_MEASUREUNIT);
-
-//				Dust.access(MindAccess.Insert, fact, ctx, XBRLDOCK_ATT_CONTEXT_FACTSBYUNITS, unit);
-
 				break;
 			case String:
 				Dust.access(MindAccess.Set, val, fact, TEXT_ATT_TOKEN);
@@ -149,124 +142,14 @@ public class XbrlPoolLoaderAgent extends DustAgent implements XbrlConsts, DustMv
 				Object t = tm.get(ta);
 				if ( null != t ) {
 					Dust.access(MindAccess.Set, val, t, MISC_ATT_GEN_EXTMAP, cid);
-//					Dust.log(EVENT_TAG_TYPE_TRACE, "Ext value", cid, val);
 				}
 			}
 		}
 		return MIND_TAG_RESULT_READACCEPT;
 	}
 
-	class FactAccess implements MvelDataWrapper {
-		DecimalFormat df = new DecimalFormat("#");
-
-		String tax;
-		Map<Object, String> conceptMap = new HashMap<>();
-
-		Map<String, Object> factVals = new TreeMap<>();
-		Map<String, Object> asked = new TreeMap<>();
-		Boolean valid;
-
-		public FactAccess(String tax) {
-			this.tax = tax;
-
-			Map<String, Object> taxUsGaap = Dust.access(MindAccess.Peek, null, MIND_TAG_CONTEXT_SELF, MISC_ATT_CONN_TARGET, XBRLDOCK_ATT_POOL_TAXONOMIES, tax, XBRLDOCK_ATT_TAXONOMY_CONCEPTS);
-			for (Map.Entry<String, Object> eCon : taxUsGaap.entrySet()) {
-				conceptMap.put(eCon.getValue(), tax + ":" + eCon.getKey());
-			}
-
-			df.setMaximumFractionDigits(8);
-		}
-
-		void reset(Set<Object> facts) {
-			factVals.clear();
-			asked.clear();
-
-			for (Object f : facts) {
-				Object con = Dust.access(MindAccess.Peek, "?", f, XBRLDOCK_ATT_FACT_CONCEPT);
-				String key = conceptMap.get(con);
-				if ( !DustUtils.isEmpty(key) ) {
-					factVals.put(key, f);
-				}
-			}
-
-			valid = null;
-		}
-
-		boolean isValid() {
-			return Boolean.TRUE.equals(valid);
-		}
-
-		@Override
-		public Number getNum(String conceptId) {
-			Object f = factVals.get(conceptId);
-			Number ret = Dust.access(MindAccess.Peek, null, f, MISC_ATT_VARIANT_VALUE);
-
-			if ( null == ret ) {
-				valid = false;
-				ret = 0;
-			} else if ( null == valid ) {
-				valid = true;
-			}
-
-			asked.put(conceptId, df.format(ret));
-
-			return ret;
-		}
-
-	};
-
 	@Override
 	protected MindHandle agentEnd() throws Exception {
-
-		Map<Object, Object> reports = Dust.access(MindAccess.Peek, Collections.EMPTY_MAP, MIND_TAG_CONTEXT_SELF, MISC_ATT_CONN_TARGET, XBRLDOCK_ATT_POOL_REPORTS);
-
-		FactAccess fa = new FactAccess("us-gaap");
-		// Assets = Liabilities and Equity
-		Object expr = DustMvelUtils.compile("getNum('us-gaap:Assets') == getNum('us-gaap:Liabilities') + getNum('us-gaap:StockholdersEquity')");
-
-		Object deiDocumentPeriodEndDate = Dust.access(MindAccess.Peek, null, MIND_TAG_CONTEXT_SELF, MISC_ATT_CONN_TARGET, XBRLDOCK_ATT_POOL_TAXONOMIES, "dei", XBRLDOCK_ATT_TAXONOMY_CONCEPTS,
-				"DocumentPeriodEndDate");
-
-		for (Map.Entry<Object, Object> eRep : reports.entrySet()) {
-			Object report = eRep.getValue();
-			Map<Object, Set<Object>> mapEvtCtx = Dust.access(MindAccess.Peek, Collections.EMPTY_MAP, report, XBRLDOCK_ATT_REPORT_CONTEXTTREE);
-
-			String repPeriod = null;
-			Map<Object, Object> repFacts = Dust.access(MindAccess.Peek, Collections.EMPTY_SET, report, MISC_ATT_CONN_MEMBERMAP);
-			for (Object f : repFacts.values()) {
-				Object con = Dust.access(MindAccess.Peek, null, f, XBRLDOCK_ATT_FACT_CONCEPT);
-				if ( deiDocumentPeriodEndDate == con ) {
-					repPeriod = Dust.access(MindAccess.Peek, null, f, TEXT_ATT_TOKEN);
-					break;
-				}
-			}
-
-			boolean found = false;
-
-			for (Map.Entry<Object, Set<Object>> eec : mapEvtCtx.entrySet()) {
-				String ctxPeriod = Dust.access(MindAccess.Peek, "?", eec.getKey(), TEXT_ATT_TOKEN);
-
-				for (Object ctx : eec.getValue()) {
-					String ctxId = Dust.access(MindAccess.Peek, "?", ctx, TEXT_ATT_TOKEN);
-					Set<Object> facts = Dust.access(MindAccess.Peek, null, ctx, XBRLDOCK_ATT_CONTEXT_FACTS);
-					if ( null != facts ) {
-						fa.reset(facts);
-
-						Object ret = DustMvelUtils.evalCompiled(expr, fa);
-
-						if ( fa.isValid() ) {
-							if ( DustUtils.isEqual(repPeriod, ctxPeriod) ) {
-								found = true;
-								Dust.log(EVENT_TAG_TYPE_TRACE, eRep.getKey(), repPeriod, ctxPeriod, ret, fa.asked, ctxId);
-							}
-						}
-					}
-				}				
-			}
-			if ( !found ) {
-				Dust.log(EVENT_TAG_TYPE_TRACE, "Balance not found", eRep.getKey(), repPeriod);
-			}
-		}
 
 		Dust.access(MindAccess.Commit, MIND_TAG_ACTION_PROCESS, MIND_TAG_CONTEXT_SELF, MISC_ATT_CONN_TARGET);
 

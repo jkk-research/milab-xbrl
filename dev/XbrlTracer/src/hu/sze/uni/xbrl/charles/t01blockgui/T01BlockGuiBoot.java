@@ -177,13 +177,18 @@ public class T01BlockGuiBoot implements XbrlConsts {
 		Dust.access(MindAccess.Set, XBRLDOCK_ASP_ENTITY, hAgtPoolLoader, XBRLDOCK_ATT_POOLLOADER_CONCEPTMAP, "dei:EntitySmallBusiness");
 		Dust.access(MindAccess.Set, XBRLDOCK_ASP_ENTITY, hAgtPoolLoader, XBRLDOCK_ATT_POOLLOADER_CONCEPTMAP, "dei:EntityEmergingGrowthCompany");
 
-		Dust.access(MindAccess.Insert, new MindCommitFilter(hAgtPoolLoader, MIND_TAG_ACTION_PROCESS), hDataFactRowData, MIND_ATT_KNOWLEDGE_LISTENERS, KEY_ADD);
-		Dust.access(MindAccess.Insert, new MindCommitFilter(hAgtPoolLoader, MIND_TAG_ACTION_END), hDataReportRow, MIND_ATT_KNOWLEDGE_LISTENERS, KEY_ADD);
+		boolean loadPool = true;
+//		boolean loadPool = false;
 
+		if ( loadPool ) {
+			Dust.access(MindAccess.Insert, new MindCommitFilter(hAgtPoolLoader, MIND_TAG_ACTION_PROCESS), hDataFactRowData, MIND_ATT_KNOWLEDGE_LISTENERS, KEY_ADD);
+			Dust.access(MindAccess.Insert, new MindCommitFilter(hAgtPoolLoader, MIND_TAG_ACTION_END), hDataReportRow, MIND_ATT_KNOWLEDGE_LISTENERS, KEY_ADD);
+		}
 		// Data browser
 
-		MindHandle hDataBrowserIn = DustDevUtils.registerAgent(XBRLTEST_UNIT, XBRLDOCK_ASP_DATABROWSERIN, "DataBrowser input");
-		MindHandle hDataBrowserOut = DustDevUtils.registerAgent(XBRLTEST_UNIT, XBRLDOCK_ASP_DATABROWSEROUT, "DataBrowser output");
+		MindHandle hDataBrowserIn = DustDevUtils.newHandle(XBRLTEST_UNIT, XBRLDOCK_ASP_DATABROWSERIN, "DataBrowser input");
+		Dust.access(MindAccess.Set, hDataReportPool, hDataBrowserIn, MISC_ATT_CONN_SOURCE);
+		MindHandle hDataBrowserOut = DustDevUtils.newHandle(XBRLTEST_UNIT, XBRLDOCK_ASP_DATABROWSEROUT, "DataBrowser output");
 
 		MindHandle hAgtDataBrowser = DustDevUtils.registerAgent(XBRLTEST_UNIT, XBRLDOCK_NAR_DATABROWSER, "XBRL DataBrowser Narrative");
 		Dust.access(MindAccess.Set, hDataBrowserIn, hAgtDataBrowser, MISC_ATT_CONN_SOURCE);
@@ -292,7 +297,7 @@ public class T01BlockGuiBoot implements XbrlConsts {
 
 //		DustDevUtils.setTag(hAgtXmlLoader, DEV_TAG_TEST);
 
-		int testIdx = 1;
+		int testIdx = 4;
 
 		switch ( testIdx ) {
 		case 1:
@@ -306,6 +311,10 @@ public class T01BlockGuiBoot implements XbrlConsts {
 		case 3:
 			Dust.access(MindAccess.Set, "chd/t03", hAgtT01Root, RESOURCE_ATT_URL_PATH);
 			Dust.access(MindAccess.Set, "reports-ferc.txt", hDataReportStream, TEXT_ATT_TOKEN);
+			break;
+		case 4:
+			Dust.access(MindAccess.Set, "chd/t04", hAgtT01Root, RESOURCE_ATT_URL_PATH);
+			Dust.access(MindAccess.Set, "reports_5555.txt", hDataReportStream, TEXT_ATT_TOKEN);
 			break;
 		}
 
