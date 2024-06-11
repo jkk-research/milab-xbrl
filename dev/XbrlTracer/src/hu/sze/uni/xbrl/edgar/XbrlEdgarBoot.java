@@ -2,6 +2,7 @@ package hu.sze.uni.xbrl.edgar;
 
 import hu.sze.milab.dust.Dust;
 import hu.sze.milab.dust.dev.DustDevUtils;
+import hu.sze.uni.xbrl.charles.t01blockgui.T02ReportFinderNarrative;
 
 public class XbrlEdgarBoot implements XbrlEdgarConsts {
 	
@@ -16,16 +17,20 @@ public class XbrlEdgarBoot implements XbrlEdgarConsts {
 		MindHandle hLogEdgarSubProc = DustDevUtils.registerLogic(EDGARMETA_UNIT, XbrlEdgarAgentProcessSubmissions.class.getCanonicalName(), "submission processor logic");
 		
 		MindHandle hLogFSRoot = DustDevUtils.registerAgent(XBRLTEST_UNIT, RESOURCE_NAR_FILESYSTEM);
-		Dust.access(MindAccess.Set, "work/xbrl/data/sources/edgar", hLogFSRoot, RESOURCE_ATT_URL_PATH);
+		Dust.access(MindAccess.Set, "~/work/xbrl/data/sources/edgar", hLogFSRoot, RESOURCE_ATT_URL_PATH);
 		
 		MindHandle hZipFile = DustDevUtils.newHandle(XBRLTEST_UNIT, RESOURCE_ASP_URL, "the zip file");
 		Dust.access(MindAccess.Insert, hLogFSRoot, hZipFile, MIND_ATT_KNOWLEDGE_LISTENERS, KEY_ADD);
-		Dust.access(MindAccess.Set, "submissions_00.zip", hZipFile, RESOURCE_ATT_URL_PATH);
+		Dust.access(MindAccess.Set, "submissions.zip", hZipFile, TEXT_ATT_TOKEN);
 		
-		MindHandle hTargetDir = DustDevUtils.newHandle(XBRLTEST_UNIT, RESOURCE_ASP_URL, "target dir");
-		Dust.access(MindAccess.Insert, hLogFSRoot, hTargetDir, MIND_ATT_KNOWLEDGE_LISTENERS, KEY_ADD);
-		Dust.access(MindAccess.Set, "submissions", hTargetDir, RESOURCE_ATT_URL_PATH);
+		MindHandle hDirSubJson = DustDevUtils.newHandle(XBRLTEST_UNIT, RESOURCE_ASP_URL, "submission JSON dir");
+		Dust.access(MindAccess.Insert, hLogFSRoot, hDirSubJson, MIND_ATT_KNOWLEDGE_LISTENERS, KEY_ADD);
+		Dust.access(MindAccess.Set, "submissions", hDirSubJson, TEXT_ATT_TOKEN);
 						
+//		MindHandle hLogFSSubCsv = DustDevUtils.registerAgent(XBRLTEST_UNIT, RESOURCE_NAR_FILESYSTEM);
+//		Dust.access(MindAccess.Set, hLogFSRoot, hLogFSSubCsv, MISC_ATT_CONN_PARENT);
+//		Dust.access(MindAccess.Set, "subData", hLogFSSubCsv, TEXT_ATT_TOKEN);
+		
 		MindHandle hZipEntry = DustDevUtils.newHandle(XBRLTEST_UNIT, RESOURCE_ASP_STREAM, "zip entry");
 		
 		MindHandle hAgtZipReader = DustDevUtils.registerAgent(XBRLTEST_UNIT, RESOURCE_NAR_ZIPREADER);
@@ -33,7 +38,7 @@ public class XbrlEdgarBoot implements XbrlEdgarConsts {
 		Dust.access(MindAccess.Set, hZipEntry, hAgtZipReader, MISC_ATT_CONN_TARGET);
 		
 		MindHandle hAgtUnzip = DustDevUtils.registerAgent(XBRLTEST_UNIT, hLogEdgarUnzip); 		
-		Dust.access(MindAccess.Set, hTargetDir, hAgtUnzip, MISC_ATT_CONN_TARGET);
+		Dust.access(MindAccess.Set, hDirSubJson, hAgtUnzip, MISC_ATT_CONN_TARGET);
 		Dust.access(MindAccess.Insert, hAgtUnzip, hZipEntry, MIND_ATT_KNOWLEDGE_LISTENERS, KEY_ADD);
 
 		MindHandle hAgtJsonDOM = DustDevUtils.registerAgent(XBRLTEST_UNIT, RESOURCE_NAR_JSONDOM);
@@ -52,16 +57,35 @@ public class XbrlEdgarBoot implements XbrlEdgarConsts {
 		Dust.access(MindAccess.Set, MISC_TAG_DIRECTION_OUT, hCsvStream, MIND_ATT_KNOWLEDGE_TAGS, MISC_TAG_DIRECTION);
 		Dust.access(MindAccess.Set, RESOURCE_TAG_STREAMTYPE_TEXT, hCsvStream, MIND_ATT_KNOWLEDGE_TAGS, RESOURCE_TAG_STREAMTYPE);
 		Dust.access(MindAccess.Insert, hLogFSRoot, hCsvStream, MIND_ATT_KNOWLEDGE_LISTENERS, KEY_ADD);
+//		Dust.access(MindAccess.Insert, hLogFSSubCsv, hCsvStream, MIND_ATT_KNOWLEDGE_LISTENERS, KEY_ADD);
 		Dust.access(MindAccess.Insert, hAgtCsvSax, hCsvStream, MIND_ATT_KNOWLEDGE_LISTENERS, KEY_ADD);
 		Dust.access(MindAccess.Insert, hAgtCsvSax, hCsvData, MIND_ATT_KNOWLEDGE_LISTENERS, KEY_ADD);
 		
 		MindHandle hAgtSubProc = DustDevUtils.registerAgent(XBRLTEST_UNIT, hLogEdgarSubProc); 		
+		Dust.access(MindAccess.Set, hDirSubJson, hAgtSubProc, MISC_ATT_CONN_SOURCE);
 		Dust.access(MindAccess.Set, hAgtJsonDOM, hAgtSubProc, EDGARMETA_ATT_JSONDOM);
 		Dust.access(MindAccess.Set, hAgtCsvSax, hAgtSubProc, EDGARMETA_ATT_CSVSAX);
 		
-		Dust.access(MindAccess.Insert, hAgtSubProc, hTargetDir, MIND_ATT_KNOWLEDGE_LISTENERS, KEY_ADD);
+		Dust.access(MindAccess.Insert, hAgtSubProc, hDirSubJson, MIND_ATT_KNOWLEDGE_LISTENERS, KEY_ADD);
+		
+		int mode = 2;
+		
+		MindHandle hLogRepFinder = DustDevUtils.registerLogic(EDGARMETA_UNIT, T02ReportFinderNarrative.class.getCanonicalName(), "unzip logic");
+		MindHandle hAgtRepFinder = DustDevUtils.registerAgent(XBRLTEST_UNIT, hLogRepFinder); 		
 
-		Dust.access(MindAccess.Set, hAgtZipReader, APP_ASSEMBLY_MAIN, MIND_ATT_ASSEMBLY_STARTAGENTS, KEY_ADD);
+		
+		switch ( mode ) {
+		case 0:
+			Dust.access(MindAccess.Set, hAgtZipReader, APP_ASSEMBLY_MAIN, MIND_ATT_ASSEMBLY_STARTAGENTS, KEY_ADD);
+			break;
+		case 1:
+			Dust.access(MindAccess.Set, hAgtSubProc, APP_ASSEMBLY_MAIN, MIND_ATT_ASSEMBLY_STARTAGENTS, KEY_ADD);
+			break;
+		case 2:
+			Dust.access(MindAccess.Set, hAgtRepFinder, APP_ASSEMBLY_MAIN, MIND_ATT_ASSEMBLY_STARTAGENTS, KEY_ADD);
+			break;
+		}
+
 	}
 
 }

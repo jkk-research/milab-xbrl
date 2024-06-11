@@ -3,11 +3,13 @@ package hu.sze.uni.xbrl.edgar;
 import java.io.File;
 
 import org.apache.commons.compress.archivers.zip.ZipArchiveEntry;
+import org.apache.commons.compress.archivers.zip.ZipFile;
 
 import hu.sze.milab.dust.Dust;
 import hu.sze.milab.dust.DustAgent;
 import hu.sze.milab.dust.dev.DustDevCounter;
 import hu.sze.milab.dust.utils.DustUtils;
+import hu.sze.milab.dust.utils.DustUtilsApache;
 
 public class XbrlEdgarAgentUnzip extends DustAgent implements XbrlEdgarConsts {
 	
@@ -32,15 +34,16 @@ public class XbrlEdgarAgentUnzip extends DustAgent implements XbrlEdgarConsts {
 			String[] idSplit = id.split("-");
 			id = idSplit[0];
 			
-			if ( 1 < idSplit.length ) {
-				cntMulti.add(id);
-			}
-			
 			String idHash = DustUtils.getHash2(id, File.separator);
 			
-			File fDataRoot = Dust.access(MindAccess.Peek, null, MIND_TAG_CONTEXT_SELF, MISC_ATT_CONN_TARGET, MISC_ATT_VARIANT_VALUE);			
+			File fDataRoot = Dust.access(MindAccess.Peek, null, MIND_TAG_CONTEXT_SELF, MISC_ATT_CONN_TARGET, DUST_ATT_IMPL_DATA);			
 			File fDir = new File(fDataRoot, idHash);
 			File fData = new File(fDir, fName);
+			
+			if ( 1 < idSplit.length ) {
+				cntMulti.add(id);
+				Dust.log(EVENT_TAG_TYPE_TRACE, "Multi file", fName, "to", fData.getCanonicalPath());
+			}
 			
 			if ( fDir.isDirectory() ) {
 				if ( fData.isFile() && (zipArchiveEntry.getSize() == fData.length())) {
@@ -50,10 +53,13 @@ public class XbrlEdgarAgentUnzip extends DustAgent implements XbrlEdgarConsts {
 				fDir.mkdirs();
 			}
 			
+			ZipFile zipFile = Dust.access(MindAccess.Peek, null, MIND_TAG_CONTEXT_TARGET, DUST_ATT_IMPL_DATA);
+			DustUtilsApache.unzipEntry(zipFile, zipArchiveEntry, fData);
+			
 //			ZipFile zipFile = Dust.access(MIND_TAG_CONTEXT_TARGET, MIND_TAG_ACCESS_PEEK, null, MISC_ATT_VARIANT_VALUE);
 //		DustUtilsApache.unzipEntry(zipFile, zipArchiveEntry, fData);
 			
-			Dust.access(MindAccess.Insert, idHash, MIND_TAG_CONTEXT_SELF, MISC_ATT_CONN_TARGET, MISC_ATT_CONN_MEMBERSET);
+//			Dust.access(MindAccess.Insert, idHash, MIND_TAG_CONTEXT_SELF, MISC_ATT_CONN_TARGET, MISC_ATT_CONN_MEMBERSET);
 			
 		}
 

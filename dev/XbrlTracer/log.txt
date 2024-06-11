@@ -1,3 +1,104 @@
+EDGAR submission import
+
+csv +companies.json gen
+
+2024-06-11T12_09_07 [giskard:5:7] giskard:10:23
+2024-06-11T12_09_07 [giskard:5:7] giskard:11:1
+2024-06-11T12_09_07 [giskard:5:27] Machine initializing...
+2024-06-11T12_09_07 [giskard:5:27] Thinking start...
+2024-06-11T12_09_07 [giskard:5:27] ... and now rebuild company index, /Volumes/Giskard_ext/work/XBRL/store/edgar/submissions
+Company process current count: 10000 time: 7383
+Company process current count: 20000 time: 6832
+Company process current count: 30000 time: 6573
+Company process current count: 40000 time: 8319
+Company process current count: 50000 time: 7292
+Company process current count: 60000 time: 7400
+Company process current count: 70000 time: 7773
+Company process current count: 80000 time: 7581
+Company process current count: 90000 time: 7255
+Company process current count: 100000 time: 6944
+Company process current count: 110000 time: 6887
+Company process current count: 120000 time: 6361
+Company process current count: 130000 time: 6160
+Company process current count: 140000 time: 6363
+Company process current count: 150000 time: 6810
+Company process current count: 160000 time: 6662
+Company process current count: 170000 time: 6692
+Company process current count: 180000 time: 6511
+Company process current count: 190000 time: 7348
+Company process current count: 200000 time: 6951
+Company process current count: 210000 time: 6996
+Company process current count: 220000 time: 6643
+Company process current count: 230000 time: 6930
+Company process current count: 240000 time: 6634
+Company process current count: 250000 time: 6956
+Company process current count: 260000 time: 7208
+Company process current count: 270000 time: 6951
+Company process current count: 280000 time: 6606
+Company process current count: 290000 time: 6735
+Company process current count: 300000 time: 6591
+Company process current count: 310000 time: 7198
+Company process current count: 320000 time: 8091
+Company process current count: 330000 time: 8151
+Company process current count: 340000 time: 7557
+Company process current count: 350000 time: 7330
+Company process current count: 360000 time: 7350
+Company process current count: 370000 time: 7088
+Company process current count: 380000 time: 6875
+Company process current count: 390000 time: 6963
+Company process current count: 400000 time: 6520
+Company process current count: 410000 time: 8644
+Company process current count: 420000 time: 8006
+Company process current count: 430000 time: 7431
+Company process current count: 440000 time: 6823
+Company process current count: 450000 time: 6523
+Company process current count: 460000 time: 6937
+Company process current count: 470000 time: 7891
+Company process current count: 480000 time: 6699
+Company process current count: 490000 time: 7015
+Company process current count: 500000 time: 7904
+Company process current count: 510000 time: 6723
+Company process current count: 520000 time: 7158
+Company process current count: 530000 time: 6810
+Company process current count: 540000 time: 6773
+Company process current count: 550000 time: 7149
+Company process current count: 560000 time: 6663
+Company process current count: 570000 time: 6681
+Company process current count: 580000 time: 6667
+Company process current count: 590000 time: 6739
+Company process current count: 600000 time: 6662
+Company process current count: 610000 time: 6835
+Company process current count: 620000 time: 6970
+Company process current count: 630000 time: 7225
+Company process current count: 640000 time: 6709
+Company process current count: 650000 time: 6705
+Company process current count: 660000 time: 6828
+Company process current count: 670000 time: 6876
+Company process current count: 680000 time: 7038
+Company process current count: 690000 time: 7354
+Company process current count: 700000 time: 7283
+Company process current count: 710000 time: 7614
+Company process current count: 720000 time: 7027
+Company process current count: 730000 time: 6743
+Company process current count: 740000 time: 6594
+Company process current count: 750000 time: 6986
+Company process current count: 760000 time: 6619
+Company process current count: 770000 time: 7312
+Company process current count: 780000 time: 6749
+Company process current count: 790000 time: 6477
+Company process current count: 800000 time: 6750
+Company process current count: 810000 time: 6871
+Company process current count: 820000 time: 8257
+Company process current count: 830000 time: 7620
+Company process current count: 840000 time: 8478
+Company process current count: 850000 time: 7881
+Company process current count: 860000 time: 7636
+Company process current count: 870000 time: 7548
+Company process current count: 880000 time: 6681
+2024-06-11T12_19_31 [giskard:5:27] Thinking complete.
+2024-06-11T12_19_31 [giskard:5:27] Total runtime: 624224 msec.
+2024-06-11T12_19_31 [giskard:5:27] Releasing Machine...
+2024-06-11T12_19_31 [giskard:5:27] Machine released.
 
 ESG India 
 
