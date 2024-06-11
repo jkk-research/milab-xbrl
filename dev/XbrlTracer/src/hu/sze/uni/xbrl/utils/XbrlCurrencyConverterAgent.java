@@ -13,7 +13,7 @@ import java.util.regex.Pattern;
 import hu.sze.milab.dust.Dust;
 import hu.sze.milab.dust.DustAgent;
 import hu.sze.milab.dust.utils.DustUtils;
-import hu.sze.milab.dust.utils.DustutilsFactory;
+import hu.sze.milab.dust.utils.DustUtilsFactory;
 import hu.sze.uni.xbrl.XbrlConsts;
 
 @SuppressWarnings({ "unchecked", "rawtypes" })
@@ -26,10 +26,10 @@ public class XbrlCurrencyConverterAgent extends DustAgent implements XbrlConsts 
 		MindHandle hInput = Dust.access(MindAccess.Peek, null, MIND_TAG_CONTEXT_TARGET);
 		MindHandle hLoadItem = Dust.access(MindAccess.Peek, null, MIND_TAG_CONTEXT_SELF, MISC_ATT_CONN_SOURCE);
 
-		DustutilsFactory<String, Map<String, Double>> rates = Dust.access(MindAccess.Peek, null, MIND_TAG_CONTEXT_SELF, DUST_ATT_IMPL_DATA);
+		DustUtilsFactory<String, Map<String, Double>> rates = Dust.access(MindAccess.Peek, null, MIND_TAG_CONTEXT_SELF, DUST_ATT_IMPL_DATA);
 
 		if ( null == rates ) {
-			rates = new DustutilsFactory(new DustCreator<Map<String, Double>>() {
+			rates = new DustUtilsFactory(new DustCreator<Map<String, Double>>() {
 				@Override
 				public Map<String, Double> create(Object key, Object... hints) {
 					return new TreeMap<>();
@@ -82,7 +82,7 @@ public class XbrlCurrencyConverterAgent extends DustAgent implements XbrlConsts 
 		return ret;
 	}
 
-	Double optConvert(DustutilsFactory<String, Map<String, Double>> rates, String mainCurrency, Map fact) throws Exception {
+	Double optConvert(DustUtilsFactory<String, Map<String, Double>> rates, String mainCurrency, Map fact) throws Exception {
 		String vv = (String) fact.get("Value");
 		if ( DustUtils.isEmpty(vv) ) {
 			return null;
