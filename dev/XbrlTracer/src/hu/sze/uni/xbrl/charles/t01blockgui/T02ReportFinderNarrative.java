@@ -4,7 +4,10 @@ import java.io.BufferedReader;
 import java.io.File;
 import java.io.FileFilter;
 import java.io.FileReader;
+import java.util.Collection;
+import java.util.HashSet;
 import java.util.Map;
+import java.util.Set;
 
 import org.json.simple.JSONValue;
 
@@ -13,7 +16,6 @@ import hu.sze.milab.dust.DustAgent;
 import hu.sze.milab.dust.dev.DustDevCounter;
 import hu.sze.milab.dust.dev.DustDevProcMon;
 import hu.sze.milab.dust.dev.DustDevUtils;
-import hu.sze.milab.dust.stream.DustStreamUtils;
 import hu.sze.milab.dust.utils.DustUtils;
 import hu.sze.milab.dust.utils.DustUtilsFile;
 import hu.sze.uni.xbrl.edgar.XbrlEdgarConsts;
@@ -127,6 +129,15 @@ public class T02ReportFinderNarrative extends DustAgent implements XbrlEdgarCons
 		String[] listHead = null;
 		File fDataRoot = new File("/Users/lkedves/work/xbrl/data/sources/edgar/submissions");
 		File fReportRoot = new File("/Users/lkedves/work/xbrl/data/sources/edgar/reports");
+		
+		Set<String> pfHtml = new HashSet<>();
+		pfHtml.add("htm");
+		pfHtml.add("html");
+		pfHtml.add("xhtml");
+
+		Set<String> pfXml = new HashSet<>();
+		pfXml.add("xml");
+		pfXml.add("xbrl");
 
 		try (FileReader fr = new FileReader("temp/SEC EDGAR_SIC3711_20240610.csv");
 				BufferedReader br = new BufferedReader(fr)) {
@@ -182,8 +193,26 @@ public class T02ReportFinderNarrative extends DustAgent implements XbrlEdgarCons
 								String doc = (13 < sd.length) ? sd[13] : null;
 								
 								if (DustUtils.isEqual(sd[2], "10-K")) {
-//									Dust.log(EVENT_TAG_TYPE_INFO, ld);
-									XbrlEdgarUtils.getFiling(fReportRoot, sd[0], sd[1], doc);
+									boolean fmtXml = DustUtils.isEqual("1", sd[7]);
+									boolean fmtXHtml = DustUtils.isEqual("1", sd[8]);
+
+									Collection<String> reqPf = fmtXml ? fmtXHtml ? pfHtml : pfXml : null;
+
+									File f = XbrlEdgarUtils.getFiling(fReportRoot, sd[0], sd[1], doc, reqPf);
+									
+									if (fmtXml) {
+										String fn = f.getName();
+										String ext = DustUtils.getPostfix(fn, ".").toLowerCase();
+										String msg = fmtXHtml ? "inlineXbrl" : "Xbrl";
+										boolean ok = reqPf.contains(ext);
+										
+										if ( !ok ) {
+											DustDevUtils.breakpoint();
+											XbrlEdgarUtils.getFiling(fReportRoot, sd[0], sd[1], doc, reqPf);
+										}
+										Dust.log(EVENT_TAG_TYPE_INFO, msg, fn, ok);
+									}
+									
 									found = true;
 								}
 							}
