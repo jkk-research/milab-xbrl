@@ -210,7 +210,7 @@ public class T02ReportFinderNarrative extends DustAgent implements XbrlEdgarCons
 											DustDevUtils.breakpoint();
 											XbrlEdgarUtils.getFiling(fReportRoot, sd[0], sd[1], doc, reqPf);
 										}
-										Dust.log(EVENT_TAG_TYPE_INFO, msg, fn, ok);
+										Dust.log(EVENT_TAG_TYPE_INFO, msg, ok, f.getCanonicalFile());
 									}
 									
 									found = true;
