@@ -234,11 +234,11 @@ public class T01BlockGuiBoot implements XbrlConsts {
 
 		MindHandle hAgtSelTaxonomy = DustDevUtils.registerAgent(XBRLTEST_UNIT, MONTRU_NAR_WIDGET, "Concept taxonomy selector");
 		Dust.access(MindAccess.Insert, XBRLDOCK_ATT_POOL_TAXONOMIES, hAgtSelTaxonomy, MISC_ATT_REF_PATH, KEY_ADD);
-		DustDevUtils.setTag(hAgtSelTaxonomy, MONTRU_TAG_WIDGET_COMBO, MONTRU_TAG_WIDGET);
+		DustDevUtils.setTag(hAgtSelTaxonomy, MONTRU_TAG_WIDGETTYPE_COMBO, MONTRU_TAG_WIDGETTYPE);
 		Dust.access(MindAccess.Insert, hAgtSelTaxonomy, hAgtGuiConceptFilterWidgetPanel, MISC_ATT_CONN_MEMBERARR, KEY_ADD);
 
 		MindHandle hAgtNameFilter = DustDevUtils.registerAgent(XBRLTEST_UNIT, MONTRU_NAR_WIDGET, "Concept name filter");
-		DustDevUtils.setTag(hAgtNameFilter, MONTRU_TAG_WIDGET_INPUT, MONTRU_TAG_WIDGET);
+		DustDevUtils.setTag(hAgtNameFilter, MONTRU_TAG_WIDGETTYPE_INPUT, MONTRU_TAG_WIDGETTYPE);
 		Dust.access(MindAccess.Insert, hAgtNameFilter, hAgtGuiConceptFilterWidgetPanel, MISC_ATT_CONN_MEMBERARR, KEY_ADD);
 
 		MindHandle hAgtGridConcepts = DustDevUtils.registerAgent(XBRLTEST_UNIT, MONTRU_NAR_GRID, "Concepts grid");
@@ -246,13 +246,13 @@ public class T01BlockGuiBoot implements XbrlConsts {
 		Dust.access(MindAccess.Insert, hAgtGridConcepts, hAgtGuiConceptFilterPanel, MISC_ATT_CONN_MEMBERARR, KEY_ADD);
 
 		MindHandle hAgtBtnAddConcept = DustDevUtils.registerAgent(XBRLTEST_UNIT, MONTRU_NAR_WIDGET, "Concept add button");
-		DustDevUtils.setTag(hAgtBtnAddConcept, MONTRU_TAG_WIDGET_BUTTON, MONTRU_TAG_WIDGET);
+		DustDevUtils.setTag(hAgtBtnAddConcept, MONTRU_TAG_WIDGETTYPE_BUTTON, MONTRU_TAG_WIDGETTYPE);
 		DustDevUtils.setTag(hAgtBtnAddConcept, MONTRU_TAG_PAGE_FOOTER, MONTRU_TAG_PAGE);
 		Dust.access(MindAccess.Set, hDataReportPool, hAgtBtnAddConcept, MISC_ATT_CONN_TARGET);
 		Dust.access(MindAccess.Insert, hAgtBtnAddConcept, hAgtGuiConceptFilterPanel, MISC_ATT_CONN_MEMBERARR, KEY_ADD);
 
 		MindHandle hAgtTreePivot = DustDevUtils.registerAgent(XBRLTEST_UNIT, MONTRU_NAR_WIDGET, "Pivot settings");
-		DustDevUtils.setTag(hAgtTreePivot, MONTRU_TAG_WIDGET_TREE, MONTRU_TAG_WIDGET);
+		DustDevUtils.setTag(hAgtTreePivot, MONTRU_TAG_WIDGETTYPE_TREE, MONTRU_TAG_WIDGETTYPE);
 		Dust.access(MindAccess.Set, "Pivot settings", hAgtTreePivot, MONTRU_ATT_GEN_LABEL);
 		Dust.access(MindAccess.Insert, hAgtTreePivot, hAgtPivotConfigTabs, MISC_ATT_CONN_MEMBERARR, KEY_ADD);
 
@@ -280,7 +280,7 @@ public class T01BlockGuiBoot implements XbrlConsts {
 		Dust.access(MindAccess.Insert, hAgtGridEvents, hAgtGuiBottomPanel, MISC_ATT_CONN_MEMBERARR, KEY_ADD);
 
 		MindHandle hAgtTreeDims = DustDevUtils.registerAgent(XBRLTEST_UNIT, MONTRU_NAR_WIDGET, "Dimension tree");
-		DustDevUtils.setTag(hAgtTreeDims, MONTRU_TAG_WIDGET_TREE, MONTRU_TAG_WIDGET);
+		DustDevUtils.setTag(hAgtTreeDims, MONTRU_TAG_WIDGETTYPE_TREE, MONTRU_TAG_WIDGETTYPE);
 		Dust.access(MindAccess.Insert, XBRLDOCK_ATT_POOL_TAXONOMIES, hAgtTreeDims, MISC_ATT_REF_PATH, KEY_ADD);
 		Dust.access(MindAccess.Set, "Dimensions", hAgtTreeDims, MONTRU_ATT_GEN_LABEL);
 		Dust.access(MindAccess.Insert, hAgtTreeDims, hAgtGuiBottomPanel, MISC_ATT_CONN_MEMBERARR, KEY_ADD);
