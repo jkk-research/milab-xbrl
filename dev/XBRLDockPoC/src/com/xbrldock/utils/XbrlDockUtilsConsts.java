@@ -12,15 +12,15 @@ import com.xbrldock.XbrlDockException;
 @SuppressWarnings({ "rawtypes", "unchecked" })
 public interface XbrlDockUtilsConsts extends XbrlDockConsts {
 
-	interface DustCreator<Type> {
+	interface ItemCreator<Type> {
 		Type create(Object key, Object... hints);
 	}
 
-	class DustCreatorSimple<Type> implements DustCreator<Type> {
+	class ItemCreatorSimple<Type> implements ItemCreator<Type> {
 
 		Class cc;
 
-		public DustCreatorSimple(Class cc) {
+		public ItemCreatorSimple(Class cc) {
 			this.cc = cc;
 		}
 
@@ -34,8 +34,8 @@ public interface XbrlDockUtilsConsts extends XbrlDockConsts {
 		}
 	}
 
-	DustCreator<Map> MAP_CREATOR = new DustCreatorSimple<>(HashMap.class);
-	DustCreator<Set> SET_CREATOR = new DustCreatorSimple<>(HashSet.class);
-	DustCreator<ArrayList> ARRAY_CREATOR = new DustCreatorSimple<>(ArrayList.class);
+	ItemCreator<Map> MAP_CREATOR = new ItemCreatorSimple<>(HashMap.class);
+	ItemCreator<Set> SET_CREATOR = new ItemCreatorSimple<>(HashSet.class);
+	ItemCreator<ArrayList> ARRAY_CREATOR = new ItemCreatorSimple<>(ArrayList.class);
 
 }

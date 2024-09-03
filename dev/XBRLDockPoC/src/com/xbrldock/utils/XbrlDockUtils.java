@@ -135,7 +135,7 @@ public class XbrlDockUtils implements XbrlDockUtilsConsts {
 		return (RetType) curr;
 	}
 
-	public static <RetType> RetType safeGet(Object map, Object key, DustCreator<RetType> creator, Object... hints) {
+	public static <RetType> RetType safeGet(Object map, Object key, ItemCreator<RetType> creator, Object... hints) {
 		synchronized (map) {
 			RetType ret = ((Map<Object, RetType>) map).get(key);
 			if ( (null == ret) && (null != creator) ) {

@@ -1,6 +1,8 @@
 package com.xbrldock;
 
+import java.io.Reader;
 import java.nio.charset.StandardCharsets;
+import java.util.Map;
 
 public interface XbrlDockConsts {
 	
@@ -25,8 +27,47 @@ public interface XbrlDockConsts {
 		Exception, Error, Warning, Info, Trace, Debug
 	}
 	
-	public enum XbrlGeometry {
-		location, dimension,
-		x, y
+	enum ReportSegment {
+		Context, Unit, Fact
+	}
+	
+	
+	enum XbrlToken {
+		id, scenario, context, 
+		unit, unitNumerator, unitDenominator, measure,
+		
+		period, instant, startDate, endDate, 
+		concept, entity, dimensions,
+		
+		value, 
+		decimals, language, 
+		
+		continuation, 
+	}	
+
+	enum FactFldCommon {
+		File, EntityId, CtxId, FactId, StartDate, EndDate, Instant, Dimensions, TagNamespace, TagId, Type, Format
+	};
+
+	enum FactFldData {
+		UnitId, Unit, OrigValue, Sign, Dec, Scale, Value, Error
+	};
+
+	enum FactFldText {
+		Language, Value
+	};
+	
+	interface ReportDataHandler {
+		void addNamespace(String ref, String id);
+		void addTaxonomy(String tx);
+		String processSegment(ReportSegment segment, Map<XbrlToken, Object> data);
+	}	
+	
+	enum ReportFormat {
+		XML, XHTML, JSON, CSV
+	}
+	
+	interface ReportFormatHandler {
+		void loadReport(Reader in, ReportDataHandler dataHandler) throws Exception;
 	}
 }
