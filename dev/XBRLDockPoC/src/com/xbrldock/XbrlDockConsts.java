@@ -1,6 +1,6 @@
 package com.xbrldock;
 
-import java.io.Reader;
+import java.io.InputStream;
 import java.nio.charset.StandardCharsets;
 import java.util.Map;
 
@@ -39,8 +39,7 @@ public interface XbrlDockConsts {
 		period, instant, startDate, endDate, 
 		concept, entity, dimensions,
 		
-		value, 
-		decimals, language, 
+		value, language, format, decimals, scale, sign,
 		
 		continuation, 
 	}	
@@ -68,6 +67,6 @@ public interface XbrlDockConsts {
 	}
 	
 	interface ReportFormatHandler {
-		void loadReport(Reader in, ReportDataHandler dataHandler) throws Exception;
+		void loadReport(InputStream in, ReportDataHandler dataHandler) throws Exception;
 	}
 }

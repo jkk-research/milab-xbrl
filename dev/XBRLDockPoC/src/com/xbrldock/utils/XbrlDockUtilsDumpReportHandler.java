@@ -50,7 +50,7 @@ public class XbrlDockUtilsDumpReportHandler implements XbrlDockConsts.ReportData
 			break;
 		}
 		
-//		XbrlDock.log(XbrlEventLevel.Info, "Processing segment", segment, ret, data);
+		XbrlDock.log(XbrlEventLevel.Info, "Processing segment", segment, ret, data);
 
 		return ret;
 	}
