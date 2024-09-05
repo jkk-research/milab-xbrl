@@ -15,6 +15,7 @@ import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
 
 import com.xbrldock.XbrlDockConsts;
+import com.xbrldock.poc.utils.XbrlDockPocUtilsValueConverter;
 import com.xbrldock.utils.XbrlDockUtils;
 
 public class XbrlDockFormatXhtml implements XbrlDockFormatConsts, XbrlDockConsts.ReportFormatHandler {
@@ -73,7 +74,7 @@ public class XbrlDockFormatXhtml implements XbrlDockFormatConsts, XbrlDockConsts
 					if (!XbrlDockUtils.isEmpty(sVal)) {
 						int si = attName.indexOf(":");
 
-						dataHandler.addNamespace(attName.substring(si+1), sVal);
+						dataHandler.addNamespace(attName.substring(si + 1), sVal);
 					}
 				}
 			}
@@ -188,6 +189,7 @@ public class XbrlDockFormatXhtml implements XbrlDockFormatConsts, XbrlDockConsts
 					}
 
 					if (!XbrlDockUtils.isEmpty(fmtCode)) {
+						segmentData.put(XbrlToken.xbrldockOrigValue, valOrig);
 						segmentData.put(XbrlToken.value, valOrig);
 						segmentData.put(XbrlToken.format, fmtCode);
 						for (XbrlToken xt : cvtKeys) {
@@ -196,6 +198,7 @@ public class XbrlDockFormatXhtml implements XbrlDockFormatConsts, XbrlDockConsts
 								segmentData.put(xt, v);
 							}
 						}
+						XbrlDockPocUtilsValueConverter.convertValue(segmentData);
 					} else {
 						Element txtFrag = e;
 						boolean last = false;
@@ -225,7 +228,8 @@ public class XbrlDockFormatXhtml implements XbrlDockFormatConsts, XbrlDockConsts
 							}
 						} while (!last);
 
-						segmentData.put(XbrlToken.value, merge.toString());
+						segmentData.put(XbrlToken.value, XbrlDockUtils.toString(merge));
+						segmentData.put(XbrlToken.xbrldockFactType, XbrlFactDataType.text);
 					}
 
 					dataHandler.processSegment(ReportSegment.Fact, segmentData);

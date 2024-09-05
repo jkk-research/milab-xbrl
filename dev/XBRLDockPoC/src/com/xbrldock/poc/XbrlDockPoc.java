@@ -9,6 +9,7 @@ import java.util.Map;
 
 import com.xbrldock.XbrlDock;
 import com.xbrldock.XbrlDockException;
+import com.xbrldock.poc.conn.xbrlorg.XbrlDockConnXbrlOrg;
 import com.xbrldock.poc.format.XbrlDockFormatJson;
 import com.xbrldock.poc.format.XbrlDockFormatXhtml;
 import com.xbrldock.utils.XbrlDockUtils;
@@ -18,7 +19,8 @@ import com.xbrldock.utils.XbrlDockUtilsJson;
 
 @SuppressWarnings({ "unchecked", "rawtypes" })
 public class XbrlDockPoc extends XbrlDock implements XbrlDockPocConsts {
-	File dir = new File("/Volumes/Giskard_ext/work/XBRL/store/xbrl.org/reports/lei");
+	File testRoot = new File("/Volumes/Giskard_ext/work/XBRL/store/xbrl.org/reports/lei");
+	File localRoot = new File("temp/reports");
 
 	@Override
 	protected void handleLog(XbrlEventLevel level, Object... params) {
@@ -31,37 +33,70 @@ public class XbrlDockPoc extends XbrlDock implements XbrlDockPocConsts {
 		Map cfg = XbrlDockUtils.toFlatMap(XBRLDOCK_PREFIX, XBRLDOCK_SEP_PATH, cfgData);
 
 		initEnv(args, cfg);
-		ReportDataHandler dh = new XbrlDockUtilsDumpReportHandler();
-
-//		loadRecJson(dh, dir);
-//		loadSingleJson(dh);
-		loadSingleXhtml(dh);
-
 	}
 
-	void loadSingleJson(ReportDataHandler dh) throws Exception, IOException, FileNotFoundException {
-		try (FileInputStream fr = new FileInputStream("temp/reports/549300EW945NUS7PK214-2022-12-31-en.json")) {
-			ReportFormatHandler fh = new XbrlDockFormatJson();
-			fh.loadReport(fr, dh);
-		}
-	}
+	public boolean test() throws Exception {
+		XbrlDockUtilsDumpReportHandler dh = new XbrlDockUtilsDumpReportHandler();
 
-	void loadRecJson(ReportDataHandler dh, File dir) {
+		XbrlDockUtilsFile.FileProcessor xhtmlFilter = new XbrlDockUtilsFile.FileProcessor() {
+			@Override
+			public boolean process(File f) {
+				return f.getName().endsWith("html") && XbrlDockUtils.isEqual(f.getParentFile().getName(), "reports");
+			}
+		};
+		ReportFormatHandler xhtmlParser = new XbrlDockFormatXhtml();
+
 		XbrlDockUtilsFile.FileProcessor jsonFilter = new XbrlDockUtilsFile.FileProcessor() {
 			@Override
 			public boolean process(File f) {
 				return f.getName().endsWith(XBRLDOCK_EXT_JSON);
 			}
 		};
+		ReportFormatHandler jsonParser = new XbrlDockFormatJson();
 
-		XbrlDockUtilsFile.FileProcessor jsonReader = new XbrlDockUtilsFile.FileProcessor() {
+		String mode = "";
+
+//		 mode = "esef";
+		 mode = "xhtmlRec";
+//		mode = "jsonRec";
+//		 mode = "jsonSingle";
+//		 mode = "xhtmlSingle";
+
+		switch (mode) {
+		case "xhtmlSingle":
+			loadReport("549300EW945NUS7PK214-2022-12-31-en/reports/549300EW945NUS7PK214-2022-12-31-en.xhtml", xhtmlParser,
+					dh);
+			break;
+		case "jsonSingle":
+			loadReport("549300EW945NUS7PK214-2022-12-31-en.json", jsonParser, dh);
+			break;
+		case "xhtmlRec":
+			dh.logAll = false;
+			loadReportRec(xhtmlFilter, xhtmlParser, dh);
+			break;
+		case "jsonRec":
+			dh.logAll = false;
+			loadReportRec(jsonFilter, jsonParser, dh);
+			break;
+		case "esef":
+			XbrlDockConnXbrlOrg ec = new XbrlDockConnXbrlOrg();
+			ec.test();
+			break;
+		default:
+			return true;
+		}
+
+		return false;
+	}
+
+	void loadReportRec(XbrlDockUtilsFile.FileProcessor filter, ReportFormatHandler fh, ReportDataHandler dh)
+			throws Exception, IOException, FileNotFoundException {
+
+		XbrlDockUtilsFile.FileProcessor processor = new XbrlDockUtilsFile.FileProcessor() {
 			@Override
 			public boolean process(File f) {
 				try (InputStream fr = new FileInputStream(f)) {
-					XbrlDock.log(XbrlEventLevel.Info, "Reading file", f.getCanonicalPath());
-
-					ReportFormatHandler fh = new XbrlDockFormatJson();
-					fh.loadReport(fr, dh);
+					loadReport(f, fh, dh);
 					return true;
 				} catch (Exception e) {
 					XbrlDockException.swallow(e);
@@ -70,14 +105,29 @@ public class XbrlDockPoc extends XbrlDock implements XbrlDockPocConsts {
 			}
 		};
 
-		XbrlDockUtilsFile.processFiles(dir, jsonReader, jsonFilter);
+		long ts = System.currentTimeMillis();
+		int count = XbrlDockUtilsFile.processFiles(testRoot, processor, filter);
+
+		XbrlDock.log(XbrlEventLevel.Info, "Loaded", count, "files in", System.currentTimeMillis() - ts, "msec.");
 	}
 
-	void loadSingleXhtml(ReportDataHandler dh) throws Exception, IOException, FileNotFoundException {
-		try (FileInputStream fr = new FileInputStream(
-				"temp/reports/549300EW945NUS7PK214-2022-12-31-en/reports/549300EW945NUS7PK214-2022-12-31-en.xhtml")) {
-			ReportFormatHandler fh = new XbrlDockFormatXhtml();
+	void loadReport(String localFile, ReportFormatHandler fh, ReportDataHandler dh)
+			throws Exception, IOException, FileNotFoundException {
+		File f = new File(localRoot, localFile);
+
+		if (!f.isFile()) {
+			XbrlDock.log(XbrlEventLevel.Error, "Missing local file", f.getCanonicalPath());
+		} else {
+			loadReport(f, fh, dh);
+		}
+	}
+
+	void loadReport(File f, ReportFormatHandler fh, ReportDataHandler dh)
+			throws Exception, IOException, FileNotFoundException {
+		try (FileInputStream fr = new FileInputStream(f)) {
+			dh.beginReport(f.getCanonicalPath());
 			fh.loadReport(fr, dh);
+			dh.endReport();
 		}
 	}
 

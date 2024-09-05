@@ -16,6 +16,7 @@ public interface XbrlDockConsts {
 	String XBRLDOCK_EXT_JSON = ".json";
 	String XBRLDOCK_EXT_CSV = ".csv";
 	String XBRLDOCK_EXT_XML = ".xml";
+	String XBRLDOCK_EXT_XHTML = ".xhtml";
 
 	String XBRLDOCK_CFG = "XbrlDockConfig.json";
 	String XBRLDOCK_PREFIX = "xbrldock";
@@ -31,35 +32,30 @@ public interface XbrlDockConsts {
 		Context, Unit, Fact
 	}
 	
+	enum XbrlFactDataType {
+		number, string, text, date, bool, empty
+	}
 	
 	enum XbrlToken {
 		id, scenario, context, 
 		unit, unitNumerator, unitDenominator, measure,
 		
 		period, instant, startDate, endDate, 
-		concept, entity, dimensions,
+		concept, entity, dimensions, value, 
 		
-		value, language, format, decimals, scale, sign,
+		format, decimals, scale, sign,
 		
-		continuation, 
+		language, continuation, 
+		
+		xbrldockFactType, xbrldockOrigValue, xbrldockParseError
 	}	
-
-	enum FactFldCommon {
-		File, EntityId, CtxId, FactId, StartDate, EndDate, Instant, Dimensions, TagNamespace, TagId, Type, Format
-	};
-
-	enum FactFldData {
-		UnitId, Unit, OrigValue, Sign, Dec, Scale, Value, Error
-	};
-
-	enum FactFldText {
-		Language, Value
-	};
 	
 	interface ReportDataHandler {
+		void beginReport(String repId);
 		void addNamespace(String ref, String id);
 		void addTaxonomy(String tx);
 		String processSegment(ReportSegment segment, Map<XbrlToken, Object> data);
+		void endReport();
 	}	
 	
 	enum ReportFormat {

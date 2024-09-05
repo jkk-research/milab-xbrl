@@ -1,8 +1,8 @@
-package com.xbrldock.poc.format;
+package com.xbrldock.poc.conn.xbrlorg;
 
 import com.xbrldock.poc.XbrlDockPocConsts;
 
-public interface XbrlDockFormatConsts extends XbrlDockPocConsts {
+public interface XbrlDockConnXbrlOrgConsts extends XbrlDockPocConsts {
 	String XBRL_PERIOD_DATEFORMATSTR = "yyyy-MM-dd'T'HH:mm:ss";
 
 //@formatter:off
