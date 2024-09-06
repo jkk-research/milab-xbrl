@@ -19,8 +19,8 @@ public interface XbrlDockPocConsts extends XbrlDockConsts, XbrlDockUtilsConsts {
 		idType, id, name, urlSource
 	}
 
-	enum ReportKeys {
-		source, id, entityId, entityName, langCode, periodEnd, published, urlPackage, sourceUrl, sourceAtts
+	enum FilingKeys {
+		source, id, entityId, entityName, langCode, periodEnd, published, urlPackage, localPath, sourceUrl, sourceAtts
 	}
 
 }

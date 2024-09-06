@@ -5,20 +5,27 @@ import java.util.Collection;
 import java.util.Map;
 import java.util.TreeMap;
 
+import com.xbrldock.XbrlDock;
 import com.xbrldock.XbrlDockException;
 import com.xbrldock.utils.XbrlDockUtils;
+import com.xbrldock.utils.XbrlDockUtilsFile;
 import com.xbrldock.utils.XbrlDockUtilsJson;
+import com.xbrldock.utils.XbrlDockUtilsNet;
 
-@SuppressWarnings({"rawtypes", "unchecked"})
+@SuppressWarnings({ "rawtypes", "unchecked" })
 public class XbrlDockConnXbrlOrg implements XbrlDockConnXbrlOrgConsts {
 	String sourceName = "xbrl.org";
-	
+
+	String urlRoot = "https://filings.xbrl.org/";
+
 	File dataRoot;
+	File cacheRoot;
 
 	Map catalog;
 
-	public XbrlDockConnXbrlOrg(String rootPath) throws Exception {
+	public XbrlDockConnXbrlOrg(String rootPath, String cachePath) throws Exception {
 		dataRoot = new File(rootPath);
+		cacheRoot = new File(cachePath);
 
 		if (!dataRoot.exists()) {
 			dataRoot.mkdirs();
@@ -34,6 +41,81 @@ public class XbrlDockConnXbrlOrg implements XbrlDockConnXbrlOrgConsts {
 	public void test() throws Exception {
 //		XbrlDockConnXbrlOrgTest.test();
 		refresh();
+		
+		Map<String, Object> filings = XbrlDockUtils.simpleGet(catalog, CatalogKeys.filings);
+		
+		for ( String k : filings.keySet() ) {
+			try {
+				File f = getFiling(k);
+				
+				XbrlDock.log(EventLevel.Info, k, (null == f) ? "missing" : f.getCanonicalPath());
+
+			} catch ( Throwable t ) {
+				XbrlDockException.swallow(t, "Filing key", k);
+			}
+		}
+		
+//		getFiling("529900SGCREUZCZ7P020-2024-06-30-ESEF-DK-0");
+	}
+
+	public File getFiling(String filingID) throws Exception {
+		File ret = null;
+		Map filingData = XbrlDockUtils.simpleGet(catalog, CatalogKeys.filings, filingID);
+
+		String path = XbrlDockUtils.simpleGet(filingData, FilingKeys.localPath);
+
+		if (!XbrlDockUtils.isEmpty(path)) {
+			return new File(path);
+		}
+		
+		String zipUrl = XbrlDockUtils.simpleGet(filingData, FilingKeys.urlPackage);
+		if (XbrlDockUtils.isEmpty(zipUrl)) {
+			return null;
+		}
+
+		String str;
+
+		str = XbrlDockUtils.simpleGet(filingData, FilingKeys.entityId);
+
+		String[] eid = str.split(XBRLDOCK_SEP_ID);
+
+		path = XbrlDockUtils.getHash2(eid[1], File.separator);
+
+		path = XbrlDockUtils.sbAppend(null, File.separator, false, PATH_FILING_CACHE, eid[0], path, eid[1], filingID)
+				.toString();
+
+		File fDir = new File(cacheRoot, path);
+		XbrlDockUtilsFile.ensureDir(fDir);
+
+		String zipFile = XbrlDockUtils.getPostfix(zipUrl, "/");
+
+		String zipDir = XbrlDockUtils.cutPostfix(zipFile, ".");
+		File fZipDir = new File(fDir, zipDir);
+		
+		File fZip = new File(fDir, zipFile);
+
+		if (!fZip.isFile()) {
+			XbrlDock.log(EventLevel.Trace, "Downloading filing package", fZip.getCanonicalPath());
+			XbrlDockUtilsNet.download(urlRoot + zipUrl, fZip);
+		}
+
+		if ( !fZipDir.isDirectory() && fZip.isFile()) {
+			XbrlDock.log(EventLevel.Trace, "Unzipping package", fZip.getCanonicalPath());
+			XbrlDockUtilsFile.extractWithApacheZipFile(fZipDir, fZip, null);
+		}
+		
+		str = XbrlDockUtils.simpleGet(filingData, FilingKeys.sourceAtts, ResponseKeys.report_url);
+		String prefix = XbrlDockUtils.cutPostfix(zipUrl, "/");
+		
+		String fileName = str.substring(prefix.length() + 1);
+		
+		ret = new File(fZipDir, fileName);
+		
+		if ( !ret.isFile()) {
+			XbrlDockException.wrap(null, "Missing filing file", ret.getCanonicalPath());
+		}
+				
+		return ret;
 	}
 
 	public void refresh() throws Exception {
@@ -64,7 +146,7 @@ public class XbrlDockConnXbrlOrg implements XbrlDockConnXbrlOrgConsts {
 				entityData.put(EntityKeys.name, XbrlDockUtils.simpleGet(atts, ResponseKeys.name));
 				entityData.put(EntityKeys.urlSource, XbrlDockUtils.simpleGet(i, JsonApiKeys.links, JsonApiKeys.self));
 				locEnt.put(id, entityData);
-				
+
 				break;
 			case language:
 				String code = XbrlDockUtils.simpleGet(atts, ResponseKeys.code);
@@ -81,29 +163,31 @@ public class XbrlDockConnXbrlOrg implements XbrlDockConnXbrlOrgConsts {
 
 		c = XbrlDockUtils.simpleGet(resp, JsonApiKeys.data);
 		for (Map<String, Object> i : c) {
-			atts = XbrlDockUtils.simpleGet(i, JsonApiKeys.attributes);			
+			atts = XbrlDockUtils.simpleGet(i, JsonApiKeys.attributes);
 			ResponseType rt = XbrlDockUtils.simpleGetEnum(ResponseType.class, i, JsonApiKeys.type);
 
 			switch (rt) {
 			case filing:
 				id = XbrlDockUtils.simpleGet(atts, ResponseKeys.fxo_id);
-				Map<ReportKeys, Object> filingData = XbrlDockUtils.safeGet(filings, id, MAP_CREATOR);
+				Map<FilingKeys, Object> filingData = XbrlDockUtils.safeGet(filings, id, MAP_CREATOR);
 
-				filingData.put(ReportKeys.source, sourceName);
-				filingData.put(ReportKeys.id, id);
-				filingData.put(ReportKeys.periodEnd, XbrlDockUtils.simpleGet(atts, ResponseKeys.period_end));
-				filingData.put(ReportKeys.published, XbrlDockUtils.simpleGet(atts, ResponseKeys.date_added));
-				filingData.put(ReportKeys.urlPackage, XbrlDockUtils.simpleGet(atts, ResponseKeys.package_url));
-				filingData.put(ReportKeys.sourceUrl, XbrlDockUtils.simpleGet(i, JsonApiKeys.links, JsonApiKeys.self));
-				filingData.put(ReportKeys.sourceAtts, atts);
-				
-				String linkId = XbrlDockUtils.simpleGet(i, JsonApiKeys.relationships, ResponseType.language, JsonApiKeys.data, JsonApiKeys.id);
-				filingData.put(ReportKeys.langCode, locLang.get(linkId));
+				filingData.put(FilingKeys.source, sourceName);
+				filingData.put(FilingKeys.id, id);
+				filingData.put(FilingKeys.periodEnd, XbrlDockUtils.simpleGet(atts, ResponseKeys.period_end));
+				filingData.put(FilingKeys.published, XbrlDockUtils.simpleGet(atts, ResponseKeys.date_added));
+				filingData.put(FilingKeys.urlPackage, XbrlDockUtils.simpleGet(atts, ResponseKeys.package_url));
+				filingData.put(FilingKeys.sourceUrl, XbrlDockUtils.simpleGet(i, JsonApiKeys.links, JsonApiKeys.self));
+				filingData.put(FilingKeys.sourceAtts, atts);
 
-				linkId = XbrlDockUtils.simpleGet(i, JsonApiKeys.relationships, ResponseType.entity, JsonApiKeys.data, JsonApiKeys.id);
+				String linkId = XbrlDockUtils.simpleGet(i, JsonApiKeys.relationships, ResponseType.language, JsonApiKeys.data,
+						JsonApiKeys.id);
+				filingData.put(FilingKeys.langCode, locLang.get(linkId));
+
+				linkId = XbrlDockUtils.simpleGet(i, JsonApiKeys.relationships, ResponseType.entity, JsonApiKeys.data,
+						JsonApiKeys.id);
 				entityData = locEnt.get(linkId);
-				filingData.put(ReportKeys.entityId, entityData.get(EntityKeys.id));
-				filingData.put(ReportKeys.entityName, entityData.get(EntityKeys.name));
+				filingData.put(FilingKeys.entityId, entityData.get(EntityKeys.id));
+				filingData.put(FilingKeys.entityName, entityData.get(EntityKeys.name));
 
 				break;
 			default:

@@ -1,6 +1,14 @@
 package com.xbrldock.utils;
 
 import java.io.File;
+import java.io.IOException;
+import java.io.OutputStream;
+import java.nio.file.Files;
+import java.util.Enumeration;
+
+import org.apache.commons.compress.archivers.zip.ZipArchiveEntry;
+import org.apache.commons.compress.archivers.zip.ZipFile;
+import org.apache.commons.compress.utils.IOUtils;
 
 public class XbrlDockUtilsFile {
 	public interface FileProcessor {
@@ -44,4 +52,40 @@ public class XbrlDockUtilsFile {
 		
 		return count;
 	}
+	
+	public static void ensureDir(File f) throws IOException {
+		if ( !f.isDirectory() && !f.mkdirs() ) {
+			throw new IOException("failed to create directory " + f);
+		}
+	}
+	
+	public static void extractWithApacheZipFile(File destFile, File zipFile, String name) throws Exception {
+		try (ZipFile zf = new ZipFile(zipFile)) {
+
+			if ( null == name ) {
+
+				for (Enumeration<ZipArchiveEntry> ee = zf.getEntries(); ee.hasMoreElements();) {
+					ZipArchiveEntry ze = ee.nextElement();
+					File f = new File(destFile, ze.getName());
+					if ( ze.isDirectory() ) {
+						ensureDir(f);
+					} else {
+						unzipEntry(zf, ze, f);
+					}
+				}
+
+			} else {
+				ZipArchiveEntry ze = zf.getEntry(name);
+				unzipEntry(zf, ze, destFile);
+			}
+		}
+	}
+
+	public static void unzipEntry(ZipFile zipFile, ZipArchiveEntry zipEntry, File toFile) throws IOException {
+		ensureDir(toFile.getParentFile());
+		try (OutputStream o = Files.newOutputStream(toFile.toPath())) {
+			IOUtils.copy(zipFile.getInputStream(zipEntry), o);
+		}
+	}
+
 }

@@ -9,7 +9,7 @@ public interface XbrlDockConnXbrlOrgConsts extends XbrlDockPocConsts, XbrlDockFo
 	String PATH_CATALOG = "catalog.json";
 	String PATH_SRVRESP = "filings.org.response.json";
 	
-	String PATH_REPORT_CACHE = "reports";
+	String PATH_FILING_CACHE = "filings";
 	String PATH_DATA = "data";
 	
 	enum CatalogKeys {
@@ -21,6 +21,6 @@ public interface XbrlDockConnXbrlOrgConsts extends XbrlDockPocConsts, XbrlDockFo
 	}
 	
 	enum ResponseKeys {
-		fxo_id, identifier, name, code, period_end, date_added, package_url
+		fxo_id, identifier, name, code, period_end, date_added, package_url, report_url
 	}
 }

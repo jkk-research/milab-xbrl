@@ -79,7 +79,7 @@ public class XbrlDockPoc extends XbrlDock implements XbrlDockPocConsts {
 			loadReportRec(jsonFilter, jsonParser, dh);
 			break;
 		case "esef":
-			XbrlDockConnXbrlOrg ec = new XbrlDockConnXbrlOrg("sources/esef");
+			XbrlDockConnXbrlOrg ec = new XbrlDockConnXbrlOrg("sources/xbrl.org", "temp/sources/xbrl.org");
 			ec.test();
 			break;
 		default:
