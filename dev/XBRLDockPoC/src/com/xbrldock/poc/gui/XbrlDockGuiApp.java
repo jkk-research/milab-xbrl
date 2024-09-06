@@ -43,7 +43,7 @@ public class XbrlDockGuiApp extends JFrame implements XbrlDockGuiConsts {
 						(int) XbrlDock.getConfig(cfg, 100, ConfigKey.dimension, ConfigKey.y));
 			}
 		} catch (Throwable t) {
-			XbrlDock.log(XbrlEventLevel.Exception, t);
+			XbrlDock.log(EventLevel.Exception, t);
 		}
 	}
 

@@ -8,6 +8,7 @@ public interface XbrlDockConsts {
 	
 	String XBRLDOCK_SEP_FILE = "_";
 	String XBRLDOCK_SEP_PATH = ".";
+	String XBRLDOCK_SEP_ID = ":";
 
 	String XBRLDOCK_CHARSET_UTF8 = StandardCharsets.UTF_8.name();// "UTF-8";
 	String XBRLDOCK_FMT_TIMESTAMP = "yyyy-MM-dd'T'HH_mm_ss";
@@ -18,17 +19,20 @@ public interface XbrlDockConsts {
 	String XBRLDOCK_EXT_XML = ".xml";
 	String XBRLDOCK_EXT_XHTML = ".xhtml";
 
-	String XBRLDOCK_CFG = "XbrlDockConfig.json";
-	String XBRLDOCK_PREFIX = "xbrldock";
-
 	int KEY_ADD = -1;
 	int KEY_SIZE = -2;
 	
-	public enum XbrlEventLevel {
+	public enum EventLevel {
 		Exception, Error, Warning, Info, Trace, Debug
 	}
 	
-	enum ReportSegment {
+
+	
+	enum XbrlReportFormat {
+		XML, XHTML, JSON, CSV
+	}
+	
+	enum XbrlReportSegment {
 		Context, Unit, Fact
 	}
 	
@@ -54,13 +58,9 @@ public interface XbrlDockConsts {
 		void beginReport(String repId);
 		void addNamespace(String ref, String id);
 		void addTaxonomy(String tx);
-		String processSegment(ReportSegment segment, Map<XbrlToken, Object> data);
+		String processSegment(XbrlReportSegment segment, Map<XbrlToken, Object> data);
 		void endReport();
 	}	
-	
-	enum ReportFormat {
-		XML, XHTML, JSON, CSV
-	}
 	
 	interface ReportFormatHandler {
 		void loadReport(InputStream in, ReportDataHandler dataHandler) throws Exception;

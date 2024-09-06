@@ -70,7 +70,7 @@ public class XbrlDockFormatJson implements XbrlDockFormatConsts, XbrlDockConsts.
 					}
 					unitData.put(XbrlToken.unit, key);
 
-					return dataHandler.processSegment(ReportSegment.Unit, unitData);
+					return dataHandler.processSegment(XbrlReportSegment.Unit, unitData);
 				}
 			};
 
@@ -102,7 +102,7 @@ public class XbrlDockFormatJson implements XbrlDockFormatConsts, XbrlDockConsts.
 						ctxData.put(XbrlToken.dimensions, d);
 					}
 
-					return dataHandler.processSegment(ReportSegment.Context, ctxData);
+					return dataHandler.processSegment(XbrlReportSegment.Context, ctxData);
 				}
 			};
 
@@ -137,7 +137,7 @@ public class XbrlDockFormatJson implements XbrlDockFormatConsts, XbrlDockConsts.
 
 				factData.put(XbrlToken.context, ctxId);
 
-				dataHandler.processSegment(ReportSegment.Fact, factData);
+				dataHandler.processSegment(XbrlReportSegment.Fact, factData);
 			}
 		}
 	}

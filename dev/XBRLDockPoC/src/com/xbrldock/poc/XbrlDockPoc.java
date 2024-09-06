@@ -23,7 +23,7 @@ public class XbrlDockPoc extends XbrlDock implements XbrlDockPocConsts {
 	File localRoot = new File("temp/reports");
 
 	@Override
-	protected void handleLog(XbrlEventLevel level, Object... params) {
+	protected void handleLog(EventLevel level, Object... params) {
 		handleLogDefault(level, params);
 	}
 
@@ -32,7 +32,7 @@ public class XbrlDockPoc extends XbrlDock implements XbrlDockPocConsts {
 
 		Map cfg = XbrlDockUtils.toFlatMap(XBRLDOCK_PREFIX, XBRLDOCK_SEP_PATH, cfgData);
 
-		initEnv(args, cfg);
+		initEnv(XBRLDOCK_PREFIX, args, cfg);
 	}
 
 	public boolean test() throws Exception {
@@ -56,8 +56,8 @@ public class XbrlDockPoc extends XbrlDock implements XbrlDockPocConsts {
 
 		String mode = "";
 
-//		 mode = "esef";
-		 mode = "xhtmlRec";
+		 mode = "esef";
+//		 mode = "xhtmlRec";
 //		mode = "jsonRec";
 //		 mode = "jsonSingle";
 //		 mode = "xhtmlSingle";
@@ -79,7 +79,7 @@ public class XbrlDockPoc extends XbrlDock implements XbrlDockPocConsts {
 			loadReportRec(jsonFilter, jsonParser, dh);
 			break;
 		case "esef":
-			XbrlDockConnXbrlOrg ec = new XbrlDockConnXbrlOrg();
+			XbrlDockConnXbrlOrg ec = new XbrlDockConnXbrlOrg("sources/esef");
 			ec.test();
 			break;
 		default:
@@ -108,7 +108,7 @@ public class XbrlDockPoc extends XbrlDock implements XbrlDockPocConsts {
 		long ts = System.currentTimeMillis();
 		int count = XbrlDockUtilsFile.processFiles(testRoot, processor, filter);
 
-		XbrlDock.log(XbrlEventLevel.Info, "Loaded", count, "files in", System.currentTimeMillis() - ts, "msec.");
+		XbrlDock.log(EventLevel.Info, "Loaded", count, "files in", System.currentTimeMillis() - ts, "msec.");
 	}
 
 	void loadReport(String localFile, ReportFormatHandler fh, ReportDataHandler dh)
@@ -116,7 +116,7 @@ public class XbrlDockPoc extends XbrlDock implements XbrlDockPocConsts {
 		File f = new File(localRoot, localFile);
 
 		if (!f.isFile()) {
-			XbrlDock.log(XbrlEventLevel.Error, "Missing local file", f.getCanonicalPath());
+			XbrlDock.log(EventLevel.Error, "Missing local file", f.getCanonicalPath());
 		} else {
 			loadReport(f, fh, dh);
 		}

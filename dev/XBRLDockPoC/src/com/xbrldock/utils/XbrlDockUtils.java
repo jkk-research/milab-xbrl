@@ -113,6 +113,11 @@ public class XbrlDockUtils implements XbrlDockUtilsConsts {
 		return sb;
 	}
 
+	public static <RetType extends Enum<RetType>> RetType simpleGetEnum(Class<RetType> rc, Object root, Object... path) {
+		String ret = simpleGet(root, path);
+		return Enum.valueOf(rc, ret);
+	}
+
 	public static <RetType> RetType simpleGet(Object root, Object... path) {
 		Object curr = root;
 
@@ -137,6 +142,10 @@ public class XbrlDockUtils implements XbrlDockUtilsConsts {
 
 	public static <RetType> RetType safeGet(Object map, Object key, ItemCreator<RetType> creator, Object... hints) {
 		synchronized (map) {
+			if ( key instanceof Enum ) {
+				key = key.toString();
+			}
+
 			RetType ret = ((Map<Object, RetType>) map).get(key);
 			if ( (null == ret) && (null != creator) ) {
 				ret = creator.create(key, hints);

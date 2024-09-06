@@ -148,7 +148,7 @@ public class XbrlDockFormatXhtml implements XbrlDockFormatConsts, XbrlDockConsts
 						}
 					}
 
-					dataHandler.processSegment(ReportSegment.Context, segmentData);
+					dataHandler.processSegment(XbrlReportSegment.Context, segmentData);
 
 					break;
 				case "xbrli:unit":
@@ -162,7 +162,7 @@ public class XbrlDockFormatXhtml implements XbrlDockFormatConsts, XbrlDockConsts
 						segmentData.put(XbrlToken.unitDenominator, getInfo(e, "xbrli:unitDenominator"));
 					}
 
-					dataHandler.processSegment(ReportSegment.Unit, segmentData);
+					dataHandler.processSegment(XbrlReportSegment.Unit, segmentData);
 					break;
 				case "ix:continuation":
 					continuation.put(e.getAttribute("id"), e);
@@ -232,7 +232,7 @@ public class XbrlDockFormatXhtml implements XbrlDockFormatConsts, XbrlDockConsts
 						segmentData.put(XbrlToken.xbrldockFactType, XbrlFactDataType.text);
 					}
 
-					dataHandler.processSegment(ReportSegment.Fact, segmentData);
+					dataHandler.processSegment(XbrlReportSegment.Fact, segmentData);
 				}
 			}
 		} catch (Throwable tl) {

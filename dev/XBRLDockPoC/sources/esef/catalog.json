@@ -1,0 +1,644 @@
+{
+  "filings" : {
+    "529900SGCREUZCZ7P020-2024-06-30-ESEF-DK-0" : {
+      "langCode" : "en",
+      "entityId" : "lei:529900SGCREUZCZ7P020",
+      "published" : "2024-08-28 14:22:28.430247",
+      "urlPackage" : "/529900SGCREUZCZ7P020/2024-06-30/ESEF/DK/0/529900SGCREUZCZ7P020-2024-06-30.zip",
+      "source" : "xbrl.org",
+      "periodEnd" : "2024-06-30",
+      "entityName" : "ALK-ABELLÓ A/S",
+      "sourceUrl" : "/api/filings/16199",
+      "id" : "529900SGCREUZCZ7P020-2024-06-30-ESEF-DK-0",
+      "sourceAtts" : {
+        "fxo_id" : "529900SGCREUZCZ7P020-2024-06-30-ESEF-DK-0",
+        "country" : "DK",
+        "inconsistency_count" : 0,
+        "package_url" : "/529900SGCREUZCZ7P020/2024-06-30/ESEF/DK/0/529900SGCREUZCZ7P020-2024-06-30.zip",
+        "sha256" : "5fb605ee4fc97a79581fd7da9c29ce9ff23bf0862d03c41e0e8f9c07fee7f606",
+        "report_url" : "/529900SGCREUZCZ7P020/2024-06-30/ESEF/DK/0/alk-2024-06-30-en/reports/alk-2024-06-30-en.xhtml",
+        "error_count" : 0,
+        "period_end" : "2024-06-30",
+        "processed" : "2024-08-28 15:54:05.092560",
+        "date_added" : "2024-08-28 14:22:28.430247",
+        "json_url" : "/529900SGCREUZCZ7P020/2024-06-30/ESEF/DK/0/alk-2024-06-30-en.json",
+        "viewer_url" : "/529900SGCREUZCZ7P020/2024-06-30/ESEF/DK/0/alk-2024-06-30-en/reports/ixbrlviewer.html",
+        "warning_count" : 0
+      }
+    },
+    "549300PHFI20T3WJRO63-2023-09-30-ESEF-BE-1" : {
+      "langCode" : "fr",
+      "entityId" : "lei:549300PHFI20T3WJRO63",
+      "published" : "2024-08-28 14:22:37.384441",
+      "urlPackage" : "/549300PHFI20T3WJRO63/2023-09-30/ESEF/BE/1/549300PHFI20T3WJRO63-2023-09-30-fr.zip",
+      "source" : "xbrl.org",
+      "periodEnd" : "2023-09-30",
+      "entityName" : "ASCENCIO",
+      "sourceUrl" : "/api/filings/16206",
+      "id" : "549300PHFI20T3WJRO63-2023-09-30-ESEF-BE-1",
+      "sourceAtts" : {
+        "fxo_id" : "549300PHFI20T3WJRO63-2023-09-30-ESEF-BE-1",
+        "country" : "BE",
+        "inconsistency_count" : 0,
+        "package_url" : "/549300PHFI20T3WJRO63/2023-09-30/ESEF/BE/1/549300PHFI20T3WJRO63-2023-09-30-fr.zip",
+        "sha256" : "9314ba748c7ae8fc8c76cf6d36fd9a22c30be8a46580c806cd76203d6728c845",
+        "report_url" : "/549300PHFI20T3WJRO63/2023-09-30/ESEF/BE/1/549300PHFI20T3WJRO63-2023-09-30-fr/reports/549300PHFI20T3WJRO63-2023-09-30-fr.xhtml",
+        "error_count" : 0,
+        "period_end" : "2023-09-30",
+        "processed" : "2024-08-28 15:56:38.130090",
+        "date_added" : "2024-08-28 14:22:37.384441",
+        "json_url" : "/549300PHFI20T3WJRO63/2023-09-30/ESEF/BE/1/549300PHFI20T3WJRO63-2023-09-30-fr.json",
+        "viewer_url" : "/549300PHFI20T3WJRO63/2023-09-30/ESEF/BE/1/549300PHFI20T3WJRO63-2023-09-30-fr/reports/ixbrlviewer.html",
+        "warning_count" : 2
+      }
+    },
+    "213800JEGHHEAXIJDX34-2024-04-28-ESEF-GB-0" : {
+      "langCode" : "en",
+      "entityId" : "lei:213800JEGHHEAXIJDX34",
+      "published" : "2024-09-03 11:20:48.980805",
+      "urlPackage" : "/213800JEGHHEAXIJDX34/2024-04-28/ESEF/GB/0/213800JEGHHEAXIJDX34-2024-04-28.zip",
+      "source" : "xbrl.org",
+      "periodEnd" : "2024-04-28",
+      "entityName" : "FRASERS GROUP PLC",
+      "sourceUrl" : "/api/filings/16265",
+      "id" : "213800JEGHHEAXIJDX34-2024-04-28-ESEF-GB-0",
+      "sourceAtts" : {
+        "fxo_id" : "213800JEGHHEAXIJDX34-2024-04-28-ESEF-GB-0",
+        "country" : "GB",
+        "inconsistency_count" : 0,
+        "package_url" : "/213800JEGHHEAXIJDX34/2024-04-28/ESEF/GB/0/213800JEGHHEAXIJDX34-2024-04-28.zip",
+        "sha256" : "98af0c8d9b63f00e1468296b6c01112a6ac95cc34fa203c2bbd60941eb3ee7a3",
+        "report_url" : "/213800JEGHHEAXIJDX34/2024-04-28/ESEF/GB/0/213800JEGHHEAXIJDX34-2024-04-28/reports/213800JEGHHEAXIJDX34-2024-04-28-T01.html",
+        "error_count" : 0,
+        "period_end" : "2024-04-28",
+        "processed" : "2024-09-03 11:41:39.543764",
+        "date_added" : "2024-09-03 11:20:48.980805",
+        "json_url" : "/213800JEGHHEAXIJDX34/2024-04-28/ESEF/GB/0/213800JEGHHEAXIJDX34-2024-04-28-T01.json",
+        "viewer_url" : "/213800JEGHHEAXIJDX34/2024-04-28/ESEF/GB/0/213800JEGHHEAXIJDX34-2024-04-28/reports/ixbrlviewer.html",
+        "warning_count" : 2
+      }
+    },
+    "5299003KG4JS99TRML67-2024-06-30-ESEF-DK-0" : {
+      "langCode" : "en",
+      "entityId" : "lei:5299003KG4JS99TRML67",
+      "published" : "2024-08-28 14:22:34.205552",
+      "urlPackage" : "/5299003KG4JS99TRML67/2024-06-30/ESEF/DK/0/5299003KG4JS99TRML67-2024-06-30-en.zip",
+      "source" : "xbrl.org",
+      "periodEnd" : "2024-06-30",
+      "entityName" : "SCANDINAVIAN TOBACCO GROUP A/S",
+      "sourceUrl" : "/api/filings/16202",
+      "id" : "5299003KG4JS99TRML67-2024-06-30-ESEF-DK-0",
+      "sourceAtts" : {
+        "fxo_id" : "5299003KG4JS99TRML67-2024-06-30-ESEF-DK-0",
+        "country" : "DK",
+        "inconsistency_count" : 0,
+        "package_url" : "/5299003KG4JS99TRML67/2024-06-30/ESEF/DK/0/5299003KG4JS99TRML67-2024-06-30-en.zip",
+        "sha256" : "5b768486e9b5ba5e89f14ce746b821820f041e457c43b46541a3edb300214c2f",
+        "report_url" : "/5299003KG4JS99TRML67/2024-06-30/ESEF/DK/0/5299003KG4JS99TRML67-2024-06-30-en/reports/5299003KG4JS99TRML67-2024-06-30-en.xhtml",
+        "error_count" : 0,
+        "period_end" : "2024-06-30",
+        "processed" : "2024-08-28 15:55:19.072451",
+        "date_added" : "2024-08-28 14:22:34.205552",
+        "json_url" : "/5299003KG4JS99TRML67/2024-06-30/ESEF/DK/0/5299003KG4JS99TRML67-2024-06-30-en.json",
+        "viewer_url" : "/5299003KG4JS99TRML67/2024-06-30/ESEF/DK/0/5299003KG4JS99TRML67-2024-06-30-en/reports/ixbrlviewer.html",
+        "warning_count" : 2
+      }
+    },
+    "52990018KGR3ILFDNJ20-2024-05-31-ESEF-DK-0" : {
+      "langCode" : "en",
+      "entityId" : "lei:52990018KGR3ILFDNJ20",
+      "published" : "2024-08-28 14:22:29.161882",
+      "urlPackage" : "/52990018KGR3ILFDNJ20/2024-05-31/ESEF/DK/0/52990018KGR3ILFDNJ20-2024-05-31-en.zip",
+      "source" : "xbrl.org",
+      "periodEnd" : "2024-05-31",
+      "entityName" : "BANG & OLUFSEN A/S",
+      "sourceUrl" : "/api/filings/16200",
+      "id" : "52990018KGR3ILFDNJ20-2024-05-31-ESEF-DK-0",
+      "sourceAtts" : {
+        "fxo_id" : "52990018KGR3ILFDNJ20-2024-05-31-ESEF-DK-0",
+        "country" : "DK",
+        "inconsistency_count" : 0,
+        "package_url" : "/52990018KGR3ILFDNJ20/2024-05-31/ESEF/DK/0/52990018KGR3ILFDNJ20-2024-05-31-en.zip",
+        "sha256" : "d5c27b918eb01ea426825fbca869f85d62ceee01e6df89f57be77da3d3ef4573",
+        "report_url" : "/52990018KGR3ILFDNJ20/2024-05-31/ESEF/DK/0/52990018KGR3ILFDNJ20-2024-05-31-en/reports/52990018KGR3ILFDNJ20-2024-05-31-en.xhtml",
+        "error_count" : 0,
+        "period_end" : "2024-05-31",
+        "processed" : "2024-08-28 15:54:23.763453",
+        "date_added" : "2024-08-28 14:22:29.161882",
+        "json_url" : "/52990018KGR3ILFDNJ20/2024-05-31/ESEF/DK/0/52990018KGR3ILFDNJ20-2024-05-31-en.json",
+        "viewer_url" : "/52990018KGR3ILFDNJ20/2024-05-31/ESEF/DK/0/52990018KGR3ILFDNJ20-2024-05-31-en/reports/ixbrlviewer.html",
+        "warning_count" : 1
+      }
+    },
+    "529900BT3M81VV58P678-2024-06-30-ESEF-DK-1" : {
+      "langCode" : "en",
+      "entityId" : "lei:529900BT3M81VV58P678",
+      "published" : "2024-08-28 14:22:35.889797",
+      "urlPackage" : "/529900BT3M81VV58P678/2024-06-30/ESEF/DK/1/529900BT3M81VV58P678-2024-06-30-en.zip",
+      "source" : "xbrl.org",
+      "periodEnd" : "2024-06-30",
+      "entityName" : "GERMAN HIGH STREET PROPERTIES A/S",
+      "sourceUrl" : "/api/filings/16204",
+      "id" : "529900BT3M81VV58P678-2024-06-30-ESEF-DK-1",
+      "sourceAtts" : {
+        "fxo_id" : "529900BT3M81VV58P678-2024-06-30-ESEF-DK-1",
+        "country" : "DK",
+        "inconsistency_count" : 0,
+        "package_url" : "/529900BT3M81VV58P678/2024-06-30/ESEF/DK/1/529900BT3M81VV58P678-2024-06-30-en.zip",
+        "sha256" : "6b60567021d272fd537478e432f6e9b9c8002b9edc80ed91528b9dfcfda92c60",
+        "report_url" : "/529900BT3M81VV58P678/2024-06-30/ESEF/DK/1/529900BT3M81VV58P678-2024-06-30-en/reports/529900BT3M81VV58P678-2024-06-30-en.xhtml",
+        "error_count" : 0,
+        "period_end" : "2024-06-30",
+        "processed" : "2024-08-28 15:56:01.323984",
+        "date_added" : "2024-08-28 14:22:35.889797",
+        "json_url" : "/529900BT3M81VV58P678/2024-06-30/ESEF/DK/1/529900BT3M81VV58P678-2024-06-30-en.json",
+        "viewer_url" : "/529900BT3M81VV58P678/2024-06-30/ESEF/DK/1/529900BT3M81VV58P678-2024-06-30-en/reports/ixbrlviewer.html",
+        "warning_count" : 1
+      }
+    },
+    "213800RPOLXUUMNKIM33-2024-06-30-ESEF-DK-0" : {
+      "langCode" : "da",
+      "entityId" : "lei:213800RPOLXUUMNKIM33",
+      "published" : "2024-08-28 14:22:25.573170",
+      "urlPackage" : "/213800RPOLXUUMNKIM33/2024-06-30/ESEF/DK/0/213800RPOLXUUMNKIM33-2024-06-30-da.zip",
+      "source" : "xbrl.org",
+      "periodEnd" : "2024-06-30",
+      "entityName" : "INVESTERINGSSELSKABET LUXOR A/S",
+      "sourceUrl" : "/api/filings/16193",
+      "id" : "213800RPOLXUUMNKIM33-2024-06-30-ESEF-DK-0",
+      "sourceAtts" : {
+        "fxo_id" : "213800RPOLXUUMNKIM33-2024-06-30-ESEF-DK-0",
+        "country" : "DK",
+        "inconsistency_count" : 0,
+        "package_url" : "/213800RPOLXUUMNKIM33/2024-06-30/ESEF/DK/0/213800RPOLXUUMNKIM33-2024-06-30-da.zip",
+        "sha256" : "8e07f6c9b05aa77ef8409c6abfef29d66588106d3cd86e5b1a845c4ea6199a2e",
+        "report_url" : "/213800RPOLXUUMNKIM33/2024-06-30/ESEF/DK/0/213800RPOLXUUMNKIM33-2024-06-30-da/reports/213800RPOLXUUMNKIM33-2024-06-30-da.xhtml",
+        "error_count" : 0,
+        "period_end" : "2024-06-30",
+        "processed" : "2024-08-28 15:51:44.893455",
+        "date_added" : "2024-08-28 14:22:25.573170",
+        "json_url" : "/213800RPOLXUUMNKIM33/2024-06-30/ESEF/DK/0/213800RPOLXUUMNKIM33-2024-06-30-da.json",
+        "viewer_url" : "/213800RPOLXUUMNKIM33/2024-06-30/ESEF/DK/0/213800RPOLXUUMNKIM33-2024-06-30-da/reports/ixbrlviewer.html",
+        "warning_count" : 0
+      }
+    },
+    "213800LEZA58SZNCBN19-2024-06-30-ESEF-DK-0" : {
+      "langCode" : "en",
+      "entityId" : "lei:213800LEZA58SZNCBN19",
+      "published" : "2024-08-28 14:22:26.954515",
+      "urlPackage" : "/213800LEZA58SZNCBN19/2024-06-30/ESEF/DK/0/ISS-2024-06-30-en.zip",
+      "source" : "xbrl.org",
+      "periodEnd" : "2024-06-30",
+      "entityName" : "ISS A/S",
+      "sourceUrl" : "/api/filings/16196",
+      "id" : "213800LEZA58SZNCBN19-2024-06-30-ESEF-DK-0",
+      "sourceAtts" : {
+        "fxo_id" : "213800LEZA58SZNCBN19-2024-06-30-ESEF-DK-0",
+        "country" : "DK",
+        "inconsistency_count" : 0,
+        "package_url" : "/213800LEZA58SZNCBN19/2024-06-30/ESEF/DK/0/ISS-2024-06-30-en.zip",
+        "sha256" : "617b94bdb4e7902588894b42c73cc4cc1bd2a8fbf5ece2d2316087a16f2b235c",
+        "report_url" : "/213800LEZA58SZNCBN19/2024-06-30/ESEF/DK/0/ISS-2024-06-30-en/reports/ISS-2024-06-30-en.xhtml",
+        "error_count" : 0,
+        "period_end" : "2024-06-30",
+        "processed" : "2024-08-28 15:52:55.818313",
+        "date_added" : "2024-08-28 14:22:26.954515",
+        "json_url" : "/213800LEZA58SZNCBN19/2024-06-30/ESEF/DK/0/ISS-2024-06-30-en.json",
+        "viewer_url" : "/213800LEZA58SZNCBN19/2024-06-30/ESEF/DK/0/ISS-2024-06-30-en/reports/ixbrlviewer.html",
+        "warning_count" : 1
+      }
+    },
+    "213800NWBVBQ8H21KM03-2024-06-30-ESEF-DK-0" : {
+      "langCode" : "da",
+      "entityId" : "lei:213800NWBVBQ8H21KM03",
+      "published" : "2024-08-28 14:22:26.587626",
+      "urlPackage" : "/213800NWBVBQ8H21KM03/2024-06-30/ESEF/DK/0/SilkeborgIF-2024-06-30-da.zip",
+      "source" : "xbrl.org",
+      "periodEnd" : "2024-06-30",
+      "entityName" : "SILKEBORG IF INVEST A/S",
+      "sourceUrl" : "/api/filings/16195",
+      "id" : "213800NWBVBQ8H21KM03-2024-06-30-ESEF-DK-0",
+      "sourceAtts" : {
+        "fxo_id" : "213800NWBVBQ8H21KM03-2024-06-30-ESEF-DK-0",
+        "country" : "DK",
+        "inconsistency_count" : 0,
+        "package_url" : "/213800NWBVBQ8H21KM03/2024-06-30/ESEF/DK/0/SilkeborgIF-2024-06-30-da.zip",
+        "sha256" : "7c15f0182ca4b50c41b7cb7c5d8eb1a209e15d54556ab3a40e75be670352e4fa",
+        "report_url" : "/213800NWBVBQ8H21KM03/2024-06-30/ESEF/DK/0/SilkeborgIF-2024-06-30-da/reports/SilkeborgIF-2024-06-30-da.xhtml",
+        "error_count" : 0,
+        "period_end" : "2024-06-30",
+        "processed" : "2024-08-28 15:52:34.969410",
+        "date_added" : "2024-08-28 14:22:26.587626",
+        "json_url" : "/213800NWBVBQ8H21KM03/2024-06-30/ESEF/DK/0/SilkeborgIF-2024-06-30-da.json",
+        "viewer_url" : "/213800NWBVBQ8H21KM03/2024-06-30/ESEF/DK/0/SilkeborgIF-2024-06-30-da/reports/ixbrlviewer.html",
+        "warning_count" : 0
+      }
+    },
+    "549300DYMC8BGZZC8844-2024-06-30-ESEF-DK-0" : {
+      "langCode" : "en",
+      "entityId" : "lei:549300DYMC8BGZZC8844",
+      "published" : "2024-08-28 14:22:25.919334",
+      "urlPackage" : "/549300DYMC8BGZZC8844/2024-06-30/ESEF/DK/0/549300DYMC8BGZZC8844-2024-06-30-en.zip",
+      "source" : "xbrl.org",
+      "periodEnd" : "2024-06-30",
+      "entityName" : "VESTAS WIND SYSTEMS A/S",
+      "sourceUrl" : "/api/filings/16194",
+      "id" : "549300DYMC8BGZZC8844-2024-06-30-ESEF-DK-0",
+      "sourceAtts" : {
+        "fxo_id" : "549300DYMC8BGZZC8844-2024-06-30-ESEF-DK-0",
+        "country" : "DK",
+        "inconsistency_count" : 0,
+        "package_url" : "/549300DYMC8BGZZC8844/2024-06-30/ESEF/DK/0/549300DYMC8BGZZC8844-2024-06-30-en.zip",
+        "sha256" : "0fe1d017d8f39357cf3f90ecc364b24d60f53fb592b8adede9ca9126668c51e2",
+        "report_url" : "/549300DYMC8BGZZC8844/2024-06-30/ESEF/DK/0/549300DYMC8BGZZC8844-2024-06-30-en/reports/549300DYMC8BGZZC8844-2024-06-30-en.xhtml",
+        "error_count" : 0,
+        "period_end" : "2024-06-30",
+        "processed" : "2024-08-28 15:52:07.607013",
+        "date_added" : "2024-08-28 14:22:25.919334",
+        "json_url" : "/549300DYMC8BGZZC8844/2024-06-30/ESEF/DK/0/549300DYMC8BGZZC8844-2024-06-30-en.json",
+        "viewer_url" : "/549300DYMC8BGZZC8844/2024-06-30/ESEF/DK/0/549300DYMC8BGZZC8844-2024-06-30-en/reports/ixbrlviewer.html",
+        "warning_count" : 15
+      }
+    },
+    "213800B3ZUTDOZYVJB41-2024-04-30-ESEF-GB-0" : {
+      "langCode" : "en",
+      "entityId" : "lei:213800B3ZUTDOZYVJB41",
+      "published" : "2024-09-03 11:20:47.633466",
+      "urlPackage" : "/213800B3ZUTDOZYVJB41/2024-04-30/ESEF/GB/0/213800B3ZUTDOZYVJB41-2024-04-30.zip",
+      "source" : "xbrl.org",
+      "periodEnd" : "2024-04-30",
+      "entityName" : "ZIGUP PLC",
+      "sourceUrl" : "/api/filings/16264",
+      "id" : "213800B3ZUTDOZYVJB41-2024-04-30-ESEF-GB-0",
+      "sourceAtts" : {
+        "fxo_id" : "213800B3ZUTDOZYVJB41-2024-04-30-ESEF-GB-0",
+        "country" : "GB",
+        "inconsistency_count" : 0,
+        "package_url" : "/213800B3ZUTDOZYVJB41/2024-04-30/ESEF/GB/0/213800B3ZUTDOZYVJB41-2024-04-30.zip",
+        "sha256" : "3f907566a0db027890bbe0c5963b8c99e7e3e1b6ada157260aff4558857abfa7",
+        "report_url" : "/213800B3ZUTDOZYVJB41/2024-04-30/ESEF/GB/0/213800B3ZUTDOZYVJB41-2024-04-30/reports/213800B3ZUTDOZYVJB41-2024-04-30-T01.xhtml",
+        "error_count" : 0,
+        "period_end" : "2024-04-30",
+        "processed" : "2024-09-03 11:41:18.263973",
+        "date_added" : "2024-09-03 11:20:47.633466",
+        "json_url" : "/213800B3ZUTDOZYVJB41/2024-04-30/ESEF/GB/0/213800B3ZUTDOZYVJB41-2024-04-30-T01.json",
+        "viewer_url" : "/213800B3ZUTDOZYVJB41/2024-04-30/ESEF/GB/0/213800B3ZUTDOZYVJB41-2024-04-30/reports/ixbrlviewer.html",
+        "warning_count" : 4
+      }
+    },
+    "097900BGMJ0000059415-2023-12-31-ESEF-SK-0" : {
+      "langCode" : "sk",
+      "entityId" : "lei:097900BGMJ0000059415",
+      "published" : "2024-08-28 14:23:20.663724",
+      "urlPackage" : "/097900BGMJ0000059415/2023-12-31/ESEF/SK/0/097900BGMJ0000059415-2023-12-31-sk.zip",
+      "source" : "xbrl.org",
+      "periodEnd" : "2023-12-31",
+      "entityName" : "Pro Partners Holding, a.s.",
+      "sourceUrl" : "/api/filings/16261",
+      "id" : "097900BGMJ0000059415-2023-12-31-ESEF-SK-0",
+      "sourceAtts" : {
+        "fxo_id" : "097900BGMJ0000059415-2023-12-31-ESEF-SK-0",
+        "country" : "SK",
+        "inconsistency_count" : 0,
+        "package_url" : "/097900BGMJ0000059415/2023-12-31/ESEF/SK/0/097900BGMJ0000059415-2023-12-31-sk.zip",
+        "sha256" : "01e763572c2cfc96d4743599640dcd619f84fc5e919adcf0e95ea447e557a212",
+        "report_url" : "/097900BGMJ0000059415/2023-12-31/ESEF/SK/0/097900BGMJ0000059415-2023-12-31-sk/reports/097900BGMJ0000059415-2023-12-31-sk.xhtml",
+        "error_count" : 0,
+        "period_end" : "2023-12-31",
+        "processed" : "2024-08-28 16:09:59.891369",
+        "date_added" : "2024-08-28 14:23:20.663724",
+        "json_url" : "/097900BGMJ0000059415/2023-12-31/ESEF/SK/0/097900BGMJ0000059415-2023-12-31-sk.json",
+        "viewer_url" : "/097900BGMJ0000059415/2023-12-31/ESEF/SK/0/097900BGMJ0000059415-2023-12-31-sk/reports/ixbrlviewer.html",
+        "warning_count" : 0
+      }
+    },
+    "213800B37PMK7IFYYM19-2024-04-30-ESEF-DK-0" : {
+      "langCode" : "en",
+      "entityId" : "lei:213800B37PMK7IFYYM19",
+      "published" : "2024-08-28 14:22:33.600262",
+      "urlPackage" : "/213800B37PMK7IFYYM19/2024-04-30/ESEF/DK/0/213800B37PMK7IFYYM19-2024-04-30-en.zip",
+      "source" : "xbrl.org",
+      "periodEnd" : "2024-04-30",
+      "entityName" : "BoConcept Holding A/S",
+      "sourceUrl" : "/api/filings/16201",
+      "id" : "213800B37PMK7IFYYM19-2024-04-30-ESEF-DK-0",
+      "sourceAtts" : {
+        "fxo_id" : "213800B37PMK7IFYYM19-2024-04-30-ESEF-DK-0",
+        "country" : "DK",
+        "inconsistency_count" : 0,
+        "package_url" : "/213800B37PMK7IFYYM19/2024-04-30/ESEF/DK/0/213800B37PMK7IFYYM19-2024-04-30-en.zip",
+        "sha256" : "55663df174b35bb483eb8a3824886edef67b419d6fe198721547f00802695103",
+        "report_url" : "/213800B37PMK7IFYYM19/2024-04-30/ESEF/DK/0/213800B37PMK7IFYYM19-2024-04-30-en/reports/213800B37PMK7IFYYM19-2024-04-30-en.xhtml",
+        "error_count" : 0,
+        "period_end" : "2024-04-30",
+        "processed" : "2024-08-28 15:55:01.957454",
+        "date_added" : "2024-08-28 14:22:33.600262",
+        "json_url" : "/213800B37PMK7IFYYM19/2024-04-30/ESEF/DK/0/213800B37PMK7IFYYM19-2024-04-30-en.json",
+        "viewer_url" : "/213800B37PMK7IFYYM19/2024-04-30/ESEF/DK/0/213800B37PMK7IFYYM19-2024-04-30-en/reports/ixbrlviewer.html",
+        "warning_count" : 0
+      }
+    },
+    "null" : {
+      "sourceUrl" : null,
+      "urlPackage" : null,
+      "sourceAtts" : null,
+      "entityName" : "INVESTERINGSSELSKABET LUXOR A/S",
+      "langCode" : "da",
+      "entityId" : "lei:213800RPOLXUUMNKIM33",
+      "source" : "xbrl.org",
+      "id" : null,
+      "published" : null,
+      "periodEnd" : null
+    },
+    "529900MTJPDPE4MHJ122-2024-06-30-ESEF-DK-0" : {
+      "langCode" : "en",
+      "entityId" : "lei:529900MTJPDPE4MHJ122",
+      "published" : "2024-09-03 11:20:50.477389",
+      "urlPackage" : "/529900MTJPDPE4MHJ122/2024-06-30/ESEF/DK/0/529900MTJPDPE4MHJ122-2024-06-30-en.zip",
+      "source" : "xbrl.org",
+      "periodEnd" : "2024-06-30",
+      "entityName" : "GENMAB A/S",
+      "sourceUrl" : "/api/filings/16266",
+      "id" : "529900MTJPDPE4MHJ122-2024-06-30-ESEF-DK-0",
+      "sourceAtts" : {
+        "fxo_id" : "529900MTJPDPE4MHJ122-2024-06-30-ESEF-DK-0",
+        "country" : "DK",
+        "inconsistency_count" : 0,
+        "package_url" : "/529900MTJPDPE4MHJ122/2024-06-30/ESEF/DK/0/529900MTJPDPE4MHJ122-2024-06-30-en.zip",
+        "sha256" : "4150ccfc0a8a9f74ebaabd04a7e60256fb2bb8465e035ea1966825841b94f715",
+        "report_url" : "/529900MTJPDPE4MHJ122/2024-06-30/ESEF/DK/0/529900MTJPDPE4MHJ122-2024-06-30-en/reports/529900MTJPDPE4MHJ122-2024-06-30-en.xhtml",
+        "error_count" : 0,
+        "period_end" : "2024-06-30",
+        "processed" : "2024-09-03 11:42:21.512069",
+        "date_added" : "2024-09-03 11:20:50.477389",
+        "json_url" : "/529900MTJPDPE4MHJ122/2024-06-30/ESEF/DK/0/529900MTJPDPE4MHJ122-2024-06-30-en.json",
+        "viewer_url" : "/529900MTJPDPE4MHJ122/2024-06-30/ESEF/DK/0/529900MTJPDPE4MHJ122-2024-06-30-en/reports/ixbrlviewer.html",
+        "warning_count" : 0
+      }
+    },
+    "213800RM6L9LN78BVA56-2024-06-30-ESEF-DK-0" : {
+      "langCode" : "en",
+      "entityId" : "lei:213800RM6L9LN78BVA56",
+      "published" : "2024-08-28 14:22:27.835236",
+      "urlPackage" : "/213800RM6L9LN78BVA56/2024-06-30/ESEF/DK/0/213800RM6L9LN78BVA56-2024-06-30-en.zip",
+      "source" : "xbrl.org",
+      "periodEnd" : "2024-06-30",
+      "entityName" : "DEMANT A/S",
+      "sourceUrl" : "/api/filings/16198",
+      "id" : "213800RM6L9LN78BVA56-2024-06-30-ESEF-DK-0",
+      "sourceAtts" : {
+        "fxo_id" : "213800RM6L9LN78BVA56-2024-06-30-ESEF-DK-0",
+        "country" : "DK",
+        "inconsistency_count" : 0,
+        "package_url" : "/213800RM6L9LN78BVA56/2024-06-30/ESEF/DK/0/213800RM6L9LN78BVA56-2024-06-30-en.zip",
+        "sha256" : "faa078d1e8e1728e41d701c0d0b8474f17c9768dee1331fc6a0052b372c2c384",
+        "report_url" : "/213800RM6L9LN78BVA56/2024-06-30/ESEF/DK/0/213800RM6L9LN78BVA56-2024-06-30-en/reports/213800RM6L9LN78BVA56-2024-06-30-en.xhtml",
+        "error_count" : 0,
+        "period_end" : "2024-06-30",
+        "processed" : "2024-08-28 15:53:36.510676",
+        "date_added" : "2024-08-28 14:22:27.835236",
+        "json_url" : "/213800RM6L9LN78BVA56/2024-06-30/ESEF/DK/0/213800RM6L9LN78BVA56-2024-06-30-en.json",
+        "viewer_url" : "/213800RM6L9LN78BVA56/2024-06-30/ESEF/DK/0/213800RM6L9LN78BVA56-2024-06-30-en/reports/ixbrlviewer.html",
+        "warning_count" : 6
+      }
+    },
+    "254900CUE0P9KFF6VY49-2023-12-31-ESEF-NL-0" : {
+      "langCode" : "en",
+      "entityId" : "lei:254900CUE0P9KFF6VY49",
+      "published" : "2024-08-28 14:22:36.682814",
+      "urlPackage" : "/254900CUE0P9KFF6VY49/2023-12-31/ESEF/NL/0/254900CUE0P9KFF6VY49-2023-12-31-en.zip",
+      "source" : "xbrl.org",
+      "periodEnd" : "2023-12-31",
+      "entityName" : "Global InterConnection Group Limited",
+      "sourceUrl" : "/api/filings/16205",
+      "id" : "254900CUE0P9KFF6VY49-2023-12-31-ESEF-NL-0",
+      "sourceAtts" : {
+        "fxo_id" : "254900CUE0P9KFF6VY49-2023-12-31-ESEF-NL-0",
+        "country" : "NL",
+        "inconsistency_count" : 0,
+        "package_url" : "/254900CUE0P9KFF6VY49/2023-12-31/ESEF/NL/0/254900CUE0P9KFF6VY49-2023-12-31-en.zip",
+        "sha256" : "c425459ccdc2988afc67a654da662e24f58cd8a2cf0b6694d1dcbe60fdafa4a2",
+        "report_url" : "/254900CUE0P9KFF6VY49/2023-12-31/ESEF/NL/0/254900CUE0P9KFF6VY49-2023-12-31-en/reports/254900CUE0P9KFF6VY49-2023-12-31-en.xhtml",
+        "error_count" : 0,
+        "period_end" : "2023-12-31",
+        "processed" : "2024-08-28 15:56:23.934717",
+        "date_added" : "2024-08-28 14:22:36.682814",
+        "json_url" : "/254900CUE0P9KFF6VY49/2023-12-31/ESEF/NL/0/254900CUE0P9KFF6VY49-2023-12-31-en.json",
+        "viewer_url" : "/254900CUE0P9KFF6VY49/2023-12-31/ESEF/NL/0/254900CUE0P9KFF6VY49-2023-12-31-en/reports/ixbrlviewer.html",
+        "warning_count" : 1
+      }
+    },
+    "213800F9OEFBTUYXUK64-2024-04-30-ESEF-DK-0" : {
+      "langCode" : "en",
+      "entityId" : "lei:213800F9OEFBTUYXUK64",
+      "published" : "2024-08-28 14:22:27.538844",
+      "urlPackage" : "/213800F9OEFBTUYXUK64/2024-04-30/ESEF/DK/0/213800F9OEFBTUYXUK64-2024-04-30-en.zip",
+      "source" : "xbrl.org",
+      "periodEnd" : "2024-04-30",
+      "entityName" : "BOCONCEPT A/S",
+      "sourceUrl" : "/api/filings/16197",
+      "id" : "213800F9OEFBTUYXUK64-2024-04-30-ESEF-DK-0",
+      "sourceAtts" : {
+        "fxo_id" : "213800F9OEFBTUYXUK64-2024-04-30-ESEF-DK-0",
+        "country" : "DK",
+        "inconsistency_count" : 0,
+        "package_url" : "/213800F9OEFBTUYXUK64/2024-04-30/ESEF/DK/0/213800F9OEFBTUYXUK64-2024-04-30-en.zip",
+        "sha256" : "fb9929ae34cfbc12da34cb090a075fe3e8f17b8a118dec1fdd34e0aca2d2d12f",
+        "report_url" : "/213800F9OEFBTUYXUK64/2024-04-30/ESEF/DK/0/213800F9OEFBTUYXUK64-2024-04-30-en/reports/213800F9OEFBTUYXUK64-2024-04-30-en.xhtml",
+        "error_count" : 0,
+        "period_end" : "2024-04-30",
+        "processed" : "2024-08-28 15:53:18.880514",
+        "date_added" : "2024-08-28 14:22:27.538844",
+        "json_url" : "/213800F9OEFBTUYXUK64/2024-04-30/ESEF/DK/0/213800F9OEFBTUYXUK64-2024-04-30-en.json",
+        "viewer_url" : "/213800F9OEFBTUYXUK64/2024-04-30/ESEF/DK/0/213800F9OEFBTUYXUK64-2024-04-30-en/reports/ixbrlviewer.html",
+        "warning_count" : 0
+      }
+    },
+    "213800JX3V4TPO7TCJ08-2024-06-30-ESEF-GB-0" : {
+      "langCode" : "en",
+      "entityId" : "lei:213800JX3V4TPO7TCJ08",
+      "published" : "2024-09-03 11:20:46.693395",
+      "urlPackage" : "/213800JX3V4TPO7TCJ08/2024-06-30/ESEF/GB/0/213800JX3V4TPO7TCJ08-2024-06-30.zip",
+      "source" : "xbrl.org",
+      "periodEnd" : "2024-06-30",
+      "entityName" : "BERKELEY ENERGIA LIMITED",
+      "sourceUrl" : "/api/filings/16263",
+      "id" : "213800JX3V4TPO7TCJ08-2024-06-30-ESEF-GB-0",
+      "sourceAtts" : {
+        "fxo_id" : "213800JX3V4TPO7TCJ08-2024-06-30-ESEF-GB-0",
+        "country" : "GB",
+        "inconsistency_count" : 0,
+        "package_url" : "/213800JX3V4TPO7TCJ08/2024-06-30/ESEF/GB/0/213800JX3V4TPO7TCJ08-2024-06-30.zip",
+        "sha256" : "b283ff10ccaf00fc4b845a98e877a273715ae38f5f8c04bc3a2f574a33f1a759",
+        "report_url" : "/213800JX3V4TPO7TCJ08/2024-06-30/ESEF/GB/0/213800JX3V4TPO7TCJ08-2024-06-30/reports/213800JX3V4TPO7TCJ08-2024-06-30-T01.xhtml",
+        "error_count" : 0,
+        "period_end" : "2024-06-30",
+        "processed" : "2024-09-03 11:41:05.256411",
+        "date_added" : "2024-09-03 11:20:46.693395",
+        "json_url" : "/213800JX3V4TPO7TCJ08/2024-06-30/ESEF/GB/0/213800JX3V4TPO7TCJ08-2024-06-30-T01.json",
+        "viewer_url" : "/213800JX3V4TPO7TCJ08/2024-06-30/ESEF/GB/0/213800JX3V4TPO7TCJ08-2024-06-30/reports/ixbrlviewer.html",
+        "warning_count" : 0
+      }
+    },
+    "213800LAZNPXSBKVHR17-2024-06-30-ESEF-GB-0" : {
+      "langCode" : "en",
+      "entityId" : "lei:213800LAZNPXSBKVHR17",
+      "published" : "2024-09-03 11:20:44.969399",
+      "urlPackage" : "/213800LAZNPXSBKVHR17/2024-06-30/ESEF/GB/0/213800LAZNPXSBKVHR17-2024-06-30.zip",
+      "source" : "xbrl.org",
+      "periodEnd" : "2024-06-30",
+      "entityName" : "SOUTH32 LIMITED",
+      "sourceUrl" : "/api/filings/16262",
+      "id" : "213800LAZNPXSBKVHR17-2024-06-30-ESEF-GB-0",
+      "sourceAtts" : {
+        "fxo_id" : "213800LAZNPXSBKVHR17-2024-06-30-ESEF-GB-0",
+        "country" : "GB",
+        "inconsistency_count" : 0,
+        "package_url" : "/213800LAZNPXSBKVHR17/2024-06-30/ESEF/GB/0/213800LAZNPXSBKVHR17-2024-06-30.zip",
+        "sha256" : "ee7b2ea319dcc2528f3ce7adc94f3789169363347543c6b052d1195446b46d86",
+        "report_url" : "/213800LAZNPXSBKVHR17/2024-06-30/ESEF/GB/0/213800LAZNPXSBKVHR17-2024-06-30/reports/213800LAZNPXSBKVHR17-2024-06-30-T01.xhtml",
+        "error_count" : 0,
+        "period_end" : "2024-06-30",
+        "processed" : "2024-09-03 11:40:33.285064",
+        "date_added" : "2024-09-03 11:20:44.969399",
+        "json_url" : "/213800LAZNPXSBKVHR17/2024-06-30/ESEF/GB/0/213800LAZNPXSBKVHR17-2024-06-30-T01.json",
+        "viewer_url" : "/213800LAZNPXSBKVHR17/2024-06-30/ESEF/GB/0/213800LAZNPXSBKVHR17-2024-06-30/reports/ixbrlviewer.html",
+        "warning_count" : 5
+      }
+    },
+    "213800ZRY1MCTFK8PQ94-2024-06-30-ESEF-DK-0" : {
+      "langCode" : "da",
+      "entityId" : "lei:213800ZRY1MCTFK8PQ94",
+      "published" : "2024-08-28 14:22:34.739556",
+      "urlPackage" : "/213800ZRY1MCTFK8PQ94/2024-06-30/ESEF/DK/0/213800ZRY1MCTFK8PQ94-2024-06-30.zip",
+      "source" : "xbrl.org",
+      "periodEnd" : "2024-06-30",
+      "entityName" : "PARKEN SPORT & ENTERTAINMENT A/S",
+      "sourceUrl" : "/api/filings/16203",
+      "id" : "213800ZRY1MCTFK8PQ94-2024-06-30-ESEF-DK-0",
+      "sourceAtts" : {
+        "fxo_id" : "213800ZRY1MCTFK8PQ94-2024-06-30-ESEF-DK-0",
+        "country" : "DK",
+        "inconsistency_count" : 0,
+        "package_url" : "/213800ZRY1MCTFK8PQ94/2024-06-30/ESEF/DK/0/213800ZRY1MCTFK8PQ94-2024-06-30.zip",
+        "sha256" : "76fc11bb7c7a6cae7809a0845aa1b3607d6d8ef7f636269e026aa787f96f7b0e",
+        "report_url" : "/213800ZRY1MCTFK8PQ94/2024-06-30/ESEF/DK/0/parken-2024-06-30-da/reports/parken-2024-06-30-da.xhtml",
+        "error_count" : 35,
+        "period_end" : "2024-06-30",
+        "processed" : "2024-08-28 15:55:42.172256",
+        "date_added" : "2024-08-28 14:22:34.739556",
+        "json_url" : "/213800ZRY1MCTFK8PQ94/2024-06-30/ESEF/DK/0/parken-2024-06-30-da.json",
+        "viewer_url" : "/213800ZRY1MCTFK8PQ94/2024-06-30/ESEF/DK/0/parken-2024-06-30-da/reports/ixbrlviewer.html",
+        "warning_count" : 12
+      }
+    }
+  },
+  "languages" : {
+    "sk" : "Slovak",
+    "en" : "English",
+    "fr" : "French",
+    "da" : "Danish"
+  },
+  "entities" : {
+    "lei:213800B3ZUTDOZYVJB41" : {
+      "name" : "ZIGUP PLC",
+      "id" : "lei:213800B3ZUTDOZYVJB41",
+      "urlSource" : "/api/entities/213800B3ZUTDOZYVJB41"
+    },
+    "lei:213800JX3V4TPO7TCJ08" : {
+      "name" : "BERKELEY ENERGIA LIMITED",
+      "id" : "lei:213800JX3V4TPO7TCJ08",
+      "urlSource" : "/api/entities/213800JX3V4TPO7TCJ08"
+    },
+    "lei:213800LEZA58SZNCBN19" : {
+      "name" : "ISS A/S",
+      "id" : "lei:213800LEZA58SZNCBN19",
+      "urlSource" : "/api/entities/213800LEZA58SZNCBN19"
+    },
+    "lei:529900SGCREUZCZ7P020" : {
+      "name" : "ALK-ABELLÓ A/S",
+      "id" : "lei:529900SGCREUZCZ7P020",
+      "urlSource" : "/api/entities/529900SGCREUZCZ7P020"
+    },
+    "lei:213800RM6L9LN78BVA56" : {
+      "name" : "DEMANT A/S",
+      "id" : "lei:213800RM6L9LN78BVA56",
+      "urlSource" : "/api/entities/213800RM6L9LN78BVA56"
+    },
+    "lei:254900CUE0P9KFF6VY49" : {
+      "name" : "Global InterConnection Group Limited",
+      "id" : "lei:254900CUE0P9KFF6VY49",
+      "urlSource" : "/api/entities/254900CUE0P9KFF6VY49"
+    },
+    "lei:213800JEGHHEAXIJDX34" : {
+      "name" : "FRASERS GROUP PLC",
+      "id" : "lei:213800JEGHHEAXIJDX34",
+      "urlSource" : "/api/entities/213800JEGHHEAXIJDX34"
+    },
+    "lei:213800RPOLXUUMNKIM33" : {
+      "name" : "INVESTERINGSSELSKABET LUXOR A/S",
+      "id" : "lei:213800RPOLXUUMNKIM33",
+      "urlSource" : "/api/entities/213800RPOLXUUMNKIM33"
+    },
+    "lei:213800NWBVBQ8H21KM03" : {
+      "name" : "SILKEBORG IF INVEST A/S",
+      "id" : "lei:213800NWBVBQ8H21KM03",
+      "urlSource" : "/api/entities/213800NWBVBQ8H21KM03"
+    },
+    "lei:529900BT3M81VV58P678" : {
+      "name" : "GERMAN HIGH STREET PROPERTIES A/S",
+      "id" : "lei:529900BT3M81VV58P678",
+      "urlSource" : "/api/entities/529900BT3M81VV58P678"
+    },
+    "lei:213800LAZNPXSBKVHR17" : {
+      "name" : "SOUTH32 LIMITED",
+      "id" : "lei:213800LAZNPXSBKVHR17",
+      "urlSource" : "/api/entities/213800LAZNPXSBKVHR17"
+    },
+    "lei:52990018KGR3ILFDNJ20" : {
+      "name" : "BANG & OLUFSEN A/S",
+      "id" : "lei:52990018KGR3ILFDNJ20",
+      "urlSource" : "/api/entities/52990018KGR3ILFDNJ20"
+    },
+    "lei:549300DYMC8BGZZC8844" : {
+      "name" : "VESTAS WIND SYSTEMS A/S",
+      "id" : "lei:549300DYMC8BGZZC8844",
+      "urlSource" : "/api/entities/549300DYMC8BGZZC8844"
+    },
+    "lei:213800B37PMK7IFYYM19" : {
+      "name" : "BoConcept Holding A/S",
+      "id" : "lei:213800B37PMK7IFYYM19",
+      "urlSource" : "/api/entities/213800B37PMK7IFYYM19"
+    },
+    "lei:213800F9OEFBTUYXUK64" : {
+      "name" : "BOCONCEPT A/S",
+      "id" : "lei:213800F9OEFBTUYXUK64",
+      "urlSource" : "/api/entities/213800F9OEFBTUYXUK64"
+    },
+    "lei:5299003KG4JS99TRML67" : {
+      "name" : "SCANDINAVIAN TOBACCO GROUP A/S",
+      "id" : "lei:5299003KG4JS99TRML67",
+      "urlSource" : "/api/entities/5299003KG4JS99TRML67"
+    },
+    "lei:529900MTJPDPE4MHJ122" : {
+      "name" : "GENMAB A/S",
+      "id" : "lei:529900MTJPDPE4MHJ122",
+      "urlSource" : "/api/entities/529900MTJPDPE4MHJ122"
+    },
+    "lei:097900BGMJ0000059415" : {
+      "name" : "Pro Partners Holding, a.s.",
+      "id" : "lei:097900BGMJ0000059415",
+      "urlSource" : "/api/entities/097900BGMJ0000059415"
+    },
+    "lei:549300PHFI20T3WJRO63" : {
+      "name" : "ASCENCIO",
+      "id" : "lei:549300PHFI20T3WJRO63",
+      "urlSource" : "/api/entities/549300PHFI20T3WJRO63"
+    },
+    "lei:213800ZRY1MCTFK8PQ94" : {
+      "name" : "PARKEN SPORT & ENTERTAINMENT A/S",
+      "id" : "lei:213800ZRY1MCTFK8PQ94",
+      "urlSource" : "/api/entities/213800ZRY1MCTFK8PQ94"
+    }
+  }
+}

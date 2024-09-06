@@ -5,8 +5,8 @@ import java.util.TreeMap;
 
 import com.xbrldock.XbrlDock;
 import com.xbrldock.XbrlDockConsts;
-import com.xbrldock.XbrlDockConsts.ReportSegment;
-import com.xbrldock.XbrlDockConsts.XbrlEventLevel;
+import com.xbrldock.XbrlDockConsts.XbrlReportSegment;
+import com.xbrldock.XbrlDockConsts.EventLevel;
 import com.xbrldock.XbrlDockConsts.XbrlToken;
 
 public class XbrlDockUtilsDumpReportHandler implements XbrlDockConsts.ReportDataHandler {
@@ -28,23 +28,23 @@ public class XbrlDockUtilsDumpReportHandler implements XbrlDockConsts.ReportData
 
 	@Override
 	public void beginReport(String repId) {
-		XbrlDock.log(XbrlEventLevel.Info, "\n\n --- Begin report", repId, "---");
+		XbrlDock.log(EventLevel.Info, "\n\n --- Begin report", repId, "---");
 		reset();
 		this.repId = repId;
 	}
 
 	@Override
 	public void addNamespace(String ref, String id) {
-		XbrlDock.log(XbrlEventLevel.Info, "Added namespace", ref, id);
+		XbrlDock.log(EventLevel.Info, "Added namespace", ref, id);
 	}
 
 	@Override
 	public void addTaxonomy(String tx) {
-		XbrlDock.log(XbrlEventLevel.Info, "Added taxonomy", tx);
+		XbrlDock.log(EventLevel.Info, "Added taxonomy", tx);
 	}
 
 	@Override
-	public String processSegment(ReportSegment segment, Map<XbrlToken, Object> data) {
+	public String processSegment(XbrlReportSegment segment, Map<XbrlToken, Object> data) {
 		String ret = "";
 
 		switch (segment) {
@@ -62,7 +62,7 @@ public class XbrlDockUtilsDumpReportHandler implements XbrlDockConsts.ReportData
 		}
 
 		if (logAll) {
-			XbrlDock.log(XbrlEventLevel.Info, "Processing segment", segment, ret, data);
+			XbrlDock.log(EventLevel.Info, "Processing segment", segment, ret, data);
 		}
 
 		return ret;
@@ -71,7 +71,7 @@ public class XbrlDockUtilsDumpReportHandler implements XbrlDockConsts.ReportData
 	@Override
 	public void endReport() {
 		if (logAll) {
-			XbrlDock.log(XbrlEventLevel.Info, " --- End report", repId, "---\n");
+			XbrlDock.log(EventLevel.Info, " --- End report", repId, "---\n");
 		}
 	}
 }

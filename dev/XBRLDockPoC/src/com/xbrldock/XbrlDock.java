@@ -12,6 +12,7 @@ public abstract class XbrlDock implements XbrlDockConsts {
 
 	private static XbrlDock XBRLDOCK;
 
+	private static String APP_PREFIX;
 	private final Map<String, Object> envData = new TreeMap<>();
 	private final ArrayList<String> argList = new ArrayList<>();
 
@@ -19,7 +20,9 @@ public abstract class XbrlDock implements XbrlDockConsts {
 		XBRLDOCK = this;
 	}
 
-	public void initEnv(String[] args, Map<String, Object> loadedConfig) {
+	public void initEnv(String appPrefix, String[] args, Map<String, Object> loadedConfig) {
+		APP_PREFIX = appPrefix;
+		
 		envData.putAll(System.getenv());
 
 		Properties props = System.getProperties();
@@ -48,14 +51,14 @@ public abstract class XbrlDock implements XbrlDockConsts {
 		envData.putAll(loadedConfig);
 	}
 
-	protected abstract void handleLog(XbrlEventLevel level, Object... params);
+	protected abstract void handleLog(EventLevel level, Object... params);
 
-	protected static void handleLogDefault(XbrlEventLevel level, Object... params) {
+	protected static void handleLogDefault(EventLevel level, Object... params) {
 		StringBuilder sb = XbrlDockUtils.sbAppend(null, ", ", false, params);
 		System.out.println("BOOTLOG " + level + " " + XbrlDockUtils.toString(sb));
 	}
 
-	public static void log(XbrlEventLevel level, Object... params) {
+	public static void log(EventLevel level, Object... params) {
 		if (null == XBRLDOCK) {
 			handleLogDefault(level, params);
 		} else {
@@ -95,7 +98,7 @@ public abstract class XbrlDock implements XbrlDockConsts {
 			target.clear();
 		}
 
-		StringBuilder sb = new StringBuilder(XBRLDOCK_PREFIX);
+		StringBuilder sb = new StringBuilder(APP_PREFIX);
 		String p = XbrlDockUtils.sbAppend(sb, XBRLDOCK_SEP_PATH, true, prefix).append(XBRLDOCK_SEP_PATH).toString();
 		int pl = p.length();
 
