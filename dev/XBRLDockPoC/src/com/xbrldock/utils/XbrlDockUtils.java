@@ -1,6 +1,7 @@
 package com.xbrldock.utils;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.Map;
 import java.util.TreeMap;
 
@@ -138,6 +139,39 @@ public class XbrlDockUtils implements XbrlDockUtilsConsts {
 		}
 
 		return (RetType) curr;
+	}
+
+	public static void simpleSet(Object root, Object val, Object... path) {
+		Object curr = root;
+		Object lastKey = null;
+		Object lastParent = null;
+		
+		if ( val instanceof Enum ) {
+			val = val.toString();
+		}
+
+		for (Object p : path) {
+			if ( null == curr ) {
+				curr = new HashMap();
+				((Map)lastParent).put(lastKey, curr);
+			}
+			if ( p instanceof Enum ) {
+				p = p.toString();
+			}
+			
+			lastKey = p;
+			lastParent = curr;
+			
+			if ( p instanceof Integer ) {
+				int idx = (Integer) p;
+				ArrayList l = (ArrayList) curr;
+				curr = ((0 < idx) && (idx < l.size())) ? l.get(idx) : null;
+			} else {
+				curr = ((Map) curr).get(p);
+			}
+		}
+
+		((Map)lastParent).put(lastKey, val);
 	}
 
 	public static <RetType> RetType safeGet(Object map, Object key, ItemCreator<RetType> creator, Object... hints) {

@@ -2,6 +2,7 @@ package com.xbrldock.poc.conn.xbrlorg;
 
 import java.io.File;
 import java.util.Collection;
+import java.util.HashMap;
 import java.util.Map;
 import java.util.TreeMap;
 
@@ -31,7 +32,7 @@ public class XbrlDockConnXbrlOrg implements XbrlDockConnXbrlOrgConsts {
 			dataRoot.mkdirs();
 		}
 
-		catalog = XbrlDockUtilsJson.readJson(new File(dataRoot, PATH_CATALOG));
+//		catalog = XbrlDockUtilsJson.readJson(new File(dataRoot, PATH_CATALOG));
 
 		if (null == catalog) {
 			catalog = new TreeMap();
@@ -42,20 +43,26 @@ public class XbrlDockConnXbrlOrg implements XbrlDockConnXbrlOrgConsts {
 //		XbrlDockConnXbrlOrgTest.test();
 		refresh();
 		
+//	getFiling("529900SGCREUZCZ7P020-2024-06-30-ESEF-DK-0");
+//		getAllFilings();
+	}
+
+	public void getAllFilings() throws Exception {
 		Map<String, Object> filings = XbrlDockUtils.simpleGet(catalog, CatalogKeys.filings);
+		
+		int idx = 0;
 		
 		for ( String k : filings.keySet() ) {
 			try {
 				File f = getFiling(k);
 				
-				XbrlDock.log(EventLevel.Info, k, (null == f) ? "missing" : f.getCanonicalPath());
+				XbrlDock.log(EventLevel.Info, ++idx, k, (null == f) ? "missing" : f.getCanonicalPath());
 
 			} catch ( Throwable t ) {
 				XbrlDockException.swallow(t, "Filing key", k);
 			}
 		}
 		
-//		getFiling("529900SGCREUZCZ7P020-2024-06-30-ESEF-DK-0");
 	}
 
 	public File getFiling(String filingID) throws Exception {
@@ -119,16 +126,17 @@ public class XbrlDockConnXbrlOrg implements XbrlDockConnXbrlOrgConsts {
 	}
 
 	public void refresh() throws Exception {
-		Map resp = XbrlDockUtilsJson.readJson(new File(dataRoot, PATH_SRVRESP));
+//		Map resp = XbrlDockUtilsJson.readJson(new File(dataRoot, PATH_SRVRESP));
+		Map resp = XbrlDockUtilsJson.readJson(new File("temp/ESEFTest/20240907_ESEF_All.json"));
 
 		Map entities = XbrlDockUtils.safeGet(catalog, CatalogKeys.entities, MAP_CREATOR);
 		Map langs = XbrlDockUtils.safeGet(catalog, CatalogKeys.languages, MAP_CREATOR);
 
 		Map atts;
 		String id;
-		Map<String, String> locLang = new TreeMap<>();
-		Map<String, Map> locEnt = new TreeMap<>();
-		Map<EntityKeys, Object> entityData;
+		Map<String, String> locLang = new HashMap<>();
+		Map<String, Object> locEnt = new TreeMap<>();
+		Object entityData;
 
 		Collection<Map<String, Object>> c;
 
@@ -142,9 +150,10 @@ public class XbrlDockConnXbrlOrg implements XbrlDockConnXbrlOrgConsts {
 			case entity:
 				String eid = EntityIdType.lei + XBRLDOCK_SEP_ID + XbrlDockUtils.simpleGet(atts, ResponseKeys.identifier);
 				entityData = XbrlDockUtils.safeGet(entities, eid, MAP_CREATOR);
-				entityData.put(EntityKeys.id, eid);
-				entityData.put(EntityKeys.name, XbrlDockUtils.simpleGet(atts, ResponseKeys.name));
-				entityData.put(EntityKeys.urlSource, XbrlDockUtils.simpleGet(i, JsonApiKeys.links, JsonApiKeys.self));
+				
+				XbrlDockUtils.simpleSet(entityData, eid, EntityKeys.id);
+				XbrlDockUtils.simpleSet(entityData, XbrlDockUtils.simpleGet(atts, ResponseKeys.name), EntityKeys.name);
+				XbrlDockUtils.simpleSet(entityData, XbrlDockUtils.simpleGet(i, JsonApiKeys.links, JsonApiKeys.self), EntityKeys.urlSource);
 				locEnt.put(id, entityData);
 
 				break;
@@ -162,6 +171,7 @@ public class XbrlDockConnXbrlOrg implements XbrlDockConnXbrlOrgConsts {
 		Map filings = XbrlDockUtils.safeGet(catalog, CatalogKeys.filings, MAP_CREATOR);
 
 		c = XbrlDockUtils.simpleGet(resp, JsonApiKeys.data);
+		XbrlDock.log(EventLevel.Trace, "Data count", c.size());
 		for (Map<String, Object> i : c) {
 			atts = XbrlDockUtils.simpleGet(i, JsonApiKeys.attributes);
 			ResponseType rt = XbrlDockUtils.simpleGetEnum(ResponseType.class, i, JsonApiKeys.type);
@@ -169,25 +179,26 @@ public class XbrlDockConnXbrlOrg implements XbrlDockConnXbrlOrgConsts {
 			switch (rt) {
 			case filing:
 				id = XbrlDockUtils.simpleGet(atts, ResponseKeys.fxo_id);
-				Map<FilingKeys, Object> filingData = XbrlDockUtils.safeGet(filings, id, MAP_CREATOR);
+				Object filingData = XbrlDockUtils.safeGet(filings, id, MAP_CREATOR);
+				
+				XbrlDockUtils.simpleSet(filingData, sourceName, FilingKeys.source);
+				XbrlDockUtils.simpleSet(filingData, id, FilingKeys.id);
+				XbrlDockUtils.simpleSet(filingData, atts, FilingKeys.sourceAtts);
 
-				filingData.put(FilingKeys.source, sourceName);
-				filingData.put(FilingKeys.id, id);
-				filingData.put(FilingKeys.periodEnd, XbrlDockUtils.simpleGet(atts, ResponseKeys.period_end));
-				filingData.put(FilingKeys.published, XbrlDockUtils.simpleGet(atts, ResponseKeys.date_added));
-				filingData.put(FilingKeys.urlPackage, XbrlDockUtils.simpleGet(atts, ResponseKeys.package_url));
-				filingData.put(FilingKeys.sourceUrl, XbrlDockUtils.simpleGet(i, JsonApiKeys.links, JsonApiKeys.self));
-				filingData.put(FilingKeys.sourceAtts, atts);
+				XbrlDockUtils.simpleSet(filingData, XbrlDockUtils.simpleGet(atts, ResponseKeys.period_end), FilingKeys.periodEnd);
+				XbrlDockUtils.simpleSet(filingData, XbrlDockUtils.simpleGet(atts, ResponseKeys.date_added), FilingKeys.published);
+				XbrlDockUtils.simpleSet(filingData, XbrlDockUtils.simpleGet(atts, ResponseKeys.package_url), FilingKeys.urlPackage);
+				XbrlDockUtils.simpleSet(filingData, XbrlDockUtils.simpleGet(i, JsonApiKeys.links, JsonApiKeys.self), FilingKeys.sourceUrl);
 
 				String linkId = XbrlDockUtils.simpleGet(i, JsonApiKeys.relationships, ResponseType.language, JsonApiKeys.data,
 						JsonApiKeys.id);
-				filingData.put(FilingKeys.langCode, locLang.get(linkId));
+				XbrlDockUtils.simpleSet(filingData, locLang.get(linkId), FilingKeys.langCode);
 
 				linkId = XbrlDockUtils.simpleGet(i, JsonApiKeys.relationships, ResponseType.entity, JsonApiKeys.data,
 						JsonApiKeys.id);
 				entityData = locEnt.get(linkId);
-				filingData.put(FilingKeys.entityId, entityData.get(EntityKeys.id));
-				filingData.put(FilingKeys.entityName, entityData.get(EntityKeys.name));
+				XbrlDockUtils.simpleSet(filingData, XbrlDockUtils.simpleGet(entityData, EntityKeys.id), FilingKeys.entityId);
+				XbrlDockUtils.simpleSet(filingData, XbrlDockUtils.simpleGet(entityData, EntityKeys.name), FilingKeys.entityName);
 
 				break;
 			default:
@@ -195,6 +206,9 @@ public class XbrlDockConnXbrlOrg implements XbrlDockConnXbrlOrgConsts {
 				break;
 			}
 		}
+		
+		XbrlDock.log(EventLevel.Trace, "Read filing count", filings.size(), "Entity count", entities.size(), "Language count", langs.size());
+
 
 		XbrlDockUtilsJson.writeJson(new File(dataRoot, PATH_CATALOG), catalog);
 	}
