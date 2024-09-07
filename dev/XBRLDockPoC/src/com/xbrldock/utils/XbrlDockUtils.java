@@ -1,6 +1,8 @@
 package com.xbrldock.utils;
 
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.TreeMap;
@@ -202,6 +204,29 @@ public class XbrlDockUtils implements XbrlDockUtilsConsts {
 	public static String replacePostfix(String strSrc, String pfSep, String postfix) {
 		int sep = strSrc.lastIndexOf(pfSep);
 		return strSrc.substring(0, sep + 1) + postfix;
+	}
+
+	private static SimpleDateFormat sdfTime = new SimpleDateFormat(XBRLDOCK_FMT_TIMESTAMP);
+	private static SimpleDateFormat sdfDate = new SimpleDateFormat(XBRLDOCK_FMT_DATE);
+	
+	public static String strTime(Date d) {
+		synchronized ( sdfTime ) {
+			return sdfTime.format(d);
+		}
+	}
+
+	public static String strTime() {
+		return strTime(new Date());
+	}
+
+	public static String strDate(Date d) {
+		synchronized ( sdfDate ) {
+			return sdfDate.format(d);
+		}
+	}
+
+	public static String strDate() {
+		return strDate(new Date());
 	}
 
 	public static String getHash2(String str, String sep) {

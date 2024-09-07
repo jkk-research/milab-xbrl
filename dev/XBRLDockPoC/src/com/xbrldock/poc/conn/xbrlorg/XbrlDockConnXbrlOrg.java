@@ -1,6 +1,7 @@
 package com.xbrldock.poc.conn.xbrlorg;
 
 import java.io.File;
+import java.io.PrintStream;
 import java.util.Collection;
 import java.util.HashMap;
 import java.util.Map;
@@ -11,6 +12,7 @@ import com.xbrldock.XbrlDockException;
 import com.xbrldock.utils.XbrlDockUtils;
 import com.xbrldock.utils.XbrlDockUtilsFile;
 import com.xbrldock.utils.XbrlDockUtilsJson;
+import com.xbrldock.utils.XbrlDockUtilsMonitor;
 import com.xbrldock.utils.XbrlDockUtilsNet;
 
 @SuppressWarnings({ "rawtypes", "unchecked" })
@@ -24,6 +26,8 @@ public class XbrlDockConnXbrlOrg implements XbrlDockConnXbrlOrgConsts {
 
 	Map catalog;
 
+	public boolean testMode;
+
 	public XbrlDockConnXbrlOrg(String rootPath, String cachePath) throws Exception {
 		dataRoot = new File(rootPath);
 		cacheRoot = new File(cachePath);
@@ -32,37 +36,57 @@ public class XbrlDockConnXbrlOrg implements XbrlDockConnXbrlOrgConsts {
 			dataRoot.mkdirs();
 		}
 
-//		catalog = XbrlDockUtilsJson.readJson(new File(dataRoot, PATH_CATALOG));
+		catalog = XbrlDockUtilsJson.readJson(new File(dataRoot, PATH_CATALOG));
 
 		if (null == catalog) {
 			catalog = new TreeMap();
+			refresh();
+		} else {
+			Map entities = XbrlDockUtils.safeGet(catalog, CatalogKeys.entities, MAP_CREATOR);
+			Map langs = XbrlDockUtils.safeGet(catalog, CatalogKeys.languages, MAP_CREATOR);
+			Map filings = XbrlDockUtils.safeGet(catalog, CatalogKeys.filings, MAP_CREATOR);
+			XbrlDock.log(EventLevel.Trace, "Read filing count", filings.size(), "Entity count", entities.size(), "Language count", langs.size());
 		}
 	}
 
 	public void test() throws Exception {
 //		XbrlDockConnXbrlOrgTest.test();
-		refresh();
-		
+//		refresh();
+
 //	getFiling("529900SGCREUZCZ7P020-2024-06-30-ESEF-DK-0");
-//		getAllFilings();
+
+//		testMode = true;
+		getAllFilings();
 	}
 
 	public void getAllFilings() throws Exception {
-		Map<String, Object> filings = XbrlDockUtils.simpleGet(catalog, CatalogKeys.filings);
-		
-		int idx = 0;
-		
-		for ( String k : filings.keySet() ) {
-			try {
-				File f = getFiling(k);
-				
-				XbrlDock.log(EventLevel.Info, ++idx, k, (null == f) ? "missing" : f.getCanonicalPath());
+		XbrlDockUtilsMonitor pm = new XbrlDockUtilsMonitor("getAllFilings", 100);
 
-			} catch ( Throwable t ) {
-				XbrlDockException.swallow(t, "Filing key", k);
+		Map<String, Object> filings = XbrlDockUtils.simpleGet(catalog, CatalogKeys.filings);
+
+		int idx = 0;
+
+		File logDir = new File("temp/log/");
+		XbrlDockUtilsFile.ensureDir(logDir);
+		File log = new File(logDir, XbrlDockUtils.strTime() + XBRLDOCK_EXT_LOG);
+
+		try (PrintStream ps = new PrintStream(log)) {
+			XbrlDock.setLogStream(ps);
+			for (String k : filings.keySet()) {
+				try {
+					pm.step();
+					File f = getFiling(k);
+
+					if ((null != f) && f.isFile()) {
+						XbrlDock.log(EventLevel.Info, ++idx, k, f.getCanonicalPath());
+					}
+				} catch (Throwable t) {
+					XbrlDockException.swallow(t, "Filing key", k);
+				}
 			}
+		} finally {
+			XbrlDock.setLogStream(null);
 		}
-		
 	}
 
 	public File getFiling(String filingID) throws Exception {
@@ -74,7 +98,7 @@ public class XbrlDockConnXbrlOrg implements XbrlDockConnXbrlOrgConsts {
 		if (!XbrlDockUtils.isEmpty(path)) {
 			return new File(path);
 		}
-		
+
 		String zipUrl = XbrlDockUtils.simpleGet(filingData, FilingKeys.urlPackage);
 		if (XbrlDockUtils.isEmpty(zipUrl)) {
 			return null;
@@ -88,8 +112,7 @@ public class XbrlDockConnXbrlOrg implements XbrlDockConnXbrlOrgConsts {
 
 		path = XbrlDockUtils.getHash2(eid[1], File.separator);
 
-		path = XbrlDockUtils.sbAppend(null, File.separator, false, PATH_FILING_CACHE, eid[0], path, eid[1], filingID)
-				.toString();
+		path = XbrlDockUtils.sbAppend(null, File.separator, false, PATH_FILING_CACHE, eid[0], path, eid[1], filingID).toString();
 
 		File fDir = new File(cacheRoot, path);
 		XbrlDockUtilsFile.ensureDir(fDir);
@@ -98,30 +121,43 @@ public class XbrlDockConnXbrlOrg implements XbrlDockConnXbrlOrgConsts {
 
 		String zipDir = XbrlDockUtils.cutPostfix(zipFile, ".");
 		File fZipDir = new File(fDir, zipDir);
-		
+
 		File fZip = new File(fDir, zipFile);
 
 		if (!fZip.isFile()) {
 			XbrlDock.log(EventLevel.Trace, "Downloading filing package", fZip.getCanonicalPath());
-			XbrlDockUtilsNet.download(urlRoot + zipUrl, fZip);
+
+			if (!testMode) {
+				XbrlDockUtilsNet.download(urlRoot + zipUrl.replace(" ", "%20"), fZip);
+			}
 		}
 
-		if ( !fZipDir.isDirectory() && fZip.isFile()) {
+		if (!fZipDir.isDirectory() && fZip.isFile()) {
 			XbrlDock.log(EventLevel.Trace, "Unzipping package", fZip.getCanonicalPath());
-			XbrlDockUtilsFile.extractWithApacheZipFile(fZipDir, fZip, null);
+			try {
+				XbrlDockUtilsFile.extractWithApacheZipFile(fZipDir, fZip, null);
+			} catch (Throwable t) {
+				fZip.delete();
+				throw t;
+			}
 		}
-		
+
+		String filingFileName;
 		str = XbrlDockUtils.simpleGet(filingData, FilingKeys.sourceAtts, ResponseKeys.report_url);
-		String prefix = XbrlDockUtils.cutPostfix(zipUrl, "/");
-		
-		String fileName = str.substring(prefix.length() + 1);
-		
-		ret = new File(fZipDir, fileName);
-		
-		if ( !ret.isFile()) {
-			XbrlDockException.wrap(null, "Missing filing file", ret.getCanonicalPath());
+
+		if (XbrlDockUtils.isEmpty(str)) {
+			// do some magic to find out...
+			filingFileName = "missing";
+		} else {
+			String prefix = XbrlDockUtils.cutPostfix(zipUrl, "/");
+			filingFileName = str.substring(prefix.length() + 1);
 		}
-				
+		ret = new File(fZipDir, filingFileName);
+
+		if (!ret.isFile()) {
+			XbrlDock.log(EventLevel.Warning, "Missing filing file", ret.getCanonicalPath());
+		}
+
 		return ret;
 	}
 
@@ -150,7 +186,7 @@ public class XbrlDockConnXbrlOrg implements XbrlDockConnXbrlOrgConsts {
 			case entity:
 				String eid = EntityIdType.lei + XBRLDOCK_SEP_ID + XbrlDockUtils.simpleGet(atts, ResponseKeys.identifier);
 				entityData = XbrlDockUtils.safeGet(entities, eid, MAP_CREATOR);
-				
+
 				XbrlDockUtils.simpleSet(entityData, eid, EntityKeys.id);
 				XbrlDockUtils.simpleSet(entityData, XbrlDockUtils.simpleGet(atts, ResponseKeys.name), EntityKeys.name);
 				XbrlDockUtils.simpleSet(entityData, XbrlDockUtils.simpleGet(i, JsonApiKeys.links, JsonApiKeys.self), EntityKeys.urlSource);
@@ -180,7 +216,7 @@ public class XbrlDockConnXbrlOrg implements XbrlDockConnXbrlOrgConsts {
 			case filing:
 				id = XbrlDockUtils.simpleGet(atts, ResponseKeys.fxo_id);
 				Object filingData = XbrlDockUtils.safeGet(filings, id, MAP_CREATOR);
-				
+
 				XbrlDockUtils.simpleSet(filingData, sourceName, FilingKeys.source);
 				XbrlDockUtils.simpleSet(filingData, id, FilingKeys.id);
 				XbrlDockUtils.simpleSet(filingData, atts, FilingKeys.sourceAtts);
@@ -190,12 +226,10 @@ public class XbrlDockConnXbrlOrg implements XbrlDockConnXbrlOrgConsts {
 				XbrlDockUtils.simpleSet(filingData, XbrlDockUtils.simpleGet(atts, ResponseKeys.package_url), FilingKeys.urlPackage);
 				XbrlDockUtils.simpleSet(filingData, XbrlDockUtils.simpleGet(i, JsonApiKeys.links, JsonApiKeys.self), FilingKeys.sourceUrl);
 
-				String linkId = XbrlDockUtils.simpleGet(i, JsonApiKeys.relationships, ResponseType.language, JsonApiKeys.data,
-						JsonApiKeys.id);
+				String linkId = XbrlDockUtils.simpleGet(i, JsonApiKeys.relationships, ResponseType.language, JsonApiKeys.data, JsonApiKeys.id);
 				XbrlDockUtils.simpleSet(filingData, locLang.get(linkId), FilingKeys.langCode);
 
-				linkId = XbrlDockUtils.simpleGet(i, JsonApiKeys.relationships, ResponseType.entity, JsonApiKeys.data,
-						JsonApiKeys.id);
+				linkId = XbrlDockUtils.simpleGet(i, JsonApiKeys.relationships, ResponseType.entity, JsonApiKeys.data, JsonApiKeys.id);
 				entityData = locEnt.get(linkId);
 				XbrlDockUtils.simpleSet(filingData, XbrlDockUtils.simpleGet(entityData, EntityKeys.id), FilingKeys.entityId);
 				XbrlDockUtils.simpleSet(filingData, XbrlDockUtils.simpleGet(entityData, EntityKeys.name), FilingKeys.entityName);
@@ -206,9 +240,8 @@ public class XbrlDockConnXbrlOrg implements XbrlDockConnXbrlOrgConsts {
 				break;
 			}
 		}
-		
-		XbrlDock.log(EventLevel.Trace, "Read filing count", filings.size(), "Entity count", entities.size(), "Language count", langs.size());
 
+		XbrlDock.log(EventLevel.Trace, "Read filing count", filings.size(), "Entity count", entities.size(), "Language count", langs.size());
 
 		XbrlDockUtilsJson.writeJson(new File(dataRoot, PATH_CATALOG), catalog);
 	}

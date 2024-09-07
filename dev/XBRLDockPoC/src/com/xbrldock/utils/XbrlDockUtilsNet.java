@@ -12,8 +12,32 @@ import java.util.zip.GZIPInputStream;
 
 import org.apache.commons.compress.utils.IOUtils;
 
-public class XbrlDockUtilsNet {
-	public static void download(String url, File file, String... headers) throws Exception {
+import com.xbrldock.XbrlDockException;
+
+public class XbrlDockUtilsNet implements XbrlDockUtilsConsts {
+
+	private static long lastRequest;
+	private static long waitMsec = 500;
+
+	private static Object LOCK = new Object();
+
+	public static HttpURLConnection connect(String url, String... headers) throws Exception {
+		long now = System.currentTimeMillis();
+
+		long diff = lastRequest - now + waitMsec;
+		if (0 < diff) {
+			synchronized (LOCK) {
+				try {
+					LOCK.wait(diff);
+				} catch (Throwable t) {
+					XbrlDockException.swallow(t);
+				}
+			}
+		}
+		
+		lastRequest = System.currentTimeMillis();
+
+//		url = URLEncoder.encode(url, XBRLDOCK_CHARSET_UTF8).replace("+", "%20");
 		HttpURLConnection conn = (HttpURLConnection) new URL(url).openConnection();
 
 		for (String h : headers) {
@@ -23,15 +47,21 @@ public class XbrlDockUtilsNet {
 			conn.setRequestProperty(key, val);
 		}
 
+		return conn;
+	}
+
+	public static void download(String url, File file, String... headers) throws Exception {
+		HttpURLConnection conn = connect(url, headers);
 		InputStream is = conn.getInputStream();
 
-		if ( "gzip".equals(conn.getContentEncoding()) ) {
+		if ("gzip".equals(conn.getContentEncoding())) {
 			try (GZIPInputStream i = new GZIPInputStream(is)) {
 				OutputStream o = Files.newOutputStream(file.toPath());
 				IOUtils.copy(i, o);
 			}
 		} else {
-			try (BufferedInputStream in = new BufferedInputStream(is); FileOutputStream fileOutputStream = new FileOutputStream(file)) {
+			try (BufferedInputStream in = new BufferedInputStream(is);
+					FileOutputStream fileOutputStream = new FileOutputStream(file)) {
 				byte dataBuffer[] = new byte[1024];
 				int bytesRead;
 				while ((bytesRead = in.read(dataBuffer, 0, 1024)) != -1) {

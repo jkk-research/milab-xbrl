@@ -1,5 +1,6 @@
 package com.xbrldock;
 
+import java.io.PrintStream;
 import java.util.ArrayList;
 import java.util.Map;
 import java.util.Properties;
@@ -11,6 +12,7 @@ import com.xbrldock.utils.XbrlDockUtils;
 public abstract class XbrlDock implements XbrlDockConsts {
 
 	private static XbrlDock XBRLDOCK;
+	private static PrintStream PS_LOG = System.out;
 
 	private static String APP_PREFIX;
 	private final Map<String, Object> envData = new TreeMap<>();
@@ -54,8 +56,17 @@ public abstract class XbrlDock implements XbrlDockConsts {
 	protected abstract void handleLog(EventLevel level, Object... params);
 
 	protected static void handleLogDefault(EventLevel level, Object... params) {
+		handleLogDefault(PS_LOG, level, params);
+	}
+
+	protected static void handleLogDefault(PrintStream target, EventLevel level, Object... params) {
 		StringBuilder sb = XbrlDockUtils.sbAppend(null, ", ", false, params);
-		System.out.println("BOOTLOG " + level + " " + XbrlDockUtils.toString(sb));
+		target.println(XbrlDockUtils.strTime() + " " + level + " " + XbrlDockUtils.toString(sb));
+		target.flush();
+	}
+
+	public static void setLogStream(PrintStream ps) {
+		PS_LOG = (null == ps) ? System.out : ps;
 	}
 
 	public static void log(EventLevel level, Object... params) {

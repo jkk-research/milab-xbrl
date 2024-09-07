@@ -14,6 +14,7 @@ public interface XbrlDockConsts {
 	String XBRLDOCK_FMT_TIMESTAMP = "yyyy-MM-dd'T'HH_mm_ss";
 	String XBRLDOCK_FMT_DATE = "yyyy-MM-dd";
 	
+	String XBRLDOCK_EXT_LOG = ".log";
 	String XBRLDOCK_EXT_JSON = ".json";
 	String XBRLDOCK_EXT_CSV = ".csv";
 	String XBRLDOCK_EXT_XML = ".xml";

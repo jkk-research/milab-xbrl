@@ -21,7 +21,7 @@ import com.xbrldock.utils.XbrlDockUtilsJson;
 public class XbrlDockPoc extends XbrlDock implements XbrlDockPocConsts {
 	File testRoot = new File("/Volumes/Giskard_ext/work/XBRL/store/xbrl.org/reports/lei");
 	File localRoot = new File("temp/reports");
-
+	
 	@Override
 	protected void handleLog(EventLevel level, Object... params) {
 		handleLogDefault(level, params);
@@ -79,7 +79,7 @@ public class XbrlDockPoc extends XbrlDock implements XbrlDockPocConsts {
 			loadReportRec(jsonFilter, jsonParser, dh);
 			break;
 		case "esef":
-			XbrlDockConnXbrlOrg ec = new XbrlDockConnXbrlOrg("sources/xbrl.org", "temp/sources/xbrl.org");
+			XbrlDockConnXbrlOrg ec = new XbrlDockConnXbrlOrg("sources/xbrl.org", "ext/XBRLDock/sources/xbrl.org");
 			ec.test();
 			break;
 		default:
