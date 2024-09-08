@@ -20,7 +20,7 @@ public interface XbrlDockPocConsts extends XbrlDockConsts, XbrlDockUtilsConsts {
 	}
 
 	enum FilingKeys {
-		source, id, entityId, entityName, langCode, periodEnd, published, urlPackage, localPath, sourceUrl, sourceAtts
+		source, id, entityId, entityName, langCode, periodEnd, published, urlPackage, packageStatus, localPath, sourceUrl, sourceAtts
 	}
 
 }

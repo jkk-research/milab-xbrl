@@ -1,6 +1,7 @@
 package com.xbrldock.poc.conn.xbrlorg;
 
 import java.io.File;
+import java.io.FileFilter;
 import java.io.PrintStream;
 import java.util.Collection;
 import java.util.HashMap;
@@ -9,6 +10,7 @@ import java.util.TreeMap;
 
 import com.xbrldock.XbrlDock;
 import com.xbrldock.XbrlDockException;
+import com.xbrldock.poc.format.XbrlDockFormatUtils;
 import com.xbrldock.utils.XbrlDockUtils;
 import com.xbrldock.utils.XbrlDockUtilsFile;
 import com.xbrldock.utils.XbrlDockUtilsJson;
@@ -25,6 +27,33 @@ public class XbrlDockConnXbrlOrg implements XbrlDockConnXbrlOrgConsts {
 	File cacheRoot;
 
 	Map catalog;
+
+	class RepFinder implements XbrlDockUtilsFile.FileProcessor {
+		File result;
+
+		void reset() {
+			result = null;
+		}
+
+		@Override
+		public boolean process(File f) {
+			if (f.isDirectory() && XbrlDockUtils.isEqual(f.getName(), "reports")) {
+				result = f;
+				return false;
+			} else {
+				return null == result;
+			}
+		}
+	};
+
+	RepFinder rf = new RepFinder();
+
+	FileFilter filingCandidate = new FileFilter() {
+		@Override
+		public boolean accept(File f) {
+			return XbrlDockFormatUtils.canBeXbrl(f);
+		}
+	};
 
 	public boolean testMode;
 
@@ -59,12 +88,12 @@ public class XbrlDockConnXbrlOrg implements XbrlDockConnXbrlOrgConsts {
 		getAllFilings();
 	}
 
+	@SuppressWarnings("unused")
 	public void getAllFilings() throws Exception {
 		XbrlDockUtilsMonitor pm = new XbrlDockUtilsMonitor("getAllFilings", 100);
 
 		Map<String, Object> filings = XbrlDockUtils.simpleGet(catalog, CatalogKeys.filings);
 
-		@SuppressWarnings("unused")
 		int idx = 0;
 
 		File logDir = new File("temp/log/");
@@ -75,7 +104,7 @@ public class XbrlDockConnXbrlOrg implements XbrlDockConnXbrlOrgConsts {
 //			XbrlDock.setLogStream(ps);
 			for (String k : filings.keySet()) {
 				try {
-					pm.step();
+//					pm.step();
 					File f = getFiling(k);
 
 					if ((null != f) && f.isFile()) {
@@ -143,37 +172,55 @@ public class XbrlDockConnXbrlOrg implements XbrlDockConnXbrlOrgConsts {
 			}
 		}
 
-		String filingFileName;
 		str = XbrlDockUtils.simpleGet(filingData, FilingKeys.sourceAtts, ResponseKeys.json_url);
-
 		if (!XbrlDockUtils.isEmpty(str)) {
 			String prefix = XbrlDockUtils.cutPostfix(zipUrl, "/");
-			filingFileName = str.substring(prefix.length() + 1);
-			File fJson = new File(fDir, filingFileName);
+			String jsonFileName = str.substring(prefix.length() + 1);
+			File fJson = new File(fDir, jsonFileName);
 
 			if (!fJson.isFile()) {
 				if (!testMode) {
 					XbrlDock.log(EventLevel.Trace, "Downloading JSON", fJson.getCanonicalPath());
 					XbrlDockUtilsNet.download(urlRoot + str.replace(" ", "%20"), fJson);
 				}
-			} else {
+//			} else {
 //				XbrlDock.log(EventLevel.Trace, "Json file found", fJson.getCanonicalPath());				
 			}
 		}
 
+//		filingFileName = "missing";
+		PackageStatus packStatus;
 		str = XbrlDockUtils.simpleGet(filingData, FilingKeys.sourceAtts, ResponseKeys.report_url);
 
-		if (XbrlDockUtils.isEmpty(str)) {
-			// do some magic to find out...
-			filingFileName = "missing";
-		} else {
+		if (!XbrlDockUtils.isEmpty(str)) {
 			String prefix = XbrlDockUtils.cutPostfix(zipUrl, "/");
-			filingFileName = str.substring(prefix.length() + 1);
+			String filingFileName = str.substring(prefix.length() + 1);
+			ret = new File(fZipDir, filingFileName);
 		}
-		ret = new File(fZipDir, filingFileName);
 
-		if (!ret.isFile()) {
-			XbrlDock.log(EventLevel.Warning, "Missing filing file", ret.getCanonicalPath());
+		if ((null == ret) || !ret.isFile()) {
+			rf.reset();
+
+			XbrlDockUtilsFile.processFiles(fDir, rf, null, true, false);
+
+			if (null != rf.result) {
+				File[] rc = rf.result.listFiles(filingCandidate);
+
+				if (0 < rc.length) {
+					ret = rc[0];
+					packStatus = (1 == rc.length) ? PackageStatus.reportFoundSingle : PackageStatus.reportFoundMulti;
+				} else {
+					packStatus = PackageStatus.reportNotFound;
+				}
+			} else {
+				packStatus = PackageStatus.reportMisplaced;
+			}
+		} else {
+			packStatus = PackageStatus.reportIdentified;
+		}
+		
+		if ((null == ret) || !ret.isFile()) {
+			XbrlDock.log(EventLevel.Warning, "Missing filing file", fZipDir.getCanonicalPath(), str, packStatus);
 		}
 
 		return ret;

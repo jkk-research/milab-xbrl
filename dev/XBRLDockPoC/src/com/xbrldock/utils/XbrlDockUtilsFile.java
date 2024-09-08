@@ -10,7 +10,7 @@ import org.apache.commons.compress.archivers.zip.ZipArchiveEntry;
 import org.apache.commons.compress.archivers.zip.ZipFile;
 import org.apache.commons.compress.utils.IOUtils;
 
-public class XbrlDockUtilsFile {
+public class XbrlDockUtilsFile implements XbrlDockUtilsConsts {
 	public interface FileProcessor {
 		boolean process(File f);
 	}
@@ -60,7 +60,7 @@ public class XbrlDockUtilsFile {
 	}
 	
 	public static void extractWithApacheZipFile(File destFile, File zipFile, String name) throws Exception {
-		try (ZipFile zf = new ZipFile(zipFile)) {
+		try (ZipFile zf = new ZipFile(zipFile, XBRLDOCK_CHARSET_UTF8)) {
 
 			if ( null == name ) {
 

@@ -19,6 +19,9 @@ public interface XbrlDockConsts {
 	String XBRLDOCK_EXT_CSV = ".csv";
 	String XBRLDOCK_EXT_XML = ".xml";
 	String XBRLDOCK_EXT_XHTML = ".xhtml";
+	String XBRLDOCK_EXT_HTML = ".html";
+	String XBRLDOCK_EXT_XBRL = ".xbrl";
+	
 
 	int KEY_ADD = -1;
 	int KEY_SIZE = -2;

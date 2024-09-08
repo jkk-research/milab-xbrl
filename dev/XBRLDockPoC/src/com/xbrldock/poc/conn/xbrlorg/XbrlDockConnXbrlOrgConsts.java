@@ -23,4 +23,10 @@ public interface XbrlDockConnXbrlOrgConsts extends XbrlDockPocConsts, XbrlDockFo
 	enum ResponseKeys {
 		fxo_id, identifier, name, code, period_end, date_added, package_url, report_url, json_url
 	}
+	
+	enum PackageStatus {
+		reportIdentified, reportFoundSingle, reportFoundMulti, reportMisplaced, reportNotFound
+	}
+
+
 }
