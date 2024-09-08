@@ -64,6 +64,7 @@ public class XbrlDockConnXbrlOrg implements XbrlDockConnXbrlOrgConsts {
 
 		Map<String, Object> filings = XbrlDockUtils.simpleGet(catalog, CatalogKeys.filings);
 
+		@SuppressWarnings("unused")
 		int idx = 0;
 
 		File logDir = new File("temp/log/");
@@ -71,14 +72,14 @@ public class XbrlDockConnXbrlOrg implements XbrlDockConnXbrlOrgConsts {
 		File log = new File(logDir, XbrlDockUtils.strTime() + XBRLDOCK_EXT_LOG);
 
 		try (PrintStream ps = new PrintStream(log)) {
-			XbrlDock.setLogStream(ps);
+//			XbrlDock.setLogStream(ps);
 			for (String k : filings.keySet()) {
 				try {
 					pm.step();
 					File f = getFiling(k);
 
 					if ((null != f) && f.isFile()) {
-						XbrlDock.log(EventLevel.Info, ++idx, k, f.getCanonicalPath());
+//						XbrlDock.log(EventLevel.Info, ++idx, k, f.getCanonicalPath());
 					}
 				} catch (Throwable t) {
 					XbrlDockException.swallow(t, "Filing key", k);
@@ -143,6 +144,23 @@ public class XbrlDockConnXbrlOrg implements XbrlDockConnXbrlOrgConsts {
 		}
 
 		String filingFileName;
+		str = XbrlDockUtils.simpleGet(filingData, FilingKeys.sourceAtts, ResponseKeys.json_url);
+
+		if (!XbrlDockUtils.isEmpty(str)) {
+			String prefix = XbrlDockUtils.cutPostfix(zipUrl, "/");
+			filingFileName = str.substring(prefix.length() + 1);
+			File fJson = new File(fDir, filingFileName);
+
+			if (!fJson.isFile()) {
+				if (!testMode) {
+					XbrlDock.log(EventLevel.Trace, "Downloading JSON", fJson.getCanonicalPath());
+					XbrlDockUtilsNet.download(urlRoot + str.replace(" ", "%20"), fJson);
+				}
+			} else {
+//				XbrlDock.log(EventLevel.Trace, "Json file found", fJson.getCanonicalPath());				
+			}
+		}
+
 		str = XbrlDockUtils.simpleGet(filingData, FilingKeys.sourceAtts, ResponseKeys.report_url);
 
 		if (XbrlDockUtils.isEmpty(str)) {

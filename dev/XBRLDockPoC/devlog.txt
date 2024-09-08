@@ -2,6 +2,23 @@
 
 https://filings.xbrl.org/api/filings?include=entity,language&filter=%5B%7B%22name%22%3A%22input_filing.filing_source.program%22%2C%22op%22%3A%22eq%22%2C%22val%22%3A%22ESEF%22%7D%5D&page%5Bsize%5D=200&page%5Bnumber%5D=1
 
+GET /529900MTJPDPE4MHJ122/2024-06-30/ESEF/DK/0/529900MTJPDPE4MHJ122-2024-06-30-en.zip HTTP/1.1
+Accept: text/html,application/xhtml+xml,application/xml;q=0.9,image/avif,image/webp,image/apng,*/*;q=0.8,application/signed-exchange;v=b3;q=0.7
+Accept-Encoding: gzip, deflate, br, zstd
+Accept-Language: en-GB,en-US;q=0.9,en;q=0.8,hu;q=0.7
+Connection: keep-alive
+Cookie: _ga_4ZTN9SY2B8=GS1.2.1714896644.1.1.1714896678.0.0.0; _ga_C9STY54E83=GS1.2.1725357382.9.1.1725357430.0.0.0; _ga=GA1.1.1753205215.1707492158; _ga_G3TG6F53RM=GS1.1.1725731707.16.1.1725731724.0.0.0
+Host: filings.xbrl.org
+Referer: https://filings.xbrl.org/filing/529900MTJPDPE4MHJ122-2024-06-30-ESEF-DK-0
+Sec-Fetch-Dest: document
+Sec-Fetch-Mode: navigate
+Sec-Fetch-Site: same-origin
+Sec-Fetch-User: ?1
+Upgrade-Insecure-Requests: 1
+User-Agent: Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/128.0.0.0 Safari/537.36
+sec-ch-ua: "Chromium";v="128", "Not;A=Brand";v="24", "Google Chrome";v="128"
+sec-ch-ua-mobile: ?0
+sec-ch-ua-platform: "macOS"
 
 *** 20240905 ***
 
