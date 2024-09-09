@@ -7,7 +7,7 @@ import com.xbrldock.utils.XbrlDockUtils;
 public class XbrlDockFormatUtils implements XbrlDockFormatConsts {
 	
 	public static boolean canBeXbrl(File f) {
-		return canBeXbrl(f.getName());
+		return f.isFile() && canBeXbrl(f.getName());
 	}
 
 	public static boolean canBeXbrl(String fileName) {

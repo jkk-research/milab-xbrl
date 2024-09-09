@@ -1,41 +1,72 @@
 package com.xbrldock.utils;
 
 import java.io.File;
+import java.io.FileFilter;
 import java.io.IOException;
 import java.io.OutputStream;
 import java.nio.file.Files;
 import java.util.Enumeration;
+import java.util.HashSet;
+import java.util.Iterator;
+import java.util.Set;
 
 import org.apache.commons.compress.archivers.zip.ZipArchiveEntry;
 import org.apache.commons.compress.archivers.zip.ZipFile;
 import org.apache.commons.compress.utils.IOUtils;
 
 public class XbrlDockUtilsFile implements XbrlDockUtilsConsts {
-	public interface FileProcessor {
-		boolean process(File f);
+	public interface FileProcessor extends GenProcessor<File> {
 	}
+	
+	public static class FileCollector implements FileProcessor {
+		Set<File> found = new HashSet<>();
+		public int limit = Integer.MAX_VALUE;
+		
+		@Override
+		public boolean process(File f, ProcessorAction action) {
+			boolean ret = true;
+			
+			switch ( action ) {
+			case Init:
+				found.clear(); 
+				break;
+			case Process:
+				found.add(f);
+				ret = found.size() < limit;
+				break;
+			default:
+				break;
+			}
+			
+			return ret;
+		}
+		
+		public Iterator<File> getFound() {
+			return found.iterator();
+		}
+	};
 	
 	public static int processFiles(File f, FileProcessor proc) {
 		return processFiles(f, proc, null, false, false);
 	}
 	
-	public static int processFiles(File f, FileProcessor proc, FileProcessor fileFilter) {
+	public static int processFiles(File f, FileProcessor proc, FileFilter fileFilter) {
 		return processFiles(f, proc, fileFilter, false, false);
 	}
 	
-	public static int processFiles(File f, FileProcessor proc, FileProcessor fileFilter, boolean dirCallBefore, boolean dirCallAfter) {
+	public static int processFiles(File f, FileProcessor proc, FileFilter fileFilter, boolean dirCallBefore, boolean dirCallAfter) {
 		int count = 0; 
 		
 		if ( f.exists() ) {
 			if ( f.isFile() ) {
-				if ((null == fileFilter) || fileFilter.process(f) ) {
-					if ( proc.process(f) ) {
+				if ((null == fileFilter) || fileFilter.accept(f) ) {
+					if ( proc.process(f, ProcessorAction.Process) ) {
 						count = 1;
 					}
 				}
 			} else {
 				if (dirCallBefore) {
-					if ( !proc.process(f) ) {
+					if ( !proc.process(f, ProcessorAction.Begin) ) {
 						return 0;
 					}
 				}
@@ -45,7 +76,7 @@ public class XbrlDockUtilsFile implements XbrlDockUtilsConsts {
 				}
 				
 				if (dirCallAfter) {
-					proc.process(f);
+					proc.process(f, ProcessorAction.End);
 				}
 			}
 		}

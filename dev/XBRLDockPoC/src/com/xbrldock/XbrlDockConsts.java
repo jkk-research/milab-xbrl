@@ -22,6 +22,9 @@ public interface XbrlDockConsts {
 	String XBRLDOCK_EXT_HTML = ".html";
 	String XBRLDOCK_EXT_XBRL = ".xbrl";
 	
+	String FNAME_METAINF = "META-INF";
+	String FNAME_REPORTS = "reports";
+	
 
 	int KEY_ADD = -1;
 	int KEY_SIZE = -2;
@@ -30,6 +33,13 @@ public interface XbrlDockConsts {
 		Exception, Error, Warning, Info, Trace, Debug
 	}
 	
+	public enum ProcessorAction {
+		Init, Begin, Process, End, Release
+	}
+	
+	public interface GenProcessor<ItemType> {
+		boolean process(ItemType item, ProcessorAction action);
+	}
 
 	
 	enum XbrlReportFormat {

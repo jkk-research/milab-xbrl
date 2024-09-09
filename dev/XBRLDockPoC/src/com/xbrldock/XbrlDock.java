@@ -59,7 +59,7 @@ public abstract class XbrlDock implements XbrlDockConsts {
 		handleLogDefault(PS_LOG, level, params);
 	}
 
-	protected static void handleLogDefault(PrintStream target, EventLevel level, Object... params) {
+	public static void handleLogDefault(PrintStream target, EventLevel level, Object... params) {
 		StringBuilder sb = XbrlDockUtils.sbAppend(null, ", ", false, params);
 		target.println(XbrlDockUtils.strTime() + " " + level + " " + XbrlDockUtils.toString(sb));
 		target.flush();

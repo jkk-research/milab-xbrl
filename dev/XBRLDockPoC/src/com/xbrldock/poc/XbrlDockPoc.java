@@ -1,6 +1,7 @@
 package com.xbrldock.poc;
 
 import java.io.File;
+import java.io.FileFilter;
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.io.IOException;
@@ -38,17 +39,17 @@ public class XbrlDockPoc extends XbrlDock implements XbrlDockPocConsts {
 	public boolean test() throws Exception {
 		XbrlDockUtilsDumpReportHandler dh = new XbrlDockUtilsDumpReportHandler();
 
-		XbrlDockUtilsFile.FileProcessor xhtmlFilter = new XbrlDockUtilsFile.FileProcessor() {
+		FileFilter xhtmlFilter = new FileFilter() {
 			@Override
-			public boolean process(File f) {
+			public boolean accept(File f) {
 				return f.getName().endsWith("html") && XbrlDockUtils.isEqual(f.getParentFile().getName(), "reports");
 			}
 		};
 		ReportFormatHandler xhtmlParser = new XbrlDockFormatXhtml();
 
-		XbrlDockUtilsFile.FileProcessor jsonFilter = new XbrlDockUtilsFile.FileProcessor() {
+		FileFilter jsonFilter = new FileFilter() {
 			@Override
-			public boolean process(File f) {
+			public boolean accept(File f) {
 				return f.getName().endsWith(XBRLDOCK_EXT_JSON);
 			}
 		};
@@ -89,12 +90,12 @@ public class XbrlDockPoc extends XbrlDock implements XbrlDockPocConsts {
 		return false;
 	}
 
-	void loadReportRec(XbrlDockUtilsFile.FileProcessor filter, ReportFormatHandler fh, ReportDataHandler dh)
+	void loadReportRec(FileFilter filter, ReportFormatHandler fh, ReportDataHandler dh)
 			throws Exception, IOException, FileNotFoundException {
 
 		XbrlDockUtilsFile.FileProcessor processor = new XbrlDockUtilsFile.FileProcessor() {
 			@Override
-			public boolean process(File f) {
+			public boolean process(File f, ProcessorAction action) {
 				try (InputStream fr = new FileInputStream(f)) {
 					loadReport(f, fh, dh);
 					return true;

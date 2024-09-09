@@ -2,16 +2,20 @@ package com.xbrldock.poc.conn.xbrlorg;
 
 import java.io.File;
 import java.io.FileFilter;
+import java.io.FileInputStream;
 import java.io.PrintStream;
 import java.util.Collection;
 import java.util.HashMap;
+import java.util.Iterator;
 import java.util.Map;
 import java.util.TreeMap;
 
 import com.xbrldock.XbrlDock;
 import com.xbrldock.XbrlDockException;
 import com.xbrldock.poc.format.XbrlDockFormatUtils;
+import com.xbrldock.poc.format.XbrlDockFormatXhtml;
 import com.xbrldock.utils.XbrlDockUtils;
+import com.xbrldock.utils.XbrlDockUtilsDumpReportHandler;
 import com.xbrldock.utils.XbrlDockUtilsFile;
 import com.xbrldock.utils.XbrlDockUtilsJson;
 import com.xbrldock.utils.XbrlDockUtilsMonitor;
@@ -28,25 +32,35 @@ public class XbrlDockConnXbrlOrg implements XbrlDockConnXbrlOrgConsts {
 
 	Map catalog;
 
-	class RepFinder implements XbrlDockUtilsFile.FileProcessor {
-		File result;
-
-		void reset() {
-			result = null;
-		}
+	class DirMapper implements XbrlDockUtilsFile.FileProcessor {
+		File metaInf;
+		File reports;
 
 		@Override
-		public boolean process(File f) {
-			if (f.isDirectory() && XbrlDockUtils.isEqual(f.getName(), "reports")) {
-				result = f;
-				return false;
-			} else {
-				return null == result;
+		public boolean process(File f, ProcessorAction action) {
+			switch (action) {
+			case Init:
+				reports = metaInf = null;
+				break;
+			case Begin:
+				switch (f.getName()) {
+				case FNAME_METAINF:
+					metaInf = f;
+					break;
+				case FNAME_REPORTS:
+					reports = f;
+					break;
+				}
+				break;
+			default:
+				break;
 			}
+
+			return true;
 		}
 	};
 
-	RepFinder rf = new RepFinder();
+	DirMapper rf = new DirMapper();
 
 	FileFilter filingCandidate = new FileFilter() {
 		@Override
@@ -54,6 +68,8 @@ public class XbrlDockConnXbrlOrg implements XbrlDockConnXbrlOrgConsts {
 			return XbrlDockFormatUtils.canBeXbrl(f);
 		}
 	};
+
+	XbrlDockUtilsFile.FileCollector repColl = new XbrlDockUtilsFile.FileCollector();
 
 	public boolean testMode;
 
@@ -88,7 +104,6 @@ public class XbrlDockConnXbrlOrg implements XbrlDockConnXbrlOrgConsts {
 		getAllFilings();
 	}
 
-	@SuppressWarnings("unused")
 	public void getAllFilings() throws Exception {
 		XbrlDockUtilsMonitor pm = new XbrlDockUtilsMonitor("getAllFilings", 100);
 
@@ -99,21 +114,36 @@ public class XbrlDockConnXbrlOrg implements XbrlDockConnXbrlOrgConsts {
 		File logDir = new File("temp/log/");
 		XbrlDockUtilsFile.ensureDir(logDir);
 		File log = new File(logDir, XbrlDockUtils.strTime() + XBRLDOCK_EXT_LOG);
+		
+		XbrlDockUtilsDumpReportHandler dh = new XbrlDockUtilsDumpReportHandler();
+		dh.logAll = false;
+		ReportFormatHandler fh = new XbrlDockFormatXhtml();
 
 		try (PrintStream ps = new PrintStream(log)) {
-//			XbrlDock.setLogStream(ps);
+			XbrlDock.setLogStream(ps);
 			for (String k : filings.keySet()) {
 				try {
-//					pm.step();
+					if ( pm.step() ) {
+						XbrlDock.handleLogDefault(System.out, EventLevel.Trace, "Process monitor", pm);
+					}
 					File f = getFiling(k);
 
 					if ((null != f) && f.isFile()) {
+						++idx;
 //						XbrlDock.log(EventLevel.Info, ++idx, k, f.getCanonicalPath());
+						
+						try (FileInputStream fr = new FileInputStream(f)) {
+							dh.beginReport(f.getCanonicalPath());
+							fh.loadReport(fr, dh);
+							dh.endReport();
+						}
 					}
 				} catch (Throwable t) {
 					XbrlDockException.swallow(t, "Filing key", k);
 				}
 			}
+			
+			XbrlDock.log(EventLevel.Info, "Found filing count", idx);
 		} finally {
 			XbrlDock.setLogStream(null);
 		}
@@ -189,38 +219,56 @@ public class XbrlDockConnXbrlOrg implements XbrlDockConnXbrlOrgConsts {
 		}
 
 //		filingFileName = "missing";
-		PackageStatus packStatus;
+		PackageStatus packStatus = PackageStatus.reportNotFound;
 		str = XbrlDockUtils.simpleGet(filingData, FilingKeys.sourceAtts, ResponseKeys.report_url);
 
 		if (!XbrlDockUtils.isEmpty(str)) {
 			String prefix = XbrlDockUtils.cutPostfix(zipUrl, "/");
 			String filingFileName = str.substring(prefix.length() + 1);
 			ret = new File(fZipDir, filingFileName);
+			packStatus = PackageStatus.reportIdentified;
 		}
 
 		if ((null == ret) || !ret.isFile()) {
-			rf.reset();
+			rf.process(null, ProcessorAction.Init);
 
 			XbrlDockUtilsFile.processFiles(fDir, rf, null, true, false);
 
-			if (null != rf.result) {
-				File[] rc = rf.result.listFiles(filingCandidate);
+			if (null != rf.reports) {
+				File[] rc = rf.reports.listFiles(filingCandidate);
 
 				if (0 < rc.length) {
 					ret = rc[0];
 					packStatus = (1 == rc.length) ? PackageStatus.reportFoundSingle : PackageStatus.reportFoundMulti;
 				} else {
-					packStatus = PackageStatus.reportNotFound;
+					repColl.process(null, ProcessorAction.Init);
+					XbrlDockUtilsFile.processFiles(rf.reports, repColl, filingCandidate);
+					Iterator<File> it = repColl.getFound();
+					if (it.hasNext()) {
+						packStatus = PackageStatus.reportMisplaced;
+						ret = it.next();
+					}
 				}
-			} else {
-				packStatus = PackageStatus.reportMisplaced;
 			}
-		} else {
-			packStatus = PackageStatus.reportIdentified;
 		}
-		
+
 		if ((null == ret) || !ret.isFile()) {
-			XbrlDock.log(EventLevel.Warning, "Missing filing file", fZipDir.getCanonicalPath(), str, packStatus);
+			if (null != rf.metaInf) {
+				File[] rc = rf.metaInf.getParentFile().listFiles(filingCandidate);
+
+				if (0 < rc.length) {
+					ret = rc[0];
+					packStatus = PackageStatus.reportMisplaced;
+				}
+			}
+		}
+
+//	if (packStatus != PackageStatus.reportIdentified) {
+//	XbrlDock.log(EventLevel.Warning, "Heuristics kicked for filing", filingID, fZipDir.getCanonicalPath(), str, packStatus);
+//}
+
+		if (packStatus == PackageStatus.reportNotFound) {
+			XbrlDock.log(EventLevel.Error, "Filing not found", filingID, fZipDir.getCanonicalPath(), str);
 		}
 
 		return ret;
