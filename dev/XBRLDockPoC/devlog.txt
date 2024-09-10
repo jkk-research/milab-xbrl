@@ -1,3 +1,9 @@
+*** 20240910 ***
+
+ext/XBRLDock/sources/xbrl.org/filings/lei/d4/25/529900YYR637SPJ0JR59/529900YYR637SPJ0JR59-2022-12-31-ESEF-HU-0/529900YYR637SPJ0JR59-2022-12-31/META-INF/taxonomyPackage.xml (No such file or directory)
+ext/XBRLDock/sources/xbrl.org/filings/lei/d4/25/529900YYR637SPJ0JR59/529900YYR637SPJ0JR59-2023-12-31-ESEF-HU-1/529900YYR637SPJ0JR59-2023-12-31/META-INF/taxonomyPackage.xml (No such file or directory)
+
+
 *** 20240907 ***
 
 https://filings.xbrl.org/api/filings?include=entity,language&filter=%5B%7B%22name%22%3A%22input_filing.filing_source.program%22%2C%22op%22%3A%22eq%22%2C%22val%22%3A%22ESEF%22%7D%5D&page%5Bsize%5D=200&page%5Bnumber%5D=1

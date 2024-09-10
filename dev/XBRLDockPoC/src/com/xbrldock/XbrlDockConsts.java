@@ -22,9 +22,11 @@ public interface XbrlDockConsts {
 	String XBRLDOCK_EXT_HTML = ".html";
 	String XBRLDOCK_EXT_XBRL = ".xbrl";
 	
-	String FNAME_METAINF = "META-INF";
-	String FNAME_REPORTS = "reports";
+	String XBRLDOCK_FNAME_METAINF = "META-INF";
+	String XBRLDOCK_FNAME_REPORTS = "reports";
 	
+	String XBRLDOCK_FNAME_CATALOG = "catalog.xml";
+	String XBRLDOCK_FNAME_TAXPACK = "taxonomyPackage.xml";
 
 	int KEY_ADD = -1;
 	int KEY_SIZE = -2;

@@ -5,9 +5,6 @@ import java.text.DecimalFormat;
 import java.util.Map;
 import java.util.TreeMap;
 
-import javax.xml.parsers.DocumentBuilder;
-import javax.xml.parsers.DocumentBuilderFactory;
-
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 import org.w3c.dom.NamedNodeMap;
@@ -15,12 +12,14 @@ import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
 
 import com.xbrldock.XbrlDockConsts;
+import com.xbrldock.poc.XbrlDockPoc;
 import com.xbrldock.poc.utils.XbrlDockPocUtilsValueConverter;
 import com.xbrldock.utils.XbrlDockUtils;
+import com.xbrldock.utils.XbrlDockUtilsXml;
 
 public class XbrlDockFormatXhtml implements XbrlDockFormatConsts, XbrlDockConsts.ReportFormatHandler {
 
-	DocumentBuilderFactory dbf;
+	
 
 	XbrlToken[] cvtKeys = { XbrlToken.scale, XbrlToken.decimals, XbrlToken.sign };
 
@@ -50,14 +49,9 @@ public class XbrlDockFormatXhtml implements XbrlDockFormatConsts, XbrlDockConsts
 			DecimalFormat df = new DecimalFormat("#");
 			df.setMaximumFractionDigits(8);
 
-			if (null == dbf) {
-				dbf = DocumentBuilderFactory.newInstance();
-			}
-
 			String sVal;
 
-			DocumentBuilder db = dbf.newDocumentBuilder();
-			Document doc = db.parse(in);
+			Document doc = XbrlDockUtilsXml.parseDoc(in, XbrlDockPoc.URL_CACHE);
 
 			Element eHtml = doc.getDocumentElement();
 
