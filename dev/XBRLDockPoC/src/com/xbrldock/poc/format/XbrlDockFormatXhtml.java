@@ -57,22 +57,7 @@ public class XbrlDockFormatXhtml implements XbrlDockFormatConsts, XbrlDockConsts
 
 			String defLang = XbrlDockUtils.isEmpty(forcedLang) ? eHtml.getAttribute("xml:lang") : forcedLang;
 
-			NamedNodeMap atts = eHtml.getAttributes();
-
-			for (int i = atts.getLength(); i-- > 0;) {
-				Node n = atts.item(i);
-
-				String attName = n.getNodeName();
-				if (attName.startsWith("xmlns")) {
-					sVal = n.getNodeValue();
-					if (!XbrlDockUtils.isEmpty(sVal)) {
-						int si = attName.indexOf(":");
-
-						dataHandler.addNamespace(attName.substring(si + 1), sVal);
-					}
-				}
-			}
-
+			
 			NodeList nl = eHtml.getElementsByTagName("*");
 			int nodeCount = nl.getLength();
 
@@ -161,6 +146,22 @@ public class XbrlDockFormatXhtml implements XbrlDockFormatConsts, XbrlDockConsts
 				case "ix:continuation":
 					continuation.put(e.getAttribute("id"), e);
 					break;
+				}
+			}
+			
+			
+			NamedNodeMap headAtts = eHtml.getAttributes();
+			for (int i = headAtts.getLength(); i-- > 0;) {
+				Node n = headAtts.item(i);
+
+				String attName = n.getNodeName();
+				if (attName.startsWith("xmlns")) {
+					sVal = n.getNodeValue();
+					if (!XbrlDockUtils.isEmpty(sVal)) {
+						int si = attName.indexOf(":");
+
+						dataHandler.addNamespace(attName.substring(si + 1), sVal);
+					}
 				}
 			}
 

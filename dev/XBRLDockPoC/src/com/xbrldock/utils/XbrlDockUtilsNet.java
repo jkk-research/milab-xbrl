@@ -52,6 +52,12 @@ public class XbrlDockUtilsNet implements XbrlDockUtilsConsts {
 
 	public static void download(String url, File file, String... headers) throws Exception {
 		HttpURLConnection conn = connect(url, headers);
+		
+		String redirect = conn.getHeaderField("Location");
+		if (redirect != null){
+			conn = connect(redirect, headers); 
+		}
+		
 		InputStream is = conn.getInputStream();
 
 		if ("gzip".equals(conn.getContentEncoding())) {

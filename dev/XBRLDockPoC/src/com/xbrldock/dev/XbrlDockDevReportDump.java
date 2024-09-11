@@ -1,15 +1,12 @@
-package com.xbrldock.utils;
+package com.xbrldock.dev;
 
 import java.util.Map;
 import java.util.TreeMap;
 
 import com.xbrldock.XbrlDock;
 import com.xbrldock.XbrlDockConsts;
-import com.xbrldock.XbrlDockConsts.XbrlReportSegment;
-import com.xbrldock.XbrlDockConsts.EventLevel;
-import com.xbrldock.XbrlDockConsts.XbrlToken;
 
-public class XbrlDockUtilsDumpReportHandler implements XbrlDockConsts.ReportDataHandler {
+public class XbrlDockDevReportDump implements XbrlDockDevConsts, XbrlDockConsts.ReportDataHandler {
 
 	public boolean logAll = true;
 

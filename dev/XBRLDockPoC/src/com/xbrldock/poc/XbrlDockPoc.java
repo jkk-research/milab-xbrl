@@ -8,53 +8,22 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.util.Map;
 
-import org.xml.sax.EntityResolver;
-import org.xml.sax.InputSource;
-import org.xml.sax.SAXException;
-
 import com.xbrldock.XbrlDock;
 import com.xbrldock.XbrlDockException;
+import com.xbrldock.dev.XbrlDockDevReportDump;
 import com.xbrldock.poc.conn.xbrlorg.XbrlDockConnXbrlOrg;
 import com.xbrldock.poc.format.XbrlDockFormatJson;
 import com.xbrldock.poc.format.XbrlDockFormatXhtml;
 import com.xbrldock.utils.XbrlDockUtils;
-import com.xbrldock.utils.XbrlDockUtilsDumpReportHandler;
 import com.xbrldock.utils.XbrlDockUtilsFile;
 import com.xbrldock.utils.XbrlDockUtilsJson;
-import com.xbrldock.utils.XbrlDockUtilsNet;
 
 @SuppressWarnings({ "unchecked", "rawtypes" })
 public class XbrlDockPoc extends XbrlDock implements XbrlDockPocConsts {
 	File testRoot = new File("/Volumes/Giskard_ext/work/XBRL/store/xbrl.org/reports/lei");
 	File localRoot = new File("temp/reports");
 	
-	public static EntityResolver URL_CACHE = new EntityResolver() {
-		File cacheRoot = new File("ext/XBRLDock/urlcache");
-		
-		@Override
-		public InputSource resolveEntity(String publicId, String systemId) throws SAXException, IOException {
-//			XbrlDock.log(EventLevel.Trace, "Resolving", publicId, systemId);
-			
-			String path = XbrlDockUtils.getPostfix(systemId, "://");
-			
-			File fCache = new File(cacheRoot, path);
-			
-			if ( !fCache.isFile() ) {
-				XbrlDockUtilsFile.ensureDir(fCache.getParentFile());
-				try {
-					XbrlDockUtilsNet.download(systemId, fCache);
-				} catch (Exception e) {
-					XbrlDockException.wrap(e, "Downloading", systemId);
-				}
-			}
-			
-			if ( fCache.isFile() ) {
-				return new InputSource(new FileInputStream(fCache));
-			}
-
-			return null;
-		}
-	};
+	public static XbrlDockDevUrlCache URL_CACHE = new XbrlDockDevUrlCache("ext/XBRLDock/urlcache");
 	
 	@Override
 	protected void handleLog(EventLevel level, Object... params) {
@@ -70,7 +39,7 @@ public class XbrlDockPoc extends XbrlDock implements XbrlDockPocConsts {
 	}
 
 	public boolean test() throws Exception {
-		XbrlDockUtilsDumpReportHandler dh = new XbrlDockUtilsDumpReportHandler();
+		XbrlDockDevReportDump dh = new XbrlDockDevReportDump();
 
 		FileFilter xhtmlFilter = new FileFilter() {
 			@Override

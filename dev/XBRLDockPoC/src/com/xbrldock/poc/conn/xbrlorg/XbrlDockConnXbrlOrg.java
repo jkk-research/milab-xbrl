@@ -5,7 +5,6 @@ import java.io.FileFilter;
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.io.IOException;
-import java.io.PrintStream;
 import java.util.Collection;
 import java.util.HashMap;
 import java.util.Iterator;
@@ -17,14 +16,14 @@ import org.w3c.dom.NodeList;
 
 import com.xbrldock.XbrlDock;
 import com.xbrldock.XbrlDockException;
+import com.xbrldock.dev.XbrlDockDevMonitor;
 import com.xbrldock.poc.XbrlDockPoc;
 import com.xbrldock.poc.format.XbrlDockFormatUtils;
 import com.xbrldock.poc.format.XbrlDockFormatXhtml;
+import com.xbrldock.poc.taxonomy.XbrlDockTaxonomyRefCollector;
 import com.xbrldock.utils.XbrlDockUtils;
-import com.xbrldock.utils.XbrlDockUtilsDumpReportHandler;
 import com.xbrldock.utils.XbrlDockUtilsFile;
 import com.xbrldock.utils.XbrlDockUtilsJson;
-import com.xbrldock.utils.XbrlDockUtilsMonitor;
 import com.xbrldock.utils.XbrlDockUtilsNet;
 import com.xbrldock.utils.XbrlDockUtilsXml;
 
@@ -115,7 +114,7 @@ public class XbrlDockConnXbrlOrg implements XbrlDockConnXbrlOrgConsts {
 	}
 
 	public void getAllFilings() throws Exception {
-		XbrlDockUtilsMonitor pm = new XbrlDockUtilsMonitor("getAllFilings", 100);
+		XbrlDockDevMonitor pm = new XbrlDockDevMonitor("getAllFilings", 20);
 
 		Map<String, Map<String, Object>> filings = XbrlDockUtils.simpleGet(catalog, CatalogKeys.filings);
 
@@ -123,25 +122,25 @@ public class XbrlDockConnXbrlOrg implements XbrlDockConnXbrlOrgConsts {
 
 		File logDir = new File("temp/log/");
 		XbrlDockUtilsFile.ensureDir(logDir);
-		File log = new File(logDir, XbrlDockUtils.strTime() + XBRLDOCK_EXT_LOG);
+//		File log = new File(logDir, XbrlDockUtils.strTime() + XBRLDOCK_EXT_LOG);
 
-		XbrlDockUtilsDumpReportHandler dh = new XbrlDockUtilsDumpReportHandler();
-		dh.logAll = false;
+		XbrlDockTaxonomyRefCollector dh = new XbrlDockTaxonomyRefCollector();
 		ReportFormatHandler fh = new XbrlDockFormatXhtml();
 
-		long ts = System.currentTimeMillis();
+//		long ts = System.currentTimeMillis();
 
-		try (PrintStream ps = new PrintStream(log)) {
-			XbrlDock.setLogStream(ps);
+//		try (PrintStream ps = new PrintStream(log)) 
+		{
+//			XbrlDock.setLogStream(ps);
 			for (Map.Entry<String, Map<String, Object>> fe : filings.entrySet()) {
 				String k = fe.getKey();
 				try {
 					if (pm.step()) {
-						long t = System.currentTimeMillis();
-						XbrlDock.handleLogDefault(System.out, EventLevel.Trace, "Process", idx, "segment time", (t - ts));
-						ts = t;
+//						long t = System.currentTimeMillis();
+//						XbrlDock.handleLogDefault(System.out, EventLevel.Trace, "Process", idx, "segment time", (t - ts));
+//						ts = t;
 
-//						break;
+						break;
 					}
 					File f = getFiling(k);
 
@@ -156,17 +155,19 @@ public class XbrlDockConnXbrlOrg implements XbrlDockConnXbrlOrgConsts {
 				}
 			}
 
-			XbrlDockUtilsJson.writeJson(new File(dataRoot, PATH_CATALOG), catalog);
+//			XbrlDockUtilsJson.writeJson(new File(dataRoot, PATH_CATALOG), catalog);
 
 			XbrlDock.log(EventLevel.Info, "Found filing count", idx);
-		} finally {
-			XbrlDock.setLogStream(null);
+			
+			XbrlDock.log(EventLevel.Info, dh);
+//		} finally {
+//			XbrlDock.setLogStream(null);
 		}
 	}
 
 	int missingMetaInf = 0;
 
-	private void loadReport(ReportFormatHandler fh, ReportDataHandler dh, Map<String, Object> filingData, File f)
+	private void loadReport(ReportFormatHandler fh, XbrlDockTaxonomyRefCollector dh, Map<String, Object> filingData, File f)
 			throws IOException, Exception, FileNotFoundException {
 
 		String str = XbrlDockUtils.simpleGet(filingData, FilingKeys.localMetaInfPath);
@@ -199,41 +200,47 @@ public class XbrlDockConnXbrlOrg implements XbrlDockConnXbrlOrgConsts {
 
 			switch (tagName) {
 			case "rewriteURI":
-				prefixes.put(e.getAttribute("uriStartString"), new File(fMetaInf, e.getAttribute("rewritePrefix")));
-				break;
-			}
-		}
-
-		File fTax = new File(fMetaInf, XBRLDOCK_FNAME_TAXPACK);
-		Element eTaxPack = XbrlDockUtilsXml.parseDoc(fTax, XbrlDockPoc.URL_CACHE).getDocumentElement();
-
-		nl = eTaxPack.getElementsByTagName("*");
-		nc = nl.getLength();
-
-		for (int idx = 0; idx < nc; ++idx) {
-			Element e = (Element) nl.item(idx);
-			String tagName = e.getTagName();
-
-			switch (tagName) {
-			case "tp:entryPointDocument":
-				str = e.getAttribute("href");
-				
-				for ( Map.Entry<String, File> pe : prefixes.entrySet()) {
-					String p = pe.getKey();
-					
-					if ( str.startsWith(p) ) {
-						File fr = new File(pe.getValue(), str.substring(p.length()));
-						XbrlDockUtilsXml.parseDoc(fr, XbrlDockPoc.URL_CACHE);						
-					}
+				String uriStart = e.getAttribute("uriStartString");
+				if ( uriStart.endsWith("/") ) {
+					uriStart = uriStart.substring(0, uriStart.length()-1);
 				}
-
+				prefixes.put(uriStart, new File(fMetaInf, e.getAttribute("rewritePrefix")));
 				break;
 			}
 		}
+		
+//		File fTax = new File(fMetaInf, XBRLDOCK_FNAME_TAXPACK);
+//		Element eTaxPack = XbrlDockUtilsXml.parseDoc(fTax, XbrlDockPoc.URL_CACHE).getDocumentElement();
+//
+//		nl = eTaxPack.getElementsByTagName("*");
+//		nc = nl.getLength();
+//		
+//		for (int idx = 0; idx < nc; ++idx) {
+//			Element e = (Element) nl.item(idx);
+//			String tagName = e.getTagName();
+//
+//			switch (tagName) {
+//			case "tp:entryPointDocument":
+//				str = e.getAttribute("href");
+//				
+//				for ( Map.Entry<String, File> pe : prefixes.entrySet()) {
+//					String p = pe.getKey();
+//					
+//					if ( str.startsWith(p) ) {
+//						File fr = new File(pe.getValue(), str.substring(p.length()));
+//						dh.init( XbrlDockUtilsXml.parseDoc(fr, XbrlDockPoc.URL_CACHE).getDocumentElement(), prefixes);				
+//					}
+//				}
+//
+//				break;
+//			}
+//		}
 
 		if (loadReport) {
 			try (FileInputStream fr = new FileInputStream(f)) {
 				dh.beginReport(f.getCanonicalPath());
+				dh.init( prefixes);				
+
 				fh.loadReport(fr, dh);
 				dh.endReport();
 			}

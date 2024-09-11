@@ -1,9 +1,8 @@
-package com.xbrldock.utils;
+package com.xbrldock.dev;
 
 import com.xbrldock.XbrlDock;
-import com.xbrldock.XbrlDockConsts.EventLevel;
 
-public class XbrlDockUtilsMonitor {
+public class XbrlDockDevMonitor implements XbrlDockDevConsts {
 	private String name;
 	private long segment;
 
@@ -12,7 +11,7 @@ public class XbrlDockUtilsMonitor {
 	
 	private long count;
 	
-	public XbrlDockUtilsMonitor(String name, long segment) {
+	public XbrlDockDevMonitor(String name, long segment) {
 		reset(name, segment);
 	}
 	
