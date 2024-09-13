@@ -11,16 +11,4 @@ public interface XbrlDockPocConsts extends XbrlDockConsts, XbrlDockUtilsConsts {
 		location, dimension, x, y, gui, frame
 	}
 
-	enum EntityIdType {
-		lei, sec_cik
-	}
-
-	enum EntityKeys {
-		idType, id, name, urlSource
-	}
-
-	enum FilingKeys {
-		source, id, entityId, entityName, langCode, periodEnd, published, urlPackage, packageStatus, localFilingPath, sourceUrl, sourceAtts, localMetaInfPath
-	}
-
 }

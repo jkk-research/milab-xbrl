@@ -14,6 +14,7 @@ import com.xbrldock.dev.XbrlDockDevReportDump;
 import com.xbrldock.poc.conn.xbrlorg.XbrlDockConnXbrlOrg;
 import com.xbrldock.poc.format.XbrlDockFormatJson;
 import com.xbrldock.poc.format.XbrlDockFormatXhtml;
+import com.xbrldock.poc.taxonomy.XbrlDockTaxonomyManager;
 import com.xbrldock.utils.XbrlDockUtils;
 import com.xbrldock.utils.XbrlDockUtilsFile;
 import com.xbrldock.utils.XbrlDockUtilsJson;
@@ -23,8 +24,9 @@ public class XbrlDockPoc extends XbrlDock implements XbrlDockPocConsts {
 	File testRoot = new File("/Volumes/Giskard_ext/work/XBRL/store/xbrl.org/reports/lei");
 	File localRoot = new File("temp/reports");
 	
-	public static XbrlDockDevUrlCache URL_CACHE = new XbrlDockDevUrlCache("ext/XBRLDock/urlcache");
-	
+	XbrlDockTaxonomyManager taxMgr;
+	XbrlDockConnXbrlOrg esefConn;
+
 	@Override
 	protected void handleLog(EventLevel level, Object... params) {
 		handleLogDefault(level, params);
@@ -36,6 +38,9 @@ public class XbrlDockPoc extends XbrlDock implements XbrlDockPocConsts {
 		Map cfg = XbrlDockUtils.toFlatMap(XBRLDOCK_PREFIX, XBRLDOCK_SEP_PATH, cfgData);
 
 		initEnv(XBRLDOCK_PREFIX, args, cfg);
+		
+		taxMgr = new XbrlDockTaxonomyManager("ext/XBRLDock/urlcache");
+		esefConn = new XbrlDockConnXbrlOrg("sources/xbrl.org", "ext/XBRLDock/sources/xbrl.org");
 	}
 
 	public boolean test() throws Exception {
@@ -82,8 +87,10 @@ public class XbrlDockPoc extends XbrlDock implements XbrlDockPocConsts {
 			loadReportRec(jsonFilter, jsonParser, dh);
 			break;
 		case "esef":
-			XbrlDockConnXbrlOrg ec = new XbrlDockConnXbrlOrg("sources/xbrl.org", "ext/XBRLDock/sources/xbrl.org");
-			ec.test();
+			esefConn.test();
+			
+			taxMgr.getTaxonomies(esefConn, "549300EW945NUS7PK214-2022-12-31-ESEF-NO-0");
+			
 			break;
 		default:
 			return true;

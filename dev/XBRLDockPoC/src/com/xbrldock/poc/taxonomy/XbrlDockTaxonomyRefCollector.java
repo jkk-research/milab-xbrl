@@ -1,7 +1,6 @@
 package com.xbrldock.poc.taxonomy;
 
 import java.io.File;
-import java.io.InputStream;
 import java.util.Map;
 import java.util.TreeMap;
 
@@ -12,7 +11,6 @@ import com.xbrldock.XbrlDock;
 import com.xbrldock.XbrlDockConsts;
 import com.xbrldock.XbrlDockException;
 import com.xbrldock.dev.XbrlDockDevCounter;
-import com.xbrldock.poc.XbrlDockPoc;
 import com.xbrldock.utils.XbrlDockUtils;
 import com.xbrldock.utils.XbrlDockUtilsXml;
 
@@ -75,7 +73,7 @@ public class XbrlDockTaxonomyRefCollector implements XbrlDockTaxonomyConsts, Xbr
 	}
 
 	@Override
-	public String processSegment(XbrlReportSegment segment, Map<XbrlToken, Object> data) {
+	public String processSegment(XbrlReportSegment segment, Map<XbrlFactKeys, Object> data) {
 		// TODO Auto-generated method stub
 		return null;
 	}
@@ -113,22 +111,22 @@ public class XbrlDockTaxonomyRefCollector implements XbrlDockTaxonomyConsts, Xbr
 
 			if (taxRef.startsWith(p)) {
 				File fr = new File(pe.getValue(), taxRef.substring(p.length()));
-				taxRoot = XbrlDockUtilsXml.parseDoc(fr, XbrlDockPoc.URL_CACHE).getDocumentElement();
+				taxRoot = XbrlDockUtilsXml.parseDoc(fr).getDocumentElement();
 				break;
 			}
 		}
 
-		if (null == taxRoot) {
-			InputStream is = null;
-			try {
-				is = XbrlDockPoc.URL_CACHE.resolveEntityStream(id, taxRef);
-				taxRoot = XbrlDockUtilsXml.parseDoc(is, XbrlDockPoc.URL_CACHE).getDocumentElement();
-			} finally {
-				if (null != is) {
-					is.close();
-				}
-			}
-		}
+//		if (null == taxRoot) {
+//			InputStream is = null;
+//			try {
+//				is = XbrlDockPoc.URL_CACHE.resolveEntityStream(id, taxRef);
+//				taxRoot = XbrlDockUtilsXml.parseDoc(is).getDocumentElement();
+//			} finally {
+//				if (null != is) {
+//					is.close();
+//				}
+//			}
+//		}
 
 		if (null == taxRoot) {
 			XbrlDock.log(EventLevel.Warning, "Taxonomy resolution error", id, taxRef);

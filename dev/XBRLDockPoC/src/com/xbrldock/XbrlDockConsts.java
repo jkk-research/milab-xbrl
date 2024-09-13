@@ -1,9 +1,12 @@
 package com.xbrldock;
 
+import java.io.File;
 import java.io.InputStream;
 import java.nio.charset.StandardCharsets;
+import java.util.Collection;
 import java.util.Map;
 
+@SuppressWarnings("rawtypes")
 public interface XbrlDockConsts {
 	
 	String XBRLDOCK_SEP_FILE = "_";
@@ -40,10 +43,16 @@ public interface XbrlDockConsts {
 	}
 	
 	public interface GenProcessor<ItemType> {
-		boolean process(ItemType item, ProcessorAction action);
+		boolean process(ItemType item, ProcessorAction action) throws Exception;
 	}
 
-	
+	public interface XbrlSource {
+		int refresh(Collection<String> updated) throws Exception;
+		Map getReportData(String id, Map target) throws Exception;
+		void visitReports(GenProcessor<Map> visitor, GenProcessor<Map> filter) throws Exception;
+		File getReportFile(String id, Object...path);
+	}
+		
 	enum XbrlReportFormat {
 		XML, XHTML, JSON, CSV
 	}
@@ -56,7 +65,21 @@ public interface XbrlDockConsts {
 		number, string, text, date, bool, empty
 	}
 	
-	enum XbrlToken {
+	enum XbrlEntityIdType {
+		lei, // sec_cik
+	}
+
+	enum XbrlEntityKeys {
+		idType, id, name, urlSource
+	}
+
+	enum XbrlFilingKeys {
+		source, id, periodEnd, published, entityId, entityName, langCode, schemas, namespaces, 
+		urlPackage, sourceUrl, sourceAtts, 
+		packageStatus, startDate, endDate, localPath, localFilingPath, localMetaInfPath
+	}
+	
+	enum XbrlFactKeys {
 		id, scenario, context, 
 		unit, unitNumerator, unitDenominator, measure,
 		
@@ -74,7 +97,7 @@ public interface XbrlDockConsts {
 		void beginReport(String repId);
 		void addNamespace(String ref, String id);
 		void addTaxonomy(String tx);
-		String processSegment(XbrlReportSegment segment, Map<XbrlToken, Object> data);
+		String processSegment(XbrlReportSegment segment, Map<XbrlFactKeys, Object> data);
 		void endReport();
 	}	
 	

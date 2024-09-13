@@ -4,7 +4,10 @@ import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.HashMap;
+import java.util.HashSet;
+import java.util.List;
 import java.util.Map;
+import java.util.Set;
 import java.util.TreeMap;
 
 @SuppressWarnings({ "unchecked", "rawtypes" })
@@ -23,7 +26,7 @@ public class XbrlDockUtils implements XbrlDockUtilsConsts {
 	};
 
 	public static void ensureArrSize(ArrayList arr, int idx) {
-		for ( int i = arr.size(); i <= idx; ++i ) {
+		for (int i = arr.size(); i <= idx; ++i) {
 			arr.add(null);
 		}
 	}
@@ -32,12 +35,12 @@ public class XbrlDockUtils implements XbrlDockUtilsConsts {
 		int idx;
 		int s = arr.size();
 
-		if ( KEY_ADD == index ) {
+		if (KEY_ADD == index) {
 			idx = s;
 			arr.add(value);
 		} else {
-			if ( index < s ) {
-				if ( overwrite ) {
+			if (index < s) {
+				if (overwrite) {
 					arr.set(index, value);
 				} else {
 					arr.add(index, value);
@@ -58,18 +61,18 @@ public class XbrlDockUtils implements XbrlDockUtilsConsts {
 
 	private static Map<String, Object> toFlatMap(Map<String, Object> target, StringBuilder prefix, String sep, Object src) {
 		int l = prefix.length() + 1;
-		
-		if ( src instanceof Map ) {
+
+		if (src instanceof Map) {
 			prefix.append(sep);
-			for ( Map.Entry<String, Object> e : ((Map<String, Object>)src).entrySet() ) {
+			for (Map.Entry<String, Object> e : ((Map<String, Object>) src).entrySet()) {
 				prefix.setLength(l);
 				prefix.append(e.getKey());
 				toFlatMap(target, prefix, sep, e.getValue());
 			}
-		} else if ( src instanceof Iterable) {
+		} else if (src instanceof Iterable) {
 			int idx = 0;
 			prefix.append(sep);
-			for ( Object o : (Iterable) src) {
+			for (Object o : (Iterable) src) {
 				prefix.setLength(l);
 				prefix.append(idx++);
 				toFlatMap(target, prefix, sep, o);
@@ -77,7 +80,7 @@ public class XbrlDockUtils implements XbrlDockUtilsConsts {
 		} else {
 			target.put(prefix.toString(), src);
 		}
-				
+
 		return target;
 	};
 
@@ -86,9 +89,9 @@ public class XbrlDockUtils implements XbrlDockUtilsConsts {
 	}
 
 	public static String toString(Object ob, String sep) {
-		if ( null == ob ) {
+		if (null == ob) {
 			return "";
-		} else if ( ob.getClass().isArray() ) {
+		} else if (ob.getClass().isArray()) {
 			StringBuilder sb = null;
 			for (Object oo : (Object[]) ob) {
 				sb = sbAppend(sb, sep, false, oo);
@@ -103,8 +106,8 @@ public class XbrlDockUtils implements XbrlDockUtilsConsts {
 		for (Object ob : objects) {
 			String str = toString(ob);
 
-			if ( strict || (0 < str.length()) ) {
-				if ( null == sb ) {
+			if (strict || (0 < str.length())) {
+				if (null == sb) {
 					sb = new StringBuilder(str);
 				} else {
 					sb.append(sep);
@@ -125,15 +128,15 @@ public class XbrlDockUtils implements XbrlDockUtilsConsts {
 		Object curr = root;
 
 		for (Object p : path) {
-			if ( null == curr ) {
+			if (null == curr) {
 				break;
 			}
-			if ( p instanceof Integer ) {
+			if (p instanceof Integer) {
 				int idx = (Integer) p;
 				ArrayList l = (ArrayList) curr;
 				curr = ((0 < idx) && (idx < l.size())) ? l.get(idx) : null;
 			} else {
-				if ( p instanceof Enum ) {
+				if (p instanceof Enum) {
 					p = p.toString();
 				}
 				curr = ((Map) curr).get(p);
@@ -147,24 +150,24 @@ public class XbrlDockUtils implements XbrlDockUtilsConsts {
 		Object curr = root;
 		Object lastKey = null;
 		Object lastParent = null;
-		
-		if ( val instanceof Enum ) {
+
+		if (val instanceof Enum) {
 			val = val.toString();
 		}
 
 		for (Object p : path) {
-			if ( null == curr ) {
+			if (null == curr) {
 				curr = new HashMap();
-				((Map)lastParent).put(lastKey, curr);
+				((Map) lastParent).put(lastKey, curr);
 			}
-			if ( p instanceof Enum ) {
+			if (p instanceof Enum) {
 				p = p.toString();
 			}
-			
+
 			lastKey = p;
 			lastParent = curr;
-			
-			if ( p instanceof Integer ) {
+
+			if (p instanceof Integer) {
 				int idx = (Integer) p;
 				ArrayList l = (ArrayList) curr;
 				curr = ((0 < idx) && (idx < l.size())) ? l.get(idx) : null;
@@ -173,17 +176,17 @@ public class XbrlDockUtils implements XbrlDockUtilsConsts {
 			}
 		}
 
-		((Map)lastParent).put(lastKey, val);
+		((Map) lastParent).put(lastKey, val);
 	}
 
 	public static <RetType> RetType safeGet(Object map, Object key, ItemCreator<RetType> creator, Object... hints) {
 		synchronized (map) {
-			if ( key instanceof Enum ) {
+			if (key instanceof Enum) {
 				key = key.toString();
 			}
 
 			RetType ret = ((Map<Object, RetType>) map).get(key);
-			if ( (null == ret) && (null != creator) ) {
+			if ((null == ret) && (null != creator)) {
 				ret = creator.create(key, hints);
 				((Map<Object, RetType>) map).put(key, ret);
 			}
@@ -208,9 +211,9 @@ public class XbrlDockUtils implements XbrlDockUtilsConsts {
 
 	private static SimpleDateFormat sdfTime = new SimpleDateFormat(XBRLDOCK_FMT_TIMESTAMP);
 	private static SimpleDateFormat sdfDate = new SimpleDateFormat(XBRLDOCK_FMT_DATE);
-	
+
 	public static String strTime(Date d) {
-		synchronized ( sdfTime ) {
+		synchronized (sdfTime) {
 			return sdfTime.format(d);
 		}
 	}
@@ -220,7 +223,7 @@ public class XbrlDockUtils implements XbrlDockUtilsConsts {
 	}
 
 	public static String strDate(Date d) {
-		synchronized ( sdfDate ) {
+		synchronized (sdfDate) {
 			return sdfDate.format(d);
 		}
 	}
@@ -238,7 +241,33 @@ public class XbrlDockUtils implements XbrlDockUtilsConsts {
 
 		return String.format("%02x%s%02x", h1, sep, h2);
 	}
-	
 
+	public static <RetType> RetType deepCopyIsh(RetType ob) {
+
+		if ((null == ob) || ob.getClass().isPrimitive() || (ob instanceof String)) {
+			return ob;
+		}
+		
+		Object ret = ob;
+
+		if (ob instanceof Map) {
+			Map r = new HashMap();
+			for (Map.Entry<Object, Object> me : ((Map<Object, Object>) ob).entrySet()) {
+				r.put(me.getKey(), deepCopyIsh(me.getValue()));
+			}
+		} else if (ob instanceof Set) {
+			Set r = new HashSet();
+			for (Object m : ((Set<Object>) ob)) {
+				r.add(deepCopyIsh(m));
+			}
+		} else if (ob instanceof List) {
+			List r = new ArrayList();
+			for (Object m : ((List<Object>) ob)) {
+				r.add(deepCopyIsh(m));
+			}
+		}
+
+		return (RetType) ret;
+	}
 
 }

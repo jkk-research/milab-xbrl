@@ -55,7 +55,7 @@ public class XbrlDockFormatJson implements XbrlDockFormatConsts, XbrlDockConsts.
 
 			Map<String, String> unitIds = new TreeMap<>();
 			ItemCreator<String> unitIDCreator = new ItemCreator<String>() {
-				Map<XbrlToken, Object> unitData = new TreeMap<>();
+				Map<XbrlFactKeys, Object> unitData = new TreeMap<>();
 
 				@Override
 				public String create(Object key, Object... hints) {
@@ -63,12 +63,12 @@ public class XbrlDockFormatJson implements XbrlDockFormatConsts, XbrlDockConsts.
 					String[] info = ((String) key).split("/");
 
 					if (1 < info.length) {
-						unitData.put(XbrlToken.unitNumerator, info[0]);
-						unitData.put(XbrlToken.unitDenominator, info[1]);
+						unitData.put(XbrlFactKeys.unitNumerator, info[0]);
+						unitData.put(XbrlFactKeys.unitDenominator, info[1]);
 					} else {
-						unitData.put(XbrlToken.measure, info[0]);
+						unitData.put(XbrlFactKeys.measure, info[0]);
 					}
-					unitData.put(XbrlToken.unit, key);
+					unitData.put(XbrlFactKeys.unit, key);
 
 					return dataHandler.processSegment(XbrlReportSegment.Unit, unitData);
 				}
@@ -76,57 +76,57 @@ public class XbrlDockFormatJson implements XbrlDockFormatConsts, XbrlDockConsts.
 
 			Map<String, String> ctxIds = new TreeMap<>();
 			ItemCreator<String> ctxIDCreator = new ItemCreator<String>() {
-				Map<XbrlToken, Object> ctxData = new TreeMap<>();
+				Map<XbrlFactKeys, Object> ctxData = new TreeMap<>();
 
 				@Override
 				public String create(Object key, Object... hints) {
 					ctxData.clear();
 
 					Map<String, Object> d = (Map<String, Object>) hints[0];
-					ctxData.put(XbrlToken.entity, d.remove(XbrlToken.entity.name()));
+					ctxData.put(XbrlFactKeys.entity, d.remove(XbrlFactKeys.entity.name()));
 
-					String period = (String) d.remove(XbrlToken.period.name());
-					ctxData.put(XbrlToken.period, period);
+					String period = (String) d.remove(XbrlFactKeys.period.name());
+					ctxData.put(XbrlFactKeys.period, period);
 
 					if (!XbrlDockUtils.isEmpty(period)) {
 						String[] info = period.split("/");
 						if (1 < info.length) {
-							ctxData.put(XbrlToken.startDate, info[0]);
-							ctxData.put(XbrlToken.endDate, info[1]);
+							ctxData.put(XbrlFactKeys.startDate, info[0]);
+							ctxData.put(XbrlFactKeys.endDate, info[1]);
 						} else {
-							ctxData.put(XbrlToken.instant, info[0]);
+							ctxData.put(XbrlFactKeys.instant, info[0]);
 						}
 					}
 
 					if (!d.isEmpty()) {
-						ctxData.put(XbrlToken.dimensions, d);
+						ctxData.put(XbrlFactKeys.dimensions, d);
 					}
 
 					return dataHandler.processSegment(XbrlReportSegment.Context, ctxData);
 				}
 			};
 
-			Map<XbrlToken, Object> factData = new TreeMap<>();
+			Map<XbrlFactKeys, Object> factData = new TreeMap<>();
 
 			Map<String, Object> facts = XbrlDockUtils.simpleGet(root, JsonKeys.facts);
 			for (Map.Entry<String, Object> fe : facts.entrySet()) {
 				factData.clear();
 
 				Map<String, Object> fd = (Map<String, Object>) fe.getValue();
-				Map<String, Object> dim = (Map<String, Object>) fd.remove(XbrlToken.dimensions.name());
+				Map<String, Object> dim = (Map<String, Object>) fd.remove(XbrlFactKeys.dimensions.name());
 
-				factData.put(XbrlToken.id, fe.getKey());
-				factData.put(XbrlToken.value, fd.remove(XbrlToken.value.name()));
-				factData.put(XbrlToken.concept, dim.remove(XbrlToken.concept.name()));
+				factData.put(XbrlFactKeys.id, fe.getKey());
+				factData.put(XbrlFactKeys.value, fd.remove(XbrlFactKeys.value.name()));
+				factData.put(XbrlFactKeys.concept, dim.remove(XbrlFactKeys.concept.name()));
 
-				String unit = (String) dim.remove(XbrlToken.unit.name());
+				String unit = (String) dim.remove(XbrlFactKeys.unit.name());
 				if (null == unit) {
-					factData.put(XbrlToken.language, dim.remove(XbrlToken.language.name()));
+					factData.put(XbrlFactKeys.language, dim.remove(XbrlFactKeys.language.name()));
 				} else {
-					factData.put(XbrlToken.decimals, fd.remove(XbrlToken.decimals.name()));
+					factData.put(XbrlFactKeys.decimals, fd.remove(XbrlFactKeys.decimals.name()));
 
 					String uid = XbrlDockUtils.safeGet(unitIds, unit, unitIDCreator);
-					factData.put(XbrlToken.unit, uid);
+					factData.put(XbrlFactKeys.unit, uid);
 				}
 
 				ArrayList<Map.Entry<String, Object>> e = new ArrayList<>(dim.entrySet());
@@ -135,7 +135,7 @@ public class XbrlDockFormatJson implements XbrlDockFormatConsts, XbrlDockConsts.
 				String dk = e.toString();
 				String ctxId = XbrlDockUtils.safeGet(ctxIds, dk, ctxIDCreator, dim);
 
-				factData.put(XbrlToken.context, ctxId);
+				factData.put(XbrlFactKeys.context, ctxId);
 
 				dataHandler.processSegment(XbrlReportSegment.Fact, factData);
 			}

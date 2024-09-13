@@ -17,6 +17,12 @@ public class XbrlDockUtilsXml implements XbrlDockUtilsConsts {
 	
 	private static DocumentBuilderFactory dbf = DocumentBuilderFactory.newInstance();
 	
+	private static EntityResolver DEF_ENTITY_RESOLVER;
+	
+	public static void setDefEntityResolver(EntityResolver er) {
+		DEF_ENTITY_RESOLVER = er;
+	}
+	
 	private static ThreadLocal<DocumentBuilder> tdb = new ThreadLocal<DocumentBuilder>() {
 		protected DocumentBuilder initialValue() {
 			try {
@@ -28,18 +34,18 @@ public class XbrlDockUtilsXml implements XbrlDockUtilsConsts {
 	};
 	
 	
-	public static Document parseDoc(InputStream is, EntityResolver er) throws Exception {
+	public static Document parseDoc(InputStream is) throws Exception {
 		DocumentBuilder db = tdb.get();
 		db.reset();
 		
-		db.setEntityResolver(er);
+		db.setEntityResolver(DEF_ENTITY_RESOLVER);
 		
 		return db.parse(is);
 	}
 	
-	public static Document parseDoc(File f, EntityResolver er) throws Exception {
+	public static Document parseDoc(File f) throws Exception {
 		try ( FileInputStream fis = new FileInputStream(f) ) {
-			return parseDoc(fis, er);
+			return parseDoc(fis);
 		}
 	}
 	

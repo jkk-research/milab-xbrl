@@ -12,7 +12,6 @@ import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
 
 import com.xbrldock.XbrlDockConsts;
-import com.xbrldock.poc.XbrlDockPoc;
 import com.xbrldock.poc.utils.XbrlDockPocUtilsValueConverter;
 import com.xbrldock.utils.XbrlDockUtils;
 import com.xbrldock.utils.XbrlDockUtilsXml;
@@ -21,7 +20,7 @@ public class XbrlDockFormatXhtml implements XbrlDockFormatConsts, XbrlDockConsts
 
 	
 
-	XbrlToken[] cvtKeys = { XbrlToken.scale, XbrlToken.decimals, XbrlToken.sign };
+	XbrlFactKeys[] cvtKeys = { XbrlFactKeys.scale, XbrlFactKeys.decimals, XbrlFactKeys.sign };
 
 	String forcedLang;
 
@@ -51,7 +50,7 @@ public class XbrlDockFormatXhtml implements XbrlDockFormatConsts, XbrlDockConsts
 
 			String sVal;
 
-			Document doc = XbrlDockUtilsXml.parseDoc(in, XbrlDockPoc.URL_CACHE);
+			Document doc = XbrlDockUtilsXml.parseDoc(in);
 
 			Element eHtml = doc.getDocumentElement();
 
@@ -61,10 +60,15 @@ public class XbrlDockFormatXhtml implements XbrlDockFormatConsts, XbrlDockConsts
 			NodeList nl = eHtml.getElementsByTagName("*");
 			int nodeCount = nl.getLength();
 
-			Map<XbrlToken, Object> segmentData = new TreeMap<>();
+			Map<XbrlFactKeys, Object> segmentData = new TreeMap<>();
 			Map<String, String> ctxDim = new TreeMap<>();
 
 			Map<String, Element> continuation = new TreeMap<>();
+//			ArrayList<String> schemas = new ArrayList<>();
+//			Map<String, String> namespaces = new TreeMap<>();
+			
+//			String repStart = null;
+//			String repEnd = null;
 
 			for (int idx = 0; idx < nodeCount; ++idx) {
 				Element e = (Element) nl.item(idx);
@@ -77,32 +81,53 @@ public class XbrlDockFormatXhtml implements XbrlDockFormatConsts, XbrlDockConsts
 					sVal = e.getAttribute("xlink:href");
 					if (!XbrlDockUtils.isEmpty(sVal)) {
 						dataHandler.addTaxonomy(sVal.trim());
+//						schemas.add(sVal.trim());
 					}
 					break;
 				case "xbrli:context":
 					segmentData.clear();
 
-					segmentData.put(XbrlToken.id, e.getAttribute("id"));
+					segmentData.put(XbrlFactKeys.context, e.getAttribute("id"));
 
 					sVal = getInfo(e, "xbrli:instant");
 					if (XbrlDockUtils.isEmpty(sVal)) {
-						segmentData.put(XbrlToken.startDate, getInfo(e, "xbrli:startDate"));
-						segmentData.put(XbrlToken.endDate, getInfo(e, "xbrli:endDate"));
+						String cs = getInfo(e, "xbrli:startDate");
+						segmentData.put(XbrlFactKeys.startDate, cs);
+						
+//						if ( (null == repStart) || (0 > repStart.compareTo(sVal)) ) {
+//							repStart = sVal;
+//						}
+						
+						String ce = getInfo(e, "xbrli:endDate");
+						segmentData.put(XbrlFactKeys.endDate, ce);
+//						if ( (null == repEnd) || (0 < repEnd.compareTo(sVal)) ) {
+//							repEnd = sVal;
+//						}
+						
+//						dataHandler.addContextRange(cs, ce);
+
 					} else {
-						segmentData.put(XbrlToken.instant, sVal);
+						segmentData.put(XbrlFactKeys.instant, sVal);
+//						dataHandler.addContextRange(sVal, sVal);
+//						if ( (null == repStart) || (0 > repStart.compareTo(sVal)) ) {
+//							repStart = sVal;
+//						}
+//						if ( (null == repEnd) || (0 < repEnd.compareTo(sVal)) ) {
+//							repEnd = sVal;
+//						}
 					}
 
 					Element eS = null;
 
 					eS = (Element) e.getElementsByTagName("xbrli:segment").item(0);
 					if (null == eS) {
-						segmentData.put(XbrlToken.entity, getInfo(e, "xbrli:entity"));
+						segmentData.put(XbrlFactKeys.entity, getInfo(e, "xbrli:entity"));
 						eS = (Element) e.getElementsByTagName("xbrli:scenario").item(0);
 					} else {
 						NodeList nn = e.getElementsByTagName("xbrli:entity");
 						if (0 < nl.getLength()) {
 							sVal = getInfo((Element) nn.item(0), "xbrli:identifier");
-							segmentData.putIfAbsent(XbrlToken.entity, sVal);
+							segmentData.putIfAbsent(XbrlFactKeys.entity, sVal);
 						}
 					}
 
@@ -123,7 +148,7 @@ public class XbrlDockFormatXhtml implements XbrlDockFormatConsts, XbrlDockConsts
 						}
 
 						if (!ctxDim.isEmpty()) {
-							segmentData.put(XbrlToken.dimensions, ctxDim);
+							segmentData.put(XbrlFactKeys.dimensions, ctxDim);
 						}
 					}
 
@@ -132,13 +157,15 @@ public class XbrlDockFormatXhtml implements XbrlDockFormatConsts, XbrlDockConsts
 					break;
 				case "xbrli:unit":
 					segmentData.clear();
+					
+					segmentData.put(XbrlFactKeys.unit, e.getAttribute("id"));
 
 					sVal = getInfo(e, "xbrli:unitNumerator");
 					if (XbrlDockUtils.isEmpty(sVal)) {
-						segmentData.put(XbrlToken.measure, getInfo(e, "xbrli:measure"));
+						segmentData.put(XbrlFactKeys.measure, getInfo(e, "xbrli:measure"));
 					} else {
-						segmentData.put(XbrlToken.unitNumerator, sVal);
-						segmentData.put(XbrlToken.unitDenominator, getInfo(e, "xbrli:unitDenominator"));
+						segmentData.put(XbrlFactKeys.unitNumerator, sVal);
+						segmentData.put(XbrlFactKeys.unitDenominator, getInfo(e, "xbrli:unitDenominator"));
 					}
 
 					dataHandler.processSegment(XbrlReportSegment.Unit, segmentData);
@@ -159,18 +186,23 @@ public class XbrlDockFormatXhtml implements XbrlDockFormatConsts, XbrlDockConsts
 					sVal = n.getNodeValue();
 					if (!XbrlDockUtils.isEmpty(sVal)) {
 						int si = attName.indexOf(":");
+						String ref = attName.substring(si + 1);
 
-						dataHandler.addNamespace(attName.substring(si + 1), sVal);
+						dataHandler.addNamespace(ref, sVal);
+						
+//						namespaces.put(ref, sVal);
 					}
 				}
 			}
-
+			
 			for (int idx = 0; idx < nodeCount; ++idx) {
 				Element e = (Element) nl.item(idx);
 				String ctxId = e.getAttribute("contextRef");
 
 				if (!XbrlDockUtils.isEmpty(ctxId)) {
 					segmentData.clear();
+
+					segmentData.put(XbrlFactKeys.id, e.getAttribute("id"));
 
 					String valOrig = e.getTextContent().trim();
 					String fmtCode = e.getAttribute("format");
@@ -184,10 +216,10 @@ public class XbrlDockFormatXhtml implements XbrlDockFormatConsts, XbrlDockConsts
 					}
 
 					if (!XbrlDockUtils.isEmpty(fmtCode)) {
-						segmentData.put(XbrlToken.xbrldockOrigValue, valOrig);
-						segmentData.put(XbrlToken.value, valOrig);
-						segmentData.put(XbrlToken.format, fmtCode);
-						for (XbrlToken xt : cvtKeys) {
+						segmentData.put(XbrlFactKeys.xbrldockOrigValue, valOrig);
+						segmentData.put(XbrlFactKeys.value, valOrig);
+						segmentData.put(XbrlFactKeys.format, fmtCode);
+						for (XbrlFactKeys xt : cvtKeys) {
 							Object v = e.getAttribute(xt.name());
 							if (null != v) {
 								segmentData.put(xt, v);
@@ -204,7 +236,7 @@ public class XbrlDockFormatXhtml implements XbrlDockFormatConsts, XbrlDockConsts
 							txtLang = defLang;
 						}
 						if (!XbrlDockUtils.isEmpty(txtLang)) {
-							segmentData.put(XbrlToken.language, txtLang);
+							segmentData.put(XbrlFactKeys.language, txtLang);
 						}
 
 						do {
@@ -223,8 +255,8 @@ public class XbrlDockFormatXhtml implements XbrlDockFormatConsts, XbrlDockConsts
 							}
 						} while (!last);
 
-						segmentData.put(XbrlToken.value, XbrlDockUtils.toString(merge));
-						segmentData.put(XbrlToken.xbrldockFactType, XbrlFactDataType.text);
+						segmentData.put(XbrlFactKeys.value, XbrlDockUtils.toString(merge));
+						segmentData.put(XbrlFactKeys.xbrldockFactType, XbrlFactDataType.text);
 					}
 
 					dataHandler.processSegment(XbrlReportSegment.Fact, segmentData);

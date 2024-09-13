@@ -46,15 +46,15 @@ public class XbrlDockUtilsFile implements XbrlDockUtilsConsts {
 		}
 	};
 	
-	public static int processFiles(File f, FileProcessor proc) {
+	public static int processFiles(File f, FileProcessor proc) throws Exception {
 		return processFiles(f, proc, null, false, false);
 	}
 	
-	public static int processFiles(File f, FileProcessor proc, FileFilter fileFilter) {
+	public static int processFiles(File f, FileProcessor proc, FileFilter fileFilter) throws Exception {
 		return processFiles(f, proc, fileFilter, false, false);
 	}
 	
-	public static int processFiles(File f, FileProcessor proc, FileFilter fileFilter, boolean dirCallBefore, boolean dirCallAfter) {
+	public static int processFiles(File f, FileProcessor proc, FileFilter fileFilter, boolean dirCallBefore, boolean dirCallAfter) throws Exception {
 		int count = 0; 
 		
 		if ( f.exists() ) {

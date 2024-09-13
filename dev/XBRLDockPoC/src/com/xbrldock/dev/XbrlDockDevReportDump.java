@@ -14,8 +14,8 @@ public class XbrlDockDevReportDump implements XbrlDockDevConsts, XbrlDockConsts.
 
 	String repId;
 
-	Map<String, Map<XbrlToken, Object>> unitDef = new TreeMap<>();
-	Map<String, Map<XbrlToken, Object>> ctxDef = new TreeMap<>();
+	Map<String, Map<XbrlFactKeys, Object>> unitDef = new TreeMap<>();
+	Map<String, Map<XbrlFactKeys, Object>> ctxDef = new TreeMap<>();
 
 	public void reset() {
 		unitDef.clear();
@@ -41,20 +41,20 @@ public class XbrlDockDevReportDump implements XbrlDockDevConsts, XbrlDockConsts.
 	}
 
 	@Override
-	public String processSegment(XbrlReportSegment segment, Map<XbrlToken, Object> data) {
+	public String processSegment(XbrlReportSegment segment, Map<XbrlFactKeys, Object> data) {
 		String ret = "";
 
 		switch (segment) {
 		case Unit:
 			ret = "unit-" + unitDef.size();
-			unitDef.put(ret, new TreeMap<XbrlToken, Object>(data));
+			unitDef.put(ret, new TreeMap<XbrlFactKeys, Object>(data));
 			break;
 		case Context:
 			ret = "ctx-" + ctxDef.size();
-			ctxDef.put(ret, new TreeMap<XbrlToken, Object>(data));
+			ctxDef.put(ret, new TreeMap<XbrlFactKeys, Object>(data));
 			break;
 		case Fact:
-			ret = (String) data.get(XbrlToken.id);
+			ret = (String) data.get(XbrlFactKeys.id);
 			break;
 		}
 

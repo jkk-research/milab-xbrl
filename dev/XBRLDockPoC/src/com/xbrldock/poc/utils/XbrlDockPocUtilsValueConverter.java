@@ -14,22 +14,22 @@ import com.xbrldock.utils.XbrlDockUtils;
 
 public class XbrlDockPocUtilsValueConverter implements XbrlDockPocConsts {
 
-	public static boolean convertValue(Map<XbrlToken, Object> data) {
+	public static boolean convertValue(Map<XbrlFactKeys, Object> data) {
 		String error = null;
 		XbrlFactDataType ft = XbrlFactDataType.empty;
 		Object valObj = null;
 
 		try {
-			String valOrig = (String) data.get(XbrlToken.xbrldockOrigValue);
+			String valOrig = (String) data.get(XbrlFactKeys.xbrldockOrigValue);
 
-			String fmtCode = (String) data.get(XbrlToken.format);
+			String fmtCode = (String) data.get(XbrlFactKeys.format);
 			fmtCode = XbrlDockUtils.getPostfix(fmtCode, ":");
 
 			if (fmtCode.startsWith("num")) {
 				ft = XbrlFactDataType.number;
-				String scale = (String) data.get(XbrlToken.scale);
-				String decimals = (String) data.get(XbrlToken.decimals);
-				String sign = (String) data.get(XbrlToken.sign);
+				String scale = (String) data.get(XbrlFactKeys.scale);
+				String decimals = (String) data.get(XbrlFactKeys.decimals);
+				String sign = (String) data.get(XbrlFactKeys.sign);
 
 				valObj = convertToNumber(valOrig, fmtCode, scale, decimals, sign);
 			} else if (fmtCode.startsWith("fixed")) {
@@ -60,10 +60,10 @@ public class XbrlDockPocUtilsValueConverter implements XbrlDockPocConsts {
 			error = "Conversion exception " + e.toString();
 		}
 
-		data.put(XbrlToken.value, valObj);
-		data.put(XbrlToken.xbrldockFactType, ft);
+		data.put(XbrlFactKeys.value, valObj);
+		data.put(XbrlFactKeys.xbrldockFactType, ft);
 		if (null != error) {
-			data.put(XbrlToken.xbrldockParseError, error);
+			data.put(XbrlFactKeys.xbrldockParseError, error);
 			return false;
 		} else {
 			return true;
