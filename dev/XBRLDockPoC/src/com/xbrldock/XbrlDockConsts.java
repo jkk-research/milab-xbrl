@@ -30,6 +30,11 @@ public interface XbrlDockConsts {
 	
 	String XBRLDOCK_FNAME_CATALOG = "catalog.xml";
 	String XBRLDOCK_FNAME_TAXPACK = "taxonomyPackage.xml";
+	
+	String XBRLDOCK_URL_PSEP = "://";
+	String XBRLDOCK_URL_UP = "../";
+	String XBRLDOCK_URL_HERE = "./";
+	String XBRLDOCK_PATH_UP = ".." + File.separator;
 
 	int KEY_ADD = -1;
 	int KEY_SIZE = -2;

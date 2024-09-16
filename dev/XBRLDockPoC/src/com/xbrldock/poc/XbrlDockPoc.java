@@ -23,7 +23,7 @@ import com.xbrldock.utils.XbrlDockUtilsJson;
 public class XbrlDockPoc extends XbrlDock implements XbrlDockPocConsts {
 	File testRoot = new File("/Volumes/Giskard_ext/work/XBRL/store/xbrl.org/reports/lei");
 	File localRoot = new File("temp/reports");
-	
+
 	XbrlDockTaxonomyManager taxMgr;
 	XbrlDockConnXbrlOrg esefConn;
 
@@ -38,8 +38,7 @@ public class XbrlDockPoc extends XbrlDock implements XbrlDockPocConsts {
 		Map cfg = XbrlDockUtils.toFlatMap(XBRLDOCK_PREFIX, XBRLDOCK_SEP_PATH, cfgData);
 
 		initEnv(XBRLDOCK_PREFIX, args, cfg);
-		
-		taxMgr = new XbrlDockTaxonomyManager("ext/XBRLDock/urlcache");
+
 		esefConn = new XbrlDockConnXbrlOrg("sources/xbrl.org", "ext/XBRLDock/sources/xbrl.org");
 	}
 
@@ -64,7 +63,8 @@ public class XbrlDockPoc extends XbrlDock implements XbrlDockPocConsts {
 
 		String mode = "";
 
-		 mode = "esef";
+		mode = "taxonomy";
+//		 mode = "esef";
 //		 mode = "xhtmlRec";
 //		mode = "jsonRec";
 //		 mode = "jsonSingle";
@@ -72,8 +72,7 @@ public class XbrlDockPoc extends XbrlDock implements XbrlDockPocConsts {
 
 		switch (mode) {
 		case "xhtmlSingle":
-			loadReport("549300EW945NUS7PK214-2022-12-31-en/reports/549300EW945NUS7PK214-2022-12-31-en.xhtml", xhtmlParser,
-					dh);
+			loadReport("549300EW945NUS7PK214-2022-12-31-en/reports/549300EW945NUS7PK214-2022-12-31-en.xhtml", xhtmlParser, dh);
 			break;
 		case "jsonSingle":
 			loadReport("549300EW945NUS7PK214-2022-12-31-en.json", jsonParser, dh);
@@ -87,10 +86,14 @@ public class XbrlDockPoc extends XbrlDock implements XbrlDockPocConsts {
 			loadReportRec(jsonFilter, jsonParser, dh);
 			break;
 		case "esef":
+			taxMgr = new XbrlDockTaxonomyManager("ext/XBRLDock/urlcache");
 			esefConn.test();
-			
-			taxMgr.getTaxonomies(esefConn, "549300EW945NUS7PK214-2022-12-31-ESEF-NO-0");
-			
+			break;
+		case "taxonomy":
+
+			taxMgr = new XbrlDockTaxonomyManager("../../urlCache");
+			taxMgr.loadTaxonomy(null, "https://xbrl.ifrs.org/taxonomy/2024-03-27/full_ifrs_entry_point_2024-03-27.xsd");
+
 			break;
 		default:
 			return true;
@@ -99,8 +102,7 @@ public class XbrlDockPoc extends XbrlDock implements XbrlDockPocConsts {
 		return false;
 	}
 
-	void loadReportRec(FileFilter filter, ReportFormatHandler fh, ReportDataHandler dh)
-			throws Exception, IOException, FileNotFoundException {
+	void loadReportRec(FileFilter filter, ReportFormatHandler fh, ReportDataHandler dh) throws Exception, IOException, FileNotFoundException {
 
 		XbrlDockUtilsFile.FileProcessor processor = new XbrlDockUtilsFile.FileProcessor() {
 			@Override
@@ -121,8 +123,7 @@ public class XbrlDockPoc extends XbrlDock implements XbrlDockPocConsts {
 		XbrlDock.log(EventLevel.Info, "Loaded", count, "files in", System.currentTimeMillis() - ts, "msec.");
 	}
 
-	void loadReport(String localFile, ReportFormatHandler fh, ReportDataHandler dh)
-			throws Exception, IOException, FileNotFoundException {
+	void loadReport(String localFile, ReportFormatHandler fh, ReportDataHandler dh) throws Exception, IOException, FileNotFoundException {
 		File f = new File(localRoot, localFile);
 
 		if (!f.isFile()) {
@@ -132,8 +133,7 @@ public class XbrlDockPoc extends XbrlDock implements XbrlDockPocConsts {
 		}
 	}
 
-	void loadReport(File f, ReportFormatHandler fh, ReportDataHandler dh)
-			throws Exception, IOException, FileNotFoundException {
+	void loadReport(File f, ReportFormatHandler fh, ReportDataHandler dh) throws Exception, IOException, FileNotFoundException {
 		try (FileInputStream fr = new FileInputStream(f)) {
 			dh.beginReport(f.getCanonicalPath());
 			fh.loadReport(fr, dh);

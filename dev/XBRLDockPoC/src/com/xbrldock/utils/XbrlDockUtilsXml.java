@@ -3,12 +3,17 @@ package com.xbrldock.utils;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.InputStream;
+import java.util.Map;
+import java.util.TreeMap;
 
 import javax.xml.parsers.DocumentBuilder;
 import javax.xml.parsers.DocumentBuilderFactory;
 import javax.xml.parsers.ParserConfigurationException;
 
 import org.w3c.dom.Document;
+import org.w3c.dom.Element;
+import org.w3c.dom.NamedNodeMap;
+import org.w3c.dom.Node;
 import org.xml.sax.EntityResolver;
 
 import com.xbrldock.XbrlDockException;
@@ -31,6 +36,29 @@ public class XbrlDockUtilsXml implements XbrlDockUtilsConsts {
 				return XbrlDockException.wrap(e);
 			}
 		};
+	};
+	
+	
+	public static Map<String, String> readAtts(Element e, Map<String, String> target) throws Exception {
+		if ( null == target ) {
+			target = new TreeMap<String, String>();
+		} else {
+			target.clear();
+		}
+		
+		
+		NamedNodeMap nm = e.getAttributes();
+		int nc = (null == nm) ? 0 : nm.getLength();
+		
+		for ( int i = nc; i-->0; ) {
+			Node node = nm.item(i);
+			String an = node.getNodeName();
+			String av = node.getNodeValue();
+			
+			target.put(an, av);
+		}
+		
+		return target;
 	};
 	
 	
