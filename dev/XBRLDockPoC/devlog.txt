@@ -1,3 +1,55 @@
+*** 20240917 ***
+
+2024-09-17T17_53_39 Trace Read filing count, 9261, Entity count, 3505, Language count, 34
+...
+2024-09-17T17_53_40 Info Total item count, 7701, Loaded file count, 453, not processed, [META-INF/catalog.xml, META-INF/taxonomyPackage.xml]
+2024-09-17T17_53_40 Info LinkTypeCounts {	
+	 --- ref:Clause	445	
+	 --- ref:IssueDate	2561	
+	 --- ref:Name	2561	
+	 --- ref:Note	83	
+	 --- ref:Number	1986	
+	 --- ref:Paragraph	2426	
+	 --- ref:Section	90	
+	 --- ref:Subparagraph	1815	
+	 --- ref:Subsection	30	
+	 --- ref:URI	2515	
+	 --- ref:URIDate	2515	
+	arc --- gen:arc	512	
+	arc --- link:calculationArc	1786	
+	arc --- link:definitionArc	4643	
+	arc --- link:labelArc	16845	
+	arc --- link:presentationArc	7914	
+	arc --- link:referenceArc	7077	
+	extended --- gen:link	84	
+	extended --- link:calculationLink	67	
+	extended --- link:definitionLink	193	
+	extended --- link:labelLink	15	
+	extended --- link:presentationLink	114	
+	extended --- link:referenceLink	40	
+	locator --- link:loc	35840	
+	resource --- label:label	257	
+	resource --- link:label	16845	
+	resource --- link:reference	2515	
+	resource --- reference:reference	46	
+	simple --- link:arcroleRef	378	
+	simple --- link:roleRef	673
+ }
+2024-09-17T17_53_40 Info ArcRoleCounts {	
+	 <TOTAL> 	38777	
+	all	179	
+	concept-label	16845	
+	concept-reference	7077	
+	dimension-default	168	
+	dimension-domain	338	
+	domain-member	3631	
+	element-label	257	
+	element-reference	255	
+	hypercube-dimension	327	
+	parent-child	7914	
+	summation-item	1786
+ }
+
 *** 20240910 ***
 
 ext/XBRLDock/sources/xbrl.org/filings/lei/d4/25/529900YYR637SPJ0JR59/529900YYR637SPJ0JR59-2022-12-31-ESEF-HU-0/529900YYR637SPJ0JR59-2022-12-31/META-INF/taxonomyPackage.xml (No such file or directory)

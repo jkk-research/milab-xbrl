@@ -12,6 +12,7 @@ import java.util.zip.GZIPInputStream;
 
 import org.apache.commons.compress.utils.IOUtils;
 
+import com.xbrldock.XbrlDock;
 import com.xbrldock.XbrlDockException;
 
 public class XbrlDockUtilsNet implements XbrlDockUtilsConsts {
@@ -51,6 +52,8 @@ public class XbrlDockUtilsNet implements XbrlDockUtilsConsts {
 	}
 
 	public static void download(String url, File file, String... headers) throws Exception {
+		XbrlDock.log(EventLevel.Trace, "Downloading url", url, "to file", file.getCanonicalPath());
+
 		HttpURLConnection conn = connect(url, headers);
 		
 		String redirect = conn.getHeaderField("Location");

@@ -24,6 +24,7 @@ public interface XbrlDockConsts {
 	String XBRLDOCK_EXT_XHTML = ".xhtml";
 	String XBRLDOCK_EXT_HTML = ".html";
 	String XBRLDOCK_EXT_XBRL = ".xbrl";
+	String XBRLDOCK_EXT_SCHEMA = ".xsd";
 	
 	String XBRLDOCK_FNAME_METAINF = "META-INF";
 	String XBRLDOCK_FNAME_REPORTS = "reports";

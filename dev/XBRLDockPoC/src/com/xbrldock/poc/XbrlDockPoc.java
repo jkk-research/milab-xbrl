@@ -91,8 +91,10 @@ public class XbrlDockPoc extends XbrlDock implements XbrlDockPocConsts {
 			break;
 		case "taxonomy":
 
-			taxMgr = new XbrlDockTaxonomyManager("../../urlCache");
-			taxMgr.loadTaxonomy(null, "https://xbrl.ifrs.org/taxonomy/2024-03-27/full_ifrs_entry_point_2024-03-27.xsd");
+			String cacheRoot = "../../urlCache";
+			taxMgr = new XbrlDockTaxonomyManager(cacheRoot);
+			File fMetaInf = new File(cacheRoot + "/xbrl.ifrs.org/taxonomy/2024-03-27/" + XBRLDOCK_FNAME_METAINF);
+			taxMgr.loadTaxonomy(fMetaInf);//, "https://xbrl.ifrs.org/taxonomy/2024-03-27/full_ifrs_entry_point_2024-03-27.xsd");
 
 			break;
 		default:
