@@ -19,15 +19,15 @@ import org.xml.sax.EntityResolver;
 import com.xbrldock.XbrlDockException;
 
 public class XbrlDockUtilsXml implements XbrlDockUtilsConsts {
-	
+
 	private static DocumentBuilderFactory dbf = DocumentBuilderFactory.newInstance();
-	
+
 	private static EntityResolver DEF_ENTITY_RESOLVER;
-	
+
 	public static void setDefEntityResolver(EntityResolver er) {
 		DEF_ENTITY_RESOLVER = er;
 	}
-	
+
 	private static ThreadLocal<DocumentBuilder> tdb = new ThreadLocal<DocumentBuilder>() {
 		protected DocumentBuilder initialValue() {
 			try {
@@ -37,44 +37,48 @@ public class XbrlDockUtilsXml implements XbrlDockUtilsConsts {
 			}
 		};
 	};
-	
-	
+
 	public static Map<String, String> readAtts(Element e, Map<String, String> target) throws Exception {
-		if ( null == target ) {
+		if (null == target) {
 			target = new TreeMap<String, String>();
 		} else {
 			target.clear();
 		}
-		
-		
+
 		NamedNodeMap nm = e.getAttributes();
 		int nc = (null == nm) ? 0 : nm.getLength();
-		
-		for ( int i = nc; i-->0; ) {
+
+		for (int i = nc; i-- > 0;) {
 			Node node = nm.item(i);
 			String an = node.getNodeName();
-			String av = node.getNodeValue();
 			
-			target.put(an, av);
+			if ( "#text".equals(an)) {
+				continue;
+			}
+
+			String av = node.getNodeValue().trim();
+
+			if (!XbrlDockUtils.isEmpty(av)) {
+				target.put(an, av);
+			}
 		}
-		
+
 		return target;
 	};
-	
-	
+
 	public static Document parseDoc(InputStream is) throws Exception {
 		DocumentBuilder db = tdb.get();
 		db.reset();
-		
+
 		db.setEntityResolver(DEF_ENTITY_RESOLVER);
-		
+
 		return db.parse(is);
 	}
-	
+
 	public static Document parseDoc(File f) throws Exception {
-		try ( FileInputStream fis = new FileInputStream(f) ) {
+		try (FileInputStream fis = new FileInputStream(f)) {
 			return parseDoc(fis);
 		}
 	}
-	
+
 }

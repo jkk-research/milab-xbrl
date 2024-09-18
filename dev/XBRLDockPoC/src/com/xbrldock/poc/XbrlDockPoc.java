@@ -14,6 +14,7 @@ import com.xbrldock.dev.XbrlDockDevReportDump;
 import com.xbrldock.poc.conn.xbrlorg.XbrlDockConnXbrlOrg;
 import com.xbrldock.poc.format.XbrlDockFormatJson;
 import com.xbrldock.poc.format.XbrlDockFormatXhtml;
+import com.xbrldock.poc.taxonomy.XbrlDockTaxonomy;
 import com.xbrldock.poc.taxonomy.XbrlDockTaxonomyManager;
 import com.xbrldock.utils.XbrlDockUtils;
 import com.xbrldock.utils.XbrlDockUtilsFile;
@@ -86,15 +87,18 @@ public class XbrlDockPoc extends XbrlDock implements XbrlDockPocConsts {
 			loadReportRec(jsonFilter, jsonParser, dh);
 			break;
 		case "esef":
-			taxMgr = new XbrlDockTaxonomyManager("ext/XBRLDock/urlcache");
+			taxMgr = new XbrlDockTaxonomyManager("temp/taxonomy", "ext/XBRLDock/urlcache");
 			esefConn.test();
 			break;
 		case "taxonomy":
 
 			String cacheRoot = "../../urlCache";
-			taxMgr = new XbrlDockTaxonomyManager(cacheRoot);
+			taxMgr = new XbrlDockTaxonomyManager("temp/taxonomy", cacheRoot);
+			
 			File fMetaInf = new File(cacheRoot + "/xbrl.ifrs.org/taxonomy/2024-03-27/" + XBRLDOCK_FNAME_METAINF);
-			taxMgr.loadTaxonomy(fMetaInf);//, "https://xbrl.ifrs.org/taxonomy/2024-03-27/full_ifrs_entry_point_2024-03-27.xsd");
+			XbrlDockTaxonomy txIfrs2024 = taxMgr.loadTaxonomy(fMetaInf);//, "https://xbrl.ifrs.org/taxonomy/2024-03-27/full_ifrs_entry_point_2024-03-27.xsd");
+			
+			txIfrs2024.getRes("en");
 
 			break;
 		default:
