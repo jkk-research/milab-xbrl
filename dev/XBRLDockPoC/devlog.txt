@@ -1,3 +1,12 @@
+*** 20240919 ***
+
+with single cache
+2024-09-19T10_16_04 Info Total item count, 7692, Loaded file count, 453, not processed, [META-INF/catalog.xml, META-INF/taxonomyPackage.xml]
+
+with double item cache
+2024-09-18T15_54_45 Info Total item count, 7693, Loaded file count, 453, not processed, [META-INF/catalog.xml, META-INF/taxonomyPackage.xml]
+
+
 *** 20240917 ***
 
 2024-09-17T17_53_39 Trace Read filing count, 9261, Entity count, 3505, Language count, 34

@@ -14,6 +14,7 @@ import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 import org.w3c.dom.NamedNodeMap;
 import org.w3c.dom.Node;
+import org.w3c.dom.NodeList;
 import org.xml.sax.EntityResolver;
 
 import com.xbrldock.XbrlDockException;
@@ -41,8 +42,6 @@ public class XbrlDockUtilsXml implements XbrlDockUtilsConsts {
 	public static Map<String, String> readAtts(Element e, Map<String, String> target) throws Exception {
 		if (null == target) {
 			target = new TreeMap<String, String>();
-		} else {
-			target.clear();
 		}
 
 		NamedNodeMap nm = e.getAttributes();
@@ -52,10 +51,6 @@ public class XbrlDockUtilsXml implements XbrlDockUtilsConsts {
 			Node node = nm.item(i);
 			String an = node.getNodeName();
 			
-			if ( "#text".equals(an)) {
-				continue;
-			}
-
 			String av = node.getNodeValue().trim();
 
 			if (!XbrlDockUtils.isEmpty(av)) {
@@ -65,6 +60,31 @@ public class XbrlDockUtilsXml implements XbrlDockUtilsConsts {
 
 		return target;
 	};
+	
+	public static Map<String, String> readChildNodes(Element e, Map<String, String> target) {
+		if (null == target) {
+			target = new TreeMap<String, String>();
+		}
+
+		NodeList cl;
+		cl = e.getChildNodes();
+		for (int ii = cl.getLength(); ii-- > 0;) {
+			Node cn = cl.item(ii);
+			String nodeName = cn.getNodeName();
+			String nodeVal = cn.getTextContent();
+			if ( null != nodeVal ) {
+				nodeVal = nodeVal.trim();
+			}
+			if (!XbrlDockUtils.isEmpty(nodeVal)) {
+				String v = (String) target.get(nodeName);
+
+				v = (null == v) ? nodeVal : v + " " + nodeVal;
+				target.put(nodeName, v);
+			}
+		}
+		
+		return target;
+	}
 
 	public static Document parseDoc(InputStream is) throws Exception {
 		DocumentBuilder db = tdb.get();

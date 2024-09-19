@@ -31,7 +31,7 @@ public class XbrlDockTaxonomy implements XbrlDockTaxonomyConsts {
 	final String id;
 	final File fTaxDir;
 
-	Map<String, Map<String, Object>> itemCache = new TreeMap<>();
+	Map<String, Object> itemCache = new TreeMap<>();
 	Map<String, Object> labels = new TreeMap<>();
 	ArrayList<Map> allRefs = new ArrayList<>();
 	Map<String, Set> refRefs = new TreeMap<>();
@@ -48,17 +48,7 @@ public class XbrlDockTaxonomy implements XbrlDockTaxonomyConsts {
 	XbrlDockDevCounter cntLinkTypes = new XbrlDockDevCounter("LinkTypeCounts", true);
 	XbrlDockDevCounter cntArcRoles = new XbrlDockDevCounter("ArcRoleCounts", true);
 
-	ItemCreator<Map> itemCacheCreator = new ItemCreatorSimple<Map>(TreeMap.class) {
-		@Override
-		public Map create(Object key, Object... hints) {
-			Map ret = super.create(key, hints);
-			schemas.add((String) key);
-			return ret;
-		}
-	};
-
 	boolean itemMapClosed;
-
 	ItemCreator<Map> itemCreator = new ItemCreatorSimple<Map>(TreeMap.class) {
 		@Override
 		public Map create(Object key, Object... hints) {
@@ -86,7 +76,7 @@ public class XbrlDockTaxonomy implements XbrlDockTaxonomyConsts {
 //			links = XbrlDockUtils.simpleGet(data, TaxonomyKeys.links);
 //			allRefs = XbrlDockUtils.simpleGet(data, TaxonomyKeys.references);
 //			refRefs = XbrlDockUtils.simpleGet(data, TaxonomyKeys.refLinks);
-//
+//			itemMapClosed = true;
 //		} else 
 		{
 			loadTaxonomy(fMetaInf);
@@ -97,7 +87,7 @@ public class XbrlDockTaxonomy implements XbrlDockTaxonomyConsts {
 			XbrlDockUtils.simpleSet(data, links, TaxonomyKeys.links);
 			XbrlDockUtils.simpleSet(data, allRefs, TaxonomyKeys.references);
 			XbrlDockUtils.simpleSet(data, refRefs, TaxonomyKeys.refLinks);
-			
+
 			XbrlDockUtilsFile.ensureDir(fTaxDir);
 
 			XbrlDockUtilsJson.writeJson(fData, data);
@@ -106,6 +96,7 @@ public class XbrlDockTaxonomy implements XbrlDockTaxonomyConsts {
 				File fRes = new File(fTaxDir, le.getKey() + RES_FNAME_POSTFIX);
 				XbrlDockUtilsJson.writeJson(fRes, le.getValue());
 			}
+
 		}
 	}
 
@@ -159,8 +150,9 @@ public class XbrlDockTaxonomy implements XbrlDockTaxonomyConsts {
 	public Map getItem(String itemRef, String id, String currPath) throws Exception {
 		String realRef = optExtendRef(itemRef, currPath);
 
-		Map m = XbrlDockUtils.safeGet(itemCache, realRef, itemCacheCreator);
-		m = XbrlDockUtils.safeGet(m, id, itemCreator, realRef);
+		optQueue(realRef);
+
+		Map m = XbrlDockUtils.safeGet(itemCache, id, itemCreator, realRef);
 
 		return m;
 	}
@@ -239,14 +231,7 @@ public class XbrlDockTaxonomy implements XbrlDockTaxonomyConsts {
 
 		loadQueue();
 
-		int allItems = 0;
-		for (Map.Entry<String, Map<String, Object>> ie : itemCache.entrySet()) {
-			int itemCount = ie.getValue().size();
-			allItems += itemCount;
-			XbrlDock.log(EventLevel.Info, ie.getKey(), itemCount);
-		}
-
-		XbrlDock.log(EventLevel.Info, "Total item count", allItems, "Loaded file count", loaded.size(), "not processed", allFiles);
+		XbrlDock.log(EventLevel.Info, "Total item count", itemCache.size(), "Loaded file count", loaded.size(), "not processed", allFiles);
 
 		XbrlDock.log(EventLevel.Info, cntLinkTypes);
 		XbrlDock.log(EventLevel.Info, cntArcRoles);
@@ -263,7 +248,6 @@ public class XbrlDockTaxonomy implements XbrlDockTaxonomyConsts {
 			String path = XbrlDockUtils.cutPostfix(schemaUrl, "/");
 
 			NodeList nl;
-			NodeList cl;
 			int nc;
 
 			nl = eSchema.getElementsByTagName("*");
@@ -296,23 +280,10 @@ public class XbrlDockTaxonomy implements XbrlDockTaxonomyConsts {
 					XbrlDockUtilsXml.readAtts(e, em);
 					break;
 				case "link:roleType":
-// 			if ( "ifrs-dim_2024-03-27_role-901000".equals(itemId)) {
-//				XbrlDock.log(EventLevel.Debug, "now");
-//			}
-
 					if (schemaUrl.startsWith(taxRoot)) {
 						em = getItem(schemaUrl, itemId, path);
 						XbrlDockUtilsXml.readAtts(e, em);
-
-						cl = e.getChildNodes();
-						for (int ii = cl.getLength(); ii-- > 0;) {
-							Node cn = cl.item(ii);
-							String nodeName = cn.getNodeName();
-							String v = (String) em.get(nodeName);
-
-							v = (null == v) ? cn.getNodeValue() : v + ", " + cn.getNodeValue();
-							em.put(nodeName, v);
-						}
+						XbrlDockUtilsXml.readChildNodes(e, em);
 					}
 					break;
 				}
@@ -329,20 +300,23 @@ public class XbrlDockTaxonomy implements XbrlDockTaxonomyConsts {
 
 	public void loadLinkbase(String url) throws Exception {
 
+		if (url.endsWith("810000.xml")) {
+			XbrlDock.log(EventLevel.Debug, url);
+		}
+
 		try (InputStream is = tmgr.resolveEntityStream("", url)) {
 			Element eRoot = XbrlDockUtilsXml.parseDoc(is).getDocumentElement();
 
 			String path = XbrlDockUtils.cutPostfix(url, "/");
 
 			NodeList nl;
-			NodeList cl;
 			int nc;
 
 			nl = eRoot.getElementsByTagName("*");
 			nc = nl.getLength();
 
 			Map<String, Object> content = new TreeMap<>();
-			List<Element> arcs = new ArrayList<>();
+			List<Map<String, String>> arcs = new ArrayList<>();
 
 			for (int idx = 0; idx < nc; ++idx) {
 				Element e = (Element) nl.item(idx);
@@ -352,6 +326,8 @@ public class XbrlDockTaxonomy implements XbrlDockTaxonomyConsts {
 				String label = e.getAttribute("xlink:label");
 
 				String lt = e.getAttribute("xlink:type");
+				Node role = e.getParentNode().getAttributes().getNamedItem("xlink:role");
+				String roleID = (null == role) ? "" : XbrlDockUtils.getPostfix(role.getTextContent(), "/");
 
 				Map em = null;
 
@@ -366,23 +342,17 @@ public class XbrlDockTaxonomy implements XbrlDockTaxonomyConsts {
 						em.put("value", e.getTextContent());
 						break;
 					case "reference":
-						Map rm = new TreeMap<String, String>();
-						cl = e.getChildNodes();
-						for (int ii = cl.getLength(); ii-- > 0;) {
-							Node cn = cl.item(ii);
-							String txt = cn.getTextContent().trim();
-							if (!XbrlDockUtils.isEmpty(txt)) {
-								rm.put(cn.getNodeName(), txt);
-							}
-						}
-						content.put(label, allRefs.size());
+						Map rm = XbrlDockUtilsXml.readChildNodes(e, null);
+						content.put(roleID + "_" + label, allRefs.size());
 						allRefs.add(rm);
 
 						break;
 					}
 					break;
 				case "arc":
-					arcs.add(e);
+					Map<String, String> am = XbrlDockUtilsXml.readAtts(e, null);
+					am.put("xlink:role", roleID);
+					arcs.add(am);
 					break;
 				case "extended":
 				case "simple":
@@ -397,28 +367,28 @@ public class XbrlDockTaxonomy implements XbrlDockTaxonomyConsts {
 				cntLinkTypes.add(lt + " --- " + tagName);
 
 				if (null != em) {
-					content.put(label, em);
+					content.put(roleID + "_" + label, em);
 				}
 			}
 
-			for (Element e : arcs) {
-				String ar = e.getAttribute("xlink:arcrole");
+			for (Map<String, String> am : arcs) {
+				String roleID = am.get("xlink:role");
+
+				String ar = am.get("xlink:arcrole");
 				ar = XbrlDockUtils.getPostfix(ar, "/");
 
 				cntArcRoles.add(ar);
 				cntArcRoles.add(" <TOTAL> ");
 
-				String fromId = e.getAttribute("xlink:from");
-				Map from = (Map) content.get(fromId);
-				String toId = e.getAttribute("xlink:to");
-				Object toVal = content.get(toId);
+				String fromId = am.get("xlink:from");
+				Map from = (Map) content.get(roleID + "_" + fromId);
+				String toId = am.get("xlink:to");
+				Object toVal = content.get(roleID + "_" + toId);
 				Map to = (toVal instanceof Map) ? (Map) toVal : null;
 
 				if ((null == from) || (null == toVal)) {
-					XbrlDock.log(EventLevel.Error, "Missing link endpoint", url, XbrlDockUtilsXml.readAtts(e, null));
-//					XbrlDockException.wrap(null, "Missing link endpoint", url, XbrlDockUtilsXml.readAtts(e, null));
-				} else {
-//					XbrlDock.log(EventLevel.Trace, "Link OK");
+//					XbrlDock.log(EventLevel.Error, "Missing link endpoint", url, am);
+					XbrlDockException.wrap(null, "Missing link endpoint", url, am);
 				}
 
 				switch (ar) {
@@ -440,20 +410,23 @@ public class XbrlDockTaxonomy implements XbrlDockTaxonomyConsts {
 				case "parent-child":
 				case "summation-item":
 
-					Map am = XbrlDockUtilsXml.readAtts(e, null);
-
 					if (null == to) {
 						XbrlDockException.wrap(null, "Both should be items", url, am);
 					}
-					Object idFrom = from.get("id");
-					Object idTo = to.get("id");
+					String idFrom = (String) from.get("id");
+					String idTo = (String) to.get("id");
 
-//					am.put("xlink:from", idFrom);
-					
 					am.remove("xlink:type");
 					am.remove("xlink:arcrole");
 					am.remove("xlink:from");
 					am.put("xlink:to", idTo);
+					am.put("xbrlDock:url", url.substring(taxRoot.length()));
+
+//					if ("ias_1_2024-03-27_role-810000".equals(roleID)) {
+//						if ("ifrs-full_CapitalRequirementsAxis".equals(idFrom)) {
+//							XbrlDock.log(EventLevel.Debug, "now");
+//						}
+//					}
 
 					Map lm = XbrlDockUtils.safeGet(links, idFrom, MAP_CREATOR);
 					ArrayList ls = XbrlDockUtils.safeGet(lm, ar, ARRAY_CREATOR);
@@ -465,7 +438,7 @@ public class XbrlDockTaxonomy implements XbrlDockTaxonomyConsts {
 
 					break;
 				default:
-					XbrlDockException.wrap(null, "Unhandled arcrole", url, XbrlDockUtilsXml.readAtts(e, null));
+					XbrlDockException.wrap(null, "Unhandled arcrole", url, am);
 					break;
 				}
 			}
