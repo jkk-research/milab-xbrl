@@ -31,13 +31,11 @@ public class XbrlDockTaxonomy implements XbrlDockTaxonomyConsts {
 	final String id;
 	final File fTaxDir;
 
-	Map<String, Object> itemCache = new TreeMap<>();
+	Map<String, Object> items = new TreeMap<>();
 	Map<String, Object> labels = new TreeMap<>();
 	ArrayList<Map> allRefs = new ArrayList<>();
 	Map<String, Set> refRefs = new TreeMap<>();
-	Map<String, Object> links = new TreeMap<>();
-
-	Map<String, Object> backLinks = new TreeMap<>();
+	ArrayList<Map<String, String>> links = new ArrayList<>();
 
 	String taxRoot;
 	private Set<String> schemas = new TreeSet<>();
@@ -83,23 +81,31 @@ public class XbrlDockTaxonomy implements XbrlDockTaxonomyConsts {
 
 			Map data = new HashMap();
 
-			XbrlDockUtils.simpleSet(data, itemCache, TaxonomyKeys.items);
+			XbrlDockUtils.simpleSet(data, items, TaxonomyKeys.items);
 			XbrlDockUtils.simpleSet(data, links, TaxonomyKeys.links);
 			XbrlDockUtils.simpleSet(data, allRefs, TaxonomyKeys.references);
 			XbrlDockUtils.simpleSet(data, refRefs, TaxonomyKeys.refLinks);
 
 			XbrlDockUtilsFile.ensureDir(fTaxDir);
 
-			XbrlDockUtilsJson.writeJson(fData, data);
-
-			for (Map.Entry<String, Object> le : labels.entrySet()) {
-				File fRes = new File(fTaxDir, le.getKey() + RES_FNAME_POSTFIX);
-				XbrlDockUtilsJson.writeJson(fRes, le.getValue());
-			}
+//			XbrlDockUtilsJson.writeJson(fData, data);
+//
+//			for (Map.Entry<String, Object> le : labels.entrySet()) {
+//				File fRes = new File(fTaxDir, le.getKey() + RES_FNAME_POSTFIX);
+//				XbrlDockUtilsJson.writeJson(fRes, le.getValue());
+//			}
 
 		}
 	}
 
+	public Map<String, Object> getItem(String id) {
+		return (Map<String, Object>) items.get(id);
+	}
+		
+	public Iterable<Map<String, String>> getLinks() {
+		return links;
+	}
+		
 	public Map<String, Object> getRes(String lang) throws Exception {
 		Map<String, Object> res = XbrlDockUtils.safeGet(labels, lang, new XbrlDockUtils.ItemCreator<Map<String, Object>>() {
 			@Override
@@ -152,7 +158,7 @@ public class XbrlDockTaxonomy implements XbrlDockTaxonomyConsts {
 
 		optQueue(realRef);
 
-		Map m = XbrlDockUtils.safeGet(itemCache, id, itemCreator, realRef);
+		Map m = XbrlDockUtils.safeGet(items, id, itemCreator, realRef);
 
 		return m;
 	}
@@ -231,7 +237,7 @@ public class XbrlDockTaxonomy implements XbrlDockTaxonomyConsts {
 
 		loadQueue();
 
-		XbrlDock.log(EventLevel.Info, "Total item count", itemCache.size(), "Loaded file count", loaded.size(), "not processed", allFiles);
+		XbrlDock.log(EventLevel.Info, "Total item count", items.size(), "Loaded file count", loaded.size(), "not processed", allFiles);
 
 		XbrlDock.log(EventLevel.Info, cntLinkTypes);
 		XbrlDock.log(EventLevel.Info, cntArcRoles);
@@ -417,8 +423,8 @@ public class XbrlDockTaxonomy implements XbrlDockTaxonomyConsts {
 					String idTo = (String) to.get("id");
 
 					am.remove("xlink:type");
-					am.remove("xlink:arcrole");
-					am.remove("xlink:from");
+					am.put("xlink:arcrole", ar);
+					am.put("xlink:from", idFrom);
 					am.put("xlink:to", idTo);
 					am.put("xbrlDock:url", url.substring(taxRoot.length()));
 
@@ -428,13 +434,10 @@ public class XbrlDockTaxonomy implements XbrlDockTaxonomyConsts {
 //						}
 //					}
 
-					Map lm = XbrlDockUtils.safeGet(links, idFrom, MAP_CREATOR);
-					ArrayList ls = XbrlDockUtils.safeGet(lm, ar, ARRAY_CREATOR);
-					ls.add(am);
-
-					lm = XbrlDockUtils.safeGet(backLinks, idTo, MAP_CREATOR);
-					ls = XbrlDockUtils.safeGet(lm, ar, ARRAY_CREATOR);
-					ls.add(am);
+					links.add(am);
+//					Map lm = XbrlDockUtils.safeGet(links, idFrom, MAP_CREATOR);
+//					ArrayList ls = XbrlDockUtils.safeGet(lm, ar, ARRAY_CREATOR);
+//					ls.add(am);
 
 					break;
 				default:

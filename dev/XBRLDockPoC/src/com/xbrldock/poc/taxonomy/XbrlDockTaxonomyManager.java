@@ -29,7 +29,9 @@ public class XbrlDockTaxonomyManager implements XbrlDockTaxonomyConsts {
 		XbrlDockUtilsFile.ensureDir(taxomonyStoreRoot);
 	}
 
-	public XbrlDockTaxonomy loadTaxonomy(File fMetaInf, String... urls) throws Exception {
+	public XbrlDockTaxonomy loadTaxonomy(String taxonomyId, String... urls) throws Exception {
+		
+		File fMetaInf = new File(urlCache.cacheRoot, taxonomyId + "/" + XBRLDOCK_FNAME_METAINF);
 		
 		File fTax = new File(fMetaInf, XBRLDOCK_FNAME_TAXPACK);
 		Element eTaxPack = XbrlDockUtilsXml.parseDoc(fTax).getDocumentElement();

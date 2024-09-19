@@ -14,6 +14,7 @@ import com.xbrldock.dev.XbrlDockDevReportDump;
 import com.xbrldock.poc.conn.xbrlorg.XbrlDockConnXbrlOrg;
 import com.xbrldock.poc.format.XbrlDockFormatJson;
 import com.xbrldock.poc.format.XbrlDockFormatXhtml;
+import com.xbrldock.poc.gui.XbrlDockGuiApp;
 import com.xbrldock.poc.taxonomy.XbrlDockTaxonomy;
 import com.xbrldock.poc.taxonomy.XbrlDockTaxonomyManager;
 import com.xbrldock.utils.XbrlDockUtils;
@@ -22,11 +23,29 @@ import com.xbrldock.utils.XbrlDockUtilsJson;
 
 @SuppressWarnings({ "unchecked", "rawtypes" })
 public class XbrlDockPoc extends XbrlDock implements XbrlDockPocConsts {
-	File testRoot = new File("/Volumes/Giskard_ext/work/XBRL/store/xbrl.org/reports/lei");
-	File localRoot = new File("temp/reports");
+	public final File testRoot = new File("/Volumes/Giskard_ext/work/XBRL/store/xbrl.org/reports/lei");
+	public final File localRoot = new File("temp/reports");
+	public final String cacheRoot = "../../urlCache";
 
 	XbrlDockTaxonomyManager taxMgr;
 	XbrlDockConnXbrlOrg esefConn;
+	
+	public static void main(String[] args) {
+		try {
+			XbrlDockPoc xbrlDock = new XbrlDockPoc();
+
+			xbrlDock.initEnv(args);
+
+			xbrlDock.test();
+		} catch (Throwable t) {
+			XbrlDock.log(EventLevel.Exception, t);
+		}
+	}
+	
+	public XbrlDockTaxonomyManager getTaxMgr() {
+		return taxMgr;
+	}
+
 
 	@Override
 	protected void handleLog(EventLevel level, Object... params) {
@@ -41,6 +60,9 @@ public class XbrlDockPoc extends XbrlDock implements XbrlDockPocConsts {
 		initEnv(XBRLDOCK_PREFIX, args, cfg);
 
 		esefConn = new XbrlDockConnXbrlOrg("sources/xbrl.org", "ext/XBRLDock/sources/xbrl.org");
+		
+		taxMgr = new XbrlDockTaxonomyManager("temp/taxonomy", cacheRoot);
+
 	}
 
 	public boolean test() throws Exception {
@@ -64,7 +86,8 @@ public class XbrlDockPoc extends XbrlDock implements XbrlDockPocConsts {
 
 		String mode = "";
 
-		mode = "taxonomy";
+		mode = "app";
+//		mode = "taxonomy";
 //		 mode = "esef";
 //		 mode = "xhtmlRec";
 //		mode = "jsonRec";
@@ -91,14 +114,16 @@ public class XbrlDockPoc extends XbrlDock implements XbrlDockPocConsts {
 			esefConn.test();
 			break;
 		case "taxonomy":
-
-			String cacheRoot = "../../urlCache";
-			taxMgr = new XbrlDockTaxonomyManager("temp/taxonomy", cacheRoot);
 			
-			File fMetaInf = new File(cacheRoot + "/xbrl.ifrs.org/taxonomy/2024-03-27/" + XBRLDOCK_FNAME_METAINF);
-			XbrlDockTaxonomy txIfrs2024 = taxMgr.loadTaxonomy(fMetaInf);//, "https://xbrl.ifrs.org/taxonomy/2024-03-27/full_ifrs_entry_point_2024-03-27.xsd");
+			XbrlDockTaxonomy txIfrs2024 = taxMgr.loadTaxonomy("xbrl.ifrs.org/taxonomy/2024-03-27");
 			
 			txIfrs2024.getRes("en");
+
+			break;
+		case "app":
+			XbrlDockGuiApp frame = new XbrlDockGuiApp(this);
+
+			frame.showTaxonomy("/xbrl.ifrs.org/taxonomy/2024-03-27/");
 
 			break;
 		default:

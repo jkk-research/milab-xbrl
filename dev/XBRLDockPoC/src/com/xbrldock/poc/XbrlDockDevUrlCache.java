@@ -15,7 +15,7 @@ import com.xbrldock.utils.XbrlDockUtilsFile;
 import com.xbrldock.utils.XbrlDockUtilsNet;
 
 public class XbrlDockDevUrlCache implements EntityResolver {
-		final File cacheRoot;
+		public final File cacheRoot;
 		
 		public XbrlDockDevUrlCache(String cacheRoot) {
 			this.cacheRoot = new File(cacheRoot);
