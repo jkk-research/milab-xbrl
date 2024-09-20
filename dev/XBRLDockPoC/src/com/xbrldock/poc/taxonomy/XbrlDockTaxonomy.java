@@ -3,7 +3,6 @@ package com.xbrldock.poc.taxonomy;
 import java.io.File;
 import java.io.InputStream;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -31,13 +30,17 @@ public class XbrlDockTaxonomy implements XbrlDockTaxonomyConsts {
 	final String id;
 	final File fTaxDir;
 
+	Map<String, Map> entryPoints = new TreeMap<>();
 	Map<String, Object> items = new TreeMap<>();
 	Map<String, Object> labels = new TreeMap<>();
 	ArrayList<Map> allRefs = new ArrayList<>();
 	Map<String, Set> refRefs = new TreeMap<>();
 	ArrayList<Map<String, String>> links = new ArrayList<>();
+	
+	String lang;
 
 	String taxRoot;
+
 	private Set<String> schemas = new TreeSet<>();
 	Set<String> linkbases = new TreeSet<String>();
 	private Set<String> loaded = new TreeSet<>();
@@ -97,15 +100,56 @@ public class XbrlDockTaxonomy implements XbrlDockTaxonomyConsts {
 
 		}
 	}
+	
+	public void setLang(String lang) {
+		this.lang = lang;
+	}
+	
+	public String toString(String itemId) {
+		String ret = (null == lang) ? null : XbrlDockUtils.simpleGet(labels, lang, itemId, "label");
+		return (null == ret) ? itemId : ret;
+	}
+
+	public Iterable<String> getEntryPoints() {
+		return entryPoints.keySet();
+	}
+
+	public Iterable<String> getLanguages() {
+		return labels.keySet();
+	}
+
+	public Iterable<String> getItemIds() {
+		return items.keySet();
+	}
+
+	public Map<String, Object> getItemLabels(String id, String lang) {
+		return XbrlDockUtils.simpleGet(labels, lang, id);
+	}
+
+	public Iterable<Map<String, Object>> getItemRefs(String id) {
+		Set<Integer> ri = refRefs.get(id);
+
+		if (null == ri) {
+			return null;
+		} else {
+			ArrayList<Map<String, Object>> ret = new ArrayList<>();
+
+			for (Integer i : ri) {
+				ret.add(allRefs.get((int) i));
+			}
+
+			return ret;
+		}
+	}
 
 	public Map<String, Object> getItem(String id) {
 		return (Map<String, Object>) items.get(id);
 	}
-		
+
 	public Iterable<Map<String, String>> getLinks() {
 		return links;
 	}
-		
+
 	public Map<String, Object> getRes(String lang) throws Exception {
 		Map<String, Object> res = XbrlDockUtils.safeGet(labels, lang, new XbrlDockUtils.ItemCreator<Map<String, Object>>() {
 			@Override
@@ -163,75 +207,74 @@ public class XbrlDockTaxonomy implements XbrlDockTaxonomyConsts {
 		return m;
 	}
 
-	public void loadTaxonomy(File fMetaInf, String... urls) throws Exception {
-		List<String> u;
-
-		if (0 == urls.length) {
-			u = new ArrayList<String>();
-
-			if (!fMetaInf.isDirectory()) {
-				XbrlDock.log(EventLevel.Error, "Missing META_INF folder", fMetaInf.getCanonicalPath());
-				return;
-			}
-
-			File p = fMetaInf.getParentFile();
-			int pp = p.getCanonicalPath().length() + 1;
-
-			allFiles.clear();
-			XbrlDockUtilsFile.processFiles(p, new XbrlDockUtilsFile.FileProcessor() {
-				@Override
-				public boolean process(File item, ProcessorAction action) throws Exception {
-					if (action == ProcessorAction.Process) {
-						if (!item.isHidden()) {
-							allFiles.add(item.getCanonicalPath().substring(pp));
-						}
-					}
-					return true;
-				}
-			});
-
-			NodeList nl;
-			int nc;
-
-			File fCat = new File(fMetaInf, XBRLDOCK_FNAME_CATALOG);
-			Element eCatalog = XbrlDockUtilsXml.parseDoc(fCat).getDocumentElement();
-
-			nl = eCatalog.getElementsByTagName("*");
-			nc = nl.getLength();
-
-			for (int idx = 0; idx < nc; ++idx) {
-				Element e = (Element) nl.item(idx);
-				String tagName = e.getTagName();
-
-				switch (tagName) {
-				case "rewriteURI":
-					taxRoot = e.getAttribute("uriStartString");
-					break;
-				}
-			}
-
-			File fTax = new File(fMetaInf, XBRLDOCK_FNAME_TAXPACK);
-			Element eTaxPack = XbrlDockUtilsXml.parseDoc(fTax).getDocumentElement();
-
-			nl = eTaxPack.getElementsByTagName("*");
-			nc = nl.getLength();
-
-			for (int idx = 0; idx < nc; ++idx) {
-				Element e = (Element) nl.item(idx);
-				String tagName = e.getTagName();
-
-				switch (tagName) {
-				case "tp:entryPointDocument":
-					u.add(e.getAttribute("href"));
-					break;
-				}
-			}
-
-		} else {
-			u = Arrays.asList(urls);
+	public void loadTaxonomy(File fMetaInf) throws Exception {
+//		if (0 == urls.length) {
+		if (!fMetaInf.isDirectory()) {
+			XbrlDock.log(EventLevel.Error, "Missing META_INF folder", fMetaInf.getCanonicalPath());
+			return;
 		}
 
-		for (String schemaUrl : u) {
+		File p = fMetaInf.getParentFile();
+		int pp = p.getCanonicalPath().length() + 1;
+
+		allFiles.clear();
+		XbrlDockUtilsFile.processFiles(p, new XbrlDockUtilsFile.FileProcessor() {
+			@Override
+			public boolean process(File item, ProcessorAction action) throws Exception {
+				if (action == ProcessorAction.Process) {
+					if (!item.isHidden()) {
+						allFiles.add(item.getCanonicalPath().substring(pp));
+					}
+				}
+				return true;
+			}
+		});
+
+		NodeList nl;
+		int nc;
+
+		File fCat = new File(fMetaInf, XBRLDOCK_FNAME_CATALOG);
+		Element eCatalog = XbrlDockUtilsXml.parseDoc(fCat).getDocumentElement();
+
+		nl = eCatalog.getElementsByTagName("*");
+		nc = nl.getLength();
+
+		for (int idx = 0; idx < nc; ++idx) {
+			Element e = (Element) nl.item(idx);
+			String tagName = e.getTagName();
+
+			switch (tagName) {
+			case "rewriteURI":
+				taxRoot = e.getAttribute("uriStartString");
+				break;
+			}
+		}
+
+		File fTax = new File(fMetaInf, XBRLDOCK_FNAME_TAXPACK);
+		Element eTaxPack = XbrlDockUtilsXml.parseDoc(fTax).getDocumentElement();
+
+		nl = eTaxPack.getElementsByTagName("*");
+		nc = nl.getLength();
+
+		for (int idx = 0; idx < nc; ++idx) {
+			Element e = (Element) nl.item(idx);
+			String tagName = e.getTagName();
+
+			switch (tagName) {
+			case "tp:entryPointDocument":
+				String epRef = e.getAttribute("href");
+				String epId = epRef.substring(taxRoot.length()) + 1;
+				epId = XbrlDockUtils.cutPostfix(epId, ".");
+				Map epMap = XbrlDockUtilsXml.readChildNodes((Element) e.getParentNode(), null);
+				epMap.put("href", epRef);
+				entryPoints.put(epId, epMap);
+				break;
+			}
+		}
+//		}
+
+		for (Map epMap : entryPoints.values()) {
+			String schemaUrl = (String) epMap.get("href");
 			loadSchema(schemaUrl);
 		}
 

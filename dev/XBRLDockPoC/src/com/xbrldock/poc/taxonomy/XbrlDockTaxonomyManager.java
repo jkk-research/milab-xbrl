@@ -49,7 +49,7 @@ public class XbrlDockTaxonomyManager implements XbrlDockTaxonomyConsts {
 //					t.loadTaxonomy(fMetaInf, urls);
 					return t;
 				} catch (Exception e) {
-					return XbrlDockException.wrap(e, "Taxonoly load error", key, urls);
+					return XbrlDockException.wrap(e, "Taxonomy load error", key, urls);
 				}
 			}
 		});

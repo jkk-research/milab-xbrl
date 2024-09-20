@@ -1,6 +1,7 @@
 package com.xbrldock.poc.gui;
 
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.Enumeration;
 import java.util.Map;
 import java.util.Set;
@@ -10,6 +11,7 @@ import java.util.TreeSet;
 import javax.swing.JTree;
 import javax.swing.tree.DefaultTreeModel;
 import javax.swing.tree.TreeNode;
+import javax.swing.tree.TreePath;
 
 import com.xbrldock.poc.XbrlDockPoc;
 import com.xbrldock.poc.taxonomy.XbrlDockTaxonomy;
@@ -19,11 +21,10 @@ import com.xbrldock.utils.XbrlDockUtils;
 public class XbrlDockGuiRoleTree extends JTree implements XbrlDockGuiConsts {
 	private static final long serialVersionUID = 1L;
 
-	XbrlDockPoc xbrlDock;
-
-	XbrlDockTaxonomy taxonomy;
-
 	private static final ArrayList<ItemNode> LEAF = new ArrayList<>();
+
+	XbrlDockPoc xbrlDock;
+	XbrlDockTaxonomy taxonomy;
 
 	class ItemNode implements TreeNode {
 
@@ -75,6 +76,20 @@ public class XbrlDockGuiRoleTree extends JTree implements XbrlDockGuiConsts {
 			return children;
 		}
 
+		void collectChildren(Collection<String> target) {
+			if (tnRoot == parent) {
+				for (Map<String, String> rl : roleLinks) {
+					target.add(rl.get("xlink:from"));
+					target.add(rl.get("xlink:to"));
+				}
+			} else {
+				target.add(id);
+				for (ItemNode c : optLoadChildren() ) {
+					c.collectChildren(target);
+				}
+			}
+		}
+
 		@Override
 		public TreeNode getChildAt(int childIndex) {
 			return optLoadChildren().get(childIndex);
@@ -112,7 +127,7 @@ public class XbrlDockGuiRoleTree extends JTree implements XbrlDockGuiConsts {
 
 		@Override
 		public String toString() {
-			return id;
+			return (null == taxonomy) ? id : taxonomy.toString(id);
 		}
 
 	}
@@ -127,7 +142,7 @@ public class XbrlDockGuiRoleTree extends JTree implements XbrlDockGuiConsts {
 		setModel(tm);
 	}
 
-	public void showTaxonomy(XbrlDockTaxonomy taxonomy) throws Exception {
+	public void setTaxonomy(XbrlDockTaxonomy taxonomy) throws Exception {
 
 		this.taxonomy = taxonomy;
 
@@ -167,12 +182,25 @@ public class XbrlDockGuiRoleTree extends JTree implements XbrlDockGuiConsts {
 					rn.children.add(new ItemNode(rootItem, rn, rn.roleLinks));
 				}
 			}
-			
+
 			tnRoot.children.add(rn);
 		}
 
 		tm.reload();
+		
+		invalidate();
+		repaint();
+	}
 
+	public Collection<String> getRelatedItems() {
+		Set<String> items = new TreeSet<>();
+
+		for (TreePath tp : getSelectionPaths()) {
+			ItemNode n = (ItemNode) tp.getLastPathComponent();
+			n.collectChildren(items);
+		}
+
+		return items;
 	}
 
 }
