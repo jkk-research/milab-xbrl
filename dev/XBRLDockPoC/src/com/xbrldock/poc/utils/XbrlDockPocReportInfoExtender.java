@@ -18,8 +18,8 @@ public class XbrlDockPocReportInfoExtender implements XbrlDockPocConsts, XbrlDoc
 
 	String repId;
 
-	Map<String, Map<XbrlFactKeys, Object>> unitDef = new TreeMap<>();
-	Map<String, Map<XbrlFactKeys, Object>> ctxDef = new TreeMap<>();
+	Map<String, Map<String, Object>> unitDef = new TreeMap<>();
+	Map<String, Map<String, Object>> ctxDef = new TreeMap<>();
 
 	public void setReportData(Map reportData) {
 		this.reportData = reportData;
@@ -36,44 +36,44 @@ public class XbrlDockPocReportInfoExtender implements XbrlDockPocConsts, XbrlDoc
 
 	@Override
 	public void addNamespace(String ref, String id) {
-		XbrlDockUtils.safeGet(reportData, XbrlFilingKeys.namespaces, MAP_CREATOR).put(ref, id);
+		XbrlDockUtils.safeGet(reportData, XDC_REPORT_TOKEN_namespaces, MAP_CREATOR).put(ref, id);
 	}
 
 	@Override
 	public void addTaxonomy(String tx) {
-		XbrlDockUtils.safeGet(reportData, XbrlFilingKeys.schemas, ARRAY_CREATOR).add(tx);
+		XbrlDockUtils.safeGet(reportData, XDC_REPORT_TOKEN_schemas, ARRAY_CREATOR).add(tx);
 	}
 
 	@Override
-	public String processSegment(XbrlReportSegment segment, Map<XbrlFactKeys, Object> data) {
+	public String processSegment(String segment, Map<String, Object> data) {
 		String ret = "";
 		String sVal;
 
 		switch (segment) {
-		case Unit:
-			ret = (String) data.get(XbrlFactKeys.unit);
+		case XDC_REP_SEG_Unit:
+			ret = (String) data.get(XDC_FACT_TOKEN_unit);
 			if (XbrlDockUtils.isEmpty(ret)) {
 				ret = "unit-" + unitDef.size();
 			}
-			unitDef.put(ret, new TreeMap<XbrlFactKeys, Object>(data));
+			unitDef.put(ret, new TreeMap<String, Object>(data));
 			break;
-		case Context:
-			ret = (String) data.get(XbrlFactKeys.context);
+		case XDC_REP_SEG_Context:
+			ret = (String) data.get(XDC_FACT_TOKEN_context);
 			if (XbrlDockUtils.isEmpty(ret)) {
 				ret = "ctx-" + ctxDef.size();
 			}
-			ctxDef.put(ret, new TreeMap<XbrlFactKeys, Object>(data));
+			ctxDef.put(ret, new TreeMap<String, Object>(data));
 			
 			
-			sVal = (String) data.get(XbrlFactKeys.instant);
+			sVal = (String) data.get(XDC_FACT_TOKEN_instant);
 			if (XbrlDockUtils.isEmpty(sVal)) {
-				String cs = (String) data.get(XbrlFactKeys.startDate);
+				String cs = (String) data.get(XDC_FACT_TOKEN_startDate);
 				
 				if ( (null == repStart) || (0 < repStart.compareTo(cs)) ) {
 					repStart = cs;
 				}
 				
-				String ce = (String) data.get(XbrlFactKeys.endDate);
+				String ce = (String) data.get(XDC_FACT_TOKEN_endDate);
 				if ( (null == repEnd) || (0 > repEnd.compareTo(ce)) ) {
 					repEnd = ce;
 				}
@@ -86,8 +86,8 @@ public class XbrlDockPocReportInfoExtender implements XbrlDockPocConsts, XbrlDoc
 				}
 			}
 			break;
-		case Fact:
-			ret = (String) data.get(XbrlFactKeys.id);
+		case XDC_REP_SEG_Fact:
+			ret = (String) data.get(XDC_FACT_TOKEN_id);
 			if (XbrlDockUtils.isEmpty(ret)) {
 				ret = "fact-" + (factCount++);
 			}
@@ -99,7 +99,7 @@ public class XbrlDockPocReportInfoExtender implements XbrlDockPocConsts, XbrlDoc
 
 	@Override
 	public void endReport() {
-		XbrlDockUtils.simpleSet(reportData, repStart, XbrlFilingKeys.startDate);
-		XbrlDockUtils.simpleSet(reportData, repEnd, XbrlFilingKeys.endDate);
+		reportData.put(XDC_REPORT_TOKEN_startDate, repStart);
+		reportData.put(XDC_REPORT_TOKEN_endDate, repEnd);
 	}
 }

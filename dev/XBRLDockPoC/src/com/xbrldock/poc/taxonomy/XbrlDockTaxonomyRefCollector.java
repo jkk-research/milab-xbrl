@@ -73,7 +73,7 @@ public class XbrlDockTaxonomyRefCollector implements XbrlDockTaxonomyConsts, Xbr
 	}
 
 	@Override
-	public String processSegment(XbrlReportSegment segment, Map<XbrlFactKeys, Object> data) {
+	public String processSegment(String segment, Map<String, Object> data) {
 		// TODO Auto-generated method stub
 		return null;
 	}

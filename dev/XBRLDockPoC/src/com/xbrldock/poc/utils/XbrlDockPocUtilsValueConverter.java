@@ -14,22 +14,22 @@ import com.xbrldock.utils.XbrlDockUtils;
 
 public class XbrlDockPocUtilsValueConverter implements XbrlDockPocConsts {
 
-	public static boolean convertValue(Map<XbrlFactKeys, Object> data) {
+	public static boolean convertValue(Map<String, Object> data) {
 		String error = null;
-		XbrlFactDataType ft = XbrlFactDataType.empty;
+		String ft = XDC_FACT_VALTYPE_empty;
 		Object valObj = null;
 
 		try {
-			String valOrig = (String) data.get(XbrlFactKeys.xbrldockOrigValue);
+			String valOrig = (String) data.get(XDC_FACT_TOKEN_xbrldockOrigValue);
 
-			String fmtCode = (String) data.get(XbrlFactKeys.format);
+			String fmtCode = (String) data.get(XDC_FACT_TOKEN_format);
 			fmtCode = XbrlDockUtils.getPostfix(fmtCode, ":");
 
 			if (fmtCode.startsWith("num")) {
-				ft = XbrlFactDataType.number;
-				String scale = (String) data.get(XbrlFactKeys.scale);
-				String decimals = (String) data.get(XbrlFactKeys.decimals);
-				String sign = (String) data.get(XbrlFactKeys.sign);
+				ft = XDC_FACT_VALTYPE_number;
+				String scale = (String) data.get(XDC_FACT_TOKEN_scale);
+				String decimals = (String) data.get(XDC_FACT_TOKEN_decimals);
+				String sign = (String) data.get(XDC_FACT_TOKEN_sign);
 
 				valObj = convertToNumber(valOrig, fmtCode, scale, decimals, sign);
 			} else if (fmtCode.startsWith("fixed")) {
@@ -37,22 +37,22 @@ public class XbrlDockPocUtilsValueConverter implements XbrlDockPocConsts {
 				switch (pf) {
 				case "zero":
 					valObj = BigDecimal.ZERO;
-					ft = XbrlFactDataType.number;
+					ft = XDC_FACT_VALTYPE_number;
 					break;
 				case "empty":
-					ft = XbrlFactDataType.empty;
+					ft = XDC_FACT_VALTYPE_empty;
 					break;
 				case "false":
 					valObj = Boolean.FALSE;
-					ft = XbrlFactDataType.bool;
+					ft = XDC_FACT_VALTYPE_bool;
 					break;
 				case "true":
 					valObj = Boolean.TRUE;
-					ft = XbrlFactDataType.bool;
+					ft = XDC_FACT_VALTYPE_bool;
 					break;
 				}
 			} else if (fmtCode.startsWith("date")) {
-				ft = XbrlFactDataType.date;
+				ft = XDC_FACT_VALTYPE_date;
 				valObj = convertToDate(valOrig, fmtCode);
 			}
 
@@ -60,10 +60,10 @@ public class XbrlDockPocUtilsValueConverter implements XbrlDockPocConsts {
 			error = "Conversion exception " + e.toString();
 		}
 
-		data.put(XbrlFactKeys.value, valObj);
-		data.put(XbrlFactKeys.xbrldockFactType, ft);
+		data.put(XDC_FACT_TOKEN_value, valObj);
+		data.put(XDC_FACT_TOKEN_xbrldockFactType, ft);
 		if (null != error) {
-			data.put(XbrlFactKeys.xbrldockParseError, error);
+			data.put(XDC_FACT_TOKEN_xbrldockParseError, error);
 			return false;
 		} else {
 			return true;

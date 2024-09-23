@@ -53,11 +53,11 @@ public class XbrlDockPoc extends XbrlDock implements XbrlDockPocConsts {
 	}
 
 	public void initEnv(String[] args) throws Exception {
-		Object cfgData = XbrlDockUtilsJson.readJson(XBRLDOCK_CFG);
+		Object cfgData = XbrlDockUtilsJson.readJson(XDC_FNAME_CONFIG);
 
-		Map cfg = XbrlDockUtils.toFlatMap(XBRLDOCK_PREFIX, XBRLDOCK_SEP_PATH, cfgData);
+		Map cfg = XbrlDockUtils.toFlatMap(XDC_PREFIX, XDC_SEP_PATH, cfgData);
 
-		initEnv(XBRLDOCK_PREFIX, args, cfg);
+		initEnv(XDC_PREFIX, args, cfg);
 
 		esefConn = new XbrlDockConnXbrlOrg("sources/xbrl.org", "ext/XBRLDock/sources/xbrl.org");
 		
@@ -79,16 +79,16 @@ public class XbrlDockPoc extends XbrlDock implements XbrlDockPocConsts {
 		FileFilter jsonFilter = new FileFilter() {
 			@Override
 			public boolean accept(File f) {
-				return f.getName().endsWith(XBRLDOCK_EXT_JSON);
+				return f.getName().endsWith(XDC_FEXT_JSON);
 			}
 		};
 		ReportFormatHandler jsonParser = new XbrlDockFormatJson();
 
 		String mode = "";
 
-		mode = "app";
+//		mode = "app";
 //		mode = "taxonomy";
-//		 mode = "esef";
+		 mode = "esef";
 //		 mode = "xhtmlRec";
 //		mode = "jsonRec";
 //		 mode = "jsonSingle";

@@ -14,10 +14,10 @@ public class XbrlDockFormatUtils implements XbrlDockFormatConsts {
 		String pf = "." + XbrlDockUtils.getPostfix(fileName, ".");
 		
 		switch ( pf ) {
-		case XBRLDOCK_EXT_XHTML:
-		case XBRLDOCK_EXT_XML:
-		case XBRLDOCK_EXT_XBRL:
-		case XBRLDOCK_EXT_HTML:
+		case XDC_FEXT_XHTML:
+		case XDC_FEXT_XML:
+		case XDC_FEXT_XBRL:
+		case XDC_FEXT_HTML:
 			return true;
 		}
 		

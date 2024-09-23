@@ -65,10 +65,10 @@ public class XbrlDockGuiApp extends JFrame implements XbrlDockGuiConsts {
 	public void display() {
 		pack();
 
-		Map cfg = XbrlDock.getSubConfig(null, ConfigKey.gui, ConfigKey.frame);
+		Map cfg = XbrlDock.getSubConfig(null, XDC_CFG_APP_gui, XDC_CFG_APP_frame);
 
-		setLocation((int) XbrlDock.getConfig(cfg, 10, ConfigKey.location, ConfigKey.x), (int) XbrlDock.getConfig(cfg, 10, ConfigKey.location, ConfigKey.y));
-		setSize((int) XbrlDock.getConfig(cfg, 200, ConfigKey.dimension, ConfigKey.x), (int) XbrlDock.getConfig(cfg, 100, ConfigKey.dimension, ConfigKey.y));
+		setLocation((int) XbrlDock.getConfig(cfg, 10, XDC_CFG_GEOM_location, XDC_CFG_GEOM_x), (int) XbrlDock.getConfig(cfg, 10, XDC_CFG_GEOM_location, XDC_CFG_GEOM_y));
+		setSize((int) XbrlDock.getConfig(cfg, 200, XDC_CFG_GEOM_dimension, XDC_CFG_GEOM_x), (int) XbrlDock.getConfig(cfg, 100, XDC_CFG_GEOM_dimension, XDC_CFG_GEOM_y));
 
 		JPanel pnlTree = new JPanel(new BorderLayout());
 		pnlTree.add(new JScrollPane(roleTree), BorderLayout.CENTER);

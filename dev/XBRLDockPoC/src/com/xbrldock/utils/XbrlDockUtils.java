@@ -119,11 +119,6 @@ public class XbrlDockUtils implements XbrlDockUtilsConsts {
 		return sb;
 	}
 
-	public static <RetType extends Enum<RetType>> RetType simpleGetEnum(Class<RetType> rc, Object root, Object... path) {
-		String ret = simpleGet(root, path);
-		return Enum.valueOf(rc, ret);
-	}
-
 	public static <RetType> RetType simpleGet(Object root, Object... path) {
 		Object curr = root;
 
@@ -136,9 +131,6 @@ public class XbrlDockUtils implements XbrlDockUtilsConsts {
 				ArrayList l = (ArrayList) curr;
 				curr = ((0 < idx) && (idx < l.size())) ? l.get(idx) : null;
 			} else {
-				if (p instanceof Enum) {
-					p = p.toString();
-				}
 				curr = ((Map) curr).get(p);
 			}
 		}
@@ -151,17 +143,10 @@ public class XbrlDockUtils implements XbrlDockUtilsConsts {
 		Object lastKey = null;
 		Object lastParent = null;
 
-		if (val instanceof Enum) {
-			val = val.toString();
-		}
-
 		for (Object p : path) {
 			if (null == curr) {
 				curr = new HashMap();
 				((Map) lastParent).put(lastKey, curr);
-			}
-			if (p instanceof Enum) {
-				p = p.toString();
 			}
 
 			lastKey = p;
@@ -181,9 +166,6 @@ public class XbrlDockUtils implements XbrlDockUtilsConsts {
 
 	public static <RetType> RetType safeGet(Object map, Object key, ItemCreator<RetType> creator, Object... hints) {
 		synchronized (map) {
-			if (key instanceof Enum) {
-				key = key.toString();
-			}
 
 			RetType ret = ((Map<Object, RetType>) map).get(key);
 			if ((null == ret) && (null != creator)) {
@@ -209,8 +191,8 @@ public class XbrlDockUtils implements XbrlDockUtilsConsts {
 		return strSrc.substring(0, sep + 1) + postfix;
 	}
 
-	private static SimpleDateFormat sdfTime = new SimpleDateFormat(XBRLDOCK_FMT_TIMESTAMP);
-	private static SimpleDateFormat sdfDate = new SimpleDateFormat(XBRLDOCK_FMT_DATE);
+	private static SimpleDateFormat sdfTime = new SimpleDateFormat(XDC_FMT_TIMESTAMP);
+	private static SimpleDateFormat sdfDate = new SimpleDateFormat(XDC_FMT_DATE);
 
 	public static String strTime(Date d) {
 		synchronized (sdfTime) {

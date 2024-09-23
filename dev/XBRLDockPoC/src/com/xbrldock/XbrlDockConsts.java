@@ -9,33 +9,33 @@ import java.util.Map;
 @SuppressWarnings("rawtypes")
 public interface XbrlDockConsts {
 	
-	String XBRLDOCK_SEP_FILE = "_";
-	String XBRLDOCK_SEP_PATH = ".";
-	String XBRLDOCK_SEP_ID = ":";
+	String XDC_SEP_FILE = "_";
+	String XDC_SEP_PATH = ".";
+	String XDC_SEP_ID = ":";
 
-	String XBRLDOCK_CHARSET_UTF8 = StandardCharsets.UTF_8.name();// "UTF-8";
-	String XBRLDOCK_FMT_TIMESTAMP = "yyyy-MM-dd'T'HH_mm_ss";
-	String XBRLDOCK_FMT_DATE = "yyyy-MM-dd";
+	String XDC_CHARSET_UTF8 = StandardCharsets.UTF_8.name();// "UTF-8";
+	String XDC_FMT_TIMESTAMP = "yyyy-MM-dd'T'HH_mm_ss";
+	String XDC_FMT_DATE = "yyyy-MM-dd";
 	
-	String XBRLDOCK_EXT_LOG = ".log";
-	String XBRLDOCK_EXT_JSON = ".json";
-	String XBRLDOCK_EXT_CSV = ".csv";
-	String XBRLDOCK_EXT_XML = ".xml";
-	String XBRLDOCK_EXT_XHTML = ".xhtml";
-	String XBRLDOCK_EXT_HTML = ".html";
-	String XBRLDOCK_EXT_XBRL = ".xbrl";
-	String XBRLDOCK_EXT_SCHEMA = ".xsd";
+	String XDC_FEXT_LOG = ".log";
+	String XDC_FEXT_JSON = ".json";
+	String XDC_FEXT_CSV = ".csv";
+	String XDC_FEXT_XML = ".xml";
+	String XDC_FEXT_XHTML = ".xhtml";
+	String XDC_FEXT_HTML = ".html";
+	String XDC_FEXT_XBRL = ".xbrl";
+	String XDC_FEXT_SCHEMA = ".xsd";
 	
-	String XBRLDOCK_FNAME_METAINF = "META-INF";
-	String XBRLDOCK_FNAME_REPORTS = "reports";
+	String XDC_FNAME_METAINF = "META-INF";
+	String XDC_FNAME_REPORTS = "reports";
 	
-	String XBRLDOCK_FNAME_CATALOG = "catalog.xml";
-	String XBRLDOCK_FNAME_TAXPACK = "taxonomyPackage.xml";
+	String XDC_FNAME_CATALOG = "catalog.xml";
+	String XDC_FNAME_TAXPACK = "taxonomyPackage.xml";
 	
-	String XBRLDOCK_URL_PSEP = "://";
-	String XBRLDOCK_URL_UP = "../";
-	String XBRLDOCK_URL_HERE = "./";
-	String XBRLDOCK_PATH_UP = ".." + File.separator;
+	String XDC_URL_PSEP = "://";
+	String XDC_URL_UP = "../";
+	String XDC_URL_HERE = "./";
+	String XDC_PATH_UP = ".." + File.separator;
 
 	int KEY_ADD = -1;
 	int KEY_SIZE = -2;
@@ -58,52 +58,93 @@ public interface XbrlDockConsts {
 		void visitReports(GenProcessor<Map> visitor, GenProcessor<Map> filter) throws Exception;
 		File getReportFile(String id, Object...path);
 	}
-		
-	enum XbrlReportFormat {
-		XML, XHTML, JSON, CSV
-	}
 	
-	enum XbrlReportSegment {
-		Context, Unit, Fact
-	}
+	String XDC_FORMAT_XML = "XML";
+	String XDC_FORMAT_XHTML = "XHTML";
+	String XDC_FORMAT_JSON = "JSON";
+	String XDC_FORMAT_CSV = "CSV";
 	
-	enum XbrlFactDataType {
-		number, string, text, date, bool, empty
-	}
 	
-	enum XbrlEntityIdType {
-		lei, // sec_cik
-	}
+	String XDC_REP_SEG_Context = "Context";
+	String XDC_REP_SEG_Unit = "Unit";
+	String XDC_REP_SEG_Fact = "Fact";
+	
+			
+	String XDC_FACT_VALTYPE_number = "number";
+	String XDC_FACT_VALTYPE_string = "string";
+	String XDC_FACT_VALTYPE_text = "text";
+	String XDC_FACT_VALTYPE_date = "date";
+	String XDC_FACT_VALTYPE_bool = "bool";
+	String XDC_FACT_VALTYPE_empty = "empty";
+	
+	
+	String XDC_ENTITY_ID_TYPE_ = "";
+	String XDC_ENTITY_ID_TYPE_LEI = "lei";
+	
 
-	enum XbrlEntityKeys {
-		idType, id, name, urlSource
-	}
+	String XDC_ENTITY_TOKEN_idType = "idType";
+	String XDC_ENTITY_TOKEN_id = "id";
+	String XDC_ENTITY_TOKEN_name = "name";
+	String XDC_ENTITY_TOKEN_urlSource = "urlSource";
 
-	enum XbrlFilingKeys {
-		source, id, periodEnd, published, entityId, entityName, langCode, schemas, namespaces, 
-		urlPackage, sourceUrl, sourceAtts, 
-		packageStatus, startDate, endDate, localPath, localFilingPath, localMetaInfPath
-	}
 	
-	enum XbrlFactKeys {
-		id, scenario, context, 
-		unit, unitNumerator, unitDenominator, measure,
-		
-		period, instant, startDate, endDate, 
-		concept, entity, dimensions, value, 
-		
-		format, decimals, scale, sign,
-		
-		language, continuation, 
-		
-		xbrldockFactType, xbrldockOrigValue, xbrldockParseError
-	}	
+	String XDC_REPORT_TOKEN_source = "source";
+	String XDC_REPORT_TOKEN_id = "id";
+	String XDC_REPORT_TOKEN_periodEnd = "periodEnd";
+	String XDC_REPORT_TOKEN_published = "published";
+	String XDC_REPORT_TOKEN_entityId = "entityId";
+	String XDC_REPORT_TOKEN_entityName = "entityName";
+	String XDC_REPORT_TOKEN_langCode = "langCode";
+	String XDC_REPORT_TOKEN_schemas = "schemas";
+	String XDC_REPORT_TOKEN_namespaces = "namespaces";
+	
+	String XDC_REPORT_TOKEN_urlPackage = "urlPackage";
+	String XDC_REPORT_TOKEN_sourceUrl = "sourceUrl";
+	String XDC_REPORT_TOKEN_sourceAtts = "sourceAtts";
+	
+	String XDC_REPORT_TOKEN_packageStatus = "packageStatus";
+	String XDC_REPORT_TOKEN_startDate = "startDate";
+	String XDC_REPORT_TOKEN_endDate = "endDate";
+	String XDC_REPORT_TOKEN_localPath = "localPath";
+	String XDC_REPORT_TOKEN_localFilingPath = "localFilingPath";
+	String XDC_REPORT_TOKEN_localMetaInfPath = "localMetaInfPath";
+
+	
+	String XDC_FACT_TOKEN_id = "id";
+	String XDC_FACT_TOKEN_scenario = "scenario";
+	String XDC_FACT_TOKEN_context = "context";
+	
+	String XDC_FACT_TOKEN_unit = "unit";
+	String XDC_FACT_TOKEN_unitNumerator = "unitNumerator";
+	String XDC_FACT_TOKEN_unitDenominator = "unitDenominator";
+	String XDC_FACT_TOKEN_measure = "measure";
+	
+	String XDC_FACT_TOKEN_period = "period";
+	String XDC_FACT_TOKEN_instant = "instant";
+	String XDC_FACT_TOKEN_startDate = "startDate";
+	String XDC_FACT_TOKEN_endDate = "endDate";
+	
+	String XDC_FACT_TOKEN_concept = "concept";
+	String XDC_FACT_TOKEN_entity = "entity";
+	String XDC_FACT_TOKEN_dimensions = "dimensions";
+	String XDC_FACT_TOKEN_value = "value";
+	
+	String XDC_FACT_TOKEN_format = "format";
+	String XDC_FACT_TOKEN_decimals = "decimals";
+	String XDC_FACT_TOKEN_scale = "scale";
+	String XDC_FACT_TOKEN_sign = "sign";
+	
+	String XDC_FACT_TOKEN_language = "language";
+	String XDC_FACT_TOKEN_continuation = "continuation";
+	String XDC_FACT_TOKEN_xbrldockFactType = "xbrldockFactType";
+	String XDC_FACT_TOKEN_xbrldockOrigValue = "xbrldockOrigValue";
+	String XDC_FACT_TOKEN_xbrldockParseError = "xbrldockParseError";
 	
 	interface ReportDataHandler {
 		void beginReport(String repId);
 		void addNamespace(String ref, String id);
 		void addTaxonomy(String tx);
-		String processSegment(XbrlReportSegment segment, Map<XbrlFactKeys, Object> data);
+		String processSegment(String segment, Map<String, Object> data);
 		void endReport();
 	}	
 	

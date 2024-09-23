@@ -4,14 +4,15 @@ import com.xbrldock.poc.XbrlDockPocConsts;
 
 public interface XbrlDockTaxonomyConsts extends XbrlDockPocConsts {
 	
-	enum TaxonomyKeys {
-		items, links, references, refLinks
-	}
-	
+	String XDC_TAXONOMY_TOKEN_items = "items";
+	String XDC_TAXONOMY_TOKEN_links = "links";
+	String XDC_TAXONOMY_TOKEN_references = "references";
+	String XDC_TAXONOMY_TOKEN_refLinks = "refLinks";
+
 	String KEY_LOADED = "loaded";
 	
-	String TAXONOMY_FNAME = "taxonomy" + XBRLDOCK_EXT_JSON;
-	String RES_FNAME_POSTFIX = "_res" + XBRLDOCK_EXT_JSON;
+	String TAXONOMY_FNAME = "taxonomy" + XDC_FEXT_JSON;
+	String RES_FNAME_POSTFIX = "_res" + XDC_FEXT_JSON;
 	
 	interface TaxonomyReader {
 		

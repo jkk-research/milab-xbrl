@@ -83,7 +83,7 @@ public abstract class XbrlDock implements XbrlDockConsts {
 		if ( null == source ) {
 			source = XBRLDOCK.envData;
 		}
-		String p = XbrlDockUtils.sbAppend(null, XBRLDOCK_SEP_PATH, true, path).toString();
+		String p = XbrlDockUtils.sbAppend(null, XDC_SEP_PATH, true, path).toString();
 		
 		ret = source.getOrDefault(p, defVal);
 		
@@ -110,7 +110,7 @@ public abstract class XbrlDock implements XbrlDockConsts {
 		}
 
 		StringBuilder sb = new StringBuilder(APP_PREFIX);
-		String p = XbrlDockUtils.sbAppend(sb, XBRLDOCK_SEP_PATH, true, prefix).append(XBRLDOCK_SEP_PATH).toString();
+		String p = XbrlDockUtils.sbAppend(sb, XDC_SEP_PATH, true, prefix).append(XDC_SEP_PATH).toString();
 		int pl = p.length();
 
 		for (Map.Entry<String, Object> e : XBRLDOCK.envData.entrySet()) {

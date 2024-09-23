@@ -38,7 +38,7 @@ public class XbrlDockUtilsNet implements XbrlDockUtilsConsts {
 		
 		lastRequest = System.currentTimeMillis();
 
-//		url = URLEncoder.encode(url, XBRLDOCK_CHARSET_UTF8).replace("+", "%20");
+//		url = URLEncoder.encode(url, XDC_CHARSET_UTF8).replace("+", "%20");
 		HttpURLConnection conn = (HttpURLConnection) new URL(url).openConnection();
 
 		for (String h : headers) {

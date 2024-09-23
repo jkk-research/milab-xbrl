@@ -73,21 +73,21 @@ public class XbrlDockTaxonomy implements XbrlDockTaxonomyConsts {
 //		if (fData.isFile()) {
 //			Map data = XbrlDockUtilsJson.readJson(fData);
 //
-//			itemCache = XbrlDockUtils.simpleGet(data, TaxonomyKeys.items);
-//			links = XbrlDockUtils.simpleGet(data, TaxonomyKeys.links);
-//			allRefs = XbrlDockUtils.simpleGet(data, TaxonomyKeys.references);
-//			refRefs = XbrlDockUtils.simpleGet(data, TaxonomyKeys.refLinks);
+//			itemCache = XbrlDockUtils.simpleGet(data, XDC_TAXONOMY_TOKEN_items);
+//			links = XbrlDockUtils.simpleGet(data, XDC_TAXONOMY_TOKEN_links);
+//			allRefs = XbrlDockUtils.simpleGet(data, XDC_TAXONOMY_TOKEN_references);
+//			refRefs = XbrlDockUtils.simpleGet(data, XDC_TAXONOMY_TOKEN_refLinks);
 //			itemMapClosed = true;
 //		} else 
 		{
 			loadTaxonomy(fMetaInf);
 
 			Map data = new HashMap();
-
-			XbrlDockUtils.simpleSet(data, items, TaxonomyKeys.items);
-			XbrlDockUtils.simpleSet(data, links, TaxonomyKeys.links);
-			XbrlDockUtils.simpleSet(data, allRefs, TaxonomyKeys.references);
-			XbrlDockUtils.simpleSet(data, refRefs, TaxonomyKeys.refLinks);
+			
+			data.put(XDC_TAXONOMY_TOKEN_items, items);
+			data.put(XDC_TAXONOMY_TOKEN_links, links);
+			data.put(XDC_TAXONOMY_TOKEN_references, allRefs);
+			data.put(XDC_TAXONOMY_TOKEN_refLinks, refRefs);
 
 			XbrlDockUtilsFile.ensureDir(fTaxDir);
 
@@ -169,14 +169,14 @@ public class XbrlDockTaxonomy implements XbrlDockTaxonomyConsts {
 	public String optExtendRef(String itemRef, String currPath) throws Exception {
 		String realRef = itemRef;
 
-		if (!realRef.contains(XBRLDOCK_URL_PSEP)) {
-			if (realRef.startsWith(XBRLDOCK_URL_HERE)) {
+		if (!realRef.contains(XDC_URL_PSEP)) {
+			if (realRef.startsWith(XDC_URL_HERE)) {
 				realRef = currPath + realRef.substring(1);
-			} else if (realRef.startsWith(XBRLDOCK_URL_UP)) {
+			} else if (realRef.startsWith(XDC_URL_UP)) {
 				do {
 					currPath = XbrlDockUtils.cutPostfix(currPath, "/");
-					realRef = realRef.substring(XBRLDOCK_URL_UP.length());
-				} while (realRef.startsWith(XBRLDOCK_URL_UP));
+					realRef = realRef.substring(XDC_URL_UP.length());
+				} while (realRef.startsWith(XDC_URL_UP));
 
 				realRef = currPath + "/" + realRef;
 			} else {
@@ -233,7 +233,7 @@ public class XbrlDockTaxonomy implements XbrlDockTaxonomyConsts {
 		NodeList nl;
 		int nc;
 
-		File fCat = new File(fMetaInf, XBRLDOCK_FNAME_CATALOG);
+		File fCat = new File(fMetaInf, XDC_FNAME_CATALOG);
 		Element eCatalog = XbrlDockUtilsXml.parseDoc(fCat).getDocumentElement();
 
 		nl = eCatalog.getElementsByTagName("*");
@@ -250,7 +250,7 @@ public class XbrlDockTaxonomy implements XbrlDockTaxonomyConsts {
 			}
 		}
 
-		File fTax = new File(fMetaInf, XBRLDOCK_FNAME_TAXPACK);
+		File fTax = new File(fMetaInf, XDC_FNAME_TAXPACK);
 		Element eTaxPack = XbrlDockUtilsXml.parseDoc(fTax).getDocumentElement();
 
 		nl = eTaxPack.getElementsByTagName("*");
@@ -508,9 +508,9 @@ public class XbrlDockTaxonomy implements XbrlDockTaxonomyConsts {
 
 	private boolean optQueue(String schemaUrl) {
 		Set<String> target = null;
-		if (schemaUrl.endsWith(XBRLDOCK_EXT_XML)) {
+		if (schemaUrl.endsWith(XDC_FEXT_XML)) {
 			target = linkbases;
-		} else if (schemaUrl.endsWith(XBRLDOCK_EXT_SCHEMA)) {
+		} else if (schemaUrl.endsWith(XDC_FEXT_SCHEMA)) {
 			target = schemas;
 		} else {
 			XbrlDock.log(EventLevel.Warning, "Strange extension", schemaUrl);

@@ -91,7 +91,7 @@ public class XbrlDockUtilsFile implements XbrlDockUtilsConsts {
 	}
 	
 	public static void extractWithApacheZipFile(File destFile, File zipFile, String name) throws Exception {
-		try (ZipFile zf = new ZipFile(zipFile, XBRLDOCK_CHARSET_UTF8)) {
+		try (ZipFile zf = new ZipFile(zipFile, XDC_CHARSET_UTF8)) {
 
 			if ( null == name ) {
 

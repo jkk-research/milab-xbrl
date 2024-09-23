@@ -31,15 +31,15 @@ public class XbrlDockTaxonomyManager implements XbrlDockTaxonomyConsts {
 
 	public XbrlDockTaxonomy loadTaxonomy(String taxonomyId, String... urls) throws Exception {
 		
-		File fMetaInf = new File(urlCache.cacheRoot, taxonomyId + "/" + XBRLDOCK_FNAME_METAINF);
+		File fMetaInf = new File(urlCache.cacheRoot, taxonomyId + "/" + XDC_FNAME_METAINF);
 		
-		File fTax = new File(fMetaInf, XBRLDOCK_FNAME_TAXPACK);
+		File fTax = new File(fMetaInf, XDC_FNAME_TAXPACK);
 		Element eTaxPack = XbrlDockUtilsXml.parseDoc(fTax).getDocumentElement();
 
 		Node eTP = eTaxPack.getElementsByTagName("tp:identifier").item(0);
 		String id = eTP.getTextContent().trim();
 		
-		String taxId = XbrlDockUtils.getPostfix(id, XBRLDOCK_URL_PSEP);
+		String taxId = XbrlDockUtils.getPostfix(id, XDC_URL_PSEP);
 		
 		XbrlDockTaxonomy ret = XbrlDockUtils.safeGet(taxonomies, taxId, new XbrlDockUtils.ItemCreator<XbrlDockTaxonomy>() {
 			@Override

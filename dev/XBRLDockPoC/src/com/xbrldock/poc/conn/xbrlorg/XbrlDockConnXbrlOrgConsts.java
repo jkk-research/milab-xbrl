@@ -1,32 +1,26 @@
 package com.xbrldock.poc.conn.xbrlorg;
 
-import com.xbrldock.poc.XbrlDockPocConsts;
-import com.xbrldock.poc.format.XbrlDockFormatConsts;
+import com.xbrldock.poc.conn.XbrlDockConnConsts;
 import com.xbrldock.utils.XbrlDockUtilsJsonApiConsts;
 
-public interface XbrlDockConnXbrlOrgConsts extends XbrlDockPocConsts, XbrlDockFormatConsts, XbrlDockUtilsJsonApiConsts {
+public interface XbrlDockConnXbrlOrgConsts extends XbrlDockConnConsts, XbrlDockUtilsJsonApiConsts {
 
-	String PATH_CATALOG = "catalog.json";
 	String PATH_SRVRESP = "filings.org.response.json";
 	
-	String PATH_FILING_CACHE = "filings";
-	String PATH_DATA = "data";
-	
-	enum CatalogKeys {
-		entities, filings, languages
-	}
-	
-	enum ResponseType {
-		filing, entity, language
-	}
-	
-	enum ResponseKeys {
-		fxo_id, identifier, name, code, period_end, date_added, package_url, report_url, json_url
-	}
-	
-	enum PackageStatus {
-		reportIdentified, reportFoundSingle, reportFoundMulti, reportMisplaced, reportNotFound
-	}
+	String XDC_CONN_CAT_TOKEN_languages = "languages";
 
+	String XDC_XBRLORG_TOKEN_filing = "filing";
+	String XDC_XBRLORG_TOKEN_entity = "entity";
+	String XDC_XBRLORG_TOKEN_language = "language";
+
+	String XDC_XBRLORG_TOKEN_fxo_id = "fxo_id";
+	String XDC_XBRLORG_TOKEN_identifier = "identifier";
+	String XDC_XBRLORG_TOKEN_name = "name";
+	String XDC_XBRLORG_TOKEN_code = "code";
+	String XDC_XBRLORG_TOKEN_period_end = "period_end";
+	String XDC_XBRLORG_TOKEN_date_added = "date_added";
+	String XDC_XBRLORG_TOKEN_package_url = "package_url";
+	String XDC_XBRLORG_TOKEN_report_url = "report_url";
+	String XDC_XBRLORG_TOKEN_json_url = "json_url";
 
 }
