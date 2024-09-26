@@ -1,14 +1,48 @@
 {
-  "gui" : {
-    "frame" : {
-      "location" : {
-        "x" : 50,
-        "y" : 50
+  "app" : {
+    "javaClass" : "com.xbrldock.poc.XbrlDockPocApp",
+    "modules" : {
+      "urlCache" : {
+        "javaClass" : "com.xbrldock.poc.XbrlDockDevUrlCache",
+        "dirStore" : "ext/XBRLDock/urlcache"
       },
-      "dimension" : {
-        "x" : 1000,
-        "y" : 600
+      "taxmgr" : {
+        "javaClass" : "com.xbrldock.poc.taxonomy.XbrlDockTaxonomyManager",
+        "dirStore" : "temp/taxonomy",
+        "dirInput" : "ext/XBRLDock/taxonomy/import"
+      },
+      "esefConn" : {
+        "javaClass" : "com.xbrldock.poc.conn.xbrlorg.XbrlDockConnXbrlOrg",
+        "dirStore" : "sources/xbrl.org",
+        "dirInput" : "ext/XBRLDock/sources/xbrl.org"
+      },
+      "manualReports" : {
+        "javaClass" : "",
+        "dirStore" : "",
+        "dirInput" : ""
+      },
+      "gui" : {
+        "javaClass" : "com.xbrldock.poc.gui.XbrlDockGuiWorkbench",
+        "location" : {
+          "x" : 50,
+          "y" : 50
+        },
+        "dimension" : {
+          "x" : 1000,
+          "y" : 600
+        }
       }
+    }
+  },
+  "gui" : {
+    "javaClass" : "com.xbrldock.poc.gui.XbrlDockGuiWorkbench",
+    "location" : {
+      "x" : 50,
+      "y" : 50
+    },
+    "dimension" : {
+      "x" : 1000,
+      "y" : 600
     }
   }
 }

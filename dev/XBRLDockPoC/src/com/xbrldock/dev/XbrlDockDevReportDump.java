@@ -4,9 +4,9 @@ import java.util.Map;
 import java.util.TreeMap;
 
 import com.xbrldock.XbrlDock;
-import com.xbrldock.XbrlDockConsts;
+import com.xbrldock.poc.XbrlDockPocConsts;
 
-public class XbrlDockDevReportDump implements XbrlDockDevConsts, XbrlDockConsts.ReportDataHandler {
+public class XbrlDockDevReportDump implements XbrlDockDevConsts, XbrlDockPocConsts.ReportDataHandler {
 
 	public boolean logAll = true;
 

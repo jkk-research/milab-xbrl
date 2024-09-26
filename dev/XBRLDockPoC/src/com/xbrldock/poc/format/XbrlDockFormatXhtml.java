@@ -11,12 +11,12 @@ import org.w3c.dom.NamedNodeMap;
 import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
 
-import com.xbrldock.XbrlDockConsts;
+import com.xbrldock.poc.XbrlDockPocConsts;
 import com.xbrldock.poc.utils.XbrlDockPocUtilsValueConverter;
 import com.xbrldock.utils.XbrlDockUtils;
 import com.xbrldock.utils.XbrlDockUtilsXml;
 
-public class XbrlDockFormatXhtml implements XbrlDockFormatConsts, XbrlDockConsts.ReportFormatHandler {
+public class XbrlDockFormatXhtml implements XbrlDockFormatConsts, XbrlDockPocConsts.ReportFormatHandler {
 
 	private static final String[] cvtKeys = { XDC_FACT_TOKEN_scale, XDC_FACT_TOKEN_decimals, XDC_FACT_TOKEN_sign };
 

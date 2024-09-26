@@ -8,13 +8,13 @@ import org.w3c.dom.Element;
 import org.w3c.dom.NodeList;
 
 import com.xbrldock.XbrlDock;
-import com.xbrldock.XbrlDockConsts;
 import com.xbrldock.XbrlDockException;
 import com.xbrldock.dev.XbrlDockDevCounter;
+import com.xbrldock.poc.XbrlDockPocConsts;
 import com.xbrldock.utils.XbrlDockUtils;
 import com.xbrldock.utils.XbrlDockUtilsXml;
 
-public class XbrlDockTaxonomyRefCollector implements XbrlDockTaxonomyConsts, XbrlDockConsts.ReportDataHandler {
+public class XbrlDockTaxonomyRefCollector implements XbrlDockTaxonomyConsts, XbrlDockPocConsts.ReportDataHandler {
 
 	String repId;
 	Map<String, String> imports = new TreeMap<>();

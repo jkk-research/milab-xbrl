@@ -4,11 +4,7 @@ import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.HashMap;
-import java.util.HashSet;
-import java.util.List;
 import java.util.Map;
-import java.util.Set;
-import java.util.TreeMap;
 
 @SuppressWarnings({ "unchecked", "rawtypes" })
 public class XbrlDockUtils implements XbrlDockUtilsConsts {
@@ -55,35 +51,6 @@ public class XbrlDockUtils implements XbrlDockUtilsConsts {
 		return idx;
 	}
 
-	public static Map<String, Object> toFlatMap(String prefix, String sep, Object src) {
-		return toFlatMap(new TreeMap(), new StringBuilder(prefix), sep, src);
-	}
-
-	private static Map<String, Object> toFlatMap(Map<String, Object> target, StringBuilder prefix, String sep, Object src) {
-		int l = prefix.length() + 1;
-
-		if (src instanceof Map) {
-			prefix.append(sep);
-			for (Map.Entry<String, Object> e : ((Map<String, Object>) src).entrySet()) {
-				prefix.setLength(l);
-				prefix.append(e.getKey());
-				toFlatMap(target, prefix, sep, e.getValue());
-			}
-		} else if (src instanceof Iterable) {
-			int idx = 0;
-			prefix.append(sep);
-			for (Object o : (Iterable) src) {
-				prefix.setLength(l);
-				prefix.append(idx++);
-				toFlatMap(target, prefix, sep, o);
-			}
-		} else {
-			target.put(prefix.toString(), src);
-		}
-
-		return target;
-	};
-
 	public static String toString(Object ob) {
 		return toString(ob, ", ");
 	}
@@ -120,6 +87,10 @@ public class XbrlDockUtils implements XbrlDockUtilsConsts {
 	}
 
 	public static <RetType> RetType simpleGet(Object root, Object... path) {
+		if ((path.length == 1) && ((String)path[0]).contains(".")) {
+			path = ((String)path[0]).split("\\.");
+		}
+		
 		Object curr = root;
 
 		for (Object p : path) {
@@ -139,6 +110,10 @@ public class XbrlDockUtils implements XbrlDockUtilsConsts {
 	}
 
 	public static void simpleSet(Object root, Object val, Object... path) {
+		if ((path.length == 1) && ((String)path[0]).contains(".")) {
+			path = ((String)path[0]).split("\\.");
+		}
+
 		Object curr = root;
 		Object lastKey = null;
 		Object lastParent = null;
@@ -224,32 +199,42 @@ public class XbrlDockUtils implements XbrlDockUtilsConsts {
 		return String.format("%02x%s%02x", h1, sep, h2);
 	}
 
-	public static <RetType> RetType deepCopyIsh(RetType ob) {
-
-		if ((null == ob) || ob.getClass().isPrimitive() || (ob instanceof String)) {
-			return ob;
+	public static <RetType> RetType createObject(Object owner, Map config) throws Exception {
+		RetType ob = (RetType) Class.forName((String) config.get(XDC_CFGTOKEN_javaClass)).getConstructor().newInstance();
+		
+		if ( ob instanceof GenModule ) {
+			((GenModule)ob).initModule((GenApp) owner, config);
 		}
 		
-		Object ret = ob;
-
-		if (ob instanceof Map) {
-			Map r = new HashMap();
-			for (Map.Entry<Object, Object> me : ((Map<Object, Object>) ob).entrySet()) {
-				r.put(me.getKey(), deepCopyIsh(me.getValue()));
-			}
-		} else if (ob instanceof Set) {
-			Set r = new HashSet();
-			for (Object m : ((Set<Object>) ob)) {
-				r.add(deepCopyIsh(m));
-			}
-		} else if (ob instanceof List) {
-			List r = new ArrayList();
-			for (Object m : ((List<Object>) ob)) {
-				r.add(deepCopyIsh(m));
-			}
-		}
-
-		return (RetType) ret;
+		return ob;
 	}
+
+//	public static <RetType> RetType deepCopyIsh(RetType ob) {
+//
+//		if ((null == ob) || ob.getClass().isPrimitive() || (ob instanceof String)) {
+//			return ob;
+//		}
+//		
+//		Object ret = ob;
+//
+//		if (ob instanceof Map) {
+//			Map r = new HashMap();
+//			for (Map.Entry<Object, Object> me : ((Map<Object, Object>) ob).entrySet()) {
+//				r.put(me.getKey(), deepCopyIsh(me.getValue()));
+//			}
+//		} else if (ob instanceof Set) {
+//			Set r = new HashSet();
+//			for (Object m : ((Set<Object>) ob)) {
+//				r.add(deepCopyIsh(m));
+//			}
+//		} else if (ob instanceof List) {
+//			List r = new ArrayList();
+//			for (Object m : ((List<Object>) ob)) {
+//				r.add(deepCopyIsh(m));
+//			}
+//		}
+//
+//		return (RetType) ret;
+//	}
 
 }

@@ -73,5 +73,4 @@ public interface XbrlDockUtilsJsonApiConsts extends XbrlDockUtilsConsts {
 	String XDC_JSONAPI_FILTER_or = "or";
 	String XDC_JSONAPI_FILTER_and = "and";
 
-
 }

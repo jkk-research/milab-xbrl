@@ -3,12 +3,11 @@ package com.xbrldock.poc.utils;
 import java.util.Map;
 import java.util.TreeMap;
 
-import com.xbrldock.XbrlDockConsts;
 import com.xbrldock.poc.XbrlDockPocConsts;
 import com.xbrldock.utils.XbrlDockUtils;
 
 @SuppressWarnings({ "unchecked", "rawtypes" })
-public class XbrlDockPocReportInfoExtender implements XbrlDockPocConsts, XbrlDockConsts.ReportDataHandler {
+public class XbrlDockPocReportInfoExtender implements XbrlDockPocConsts, XbrlDockPocConsts.ReportDataHandler {
 
 	Map reportData;
 

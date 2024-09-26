@@ -6,7 +6,6 @@ import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.io.InputStream;
-import java.util.Map;
 
 import com.xbrldock.XbrlDock;
 import com.xbrldock.XbrlDockException;
@@ -19,9 +18,9 @@ import com.xbrldock.poc.taxonomy.XbrlDockTaxonomy;
 import com.xbrldock.poc.taxonomy.XbrlDockTaxonomyManager;
 import com.xbrldock.utils.XbrlDockUtils;
 import com.xbrldock.utils.XbrlDockUtilsFile;
-import com.xbrldock.utils.XbrlDockUtilsJson;
 
-@SuppressWarnings({ "unchecked", "rawtypes" })
+//@SuppressWarnings({ "unchecked", "rawtypes" })
+@Deprecated
 public class XbrlDockPoc extends XbrlDock implements XbrlDockPocConsts {
 	public final File testRoot = new File("/Volumes/Giskard_ext/work/XBRL/store/xbrl.org/reports/lei");
 	public final File localRoot = new File("temp/reports");
@@ -46,6 +45,7 @@ public class XbrlDockPoc extends XbrlDock implements XbrlDockPocConsts {
 		return taxMgr;
 	}
 
+	
 
 	@Override
 	protected void handleLog(EventLevel level, Object... params) {
@@ -53,15 +53,15 @@ public class XbrlDockPoc extends XbrlDock implements XbrlDockPocConsts {
 	}
 
 	public void initEnv(String[] args) throws Exception {
-		Object cfgData = XbrlDockUtilsJson.readJson(XDC_FNAME_CONFIG);
+//		Object cfgData = XbrlDockUtilsJson.readJson(XDC_FNAME_CONFIG);
 
-		Map cfg = XbrlDockUtils.toFlatMap(XDC_PREFIX, XDC_SEP_PATH, cfgData);
+//		Map cfg = XbrlDockUtils.toFlatMap(XDC_PREFIX, XDC_SEP_PATH, cfgData);
+//
+//		initEnv(XDC_PREFIX, args, cfg);
 
-		initEnv(XDC_PREFIX, args, cfg);
-
-		esefConn = new XbrlDockConnXbrlOrg("sources/xbrl.org", "ext/XBRLDock/sources/xbrl.org");
-		
-		taxMgr = new XbrlDockTaxonomyManager("temp/taxonomy", cacheRoot);
+//		esefConn = new XbrlDockConnXbrlOrg("sources/xbrl.org", "ext/XBRLDock/sources/xbrl.org");
+//		
+//		taxMgr = new XbrlDockTaxonomyManager("temp/taxonomy", cacheRoot);
 
 	}
 
@@ -86,9 +86,9 @@ public class XbrlDockPoc extends XbrlDock implements XbrlDockPocConsts {
 
 		String mode = "";
 
-//		mode = "app";
+		mode = "app";
 //		mode = "taxonomy";
-		 mode = "esef";
+//		 mode = "esef";
 //		 mode = "xhtmlRec";
 //		mode = "jsonRec";
 //		 mode = "jsonSingle";
@@ -110,7 +110,7 @@ public class XbrlDockPoc extends XbrlDock implements XbrlDockPocConsts {
 			loadReportRec(jsonFilter, jsonParser, dh);
 			break;
 		case "esef":
-			taxMgr = new XbrlDockTaxonomyManager("temp/taxonomy", "ext/XBRLDock/urlcache");
+//			taxMgr = new XbrlDockTaxonomyManager("temp/taxonomy", "ext/XBRLDock/urlcache");
 			esefConn.test();
 			break;
 		case "taxonomy":
@@ -170,6 +170,12 @@ public class XbrlDockPoc extends XbrlDock implements XbrlDockPocConsts {
 			fh.loadReport(fr, dh);
 			dh.endReport();
 		}
+	}
+
+	@Override
+	protected void run() throws Exception {
+		// TODO Auto-generated method stub
+		
 	}
 
 }

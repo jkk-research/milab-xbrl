@@ -1,9 +1,7 @@
 package com.xbrldock;
 
 import java.io.File;
-import java.io.InputStream;
 import java.nio.charset.StandardCharsets;
-import java.util.Collection;
 import java.util.Map;
 
 @SuppressWarnings("rawtypes")
@@ -17,6 +15,7 @@ public interface XbrlDockConsts {
 	String XDC_FMT_TIMESTAMP = "yyyy-MM-dd'T'HH_mm_ss";
 	String XDC_FMT_DATE = "yyyy-MM-dd";
 	
+	String XDC_FEXT_ZIP = ".zip";
 	String XDC_FEXT_LOG = ".log";
 	String XDC_FEXT_JSON = ".json";
 	String XDC_FEXT_CSV = ".csv";
@@ -26,16 +25,22 @@ public interface XbrlDockConsts {
 	String XDC_FEXT_XBRL = ".xbrl";
 	String XDC_FEXT_SCHEMA = ".xsd";
 	
-	String XDC_FNAME_METAINF = "META-INF";
-	String XDC_FNAME_REPORTS = "reports";
-	
-	String XDC_FNAME_CATALOG = "catalog.xml";
-	String XDC_FNAME_TAXPACK = "taxonomyPackage.xml";
-	
 	String XDC_URL_PSEP = "://";
 	String XDC_URL_UP = "../";
 	String XDC_URL_HERE = "./";
 	String XDC_PATH_UP = ".." + File.separator;
+	
+	String XDC_FNAME_CONFIG = "XbrlDockConfig.json";
+	String XDC_CFGPREFIX_xbrldock = "xbrldock";
+	
+	String XDC_CFGTOKEN_env = "env";
+	
+	String XDC_CFGTOKEN_javaClass = "javaClass";
+	String XDC_CFGTOKEN_app = "app";
+	String XDC_CFGTOKEN_gui = "gui";
+	String XDC_CFGTOKEN_modules = "modules";
+	String XDC_CFGTOKEN_ = "";
+
 
 	int KEY_ADD = -1;
 	int KEY_SIZE = -2;
@@ -48,17 +53,22 @@ public interface XbrlDockConsts {
 		Init, Begin, Process, End, Release
 	}
 	
+	public interface GenApp {
+		<RetType> RetType getModule(String moduleKey);
+	}
+	
+	public interface GenModule {
+		void initModule(GenApp app, Map config) throws Exception;
+	}
+	
+	interface ItemCreator<Type> {
+		Type create(Object key, Object... hints);
+	}
+	
 	public interface GenProcessor<ItemType> {
 		boolean process(ItemType item, ProcessorAction action) throws Exception;
 	}
 
-	public interface XbrlSource {
-		int refresh(Collection<String> updated) throws Exception;
-		Map getReportData(String id, Map target) throws Exception;
-		void visitReports(GenProcessor<Map> visitor, GenProcessor<Map> filter) throws Exception;
-		File getReportFile(String id, Object...path);
-	}
-	
 	String XDC_FORMAT_XML = "XML";
 	String XDC_FORMAT_XHTML = "XHTML";
 	String XDC_FORMAT_JSON = "JSON";
@@ -140,15 +150,4 @@ public interface XbrlDockConsts {
 	String XDC_FACT_TOKEN_xbrldockOrigValue = "xbrldockOrigValue";
 	String XDC_FACT_TOKEN_xbrldockParseError = "xbrldockParseError";
 	
-	interface ReportDataHandler {
-		void beginReport(String repId);
-		void addNamespace(String ref, String id);
-		void addTaxonomy(String tx);
-		String processSegment(String segment, Map<String, Object> data);
-		void endReport();
-	}	
-	
-	interface ReportFormatHandler {
-		void loadReport(InputStream in, ReportDataHandler dataHandler) throws Exception;
-	}
 }

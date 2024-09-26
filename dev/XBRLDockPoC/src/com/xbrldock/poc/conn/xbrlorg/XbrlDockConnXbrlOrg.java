@@ -12,9 +12,9 @@ import java.util.Map;
 import java.util.TreeMap;
 
 import com.xbrldock.XbrlDock;
-import com.xbrldock.XbrlDockConsts;
 import com.xbrldock.XbrlDockException;
 import com.xbrldock.dev.XbrlDockDevMonitor;
+import com.xbrldock.poc.XbrlDockPocConsts;
 import com.xbrldock.poc.format.XbrlDockFormatUtils;
 import com.xbrldock.poc.format.XbrlDockFormatXhtml;
 import com.xbrldock.poc.utils.XbrlDockPocReportInfoExtender;
@@ -24,7 +24,7 @@ import com.xbrldock.utils.XbrlDockUtilsJson;
 import com.xbrldock.utils.XbrlDockUtilsNet;
 
 @SuppressWarnings({ "rawtypes", "unchecked" })
-public class XbrlDockConnXbrlOrg implements XbrlDockConnXbrlOrgConsts, XbrlDockConsts.XbrlSource {
+public class XbrlDockConnXbrlOrg implements XbrlDockConnXbrlOrgConsts, XbrlDockPocConsts.XDModSourceConnector {
 	String sourceName = "xbrl.org";
 
 	String urlRoot = "https://filings.xbrl.org/";
@@ -76,6 +76,10 @@ public class XbrlDockConnXbrlOrg implements XbrlDockConnXbrlOrgConsts, XbrlDockC
 	public boolean testMode;
 //	public boolean loadReport;
 	public boolean loadReport = true;
+	
+	public XbrlDockConnXbrlOrg() {
+		// TODO Auto-generated constructor stub
+	}
 
 	public XbrlDockConnXbrlOrg(String rootPath, String cachePath) throws Exception {
 		dataRoot = new File(rootPath);
@@ -99,6 +103,12 @@ public class XbrlDockConnXbrlOrg implements XbrlDockConnXbrlOrgConsts, XbrlDockC
 			XbrlDock.log(EventLevel.Trace, "Read filing count", filings.size(), "Entity count", entities.size(), "Language count", langs.size());
 		}
 	}
+	
+	@Override
+	public void initModule(GenApp app, Map config) {
+		// TODO Auto-generated method stub
+		
+	}
 
 	@Override
 	public Map getReportData(String id, Map target) throws Exception {
@@ -113,10 +123,12 @@ public class XbrlDockConnXbrlOrg implements XbrlDockConnXbrlOrgConsts, XbrlDockC
 		} else {
 			target.clear();
 		}
+		
+		target.putAll(filingData);
 
-		for (Map.Entry<Object, Object> me : ((Map<Object, Object>) filingData).entrySet()) {
-			target.put(me.getKey(), XbrlDockUtils.deepCopyIsh(me.getValue()));
-		}
+//		for (Map.Entry<Object, Object> me : ((Map<Object, Object>) filingData).entrySet()) {
+//			target.put(me.getKey(), XbrlDockUtils.deepCopyIsh(me.getValue()));
+//		}
 
 		return target;
 	}

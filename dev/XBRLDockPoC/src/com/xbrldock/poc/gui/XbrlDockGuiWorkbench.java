@@ -17,7 +17,7 @@ import com.xbrldock.poc.taxonomy.XbrlDockTaxonomy;
 import com.xbrldock.utils.XbrlDockUtilsGui;
 
 //@SuppressWarnings({ "rawtypes", "unchecked" })
-public class XbrlDockGuiApp extends JFrame implements XbrlDockGuiConsts {
+public class XbrlDockGuiWorkbench extends JFrame implements XbrlDockGuiConsts {
 	private static final long serialVersionUID = 1L;
 
 	XbrlDockPoc xbrlDock;
@@ -49,8 +49,8 @@ public class XbrlDockGuiApp extends JFrame implements XbrlDockGuiConsts {
 		}
 	};
 
-	public XbrlDockGuiApp(XbrlDockPoc xbrlDock) throws Exception {
-		super("XBRLDock PoC");
+	public XbrlDockGuiWorkbench(XbrlDockPoc xbrlDock) throws Exception {
+		super("XBRLDock PoC Workbench");
 
 		this.xbrlDock = xbrlDock;
 		
@@ -67,7 +67,7 @@ public class XbrlDockGuiApp extends JFrame implements XbrlDockGuiConsts {
 //
 //		setLocation((int) XbrlDock.getConfig(cfg, 10, XDC_CFG_GEOM_location, XDC_CFG_GEOM_x), (int) XbrlDock.getConfig(cfg, 10, XDC_CFG_GEOM_location, XDC_CFG_GEOM_y));
 //		setSize((int) XbrlDock.getConfig(cfg, 200, XDC_CFG_GEOM_dimension, XDC_CFG_GEOM_x), (int) XbrlDock.getConfig(cfg, 100, XDC_CFG_GEOM_dimension, XDC_CFG_GEOM_y));
-		
+
 		setLocation(50, 50);
 		setSize(1000, 800);
 

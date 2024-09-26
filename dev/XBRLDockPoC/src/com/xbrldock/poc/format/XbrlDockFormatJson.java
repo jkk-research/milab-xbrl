@@ -11,11 +11,11 @@ import java.util.TreeMap;
 
 import org.json.simple.parser.JSONParser;
 
-import com.xbrldock.XbrlDockConsts;
+import com.xbrldock.poc.XbrlDockPocConsts;
 import com.xbrldock.utils.XbrlDockUtils;
 
 @SuppressWarnings("unchecked")
-public class XbrlDockFormatJson implements XbrlDockFormatConsts, XbrlDockConsts.ReportFormatHandler {
+public class XbrlDockFormatJson implements XbrlDockFormatConsts, XbrlDockPocConsts.ReportFormatHandler {
 
 	Comparator<Map.Entry<String, Object>> dimComp = new Comparator<Map.Entry<String, Object>>() {
 		@Override

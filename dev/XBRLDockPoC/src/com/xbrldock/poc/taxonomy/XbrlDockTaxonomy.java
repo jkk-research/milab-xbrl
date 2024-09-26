@@ -38,7 +38,7 @@ public class XbrlDockTaxonomy implements XbrlDockTaxonomyConsts {
 	ArrayList<Map<String, String>> links = new ArrayList<>();
 	
 	String lang;
-
+	
 	String taxRoot;
 
 	private Set<String> schemas = new TreeSet<>();
@@ -66,9 +66,9 @@ public class XbrlDockTaxonomy implements XbrlDockTaxonomyConsts {
 
 		this.id = taxId;
 
-		fTaxDir = new File(tmgr.taxomonyStoreRoot, taxId);
+		fTaxDir = new File(tmgr.taxonomyStoreRoot, taxId);
 
-		File fData = new File(fTaxDir, TAXONOMY_FNAME);
+//		File fData = new File(fTaxDir, TAXONOMY_FNAME);
 
 //		if (fData.isFile()) {
 //			Map data = XbrlDockUtilsJson.readJson(fData);
@@ -158,7 +158,7 @@ public class XbrlDockTaxonomy implements XbrlDockTaxonomyConsts {
 				try {
 					return XbrlDockUtilsJson.readJson(fRes);
 				} catch (Exception e) {
-					return XbrlDockException.wrap(e, "Reading resource", key, "for taxonomy", taxRoot, "from file", fRes);
+					return XbrlDockException.wrap(e, "Reading resource", key, "for taxonomy", id, "from file", fRes);
 				}
 			}
 		});
@@ -235,6 +235,11 @@ public class XbrlDockTaxonomy implements XbrlDockTaxonomyConsts {
 
 		File fCat = new File(fMetaInf, XDC_FNAME_CATALOG);
 		Element eCatalog = XbrlDockUtilsXml.parseDoc(fCat).getDocumentElement();
+		
+		String base = eCatalog.getAttribute("xml:base");
+		File fBase = XbrlDockUtils.isEmpty(base) ? fMetaInf : new File(fMetaInf, base).getCanonicalFile();
+		
+		Map<String, String> ur = new HashMap<String, String>();
 
 		nl = eCatalog.getElementsByTagName("*");
 		nc = nl.getLength();
@@ -245,10 +250,16 @@ public class XbrlDockTaxonomy implements XbrlDockTaxonomyConsts {
 
 			switch (tagName) {
 			case "rewriteURI":
-				taxRoot = e.getAttribute("uriStartString");
+				String us = e.getAttribute("uriStartString");
+				if ( (null == taxRoot) || (taxRoot.length() > us.length())) {
+					taxRoot = us;
+				}
+				ur.put(us, e.getAttribute("rewritePrefix"));
 				break;
 			}
 		}
+		
+		tmgr.getUrlCache().setRewrite(fBase, ur);
 
 		File fTax = new File(fMetaInf, XDC_FNAME_TAXPACK);
 		Element eTaxPack = XbrlDockUtilsXml.parseDoc(fTax).getDocumentElement();
@@ -263,7 +274,7 @@ public class XbrlDockTaxonomy implements XbrlDockTaxonomyConsts {
 			switch (tagName) {
 			case "tp:entryPointDocument":
 				String epRef = e.getAttribute("href");
-				String epId = epRef.substring(taxRoot.length()) + 1;
+				String epId = XbrlDockUtils.getPostfix(epRef, "/"); // epRef.substring(taxRoot.length()) + 1;
 				epId = XbrlDockUtils.cutPostfix(epId, ".");
 				Map epMap = XbrlDockUtilsXml.readChildNodes((Element) e.getParentNode(), null);
 				epMap.put("href", epRef);
@@ -290,7 +301,7 @@ public class XbrlDockTaxonomy implements XbrlDockTaxonomyConsts {
 
 		XbrlDock.log(EventLevel.Trace, "loadSchema", schemaUrl);
 
-		try (InputStream is = tmgr.resolveEntityStream("", schemaUrl)) {
+		try (InputStream is = tmgr.getUrlStream(schemaUrl)) {
 			Element eSchema = XbrlDockUtilsXml.parseDoc(is).getDocumentElement();
 
 //			String targetNS = eSchema.getAttribute("targetNamespace");
@@ -353,7 +364,7 @@ public class XbrlDockTaxonomy implements XbrlDockTaxonomyConsts {
 			XbrlDock.log(EventLevel.Debug, url);
 		}
 
-		try (InputStream is = tmgr.resolveEntityStream("", url)) {
+		try (InputStream is = tmgr.getUrlStream(url)) {
 			Element eRoot = XbrlDockUtilsXml.parseDoc(is).getDocumentElement();
 
 			String path = XbrlDockUtils.cutPostfix(url, "/");

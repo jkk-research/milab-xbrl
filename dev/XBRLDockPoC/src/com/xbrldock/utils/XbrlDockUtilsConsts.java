@@ -11,11 +11,7 @@ import com.xbrldock.XbrlDockException;
 
 @SuppressWarnings({ "rawtypes", "unchecked" })
 public interface XbrlDockUtilsConsts extends XbrlDockConsts {
-
-	interface ItemCreator<Type> {
-		Type create(Object key, Object... hints);
-	}
-
+	
 	class ItemCreatorSimple<Type> implements ItemCreator<Type> {
 
 		Class cc;
