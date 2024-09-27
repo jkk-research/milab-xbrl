@@ -109,6 +109,20 @@ public class XbrlDockConnXbrlOrg implements XbrlDockConnXbrlOrgConsts, XbrlDockP
 		// TODO Auto-generated method stub
 		
 	}
+	
+	@Override
+	public <RetType> RetType process(String command, Object... params) throws Exception {
+		Object ret = null;
+		
+		switch (command) {
+		default:
+			XbrlDockException.wrap(null, "Unhandled agent command", command, params);
+			break;
+		}
+		
+		return (RetType) ret;
+
+	}
 
 	@Override
 	public Map getReportData(String id, Map target) throws Exception {

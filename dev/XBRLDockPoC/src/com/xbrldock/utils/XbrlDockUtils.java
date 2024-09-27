@@ -17,6 +17,22 @@ public class XbrlDockUtils implements XbrlDockUtilsConsts {
 		return (null == o1) ? (null == o2) : (null != o2) && o1.equals(o2);
 	}
 
+	public static String getCommonPrefix(String a, String b) {
+		if (isEmpty(a)) {
+			return b;
+		} else if (isEmpty(b)) {
+			return a;
+		} else {
+			int minLength = Math.min(a.length(), b.length());
+			for (int i = 0; i < minLength; i++) {
+				if (a.charAt(i) != b.charAt(i)) {
+					return a.substring(0, i);
+				}
+			}
+			return a.substring(0, minLength);
+		}
+	}
+
 	public static int safeCompare(Object v1, Object v2) {
 		return (null == v1) ? (null == v2) ? 0 : 1 : (null == v2) ? 1 : ((Comparable) v1).compareTo(v2);
 	};
@@ -87,10 +103,10 @@ public class XbrlDockUtils implements XbrlDockUtilsConsts {
 	}
 
 	public static <RetType> RetType simpleGet(Object root, Object... path) {
-		if ((path.length == 1) && ((String)path[0]).contains(".")) {
-			path = ((String)path[0]).split("\\.");
+		if ((path.length == 1) && ((String) path[0]).contains(".")) {
+			path = ((String) path[0]).split("\\.");
 		}
-		
+
 		Object curr = root;
 
 		for (Object p : path) {
@@ -110,8 +126,8 @@ public class XbrlDockUtils implements XbrlDockUtilsConsts {
 	}
 
 	public static void simpleSet(Object root, Object val, Object... path) {
-		if ((path.length == 1) && ((String)path[0]).contains(".")) {
-			path = ((String)path[0]).split("\\.");
+		if ((path.length == 1) && ((String) path[0]).contains(".")) {
+			path = ((String) path[0]).split("\\.");
 		}
 
 		Object curr = root;
@@ -201,40 +217,22 @@ public class XbrlDockUtils implements XbrlDockUtilsConsts {
 
 	public static <RetType> RetType createObject(Object owner, Map config) throws Exception {
 		RetType ob = (RetType) Class.forName((String) config.get(XDC_CFGTOKEN_javaClass)).getConstructor().newInstance();
-		
-		if ( ob instanceof GenModule ) {
-			((GenModule)ob).initModule((GenApp) owner, config);
+
+		if (ob instanceof GenAgent) {
+			((GenAgent) ob).initModule((GenApp) owner, config);
 		}
-		
+
 		return ob;
 	}
 
-//	public static <RetType> RetType deepCopyIsh(RetType ob) {
-//
-//		if ((null == ob) || ob.getClass().isPrimitive() || (ob instanceof String)) {
-//			return ob;
-//		}
-//		
-//		Object ret = ob;
-//
-//		if (ob instanceof Map) {
-//			Map r = new HashMap();
-//			for (Map.Entry<Object, Object> me : ((Map<Object, Object>) ob).entrySet()) {
-//				r.put(me.getKey(), deepCopyIsh(me.getValue()));
-//			}
-//		} else if (ob instanceof Set) {
-//			Set r = new HashSet();
-//			for (Object m : ((Set<Object>) ob)) {
-//				r.add(deepCopyIsh(m));
-//			}
-//		} else if (ob instanceof List) {
-//			List r = new ArrayList();
-//			for (Object m : ((List<Object>) ob)) {
-//				r.add(deepCopyIsh(m));
-//			}
-//		}
-//
-//		return (RetType) ret;
-//	}
+	public static Map ensureMap(Map target, boolean clear) {
+		if (null == target) {
+			target = new HashMap<String, Object>();
+		} else if (clear) {
+			target.clear();
+		}
+
+		return target;
+	}
 
 }

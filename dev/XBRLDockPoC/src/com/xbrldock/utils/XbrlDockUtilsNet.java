@@ -2,15 +2,22 @@ package com.xbrldock.utils;
 
 import java.io.BufferedInputStream;
 import java.io.File;
+import java.io.FileInputStream;
 import java.io.FileOutputStream;
+import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
 import java.net.HttpURLConnection;
 import java.net.URL;
 import java.nio.file.Files;
+import java.util.Collections;
+import java.util.Map;
+import java.util.TreeMap;
 import java.util.zip.GZIPInputStream;
 
 import org.apache.commons.compress.utils.IOUtils;
+import org.xml.sax.InputSource;
+import org.xml.sax.SAXException;
 
 import com.xbrldock.XbrlDock;
 import com.xbrldock.XbrlDockException;
@@ -21,6 +28,22 @@ public class XbrlDockUtilsNet implements XbrlDockUtilsConsts {
 	private static long waitMsec = 500;
 
 	private static Object LOCK = new Object();
+	
+	private static File CACHE_ROOT;
+	private static ThreadLocal<Map<String, File>> URL_REWRITES = new ThreadLocal<Map<String, File>>() {
+		@Override
+		protected Map<String, File> initialValue() {
+			return new TreeMap<String, File>(Collections.reverseOrder());
+		}
+	};
+
+	public static void setCacheRoot(String root) {
+		CACHE_ROOT = new File(root);
+	}
+	
+	public static File getCacheRoot() {
+		return CACHE_ROOT;
+	}
 
 	public static HttpURLConnection connect(String url, String... headers) throws Exception {
 		long now = System.currentTimeMillis();
@@ -49,6 +72,48 @@ public class XbrlDockUtilsNet implements XbrlDockUtilsConsts {
 		}
 
 		return conn;
+	}
+	
+	public static void setRewrite(File root, Map<String, String> prefixes) throws Exception {
+		Map<String, File> ur = URL_REWRITES.get();
+
+		ur.clear();
+
+		for (Map.Entry<String, String> ep : prefixes.entrySet()) {
+			ur.put(ep.getKey(), new File(root, ep.getValue()).getCanonicalFile());
+		}
+	}
+
+	public static InputSource resolveEntity(String url) throws SAXException, IOException {
+		return new InputSource(resolveEntityStream(url));
+	}
+
+	public static InputStream resolveEntityStream(String url) throws SAXException, IOException {
+		String path = XbrlDockUtils.getPostfix(url, "://");
+		File fCache = new File(CACHE_ROOT, path);
+
+		for (Map.Entry<String, File> ep : URL_REWRITES.get().entrySet()) {
+			String p = ep.getKey();
+			if (url.startsWith(p)) {
+				fCache = new File(ep.getValue(), url.substring(p.length()));
+				break;
+			}
+		}
+
+		if (!fCache.isFile()) {
+			XbrlDockUtilsFile.ensureDir(fCache.getParentFile());
+			try {
+				XbrlDockUtilsNet.download(url, fCache);
+			} catch (Exception e) {
+				XbrlDockException.wrap(e, "Downloading", url);
+			}
+		}
+
+		if (fCache.isFile()) {
+			return new FileInputStream(fCache);
+		}
+
+		return null;
 	}
 
 	public static void download(String url, File file, String... headers) throws Exception {

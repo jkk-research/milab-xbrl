@@ -1,26 +1,27 @@
 package com.xbrldock.poc;
 
 import java.io.File;
-import java.io.IOException;
 import java.io.InputStream;
 import java.util.Collection;
 import java.util.Map;
-
-import org.xml.sax.EntityResolver;
-import org.xml.sax.InputSource;
-import org.xml.sax.SAXException;
 
 import com.xbrldock.XbrlDockConsts;
 import com.xbrldock.utils.XbrlDockUtilsConsts;
 
 @SuppressWarnings("rawtypes")
 public interface XbrlDockPocConsts extends XbrlDockConsts, XbrlDockUtilsConsts {	
-	String XDC_CFGTOKEN_MOD_urlCache = "urlCache";
-	String XDC_CFGTOKEN_MOD_taxmgr = "taxmgr";
-	String XDC_CFGTOKEN_MOD_esefConn = "esefConn";
-	String XDC_CFGTOKEN_MOD_manualReports = "manualReports";
-	String XDC_CFGTOKEN_MOD_gui = "gui";
+	String XDC_CFGTOKEN_AGENT_taxmgr = "taxmgr";
+	String XDC_CFGTOKEN_AGENT_esefConn = "esefConn";
+	String XDC_CFGTOKEN_AGENT_manualReports = "manualReports";
+	String XDC_CFGTOKEN_AGENT_gui = "gui";
 	
+	String XDC_CMD_TAXMGR_IMPORT = "import";
+
+	String XDC_METAINFO_urlRewrite = "xdc_urlRewrite";
+	String XDC_METAINFO_pkgInfo = "xdc_pkgInfo";
+	String XDC_METAINFO_entryPoints = "xdc_entryPoints";
+	String XDC_METAINFO_entryPointRefs = "xdc_entryPointRefs";
+
 	String XDC_CFGTOKEN_dirStore = "dirStore";
 	String XDC_CFGTOKEN_dirInput = "dirInput";
 
@@ -36,19 +37,8 @@ public interface XbrlDockPocConsts extends XbrlDockConsts, XbrlDockUtilsConsts {
 	String XDC_FNAME_CATALOG = "catalog.xml";
 	String XDC_FNAME_TAXPACK = "taxonomyPackage.xml";
 
-	public interface XDModUrlResolver extends GenModule, EntityResolver {
-		File getCacheRoot();
-		void setRewrite(File root, Map<String, String> prefixes) throws Exception;
-		
-		public InputSource resolveEntity(String publicId, String systemId) throws SAXException, IOException;
-		public InputStream resolveEntityStream(String publicId, String systemId) throws SAXException, IOException;
-	}
 	
-	public interface XDModTaxonomyManager extends GenModule {
-		void importTaxonomy(File taxSource) throws Exception;
-	}
-	
-	public interface XDModSourceConnector extends GenModule {
+	public interface XDModSourceConnector extends GenAgent {
 		int refresh(Collection<String> updated) throws Exception;
 		Map getReportData(String id, Map target) throws Exception;
 		void visitReports(GenProcessor<Map> visitor, GenProcessor<Map> filter) throws Exception;

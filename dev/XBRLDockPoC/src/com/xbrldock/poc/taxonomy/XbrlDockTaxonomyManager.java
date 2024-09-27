@@ -1,80 +1,95 @@
 package com.xbrldock.poc.taxonomy;
 
 import java.io.File;
-import java.io.InputStream;
 import java.util.Map;
 import java.util.TreeMap;
 
 import org.w3c.dom.Element;
 import org.w3c.dom.Node;
 
+import com.xbrldock.XbrlDock;
+import com.xbrldock.XbrlDockConsts;
 import com.xbrldock.XbrlDockException;
-import com.xbrldock.poc.XbrlDockPocConsts;
+import com.xbrldock.poc.utils.XbrlDockPocUtils;
 import com.xbrldock.utils.XbrlDockUtils;
 import com.xbrldock.utils.XbrlDockUtilsFile;
+import com.xbrldock.utils.XbrlDockUtilsJson;
+import com.xbrldock.utils.XbrlDockUtilsNet;
 import com.xbrldock.utils.XbrlDockUtilsXml;
 
-@SuppressWarnings("rawtypes")
-public class XbrlDockTaxonomyManager implements XbrlDockTaxonomyConsts, XbrlDockPocConsts.XDModTaxonomyManager {
+@SuppressWarnings({ "rawtypes", "unchecked" })
+public class XbrlDockTaxonomyManager implements XbrlDockTaxonomyConsts, XbrlDockConsts.GenAgent {
 
-	private XDModUrlResolver urlCache;
 	File taxonomyStoreRoot;
 	File dirInput;
 
 	private final Map<String, XbrlDockTaxonomy> taxonomies = new TreeMap<>();
-	
+
 	public XbrlDockTaxonomyManager() {
-		// TODO Auto-generated constructor stub
 	}
-	
+
 	@Override
 	public void initModule(GenApp app, Map config) throws Exception {
-		this.urlCache = app.getModule(XDC_CFGTOKEN_MOD_urlCache);
 		String dataRoot = XbrlDockUtils.simpleGet(config, XDC_CFGTOKEN_dirStore);
 		this.taxonomyStoreRoot = new File(dataRoot);
 		XbrlDockUtilsFile.ensureDir(taxonomyStoreRoot);
-		
+
 		String inputRoot = XbrlDockUtils.simpleGet(config, XDC_CFGTOKEN_dirInput);
 		this.dirInput = new File(inputRoot);
 	}
 
-//	public XbrlDockTaxonomyManager(String dataRoot, String cacheRoot) throws Exception {
-//		urlCache = new XbrlDockDevUrlCache(cacheRoot);
-//		XbrlDockUtilsXml.setDefEntityResolver(urlCache);
-//		
-//		taxonomyStoreRoot = new File(dataRoot);
-//		XbrlDockUtilsFile.ensureDir(taxonomyStoreRoot);
-//	}
-
 	@Override
-	public void importTaxonomy(File taxSource) throws Exception {
-		File fTempDir = null;
+	public <RetType> RetType process(String command, Object... params) throws Exception {
+		Object ret = null;
+		switch (command) {
+		case XDC_CMD_TAXMGR_IMPORT:
+			importTaxonomy((File) params[0]);
+			break;
+		default:
+			XbrlDockException.wrap(null, "Unhandled agent command", command, params);
+			break;
+		}
 		
-		if ( taxSource.isFile() && taxSource.getName().endsWith(XDC_FEXT_ZIP)) {
+		return (RetType) ret;
+	}
+
+	private void importTaxonomy(File taxSource) throws Exception {
+		File fTempDir = null;
+
+		if (taxSource.isFile() && taxSource.getName().endsWith(XDC_FEXT_ZIP)) {
 			fTempDir = new File(dirInput, XbrlDockUtils.strTime());
 			XbrlDockUtilsFile.extractWithApacheZipFile(fTempDir, taxSource, null);
-			
+
 			taxSource = fTempDir;
 		}
-		
-		if ( taxSource.isDirectory() ) {
+
+		if (taxSource.isDirectory()) {
+			Map txmyInfo = XbrlDockPocUtils.readMeta(taxSource, null);
 			
+			String id = XbrlDockUtils.simpleGet(txmyInfo, XDC_METAINFO_pkgInfo, "identifier");
+			id = XbrlDockUtils.getPostfix(id, XDC_URL_PSEP);
+			File fDir = new File(taxonomyStoreRoot, id);
+			XbrlDockUtilsFile.ensureDir(fDir);
+			
+			XbrlDockUtilsJson.writeJson(new File(fDir, XDC_TAXONOMY_FNAME), txmyInfo);
+			
+			XbrlDock.log(EventLevel.Trace, txmyInfo);
 		}
-		
+
 	}
-	
+
 	public XbrlDockTaxonomy loadTaxonomy(String taxonomyId) throws Exception {
-		
-		File fMetaInf = new File(urlCache.getCacheRoot(), taxonomyId + "/" + XDC_FNAME_METAINF);
-		
+
+		File fMetaInf = new File(XbrlDockUtilsNet.getCacheRoot(), taxonomyId + "/" + XDC_FNAME_METAINF);
+
 		File fTax = new File(fMetaInf, XDC_FNAME_TAXPACK);
 		Element eTaxPack = XbrlDockUtilsXml.parseDoc(fTax).getDocumentElement();
 
 		Node eTP = eTaxPack.getElementsByTagName("tp:identifier").item(0);
 		String id = eTP.getTextContent().trim();
-		
+
 		String taxId = XbrlDockUtils.getPostfix(id, XDC_URL_PSEP);
-		
+
 		XbrlDockTaxonomy ret = XbrlDockUtils.safeGet(taxonomies, taxId, new XbrlDockUtils.ItemCreator<XbrlDockTaxonomy>() {
 			@Override
 			public XbrlDockTaxonomy create(Object key, Object... hints) {
@@ -87,16 +102,8 @@ public class XbrlDockTaxonomyManager implements XbrlDockTaxonomyConsts, XbrlDock
 				}
 			}
 		});
-		
+
 		return ret;
-	}
-
-	public InputStream getUrlStream(String url) throws Exception {
-		return urlCache.resolveEntityStream("", url);
-	}
-
-	public XDModUrlResolver getUrlCache() {
-		return urlCache;
 	}
 
 }

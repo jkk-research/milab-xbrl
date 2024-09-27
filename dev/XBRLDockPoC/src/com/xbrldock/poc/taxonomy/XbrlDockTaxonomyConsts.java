@@ -11,8 +11,8 @@ public interface XbrlDockTaxonomyConsts extends XbrlDockPocConsts {
 
 	String KEY_LOADED = "loaded";
 	
-	String TAXONOMY_FNAME = "taxonomy" + XDC_FEXT_JSON;
-	String RES_FNAME_POSTFIX = "_res" + XDC_FEXT_JSON;
+	String XDC_TAXONOMY_FNAME = "taxonomy" + XDC_FEXT_JSON;
+	String XDC_RES_FNAME_POSTFIX = "_res" + XDC_FEXT_JSON;
 	
 	interface TaxonomyReader {
 		

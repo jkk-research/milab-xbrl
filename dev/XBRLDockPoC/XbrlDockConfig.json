@@ -1,11 +1,8 @@
 {
   "app" : {
     "javaClass" : "com.xbrldock.poc.XbrlDockPocApp",
-    "modules" : {
-      "urlCache" : {
-        "javaClass" : "com.xbrldock.poc.XbrlDockDevUrlCache",
-        "dirStore" : "ext/XBRLDock/urlcache"
-      },
+    "dirUrlCache" : "ext/XBRLDock/urlcache",
+    "agents" : {
       "taxmgr" : {
         "javaClass" : "com.xbrldock.poc.taxonomy.XbrlDockTaxonomyManager",
         "dirStore" : "temp/taxonomy",

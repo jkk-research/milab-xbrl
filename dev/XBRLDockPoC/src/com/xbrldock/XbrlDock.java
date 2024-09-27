@@ -19,11 +19,10 @@ public abstract class XbrlDock implements XbrlDockConsts, XbrlDockUtilsConsts, X
 	private static XbrlDock XBRLDOCK;
 	private static PrintStream PS_LOG = System.out;
 
-//	private static String APP_PREFIX;
 	protected final static Map<String, Object> APP_CONFIG = new TreeMap<>();
 	protected final static ArrayList<String> APP_ARGS = new ArrayList<>();
 
-	private final Map<String, GenModule> modules = new TreeMap<>();
+	private final Map<String, GenAgent> agents = new TreeMap<>();
 
 	public static void main(String[] args) {
 		try {
@@ -81,37 +80,6 @@ public abstract class XbrlDock implements XbrlDockConsts, XbrlDockUtilsConsts, X
 		XbrlDockUtils.simpleSet(root, val, path);
 	}
 
-//	public void initEnv(String appPrefix, String[] args, Map<String, Object> loadedConfig) {
-//		APP_PREFIX = appPrefix;
-//		
-//		envData.putAll(System.getenv());
-//
-//		Properties props = System.getProperties();
-//		for (Object k : props.keySet()) {
-//			String pk = XbrlDockUtils.toString(k);
-//			envData.put(pk, props.getProperty(pk));
-//		}
-//
-//		for (String a : args) {
-//			if (a.startsWith("-")) {
-//				String name = a.substring(1);
-//				String val = null;
-//
-//				int sep = name.indexOf("=");
-//				if (-1 != sep) {
-//					val = name.substring(sep + 1);
-//					name = name.substring(0, sep);
-//				}
-//
-//				envData.put(name, val);
-//			} else {
-//				APP_ARGS.add(a);
-//			}
-//		}
-//
-//		envData.putAll(loadedConfig);
-//	}
-
 	protected abstract void handleLog(EventLevel level, Object... params);
 
 	protected static void handleLogDefault(EventLevel level, Object... params) {
@@ -137,65 +105,27 @@ public abstract class XbrlDock implements XbrlDockConsts, XbrlDockUtilsConsts, X
 	}
 
 	@Override
-	public <RetType> RetType getModule(String moduleKey) {
-		Map cfg = XbrlDockUtils.simpleGet(APP_CONFIG, XDC_CFGTOKEN_app, XDC_CFGTOKEN_modules, moduleKey);
+	public <RetType> RetType callAgent(String agentId, String command, Object... params) throws Exception {
+		Map cfg = XbrlDockUtils.simpleGet(APP_CONFIG, XDC_CFGTOKEN_app, XDC_CFGTOKEN_agents, agentId);
 		
-		return (RetType) XbrlDockUtils.safeGet(XBRLDOCK.modules, moduleKey, new ItemCreator<Object>() {
+		GenAgent agent = XbrlDockUtils.safeGet(XBRLDOCK.agents, agentId, new ItemCreator<GenAgent>() {
 			@Override
-			public Object create(Object key, Object... hints) {
+			public GenAgent create(Object key, Object... hints) {
 				try {
 					return XbrlDockUtils.createObject(XBRLDOCK, cfg);
 				} catch (Exception e) {
-					return XbrlDockException.wrap(e, "getModule", moduleKey, cfg);
+					return XbrlDockException.wrap(e, "getModule", agentId, cfg);
 				}
 			}
 		});
+		
+		Object ret = null;
+		
+		if ( !XbrlDockUtils.isEmpty(command) ) {
+			ret = agent.process(command, params);
+		}
+		
+		return (RetType) ret;
 	}
-
-//	public static <RetType> RetType getConfig(Map<String, Object> source, RetType defVal, Object... path) {
-//		Object ret;
-//		
-//		if ( null == source ) {
-//			source = XBRLDOCK.envData;
-//		}
-//		String p = XbrlDockUtils.sbAppend(null, XDC_SEP_PATH, true, path).toString();
-//		
-//		ret = source.getOrDefault(p, defVal);
-//		
-//		if ((null != ret) && !(defVal instanceof String) ) {
-//			if ( defVal instanceof Integer ) {
-//				ret = ((Number) ret).intValue();
-//			} else if ( defVal instanceof Long ) {
-//				ret = ((Number) ret).longValue();
-//			} else if ( defVal instanceof Float ) {
-//				ret = ((Number) ret).floatValue();
-//			} else if ( defVal instanceof Double ) {
-//				ret = ((Number) ret).doubleValue();
-//			} 
-//		}
-//		
-//		return (RetType) ret;
-//	}
-
-//	public static Map<String, Object> getSubConfig(Map<String, Object> target, Object... prefix) {
-//		if (null == target) {
-//			target = new TreeMap<String, Object>();
-//		} else {
-//			target.clear();
-//		}
-//
-//		StringBuilder sb = new StringBuilder(APP_PREFIX);
-//		String p = XbrlDockUtils.sbAppend(sb, XDC_SEP_PATH, true, prefix).append(XDC_SEP_PATH).toString();
-//		int pl = p.length();
-//
-//		for (Map.Entry<String, Object> e : XBRLDOCK.envData.entrySet()) {
-//			String k = e.getKey();
-//			if (k.startsWith(p)) {
-//				target.put(k.substring(pl), e.getValue());
-//			}
-//		}
-//
-//		return target;
-//	}
 
 }

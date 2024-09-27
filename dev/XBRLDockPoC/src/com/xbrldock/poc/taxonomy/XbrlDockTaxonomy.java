@@ -20,12 +20,11 @@ import com.xbrldock.dev.XbrlDockDevCounter;
 import com.xbrldock.utils.XbrlDockUtils;
 import com.xbrldock.utils.XbrlDockUtilsFile;
 import com.xbrldock.utils.XbrlDockUtilsJson;
+import com.xbrldock.utils.XbrlDockUtilsNet;
 import com.xbrldock.utils.XbrlDockUtilsXml;
 
 @SuppressWarnings({ "rawtypes", "unchecked" })
 public class XbrlDockTaxonomy implements XbrlDockTaxonomyConsts {
-
-	private final XbrlDockTaxonomyManager tmgr;
 
 	final String id;
 	final File fTaxDir;
@@ -62,13 +61,11 @@ public class XbrlDockTaxonomy implements XbrlDockTaxonomyConsts {
 	};
 
 	public XbrlDockTaxonomy(String taxId, File fMetaInf, XbrlDockTaxonomyManager tmgr) throws Exception {
-		this.tmgr = tmgr;
-
 		this.id = taxId;
 
 		fTaxDir = new File(tmgr.taxonomyStoreRoot, taxId);
 
-//		File fData = new File(fTaxDir, TAXONOMY_FNAME);
+		File fData = new File(fTaxDir, XDC_TAXONOMY_FNAME);
 
 //		if (fData.isFile()) {
 //			Map data = XbrlDockUtilsJson.readJson(fData);
@@ -154,7 +151,7 @@ public class XbrlDockTaxonomy implements XbrlDockTaxonomyConsts {
 		Map<String, Object> res = XbrlDockUtils.safeGet(labels, lang, new XbrlDockUtils.ItemCreator<Map<String, Object>>() {
 			@Override
 			public Map<String, Object> create(Object key, Object... hints) {
-				File fRes = new File(fTaxDir, key + RES_FNAME_POSTFIX);
+				File fRes = new File(fTaxDir, key + XDC_RES_FNAME_POSTFIX);
 				try {
 					return XbrlDockUtilsJson.readJson(fRes);
 				} catch (Exception e) {
@@ -259,7 +256,7 @@ public class XbrlDockTaxonomy implements XbrlDockTaxonomyConsts {
 			}
 		}
 		
-		tmgr.getUrlCache().setRewrite(fBase, ur);
+		XbrlDockUtilsNet.setRewrite(fBase, ur);
 
 		File fTax = new File(fMetaInf, XDC_FNAME_TAXPACK);
 		Element eTaxPack = XbrlDockUtilsXml.parseDoc(fTax).getDocumentElement();
@@ -301,7 +298,7 @@ public class XbrlDockTaxonomy implements XbrlDockTaxonomyConsts {
 
 		XbrlDock.log(EventLevel.Trace, "loadSchema", schemaUrl);
 
-		try (InputStream is = tmgr.getUrlStream(schemaUrl)) {
+		try (InputStream is = XbrlDockUtilsNet.resolveEntityStream(schemaUrl)) {
 			Element eSchema = XbrlDockUtilsXml.parseDoc(is).getDocumentElement();
 
 //			String targetNS = eSchema.getAttribute("targetNamespace");
@@ -364,7 +361,7 @@ public class XbrlDockTaxonomy implements XbrlDockTaxonomyConsts {
 			XbrlDock.log(EventLevel.Debug, url);
 		}
 
-		try (InputStream is = tmgr.getUrlStream(url)) {
+		try (InputStream is = XbrlDockUtilsNet.resolveEntityStream(url)) {
 			Element eRoot = XbrlDockUtilsXml.parseDoc(is).getDocumentElement();
 
 			String path = XbrlDockUtils.cutPostfix(url, "/");

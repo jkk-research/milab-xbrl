@@ -38,7 +38,8 @@ public interface XbrlDockConsts {
 	String XDC_CFGTOKEN_javaClass = "javaClass";
 	String XDC_CFGTOKEN_app = "app";
 	String XDC_CFGTOKEN_gui = "gui";
-	String XDC_CFGTOKEN_modules = "modules";
+	String XDC_CFGTOKEN_agents = "agents";
+	String XDC_CFGTOKEN_dirUrlCache = "dirUrlCache";
 	String XDC_CFGTOKEN_ = "";
 
 
@@ -54,11 +55,12 @@ public interface XbrlDockConsts {
 	}
 	
 	public interface GenApp {
-		<RetType> RetType getModule(String moduleKey);
+		<RetType> RetType callAgent(String agentId, String command, Object... params) throws Exception;
 	}
 	
-	public interface GenModule {
+	public interface GenAgent {
 		void initModule(GenApp app, Map config) throws Exception;
+		<RetType> RetType process(String command, Object... params) throws Exception;
 	}
 	
 	interface ItemCreator<Type> {
