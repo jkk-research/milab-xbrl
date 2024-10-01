@@ -10,13 +10,14 @@ import com.xbrldock.utils.XbrlDockUtilsConsts;
 
 @SuppressWarnings("rawtypes")
 public interface XbrlDockPocConsts extends XbrlDockConsts, XbrlDockUtilsConsts {	
-	String XDC_CFGTOKEN_AGENT_taxmgr = "taxmgr";
+	String XDC_CFGTOKEN_AGENT_metaManager = "metaManager";
 	String XDC_CFGTOKEN_AGENT_esefConn = "esefConn";
 	String XDC_CFGTOKEN_AGENT_manualReports = "manualReports";
 	String XDC_CFGTOKEN_AGENT_gui = "gui";
 	
-	String XDC_CMD_TAXMGR_IMPORT = "import";
+	String XDC_CMD_METAMGR_IMPORT = "import";
 
+	String XDC_METAINFO_dir = "xdc_metaInfoDir";
 	String XDC_METAINFO_urlRewrite = "xdc_urlRewrite";
 	String XDC_METAINFO_pkgInfo = "xdc_pkgInfo";
 	String XDC_METAINFO_entryPoints = "xdc_entryPoints";

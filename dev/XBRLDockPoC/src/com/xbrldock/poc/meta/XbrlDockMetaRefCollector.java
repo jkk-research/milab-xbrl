@@ -1,4 +1,4 @@
-package com.xbrldock.poc.taxonomy;
+package com.xbrldock.poc.meta;
 
 import java.io.File;
 import java.util.Map;
@@ -14,7 +14,7 @@ import com.xbrldock.poc.XbrlDockPocConsts;
 import com.xbrldock.utils.XbrlDockUtils;
 import com.xbrldock.utils.XbrlDockUtilsXml;
 
-public class XbrlDockTaxonomyRefCollector implements XbrlDockTaxonomyConsts, XbrlDockPocConsts.ReportDataHandler {
+public class XbrlDockMetaRefCollector implements XbrlDockMetaConsts, XbrlDockPocConsts.ReportDataHandler {
 
 	String repId;
 	Map<String, String> imports = new TreeMap<>();

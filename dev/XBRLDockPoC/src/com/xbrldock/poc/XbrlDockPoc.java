@@ -14,8 +14,8 @@ import com.xbrldock.poc.conn.xbrlorg.XbrlDockConnXbrlOrg;
 import com.xbrldock.poc.format.XbrlDockFormatJson;
 import com.xbrldock.poc.format.XbrlDockFormatXhtml;
 import com.xbrldock.poc.gui.XbrlDockGuiApp;
-import com.xbrldock.poc.taxonomy.XbrlDockTaxonomy;
-import com.xbrldock.poc.taxonomy.XbrlDockTaxonomyManager;
+import com.xbrldock.poc.meta.XbrlDockMetaTaxonomy;
+import com.xbrldock.poc.meta.XbrlDockTaxonomyManager;
 import com.xbrldock.utils.XbrlDockUtils;
 import com.xbrldock.utils.XbrlDockUtilsFile;
 
@@ -115,7 +115,7 @@ public class XbrlDockPoc extends XbrlDock implements XbrlDockPocConsts {
 			break;
 		case "taxonomy":
 			
-			XbrlDockTaxonomy txIfrs2024 = taxMgr.loadTaxonomy("xbrl.ifrs.org/taxonomy/2024-03-27");
+			XbrlDockMetaTaxonomy txIfrs2024 = taxMgr.loadTaxonomy("xbrl.ifrs.org/taxonomy/2024-03-27");
 			
 			txIfrs2024.getRes("en");
 

@@ -14,7 +14,7 @@ import javax.swing.tree.TreeNode;
 import javax.swing.tree.TreePath;
 
 import com.xbrldock.poc.XbrlDockPoc;
-import com.xbrldock.poc.taxonomy.XbrlDockTaxonomy;
+import com.xbrldock.poc.meta.XbrlDockMetaTaxonomy;
 import com.xbrldock.utils.XbrlDockUtils;
 
 @SuppressWarnings({ "rawtypes", "unchecked" })
@@ -24,7 +24,7 @@ public class XbrlDockGuiRoleTree extends JTree implements XbrlDockGuiConsts {
 	private static final ArrayList<ItemNode> LEAF = new ArrayList<>();
 
 	XbrlDockPoc xbrlDock;
-	XbrlDockTaxonomy taxonomy;
+	XbrlDockMetaTaxonomy taxonomy;
 
 	class ItemNode implements TreeNode {
 
@@ -142,7 +142,7 @@ public class XbrlDockGuiRoleTree extends JTree implements XbrlDockGuiConsts {
 		setModel(tm);
 	}
 
-	public void setTaxonomy(XbrlDockTaxonomy taxonomy) throws Exception {
+	public void setTaxonomy(XbrlDockMetaTaxonomy taxonomy) throws Exception {
 
 		this.taxonomy = taxonomy;
 

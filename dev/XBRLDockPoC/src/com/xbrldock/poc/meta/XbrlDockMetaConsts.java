@@ -1,8 +1,8 @@
-package com.xbrldock.poc.taxonomy;
+package com.xbrldock.poc.meta;
 
 import com.xbrldock.poc.XbrlDockPocConsts;
 
-public interface XbrlDockTaxonomyConsts extends XbrlDockPocConsts {
+public interface XbrlDockMetaConsts extends XbrlDockPocConsts {
 	
 	String XDC_TAXONOMY_TOKEN_items = "items";
 	String XDC_TAXONOMY_TOKEN_links = "links";

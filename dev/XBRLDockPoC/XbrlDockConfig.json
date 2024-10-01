@@ -3,8 +3,8 @@
     "javaClass" : "com.xbrldock.poc.XbrlDockPocApp",
     "dirUrlCache" : "ext/XBRLDock/urlcache",
     "agents" : {
-      "taxmgr" : {
-        "javaClass" : "com.xbrldock.poc.taxonomy.XbrlDockTaxonomyManager",
+      "metaManager" : {
+        "javaClass" : "com.xbrldock.poc.meta.XbrlDockMetaManager",
         "dirStore" : "temp/taxonomy",
         "dirInput" : "ext/XBRLDock/taxonomy/import"
       },

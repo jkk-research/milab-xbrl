@@ -1,4 +1,4 @@
-package com.xbrldock.poc.taxonomy;
+package com.xbrldock.poc.meta;
 
 import java.io.File;
 import java.io.InputStream;
@@ -24,7 +24,7 @@ import com.xbrldock.utils.XbrlDockUtilsNet;
 import com.xbrldock.utils.XbrlDockUtilsXml;
 
 @SuppressWarnings({ "rawtypes", "unchecked" })
-public class XbrlDockTaxonomy implements XbrlDockTaxonomyConsts {
+public class XbrlDockTaxonomy2 implements XbrlDockMetaConsts {
 
 	final String id;
 	final File fTaxDir;
@@ -60,7 +60,7 @@ public class XbrlDockTaxonomy implements XbrlDockTaxonomyConsts {
 		}
 	};
 
-	public XbrlDockTaxonomy(String taxId, File fMetaInf, XbrlDockTaxonomyManager tmgr) throws Exception {
+	public XbrlDockTaxonomy2(String taxId, File fMetaInf, XbrlDockTaxonomyManager tmgr) throws Exception {
 		this.id = taxId;
 
 		fTaxDir = new File(tmgr.taxonomyStoreRoot, taxId);

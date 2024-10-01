@@ -13,7 +13,7 @@ import javax.swing.JPanel;
 import javax.swing.JScrollPane;
 
 import com.xbrldock.poc.XbrlDockPoc;
-import com.xbrldock.poc.taxonomy.XbrlDockTaxonomy;
+import com.xbrldock.poc.meta.XbrlDockMetaTaxonomy;
 import com.xbrldock.utils.XbrlDockUtilsGui;
 
 //@SuppressWarnings({ "rawtypes", "unchecked" })
@@ -22,7 +22,7 @@ public class XbrlDockGuiApp extends JFrame implements XbrlDockGuiConsts {
 
 	XbrlDockPoc xbrlDock;
 
-	XbrlDockTaxonomy taxonomy;
+	XbrlDockMetaTaxonomy taxonomy;
 
 	XbrlDockGuiRoleTree roleTree;
 	XbrlDockGuiItemInfoGrid itemGrid;

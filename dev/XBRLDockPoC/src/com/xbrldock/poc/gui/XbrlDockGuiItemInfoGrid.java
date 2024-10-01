@@ -24,7 +24,7 @@ import javax.swing.table.AbstractTableModel;
 
 import com.xbrldock.XbrlDockException;
 import com.xbrldock.poc.XbrlDockPoc;
-import com.xbrldock.poc.taxonomy.XbrlDockTaxonomy;
+import com.xbrldock.poc.meta.XbrlDockMetaTaxonomy;
 import com.xbrldock.utils.XbrlDockUtilsGui;
 
 //@SuppressWarnings({ "rawtypes", "unchecked" })
@@ -33,7 +33,7 @@ public class XbrlDockGuiItemInfoGrid extends JPanel implements XbrlDockGuiConsts
 	private static final long serialVersionUID = 1L;
 
 	XbrlDockPoc xbrlDock;
-	XbrlDockTaxonomy taxonomy;
+	XbrlDockMetaTaxonomy taxonomy;
 
 	ArrayList<String> attNames = new ArrayList<>();
 
@@ -217,7 +217,7 @@ public class XbrlDockGuiItemInfoGrid extends JPanel implements XbrlDockGuiConsts
 		add(sp, BorderLayout.CENTER);
 	}
 
-	public void setTaxonomy(XbrlDockTaxonomy taxonomy) throws Exception {
+	public void setTaxonomy(XbrlDockMetaTaxonomy taxonomy) throws Exception {
 
 		this.taxonomy = taxonomy;
 

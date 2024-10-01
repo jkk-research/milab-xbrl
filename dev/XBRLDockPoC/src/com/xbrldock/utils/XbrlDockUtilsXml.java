@@ -105,8 +105,9 @@ public class XbrlDockUtilsXml implements XbrlDockUtilsConsts {
 		return target;
 	}
 
-	public interface ChildProcessor {
-		void processChild(String tagName, Element ch);
+	public static abstract class ChildProcessor {
+		public abstract void processChild(String tagName, Element ch);
+		public void finish() {};
 	}
 
 	public static void processChildren(Element eTaxPack, ChildProcessor childProcessor) {
@@ -121,5 +122,7 @@ public class XbrlDockUtilsXml implements XbrlDockUtilsConsts {
 				childProcessor.processChild(tagName, e);
 			}
 		}
+		
+		childProcessor.finish();
 	}
 }

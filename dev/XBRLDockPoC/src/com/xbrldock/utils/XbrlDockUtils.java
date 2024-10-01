@@ -235,4 +235,25 @@ public class XbrlDockUtils implements XbrlDockUtilsConsts {
 		return target;
 	}
 
+	public static String optExtendRef(String refPath, String currPath) {
+		String realRef = refPath;
+
+		if (!realRef.contains(XDC_URL_PSEP)) {
+			if (realRef.startsWith(XDC_URL_HERE)) {
+				realRef = currPath + realRef.substring(1);
+			} else if (realRef.startsWith(XDC_URL_UP)) {
+				do {
+					currPath = XbrlDockUtils.cutPostfix(currPath, "/");
+					realRef = realRef.substring(XDC_URL_UP.length());
+				} while (realRef.startsWith(XDC_URL_UP));
+
+				realRef = currPath + "/" + realRef;
+			} else {
+				realRef = currPath + "/" + realRef;
+			}
+		}
+
+		return realRef;
+	}
+
 }

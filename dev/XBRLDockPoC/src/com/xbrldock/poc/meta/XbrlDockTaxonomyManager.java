@@ -1,4 +1,4 @@
-package com.xbrldock.poc.taxonomy;
+package com.xbrldock.poc.meta;
 
 import java.io.File;
 import java.util.Map;
@@ -18,12 +18,12 @@ import com.xbrldock.utils.XbrlDockUtilsNet;
 import com.xbrldock.utils.XbrlDockUtilsXml;
 
 @SuppressWarnings({ "rawtypes", "unchecked" })
-public class XbrlDockTaxonomyManager implements XbrlDockTaxonomyConsts, XbrlDockConsts.GenAgent {
+public class XbrlDockTaxonomyManager implements XbrlDockMetaConsts, XbrlDockConsts.GenAgent {
 
 	File taxonomyStoreRoot;
 	File dirInput;
 
-	private final Map<String, XbrlDockTaxonomy> taxonomies = new TreeMap<>();
+	private final Map<String, XbrlDockMetaTaxonomy> taxonomies = new TreeMap<>();
 
 	public XbrlDockTaxonomyManager() {
 	}
@@ -42,7 +42,7 @@ public class XbrlDockTaxonomyManager implements XbrlDockTaxonomyConsts, XbrlDock
 	public <RetType> RetType process(String command, Object... params) throws Exception {
 		Object ret = null;
 		switch (command) {
-		case XDC_CMD_TAXMGR_IMPORT:
+		case XDC_CMD_METAMGR_IMPORT:
 			importTaxonomy((File) params[0]);
 			break;
 		default:
@@ -78,7 +78,7 @@ public class XbrlDockTaxonomyManager implements XbrlDockTaxonomyConsts, XbrlDock
 
 	}
 
-	public XbrlDockTaxonomy loadTaxonomy(String taxonomyId) throws Exception {
+	public XbrlDockMetaTaxonomy loadTaxonomy(String taxonomyId) throws Exception {
 
 		File fMetaInf = new File(XbrlDockUtilsNet.getCacheRoot(), taxonomyId + "/" + XDC_FNAME_METAINF);
 
@@ -90,11 +90,11 @@ public class XbrlDockTaxonomyManager implements XbrlDockTaxonomyConsts, XbrlDock
 
 		String taxId = XbrlDockUtils.getPostfix(id, XDC_URL_PSEP);
 
-		XbrlDockTaxonomy ret = XbrlDockUtils.safeGet(taxonomies, taxId, new XbrlDockUtils.ItemCreator<XbrlDockTaxonomy>() {
+		XbrlDockMetaTaxonomy ret = XbrlDockUtils.safeGet(taxonomies, taxId, new XbrlDockUtils.ItemCreator<XbrlDockMetaTaxonomy>() {
 			@Override
-			public XbrlDockTaxonomy create(Object key, Object... hints) {
+			public XbrlDockMetaTaxonomy create(Object key, Object... hints) {
 				try {
-					XbrlDockTaxonomy t = new XbrlDockTaxonomy(taxId, fMetaInf, XbrlDockTaxonomyManager.this);
+					XbrlDockMetaTaxonomy t = new XbrlDockMetaTaxonomy(taxId, fMetaInf, XbrlDockTaxonomyManager.this);
 //					t.loadTaxonomy(fMetaInf);
 					return t;
 				} catch (Exception e) {
