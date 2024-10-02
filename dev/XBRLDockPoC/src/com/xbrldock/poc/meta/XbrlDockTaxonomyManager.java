@@ -71,7 +71,7 @@ public class XbrlDockTaxonomyManager implements XbrlDockMetaConsts, XbrlDockCons
 			File fDir = new File(taxonomyStoreRoot, id);
 			XbrlDockUtilsFile.ensureDir(fDir);
 			
-			XbrlDockUtilsJson.writeJson(new File(fDir, XDC_TAXONOMY_FNAME), txmyInfo);
+			XbrlDockUtilsJson.writeJson(new File(fDir, XDC_TAXONOMYHEAD_FNAME), txmyInfo);
 			
 			XbrlDock.log(EventLevel.Trace, txmyInfo);
 		}

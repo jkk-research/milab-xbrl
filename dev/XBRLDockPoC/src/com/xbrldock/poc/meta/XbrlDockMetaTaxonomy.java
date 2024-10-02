@@ -65,15 +65,15 @@ public class XbrlDockMetaTaxonomy implements XbrlDockMetaConsts {
 
 		fTaxDir = new File(tmgr.taxonomyStoreRoot, taxId);
 
-		File fData = new File(fTaxDir, XDC_TAXONOMY_FNAME);
+//		File fData = new File(fTaxDir, XDC_TAXONOMYHEAD_FNAME);
 
 //		if (fData.isFile()) {
 //			Map data = XbrlDockUtilsJson.readJson(fData);
 //
-//			itemCache = XbrlDockUtils.simpleGet(data, XDC_TAXONOMY_TOKEN_items);
-//			links = XbrlDockUtils.simpleGet(data, XDC_TAXONOMY_TOKEN_links);
-//			allRefs = XbrlDockUtils.simpleGet(data, XDC_TAXONOMY_TOKEN_references);
-//			refRefs = XbrlDockUtils.simpleGet(data, XDC_TAXONOMY_TOKEN_refLinks);
+//			itemCache = XbrlDockUtils.simpleGet(data, XDC_METATOKEN_items);
+//			links = XbrlDockUtils.simpleGet(data, XDC_METATOKEN_links);
+//			allRefs = XbrlDockUtils.simpleGet(data, XDC_METATOKEN_references);
+//			refRefs = XbrlDockUtils.simpleGet(data, XDC_METATOKEN_refLinks);
 //			itemMapClosed = true;
 //		} else 
 		{
@@ -81,10 +81,10 @@ public class XbrlDockMetaTaxonomy implements XbrlDockMetaConsts {
 
 			Map data = new HashMap();
 			
-			data.put(XDC_TAXONOMY_TOKEN_items, items);
-			data.put(XDC_TAXONOMY_TOKEN_links, links);
-			data.put(XDC_TAXONOMY_TOKEN_references, allRefs);
-			data.put(XDC_TAXONOMY_TOKEN_refLinks, refRefs);
+			data.put(XDC_METATOKEN_items, items);
+			data.put(XDC_METATOKEN_links, links);
+			data.put(XDC_METATOKEN_references, allRefs);
+			data.put(XDC_METATOKEN_refLinks, refRefs);
 
 			XbrlDockUtilsFile.ensureDir(fTaxDir);
 
@@ -151,7 +151,7 @@ public class XbrlDockMetaTaxonomy implements XbrlDockMetaConsts {
 		Map<String, Object> res = XbrlDockUtils.safeGet(labels, lang, new XbrlDockUtils.ItemCreator<Map<String, Object>>() {
 			@Override
 			public Map<String, Object> create(Object key, Object... hints) {
-				File fRes = new File(fTaxDir, key + XDC_RES_FNAME_POSTFIX);
+				File fRes = new File(fTaxDir, XDC_TAXONOMYRES_FNAME_PREFIX + key + XDC_FEXT_JSON);
 				try {
 					return XbrlDockUtilsJson.readJson(fRes);
 				} catch (Exception e) {

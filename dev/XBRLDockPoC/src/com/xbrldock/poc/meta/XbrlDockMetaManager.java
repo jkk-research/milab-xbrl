@@ -18,10 +18,8 @@ import com.xbrldock.XbrlDock;
 import com.xbrldock.XbrlDockConsts;
 import com.xbrldock.XbrlDockException;
 import com.xbrldock.dev.XbrlDockDevCounter;
-import com.xbrldock.poc.utils.XbrlDockPocUtils;
 import com.xbrldock.utils.XbrlDockUtils;
 import com.xbrldock.utils.XbrlDockUtilsFile;
-import com.xbrldock.utils.XbrlDockUtilsJson;
 import com.xbrldock.utils.XbrlDockUtilsNet;
 import com.xbrldock.utils.XbrlDockUtilsXml;
 
@@ -32,9 +30,8 @@ public class XbrlDockMetaManager implements XbrlDockMetaConsts, XbrlDockConsts.G
 	File dirInput;
 
 	private final Map<String, XbrlDockMetaContainer> taxonomies = new TreeMap<>();
-	
-	XbrlDockDevCounter missingArcRoles = new XbrlDockDevCounter("Missing ArcRoles", true);
 
+	XbrlDockDevCounter missingArcRoles = new XbrlDockDevCounter("Missing ArcRoles", true);
 
 	public XbrlDockMetaManager() {
 	}
@@ -120,10 +117,13 @@ public class XbrlDockMetaManager implements XbrlDockMetaConsts, XbrlDockConsts.G
 		Set allRefs = new TreeSet();
 
 		XbrlDockUtilsXml.ChildProcessor procEntryPointItem = new XbrlDockUtilsXml.ChildProcessor() {
-			Map epInfo = new HashMap();
+			Map epInfo;
 
 			@Override
 			public void processChild(String tagName, Element ch) {
+				if ( null == epInfo ) {
+					epInfo = new HashMap();
+				}
 				switch (tagName) {
 				case "entryPointDocument":
 					String epRef = ch.getAttribute("href");
@@ -144,6 +144,7 @@ public class XbrlDockMetaManager implements XbrlDockMetaConsts, XbrlDockConsts.G
 					epInfo.put(XDC_METAINFO_entryPointRefs, new ArrayList(epRefs));
 					epRefs.clear();
 				}
+				epInfo = null;
 			}
 		};
 
@@ -204,11 +205,13 @@ public class XbrlDockMetaManager implements XbrlDockMetaConsts, XbrlDockConsts.G
 			id = XbrlDockUtils.getPostfix(id, XDC_URL_PSEP);
 			File fDir = new File(taxonomyStoreRoot, id);
 			XbrlDockUtilsFile.ensureDir(fDir);
-
-			XbrlDockUtilsJson.writeJson(new File(fDir, XDC_TAXONOMY_FNAME), txmyInfo);
-
-			XbrlDock.log(EventLevel.Trace, txmyInfo);
 			
+			mc.save(fDir);
+			
+			XbrlDock.log(EventLevel.Trace, txmyInfo);
+
+			XbrlDock.log(EventLevel.Trace, "Schema stats", mc.cntLinkTypes, mc.cntArcRoles);
+
 		}
 	}
 
@@ -233,9 +236,9 @@ public class XbrlDockMetaManager implements XbrlDockMetaConsts, XbrlDockConsts.G
 				metaContainer.optQueue(ep, null);
 			}
 		}
-		
+
 		XbrlDock.log(EventLevel.Trace, "getMetaContainer start loading from", schemaRoot.getCanonicalPath());
-		
+
 		File fMIDir = XbrlDockUtils.simpleGet(metaInfo, XDC_METAINFO_dir);
 		Map rewrite = XbrlDockUtils.simpleGet(metaInfo, XDC_METAINFO_urlRewrite);
 		XbrlDockUtilsNet.setRewrite(fMIDir, rewrite);
@@ -267,7 +270,7 @@ public class XbrlDockMetaManager implements XbrlDockMetaConsts, XbrlDockConsts.G
 				metaContainer.setUrlContent(cachedContent);
 			}
 		}
-		
+
 		XbrlDock.log(EventLevel.Error, "Unhandled arcroles", missingArcRoles);
 
 		return metaContainer;
@@ -288,28 +291,29 @@ public class XbrlDockMetaManager implements XbrlDockMetaConsts, XbrlDockConsts.G
 		for (int idx = 0; idx < nc; ++idx) {
 			Element e = (Element) nl.item(idx);
 			String tagName = e.getTagName();
+			String tn = XbrlDockUtils.getPostfix(tagName, ":");
 
 			String ns = targetNS;
 			String sl = null;
 
 			String itemId = e.getAttribute("id");
 
-			switch (tagName) {
-			case "xsd:import":
+			switch (tn) {
+			case "import":
 				ns = e.getAttribute("namespace");
 				sl = e.getAttribute("schemaLocation");
 				break;
-			case "xsd:include":
+			case "include":
 				sl = e.getAttribute("schemaLocation");
 				break;
-			case "link:linkbaseRef":
+			case "linkbaseRef":
 				sl = e.getAttribute("xlink:href");
 				break;
-			case "xsd:element":
+			case "element":
 				em = metaContainer.getItem(itemId, ns);
 				XbrlDockUtilsXml.readAtts(e, em);
 				break;
-			case "link:roleType":
+			case "roleType":
 //					if (schemaUrl.startsWith(taxRoot)) 
 			{
 				em = metaContainer.getItem(itemId, ns);
@@ -417,18 +421,24 @@ public class XbrlDockMetaManager implements XbrlDockMetaConsts, XbrlDockConsts.G
 //				XbrlDockException.wrap(null, "Missing link endpoint", url, am);
 			}
 
+			String idFrom = (String) from.get("id");
+
 			switch (ar) {
 			case "concept-label":
 			case "element-label":
 			case "assertion-unsatisfied-message":
 				String labelType = (String) to.get("xlink:role");
 				labelType = XbrlDockUtils.getPostfix(labelType, "/");
-				metaContainer.setLabel(to.get("xml:lang"), from.get("id"), labelType, to.get("value"));
+				metaContainer.setLabel(to.get("xml:lang"), idFrom, labelType, to.get("value"));
 //					XbrlDockUtils.simpleSet(labels, to.get("value"), to.get("xml:lang"), from.get("id"), labelType);
 				break;
 			case "concept-reference":
 			case "element-reference":
-				metaContainer.setDocumentRef(from.get("id"), toVal);
+				if (null == idFrom) {
+					missingArcRoles.add(ar);
+				} else {
+					metaContainer.setDocumentRef(from, toVal);
+				}
 //					XbrlDockUtils.safeGet(refRefs, from.get("id"), SET_CREATOR).add(toVal);
 				break;
 			case "all":
@@ -438,14 +448,13 @@ public class XbrlDockMetaManager implements XbrlDockMetaConsts, XbrlDockConsts.G
 			case "hypercube-dimension":
 			case "parent-child":
 			case "summation-item":
-				default:
+			default:
 
 				if ((null == to) || (null == from)) {
 					missingArcRoles.add(ar);
 					break;
 //					XbrlDockException.wrap(null, "Both should be items", url, am);
 				}
-				String idFrom = (String) from.get("id");
 				String idTo = (String) to.get("id");
 
 				am.remove("xlink:type");
