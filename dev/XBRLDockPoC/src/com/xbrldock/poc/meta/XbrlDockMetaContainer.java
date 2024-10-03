@@ -13,6 +13,7 @@ import org.w3c.dom.Element;
 
 import com.xbrldock.XbrlDock;
 import com.xbrldock.dev.XbrlDockDevCounter;
+import com.xbrldock.poc.utils.XbrlDockPocUtils;
 import com.xbrldock.utils.XbrlDockUtils;
 import com.xbrldock.utils.XbrlDockUtilsJson;
 
@@ -30,6 +31,7 @@ public class XbrlDockMetaContainer implements XbrlDockMetaConsts {
 	String path;
 	Map currentContent;
 
+	Map references = new TreeMap<>();
 	Map<String, Map<String, Object>> labels = new TreeMap<>();
 	Map<String, Map<String, Object>> contentByURL = new TreeMap<>();
 	Map<String, Object> itemsByNS = new TreeMap<>();
@@ -84,8 +86,11 @@ public class XbrlDockMetaContainer implements XbrlDockMetaConsts {
 
 		optQueue(realUrl, callerNamespace);
 
-		Map m = XbrlDockUtils.safeGet(contentByURL.get(realUrl), XDC_METATOKEN_items, MAP_CREATOR);
+		Map m = XbrlDockUtils.safeGet(contentByURL, realUrl, MAP_CREATOR);
+		m = XbrlDockUtils.safeGet(m, XDC_METATOKEN_items, MAP_CREATOR);
 		m = XbrlDockUtils.safeGet(m, id, MAP_CREATOR);
+		
+		m.put(XDC_METATOKEN_url, realUrl);
 
 		return m;
 	}
@@ -143,18 +148,22 @@ public class XbrlDockMetaContainer implements XbrlDockMetaConsts {
 	}
 
 	int storeDocumentRef(Map rm) {
-		ArrayList<Map> allRefs = XbrlDockUtils.safeGet(currentContent, XDC_METATOKEN_references, ARRAY_CREATOR);
+		ArrayList<Map> allRefs = XbrlDockUtils.safeGet(references, XDC_METATOKEN_references, ARRAY_CREATOR);
+//		ArrayList<Map> allRefs = XbrlDockUtils.safeGet(currentContent, XDC_METATOKEN_references, ARRAY_CREATOR);
 		allRefs.add(rm);
 		return allRefs.size() - 1;
 	}
 
 	void setDocumentRef(Map item, Object refIdx) {
 //		Map refRefs = XbrlDockUtils.safeGet(currentContent, XDC_METATOKEN_references, SORTEDMAP_CREATOR);
-		ArrayList al = XbrlDockUtils.safeGet(currentContent, XDC_METATOKEN_references, ARRAY_CREATOR);
-		String ri = XbrlDockUtils.sbAppend(null, ":", true, currentUrl, XDC_METATOKEN_references, refIdx).toString();
+		String itemId = XbrlDockPocUtils.getGlobalItemId(item);
+		Map refLinks = XbrlDockUtils.safeGet(references, XDC_METATOKEN_refLinks, SORTEDMAP_CREATOR);
 
-		if (!al.contains(ri)) {
-			al.add(ri);
+		ArrayList al = XbrlDockUtils.safeGet(refLinks, itemId, ARRAY_CREATOR);
+//		String ri = XbrlDockUtils.sbAppend(null, ":", true, currentUrl, XDC_METATOKEN_references, refIdx).toString();
+
+		if (!al.contains(refIdx)) {
+			al.add(refIdx);
 		}
 	}
 
@@ -191,8 +200,8 @@ public class XbrlDockMetaContainer implements XbrlDockMetaConsts {
 		metaInfo.put(XDC_METATOKEN_includes, inc);
 		
 		XbrlDockUtilsJson.writeJson(new File(fDir, XDC_TAXONOMYHEAD_FNAME), metaInfo);
-
 		XbrlDockUtilsJson.writeJson(new File(fDir, XDC_TAXONOMYDATA_FNAME), contentByURL);
+		XbrlDockUtilsJson.writeJson(new File(fDir, XDC_TAXONOMYREFS_FNAME), references);
 
 		for (Entry<String, Map<String, Object>> le : labels.entrySet()) {
 			XbrlDockUtilsJson.writeJson(new File(fDir, XDC_TAXONOMYRES_FNAME_PREFIX + le.getKey() + XDC_FEXT_JSON), le.getValue());

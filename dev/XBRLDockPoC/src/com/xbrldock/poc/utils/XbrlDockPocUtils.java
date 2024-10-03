@@ -17,6 +17,11 @@ import com.xbrldock.utils.XbrlDockUtilsXml;
 
 @SuppressWarnings({ "rawtypes", "unchecked" })
 public class XbrlDockPocUtils extends XbrlDockUtils implements XbrlDockPocConsts {
+	
+	public static String getGlobalItemId(Map item) {
+		return (null == item) ? null : XbrlDockUtils.sbAppend(null, "#", true, item.get(XDC_METATOKEN_url), item.get("id")).toString();
+	}
+
 
 	public static Map<String, Object> readMeta(File root, Map<String, Object> target) throws Exception {
 		Map<String, Object> t = ensureMap(target, true);

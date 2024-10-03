@@ -18,6 +18,7 @@ import com.xbrldock.XbrlDock;
 import com.xbrldock.XbrlDockConsts;
 import com.xbrldock.XbrlDockException;
 import com.xbrldock.dev.XbrlDockDevCounter;
+import com.xbrldock.poc.utils.XbrlDockPocUtils;
 import com.xbrldock.utils.XbrlDockUtils;
 import com.xbrldock.utils.XbrlDockUtilsFile;
 import com.xbrldock.utils.XbrlDockUtilsNet;
@@ -398,7 +399,7 @@ public class XbrlDockMetaManager implements XbrlDockMetaConsts, XbrlDockConsts.G
 			}
 		}
 
-		String url = metaContainer.getCurrentUrl();
+//		String url = metaContainer.getCurrentUrl();
 
 		for (Map<String, String> am : arcs) {
 			String roleID = am.get("xlink:role");
@@ -421,7 +422,7 @@ public class XbrlDockMetaManager implements XbrlDockMetaConsts, XbrlDockConsts.G
 //				XbrlDockException.wrap(null, "Missing link endpoint", url, am);
 			}
 
-			String idFrom = (String) from.get("id");
+			String idFrom = XbrlDockPocUtils.getGlobalItemId(from);
 
 			switch (ar) {
 			case "concept-label":
@@ -455,13 +456,13 @@ public class XbrlDockMetaManager implements XbrlDockMetaConsts, XbrlDockConsts.G
 					break;
 //					XbrlDockException.wrap(null, "Both should be items", url, am);
 				}
-				String idTo = (String) to.get("id");
+				String idTo = XbrlDockPocUtils.getGlobalItemId(to);
 
 				am.remove("xlink:type");
 				am.put("xlink:arcrole", ar);
 				am.put("xlink:from", idFrom);
 				am.put("xlink:to", idTo);
-				am.put("xbrlDock:url", url);
+//				am.put("xbrlDock:url", url);
 //					am.put("xbrlDock:url", url.substring(taxRoot.length()));
 
 //					if ("ias_1_2024-03-27_role-810000".equals(roleID)) {

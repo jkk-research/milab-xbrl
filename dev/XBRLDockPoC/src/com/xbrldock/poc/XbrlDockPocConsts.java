@@ -23,6 +23,15 @@ public interface XbrlDockPocConsts extends XbrlDockConsts, XbrlDockUtilsConsts {
 	String XDC_METAINFO_entryPoints = "xdc_entryPoints";
 	String XDC_METAINFO_entryPointRefs = "xdc_entryPointRefs";
 
+	String XDC_METATOKEN_content = "xdc_content";
+	
+	String XDC_METATOKEN_items = "items";
+	String XDC_METATOKEN_links = "links";
+	String XDC_METATOKEN_references = "references";
+	String XDC_METATOKEN_refLinks = "refLinks";
+	String XDC_METATOKEN_includes = "includes";
+	String XDC_METATOKEN_url = "xdc_url";
+
 	String XDC_CFGTOKEN_dirStore = "dirStore";
 	String XDC_CFGTOKEN_dirInput = "dirInput";
 
