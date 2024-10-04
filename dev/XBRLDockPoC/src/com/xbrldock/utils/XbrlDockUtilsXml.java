@@ -29,13 +29,15 @@ public class XbrlDockUtilsXml implements XbrlDockUtilsConsts {
 	private static EntityResolver CACHED_RESOLVER = new EntityResolver() {
 		@Override
 		public InputSource resolveEntity(String publicId, String systemId) throws SAXException, IOException {
-			return XbrlDockUtilsNet.resolveEntity(systemId);
+			String url = systemId.startsWith("http") ? systemId : publicId.startsWith("http") ? publicId : null;
+			return (null == url) ? new InputSource() : XbrlDockUtilsNet.resolveEntity(url);
 		}
 	};
 
 	private static ThreadLocal<DocumentBuilder> tdb = new ThreadLocal<DocumentBuilder>() {
 		protected DocumentBuilder initialValue() {
 			try {
+				dbf.setValidating(false);
 				return dbf.newDocumentBuilder();
 			} catch (ParserConfigurationException e) {
 				return XbrlDockException.wrap(e);

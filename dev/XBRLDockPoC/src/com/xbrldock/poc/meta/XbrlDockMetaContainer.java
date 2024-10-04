@@ -15,6 +15,7 @@ import com.xbrldock.XbrlDock;
 import com.xbrldock.dev.XbrlDockDevCounter;
 import com.xbrldock.poc.utils.XbrlDockPocUtils;
 import com.xbrldock.utils.XbrlDockUtils;
+import com.xbrldock.utils.XbrlDockUtilsFile;
 import com.xbrldock.utils.XbrlDockUtilsJson;
 
 @SuppressWarnings({ "rawtypes", "unchecked" })
@@ -36,15 +37,22 @@ public class XbrlDockMetaContainer implements XbrlDockMetaConsts {
 	Map<String, Map<String, Object>> contentByURL = new TreeMap<>();
 	Map<String, Object> itemsByNS = new TreeMap<>();
 
+	boolean updated;
+
 	XbrlDockDevCounter cntLinkTypes = new XbrlDockDevCounter("LinkTypeCounts", true);
 	XbrlDockDevCounter cntArcRoles = new XbrlDockDevCounter("ArcRoleCounts", true);
 
 	public XbrlDockMetaContainer(Map<String, Object> mi) {
 		this.metaInfo = mi;
+		updated = false;
 	}
 
 	public Map getUrlContent(String url) {
 		return contentByURL.get(url);
+	}
+
+	public Map getHead() {
+		return metaInfo;
 	}
 
 	void setUrlContent(Map content) throws Exception {
@@ -52,14 +60,17 @@ public class XbrlDockMetaContainer implements XbrlDockMetaConsts {
 
 		Map<String, Map<String, Object>> items = (Map<String, Map<String, Object>>) content.get(XDC_METATOKEN_items);
 
-		for (Map.Entry<String, Map<String, Object>> ei : items.entrySet()) {
-			registerNSItem(ei.getValue().get("name"), ei.getKey());
+		if (null != items) {
+			for (Map.Entry<String, Map<String, Object>> ei : items.entrySet()) {
+				registerNSItem(ei.getValue().get("name"), ei.getKey());
+			}
 		}
-
 		Map<String, String> incl = (Map) content.getOrDefault(XDC_METATOKEN_includes, Collections.EMPTY_MAP);
 
-		for (Map.Entry<String, String> ie : incl.entrySet()) {
-			optQueue(ie.getKey(), ie.getValue());
+		if (null != incl) {
+			for (Map.Entry<String, String> ie : incl.entrySet()) {
+				optQueue(ie.getKey(), ie.getValue());
+			}
 		}
 	}
 
@@ -89,8 +100,10 @@ public class XbrlDockMetaContainer implements XbrlDockMetaConsts {
 		Map m = XbrlDockUtils.safeGet(contentByURL, realUrl, MAP_CREATOR);
 		m = XbrlDockUtils.safeGet(m, XDC_METATOKEN_items, MAP_CREATOR);
 		m = XbrlDockUtils.safeGet(m, id, MAP_CREATOR);
-		
+
 		m.put(XDC_METATOKEN_url, realUrl);
+
+		updated = true;
 
 		return m;
 	}
@@ -100,7 +113,11 @@ public class XbrlDockMetaContainer implements XbrlDockMetaConsts {
 			return null;
 		}
 
-		currentUrl = queue.remove(0);
+		return setCurrentUrl(queue.remove(0));
+	}
+
+	String setCurrentUrl(String url) {
+		currentUrl = url;
 		loaded.add(currentUrl);
 
 		path = XbrlDockUtils.cutPostfix(currentUrl, "/");
@@ -122,7 +139,7 @@ public class XbrlDockMetaContainer implements XbrlDockMetaConsts {
 			Map incl = XbrlDockUtils.safeGet(currentContent, XDC_METATOKEN_includes, SORTEDMAP_CREATOR);
 			incl.put(url, targetNs);
 		}
-		
+
 		if (loaded.contains(url) || queue.contains(url)) {
 			return false;
 		}
@@ -149,21 +166,19 @@ public class XbrlDockMetaContainer implements XbrlDockMetaConsts {
 
 	int storeDocumentRef(Map rm) {
 		ArrayList<Map> allRefs = XbrlDockUtils.safeGet(references, XDC_METATOKEN_references, ARRAY_CREATOR);
-//		ArrayList<Map> allRefs = XbrlDockUtils.safeGet(currentContent, XDC_METATOKEN_references, ARRAY_CREATOR);
 		allRefs.add(rm);
 		return allRefs.size() - 1;
 	}
 
 	void setDocumentRef(Map item, Object refIdx) {
-//		Map refRefs = XbrlDockUtils.safeGet(currentContent, XDC_METATOKEN_references, SORTEDMAP_CREATOR);
 		String itemId = XbrlDockPocUtils.getGlobalItemId(item);
 		Map refLinks = XbrlDockUtils.safeGet(references, XDC_METATOKEN_refLinks, SORTEDMAP_CREATOR);
 
 		ArrayList al = XbrlDockUtils.safeGet(refLinks, itemId, ARRAY_CREATOR);
-//		String ri = XbrlDockUtils.sbAppend(null, ":", true, currentUrl, XDC_METATOKEN_references, refIdx).toString();
 
 		if (!al.contains(refIdx)) {
 			al.add(refIdx);
+			updated = true;
 		}
 	}
 
@@ -179,33 +194,37 @@ public class XbrlDockMetaContainer implements XbrlDockMetaConsts {
 	void setLabel(Object lang, Object itemId, String labelType, Object value) {
 		Map ll = XbrlDockUtils.safeGet(labels, lang, SORTEDMAP_CREATOR);
 		XbrlDockUtils.simpleSet(ll, value, itemId, labelType);
+		updated = true;
 	}
 
 	void addLink(Map<String, String> linkInfo) {
 		ArrayList<Map<String, String>> links = XbrlDockUtils.safeGet(contentByURL.get(currentUrl), XDC_METATOKEN_links, ARRAY_CREATOR);
 		links.add(linkInfo);
+		updated = true;
 	}
 
-	public void save(File fDir) throws Exception {
-		metaInfo.remove(XDC_METAINFO_dir);
-		ArrayList inc = new ArrayList(loaded);
-		
-//		String pub = XbrlDockUtils.simpleGet(metaInfo, XDC_METAINFO_pkgInfo, "publisherURL");
-//		ArrayList inc = new ArrayList();
-//		for ( String i : loaded ) {
-//			if ( i.startsWith(pub) ) {
-//				inc.add(i);
-//			}
-//		}
-		metaInfo.put(XDC_METATOKEN_includes, inc);
-		
-		XbrlDockUtilsJson.writeJson(new File(fDir, XDC_TAXONOMYHEAD_FNAME), metaInfo);
-		XbrlDockUtilsJson.writeJson(new File(fDir, XDC_TAXONOMYDATA_FNAME), contentByURL);
-		XbrlDockUtilsJson.writeJson(new File(fDir, XDC_TAXONOMYREFS_FNAME), references);
+	public void optSave(File taxonomyStoreRoot) throws Exception {
+		if (updated) {
+			String id = XbrlDockUtils.simpleGet(metaInfo, XDC_METAINFO_pkgInfo, "identifier");
+			id = XbrlDockUtils.getPostfix(id, XDC_URL_PSEP);
+			File fDir = new File(taxonomyStoreRoot, id);
+			XbrlDockUtilsFile.ensureDir(fDir);
 
-		for (Entry<String, Map<String, Object>> le : labels.entrySet()) {
-			XbrlDockUtilsJson.writeJson(new File(fDir, XDC_TAXONOMYRES_FNAME_PREFIX + le.getKey() + XDC_FEXT_JSON), le.getValue());
+			XbrlDock.log(EventLevel.Trace, "Saving MetaContainer", id);
 
+			metaInfo.remove(XDC_METAINFO_dir);
+			ArrayList inc = new ArrayList(loaded);
+			metaInfo.put(XDC_METATOKEN_includes, inc);
+
+			XbrlDockUtilsJson.writeJson(new File(fDir, XDC_TAXONOMYHEAD_FNAME), metaInfo);
+			XbrlDockUtilsJson.writeJson(new File(fDir, XDC_TAXONOMYDATA_FNAME), contentByURL);
+			XbrlDockUtilsJson.writeJson(new File(fDir, XDC_TAXONOMYREFS_FNAME), references);
+
+			for (Entry<String, Map<String, Object>> le : labels.entrySet()) {
+				XbrlDockUtilsJson.writeJson(new File(fDir, XDC_TAXONOMYRES_FNAME_PREFIX + le.getKey() + XDC_FEXT_JSON), le.getValue());
+			}
+
+			updated = false;
 		}
 	}
 

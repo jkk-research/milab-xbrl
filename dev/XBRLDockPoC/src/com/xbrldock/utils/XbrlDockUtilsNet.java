@@ -121,6 +121,9 @@ public class XbrlDockUtilsNet implements XbrlDockUtilsConsts {
 
 		HttpURLConnection conn = connect(url, headers);
 		
+		conn.setConnectTimeout(5000);
+		conn.setReadTimeout(10000);
+		
 		String redirect = conn.getHeaderField("Location");
 		if (redirect != null){
 			conn = connect(redirect, headers); 

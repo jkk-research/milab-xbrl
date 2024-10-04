@@ -169,7 +169,7 @@ public class XbrlDockUtils implements XbrlDockUtilsConsts {
 
 	public static String getPostfix(String strSrc, String pfSep) {
 		int sep = strSrc.lastIndexOf(pfSep);
-		return strSrc.substring(sep + pfSep.length());
+		return  (-1 == sep) ? strSrc : strSrc.substring(sep + pfSep.length());
 	}
 
 	public static String cutPostfix(String strSrc, String pfSep) {
@@ -179,7 +179,7 @@ public class XbrlDockUtils implements XbrlDockUtilsConsts {
 
 	public static String replacePostfix(String strSrc, String pfSep, String postfix) {
 		int sep = strSrc.lastIndexOf(pfSep);
-		return strSrc.substring(0, sep + 1) + postfix;
+		return  (-1 == sep) ? strSrc : strSrc.substring(0, sep + pfSep.length()) + postfix;
 	}
 
 	private static SimpleDateFormat sdfTime = new SimpleDateFormat(XDC_FMT_TIMESTAMP);

@@ -64,7 +64,7 @@ public class XbrlDockTaxonomyManager implements XbrlDockMetaConsts, XbrlDockCons
 		}
 
 		if (taxSource.isDirectory()) {
-			Map txmyInfo = XbrlDockPocUtils.readMeta(taxSource, null);
+			Map txmyInfo = XbrlDockPocUtils.readMeta(taxSource);
 			
 			String id = XbrlDockUtils.simpleGet(txmyInfo, XDC_METAINFO_pkgInfo, "identifier");
 			id = XbrlDockUtils.getPostfix(id, XDC_URL_PSEP);

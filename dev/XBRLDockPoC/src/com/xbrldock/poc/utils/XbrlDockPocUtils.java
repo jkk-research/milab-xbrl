@@ -5,6 +5,7 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Set;
+import java.util.TreeMap;
 import java.util.TreeSet;
 
 import org.w3c.dom.Element;
@@ -22,24 +23,25 @@ public class XbrlDockPocUtils extends XbrlDockUtils implements XbrlDockPocConsts
 		return (null == item) ? null : XbrlDockUtils.sbAppend(null, "#", true, item.get(XDC_METATOKEN_url), item.get("id")).toString();
 	}
 
-
-	public static Map<String, Object> readMeta(File root, Map<String, Object> target) throws Exception {
-		Map<String, Object> t = ensureMap(target, true);
+	public static Map<String, Object> readMeta(File root) throws Exception {
+		Map<String, Object> t = new TreeMap<>();
 
 		XbrlDockUtilsFile.FileProcessor mif = new XbrlDockUtilsFile.FileProcessor() {
+			boolean ret = true;
+
 			@Override
 			public boolean process(File f, ProcessorAction action) {
-				if ((action == ProcessorAction.Begin) && isEqual(XDC_FNAME_METAINF, f.getName())) {
-					t.put("", f);
-					return false;
+				if ((action == ProcessorAction.Begin) && XbrlDockUtils.isEqual(XDC_FNAME_METAINF, f.getName())) {
+					t.put(XDC_METAINFO_dir, f);
+					ret = false;
 				}
-				return true;
+				return ret;
 			}
 		};
 
 		XbrlDockUtilsFile.processFiles(root, mif, null, true, false);
 
-		File fMetaInf = (File) t.remove("");
+		File fMetaInf = (File) t.get(XDC_METAINFO_dir);
 
 		NodeList nl;
 		int nc;
@@ -65,7 +67,7 @@ public class XbrlDockPocUtils extends XbrlDockUtils implements XbrlDockPocConsts
 			case "rewriteURI":
 				String us = e.getAttribute("uriStartString");
 				String rp = base + e.getAttribute("rewritePrefix");
-				simpleSet(t, rp, XDC_METAINFO_urlRewrite, us);
+				XbrlDockUtils.simpleSet(t, rp, XDC_METAINFO_urlRewrite, us);
 				break;
 			}
 		}
@@ -73,61 +75,74 @@ public class XbrlDockPocUtils extends XbrlDockUtils implements XbrlDockPocConsts
 		File fTax = new File(fMetaInf, XDC_FNAME_TAXPACK);
 		Element eTaxPack = XbrlDockUtilsXml.parseDoc(fTax).getDocumentElement();
 
+		Set epRefs = new TreeSet();
 		Set allRefs = new TreeSet();
+
+		XbrlDockUtilsXml.ChildProcessor procEntryPointItem = new XbrlDockUtilsXml.ChildProcessor() {
+			Map epInfo;
+
+			@Override
+			public void processChild(String tagName, Element ch) {
+				if ( null == epInfo ) {
+					epInfo = new HashMap();
+				}
+				switch (tagName) {
+				case "entryPointDocument":
+					String epRef = ch.getAttribute("href");
+					epRefs.add(epRef);
+					allRefs.add(epRef);
+					break;
+				default:
+					XbrlDockUtils.simpleSet(epInfo, ch.getTextContent().replaceAll("\\s+", " ").trim(), tagName);
+					break;
+				}
+			}
+
+			@Override
+			public void finish() {
+				XbrlDockUtils.safeGet(t, XDC_METAINFO_entryPoints, ARRAY_CREATOR).add(epInfo);
+
+				if (!epRefs.isEmpty()) {
+					epInfo.put(XDC_METAINFO_entryPointRefs, new ArrayList(epRefs));
+					epRefs.clear();
+				}
+				epInfo = null;
+			}
+		};
+
+		XbrlDockUtilsXml.ChildProcessor procEntryPointList = new XbrlDockUtilsXml.ChildProcessor() {
+			@Override
+			public void processChild(String tagName, Element ch) {
+				switch (tagName) {
+				case "entryPoint":
+					XbrlDockUtilsXml.processChildren(ch, procEntryPointItem);
+					break;
+				default:
+					break;
+				}
+			}
+		};
 
 		XbrlDockUtilsXml.processChildren(eTaxPack, new XbrlDockUtilsXml.ChildProcessor() {
 			@Override
 			public void processChild(String tagName, Element ch) {
 				switch (tagName) {
 				case "entryPoints":
-					XbrlDockUtilsXml.processChildren(ch, new XbrlDockUtilsXml.ChildProcessor() {
-						@Override
-						public void processChild(String tagName, Element ch) {
-							switch (tagName) {
-							case "entryPoint":
-								Map epInfo = new HashMap();
-								Set epRefs = new TreeSet();
-								XbrlDockUtils.safeGet(t, XDC_METAINFO_entryPoints, ARRAY_CREATOR).add(epInfo);
-
-								XbrlDockUtilsXml.processChildren(ch, new XbrlDockUtilsXml.ChildProcessor() {
-									@Override
-									public void processChild(String tagName, Element ch) {
-										switch (tagName) {
-										case "entryPointDocument":
-											String epRef = ch.getAttribute("href");
-											epRefs.add(epRef);
-											allRefs.add(epRef);
-//											XbrlDockUtils.safeGet(t, XDC_METAINFO_entryPointRefs, SET_CREATOR).add(epRef);
-//											XbrlDockUtils.safeGet(epInfo, XDC_METAINFO_entryPointRefs, SET_CREATOR).add(epRef);
-											break;
-										default:
-											simpleSet(epInfo, ch.getTextContent().replaceAll("\\s+", " ").trim(), tagName);
-											break;
-										}
-									}
-								});
-
-								if (!epRefs.isEmpty()) {
-									epInfo.put(XDC_METAINFO_entryPointRefs, new ArrayList(epRefs));
-								}
-								break;
-							default:
-								break;
-							}
-						}
-					});
+					XbrlDockUtilsXml.processChildren(ch, procEntryPointList);
 					break;
 				default:
-					simpleSet(t, ch.getTextContent().replaceAll("\\s+", " ").trim(), XDC_METAINFO_pkgInfo, tagName);
+					XbrlDockUtils.simpleSet(t, ch.getTextContent().replaceAll("\\s+", " ").trim(), XDC_METAINFO_pkgInfo, tagName);
 					break;
 				}
 			}
-		});
-		
-		if (!allRefs.isEmpty()) {
-			t.put(XDC_METAINFO_entryPointRefs, new ArrayList(allRefs));
-		}
 
+			@Override
+			public void finish() {
+				if (!allRefs.isEmpty()) {
+					t.put(XDC_METAINFO_entryPointRefs, new ArrayList(allRefs));
+				}
+			}
+		});
 
 		return t;
 	}
