@@ -83,14 +83,15 @@ public class XbrlDockMetaManager implements XbrlDockMetaConsts, XbrlDockConsts.G
 
 			mc.optSave(taxonomyStoreRoot);
 
-			XbrlDock.log(EventLevel.Trace, mc.metaInfo);
+//			XbrlDock.log(EventLevel.Trace, mc.metaInfo);
 
-			XbrlDock.log(EventLevel.Trace, "Schema stats", mc.cntLinkTypes, mc.cntArcRoles);
+//			XbrlDock.log(EventLevel.Trace, "Schema stats", mc.cntLinkTypes, mc.cntArcRoles);
 
 		}
 	}
 
 	public XbrlDockMetaContainer getMetaContainer(File schemaRoot, boolean cache, String... entryPoints) throws Exception {
+		XbrlDock.log(EventLevel.Context, "Loading MetaContainer from", schemaRoot.getPath());
 
 		Map<String, Object> metaInfo = XbrlDockPocUtils.readMeta(schemaRoot);
 
@@ -112,8 +113,6 @@ public class XbrlDockMetaManager implements XbrlDockMetaConsts, XbrlDockConsts.G
 			}
 		}
 
-		XbrlDock.log(EventLevel.Trace, "getMetaContainer start loading from", schemaRoot.getCanonicalPath());
-
 		File fMIDir = XbrlDockUtils.simpleGet(metaInfo, XDC_METAINFO_dir);
 		Map rewrite = XbrlDockUtils.simpleGet(metaInfo, XDC_METAINFO_urlRewrite);
 		XbrlDockUtilsNet.setRewrite(fMIDir, rewrite);
@@ -133,7 +132,7 @@ public class XbrlDockMetaManager implements XbrlDockMetaConsts, XbrlDockConsts.G
 				try (InputStream is = XbrlDockUtilsNet.resolveEntityStream(url)) {
 					Element eDoc = XbrlDockUtilsXml.parseDoc(is).getDocumentElement();
 
-					XbrlDock.log(EventLevel.Trace, "loading", url);
+//					XbrlDock.log(EventLevel.Trace, "loading", url);
 
 					XbrlDockMetaContainer mcData = null;
 
@@ -174,17 +173,17 @@ public class XbrlDockMetaManager implements XbrlDockMetaConsts, XbrlDockConsts.G
 
 		if (cache) {
 			Set<String> alienKeys = new TreeSet<>(metaContainer.contentByURL.keySet());
-			
+
 			for (String prefix : ownedUrls) {
-				for (Iterator<String> iak = alienKeys.iterator(); iak.hasNext(); ) {
+				for (Iterator<String> iak = alienKeys.iterator(); iak.hasNext();) {
 					String ak = iak.next();
-					if ( ak.startsWith(prefix) ) {
+					if (ak.startsWith(prefix)) {
 						iak.remove();
 					}
 				}
 				taxonomies.put(prefix, metaContainer);
 			}
-			
+
 			for (String ak : alienKeys) {
 				metaContainer.contentByURL.remove(ak);
 			}
@@ -194,7 +193,9 @@ public class XbrlDockMetaManager implements XbrlDockMetaConsts, XbrlDockConsts.G
 			mc.optSave(taxonomyStoreRoot);
 		}
 
-		XbrlDock.log(EventLevel.Error, importIssues);
+		if (!importIssues.isEmpty()) {
+			XbrlDock.log(EventLevel.Error, importIssues);
+		}
 
 		return metaContainer;
 	}
@@ -276,6 +277,7 @@ public class XbrlDockMetaManager implements XbrlDockMetaConsts, XbrlDockConsts.G
 			}
 
 			if (null != sl) {
+				sl = XbrlDockUtils.optCleanUrl(sl);
 				metaContainer.optQueue(sl, ns);
 			}
 		}
@@ -330,7 +332,7 @@ public class XbrlDockMetaManager implements XbrlDockMetaConsts, XbrlDockConsts.G
 					break;
 				default:
 					String iid = e.getAttribute("id");
-					if ( XbrlDockUtils.isEmpty(iid)) {
+					if (XbrlDockUtils.isEmpty(iid)) {
 						iid = roleID + XDC_SEP_ID + label;
 					}
 					em = mcData.getItem(url, iid, null);
@@ -427,7 +429,7 @@ public class XbrlDockMetaManager implements XbrlDockMetaConsts, XbrlDockConsts.G
 //					XbrlDockException.wrap(null, "Both should be items", url, am);
 				}
 				String idTo = XbrlDockPocUtils.getGlobalItemId(to);
-				
+
 				if (idFrom.contains("#null#")) {
 					importIssues.add("Missing link endpoints -  " + ar);
 					break;

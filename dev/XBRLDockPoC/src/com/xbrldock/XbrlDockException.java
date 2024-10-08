@@ -7,7 +7,7 @@ import com.xbrldock.utils.XbrlDockUtils;
 public final class XbrlDockException extends RuntimeException implements XbrlDockConsts {
 	private static final long serialVersionUID = 1L;
 
-	static PrintStream DUMP_STACK_TRACE = System.err;
+	public static PrintStream DUMP_STACK_TRACE = System.err;
 
 	private XbrlDockException(Throwable src, Object... params) {
 		super(XbrlDockUtils.sbAppend(null, ",", false, params).toString(), src);
@@ -28,7 +28,7 @@ public final class XbrlDockException extends RuntimeException implements XbrlDoc
 	}
 
 	private static void log(boolean thrown, Throwable src, String msg) {
-		XbrlDock.log(null, src, msg);
+		XbrlDock.log(EventLevel.Exception, src, msg);
 
 		if ( (null != DUMP_STACK_TRACE) && (null != src) ) {
 			src.printStackTrace(DUMP_STACK_TRACE);

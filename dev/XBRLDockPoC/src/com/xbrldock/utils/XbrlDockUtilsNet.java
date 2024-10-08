@@ -12,6 +12,8 @@ import java.net.URL;
 import java.nio.file.Files;
 import java.util.Collections;
 import java.util.Map;
+import java.util.Map.Entry;
+import java.util.Set;
 import java.util.TreeMap;
 import java.util.zip.GZIPInputStream;
 
@@ -92,7 +94,9 @@ public class XbrlDockUtilsNet implements XbrlDockUtilsConsts {
 		String path = XbrlDockUtils.getPostfix(url, "://");
 		File fCache = new File(CACHE_ROOT, path);
 
-		for (Map.Entry<String, File> ep : URL_REWRITES.get().entrySet()) {
+		Set<Entry<String, File>> rewriteEntries = URL_REWRITES.get().entrySet();
+		
+		for (Map.Entry<String, File> ep : rewriteEntries) {
 			String p = ep.getKey();
 			if (url.startsWith(p)) {
 				fCache = new File(ep.getValue(), url.substring(p.length()));
@@ -117,7 +121,7 @@ public class XbrlDockUtilsNet implements XbrlDockUtilsConsts {
 	}
 
 	public static void download(String url, File file, String... headers) throws Exception {
-		XbrlDock.log(EventLevel.Trace, "Downloading url", url, "to file", file.getCanonicalPath());
+		XbrlDock.log(EventLevel.Info, "Downloading url", url, "to file", file.getCanonicalPath());
 
 		HttpURLConnection conn = connect(url, headers);
 		

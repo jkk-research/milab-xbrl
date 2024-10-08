@@ -235,6 +235,16 @@ public class XbrlDockUtils implements XbrlDockUtilsConsts {
 		return target;
 	}
 
+	public static String optCleanUrl(String url) {
+		int psp = url.indexOf(XDC_URL_PSEP) + XDC_URL_PSEP.length();
+		String rr = url.substring(psp);
+		if ( rr.contains("//") ) {
+			url = url.substring(0, psp) + rr.replaceAll("/+", "/");
+		}
+
+		return url;
+	}
+
 	public static String optExtendRef(String refPath, String currPath) {
 		String realRef = refPath;
 
@@ -253,7 +263,7 @@ public class XbrlDockUtils implements XbrlDockUtilsConsts {
 			}
 		}
 
-		return realRef;
+		return optCleanUrl(realRef);
 	}
 
 }

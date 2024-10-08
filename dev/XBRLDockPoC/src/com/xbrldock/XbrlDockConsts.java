@@ -48,7 +48,7 @@ public interface XbrlDockConsts {
 	int KEY_SIZE = -2;
 	
 	public enum EventLevel {
-		Exception, Error, Warning, Info, Trace, Debug
+		Exception, Error, Warning, Info, Trace, Debug, Context
 	}
 	
 	public enum ProcessorAction {

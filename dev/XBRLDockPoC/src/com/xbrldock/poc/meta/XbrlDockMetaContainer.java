@@ -83,6 +83,14 @@ public class XbrlDockMetaContainer implements XbrlDockMetaConsts {
 		int sp = itemRef.lastIndexOf("#");
 		String id = itemRef.substring(sp + 1);
 		String realRef = itemRef.substring(0, sp);
+		
+		realRef = XbrlDockUtils.optCleanUrl(realRef);
+		
+//		int psp = realRef.indexOf(XDC_URL_PSEP) + XDC_URL_PSEP.length();
+//		String rr = realRef.substring(psp);
+//		if ( rr.contains("//") ) {
+//			realRef = realRef.substring(0, psp) + rr.replaceAll("/+", "/");
+//		}
 
 		return getItem(realRef, id, null);
 	}
@@ -143,6 +151,14 @@ public class XbrlDockMetaContainer implements XbrlDockMetaConsts {
 
 	boolean optQueue(String url, String targetNs) {
 		url = XbrlDockUtils.optExtendRef(url, path);
+		
+		if ( url.split("//").length > 2 ) {
+			XbrlDock.log(EventLevel.Warning, "Sorry?", url);
+		}
+
+		if ( url.contains("xsdesef_cor") ) {
+			XbrlDock.log(EventLevel.Warning, "Sorry?", url);
+		}
 
 		if (null != currentContent) {
 			Map incl = XbrlDockUtils.safeGet(currentContent, XDC_METATOKEN_includes, SORTEDMAP_CREATOR);
@@ -164,6 +180,7 @@ public class XbrlDockMetaContainer implements XbrlDockMetaConsts {
 
 		if (-1 != idx) {
 			queue.add(idx, url);
+			
 			if (!XbrlDockUtils.isEmpty(targetNs)) {
 				queueNS.put(url, targetNs);
 			}

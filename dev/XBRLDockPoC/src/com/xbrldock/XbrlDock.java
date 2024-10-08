@@ -68,6 +68,12 @@ public abstract class XbrlDock implements XbrlDockConsts, XbrlDockUtilsConsts, X
 		} catch (Throwable t) {
 			XbrlDock.log(EventLevel.Exception, t);
 		}
+		
+		PS_LOG.println("**********************");
+		PS_LOG.println("*                    *");
+		PS_LOG.println("*      Complete      *");
+		PS_LOG.println("*                    *");
+		PS_LOG.println("**********************");
 	}
 	
 	protected abstract void run() throws Exception;

@@ -58,4 +58,8 @@ public class XbrlDockDevCounter implements XbrlDockDevConsts, Iterable<Map.Entry
 	public Long peek(Object ob) {
 		return counts.getOrDefault(ob, 0L);
 	}
+
+	public boolean isEmpty() {
+		return counts.isEmpty();
+	}
 }

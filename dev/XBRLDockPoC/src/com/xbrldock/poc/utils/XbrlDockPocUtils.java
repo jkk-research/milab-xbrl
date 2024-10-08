@@ -18,9 +18,10 @@ import com.xbrldock.utils.XbrlDockUtilsXml;
 
 @SuppressWarnings({ "rawtypes", "unchecked" })
 public class XbrlDockPocUtils extends XbrlDockUtils implements XbrlDockPocConsts {
-	
+
 	public static String getGlobalItemId(Map item) {
-		return (null == item) ? null : XbrlDockUtils.sbAppend(null, "#", true, XbrlDockUtils.getPostfix((String) item.get(XDC_METATOKEN_url), XDC_URL_PSEP), item.get("id")).toString();
+		return (null == item) ? null
+				: XbrlDockUtils.sbAppend(null, "#", true, XbrlDockUtils.getPostfix((String) item.get(XDC_METATOKEN_url), XDC_URL_PSEP), item.get("id")).toString();
 	}
 
 	public static Map<String, Object> readMeta(File root) throws Exception {
@@ -83,12 +84,20 @@ public class XbrlDockPocUtils extends XbrlDockUtils implements XbrlDockPocConsts
 
 			@Override
 			public void processChild(String tagName, Element ch) {
-				if ( null == epInfo ) {
+				if (null == epInfo) {
 					epInfo = new HashMap();
 				}
 				switch (tagName) {
 				case "entryPointDocument":
 					String epRef = ch.getAttribute("href");
+					epRef = XbrlDockUtils.optCleanUrl(epRef);
+
+					if (epRef.contains("01-01.xsdesef_cor-gen-en.xml")) {
+						epRef = epRef.replace("01-01.xsdesef_cor-gen-en.xml", "01-01_cor.xsd");
+					} else if (epRef.contains("01-01.xsdesef_cor-lab-en.xml")) {
+						epRef = epRef.replace("01-01.xsdesef_cor-lab-en.xml", "01-01_cor.xsd");
+					}
+
 					epRefs.add(epRef);
 					allRefs.add(epRef);
 					break;
