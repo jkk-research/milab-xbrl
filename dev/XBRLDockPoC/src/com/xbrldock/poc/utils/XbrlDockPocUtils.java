@@ -20,7 +20,7 @@ import com.xbrldock.utils.XbrlDockUtilsXml;
 public class XbrlDockPocUtils extends XbrlDockUtils implements XbrlDockPocConsts {
 	
 	public static String getGlobalItemId(Map item) {
-		return (null == item) ? null : XbrlDockUtils.sbAppend(null, "#", true, item.get(XDC_METATOKEN_url), item.get("id")).toString();
+		return (null == item) ? null : XbrlDockUtils.sbAppend(null, "#", true, XbrlDockUtils.getPostfix((String) item.get(XDC_METATOKEN_url), XDC_URL_PSEP), item.get("id")).toString();
 	}
 
 	public static Map<String, Object> readMeta(File root) throws Exception {

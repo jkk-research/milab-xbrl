@@ -5,7 +5,7 @@
     "agents" : {
       "metaManager" : {
         "javaClass" : "com.xbrldock.poc.meta.XbrlDockMetaManager",
-        "dirStore" : "temp/taxonomy",
+        "dirStore" : "ext/XBRLDock/taxonomy/store",
         "dirInput" : "ext/XBRLDock/taxonomy/import"
       },
       "esefConn" : {

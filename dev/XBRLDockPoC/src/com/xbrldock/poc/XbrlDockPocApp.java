@@ -11,6 +11,7 @@ import com.xbrldock.utils.XbrlDockUtilsNet;
 //@SuppressWarnings({ "rawtypes" })
 public class XbrlDockPocApp extends XbrlDock implements XbrlDockPocConsts {
 
+	boolean skip  = false;
 	@Override
 	protected void handleLog(EventLevel level, Object... params) {
 		handleLogDefault(level, params);
@@ -24,6 +25,13 @@ public class XbrlDockPocApp extends XbrlDock implements XbrlDockPocConsts {
 		if (Boolean.TRUE.equals(XbrlDockUtils.simpleGet(APP_CONFIG, XDC_CFGTOKEN_env, XDC_CFGTOKEN_AGENT_gui))) {
 			callAgent(XDC_CFGTOKEN_AGENT_gui, null);
 		}
+		
+//		if ( skip ) {
+//			callAgent(XDC_CFGTOKEN_AGENT_metaManager, XDC_CMD_METAMGR_IMPORT, new File("ext/XBRLDock/taxonomy/import/IFRSAT-2022-03-24"));
+//			callAgent(XDC_CFGTOKEN_AGENT_metaManager, XDC_CMD_METAMGR_IMPORT, new File("ext/XBRLDock/taxonomy/import/esef_taxonomy_2022_v1.1"));
+//			return;
+//		}
+
 
 //		taxMgr.importTaxonomy(new File("ext/XBRLDock/temp/IFRST_2021-03-24.zip"));
 		callAgent(XDC_CFGTOKEN_AGENT_metaManager, XDC_CMD_METAMGR_IMPORT, new File("ext/XBRLDock/taxonomy/import/IFRSAT-2022-03-24"));
@@ -36,7 +44,11 @@ public class XbrlDockPocApp extends XbrlDock implements XbrlDockPocConsts {
 		callAgent(XDC_CFGTOKEN_AGENT_metaManager, XDC_CMD_METAMGR_IMPORT, new File("ext/XBRLDock/taxonomy/import/esef_taxonomy_2019"));
 		
 //		callAgent(XDC_CFGTOKEN_AGENT_metaManager, XDC_CMD_METAMGR_IMPORT, new File("ext/XBRLDock/taxonomy/import/us-gaap-2024.zip"));
-//		callAgent(XDC_CFGTOKEN_AGENT_metaManager, XDC_CMD_METAMGR_IMPORT, new File("ext/XBRLDock/taxonomy/import/2024-10-02T04_36_16"));
+		callAgent(XDC_CFGTOKEN_AGENT_metaManager, XDC_CMD_METAMGR_IMPORT, new File("ext/XBRLDock/taxonomy/import/us-gaap-2024"));
+		
+		if ( skip ) {
+			return;
+		}
 
 		checkReports();
 	}

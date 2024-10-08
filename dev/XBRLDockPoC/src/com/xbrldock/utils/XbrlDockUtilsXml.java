@@ -61,6 +61,10 @@ public class XbrlDockUtilsXml implements XbrlDockUtilsConsts {
 	}
 
 	public static Map<String, String> readAtts(Element e, Map<String, String> target) throws Exception {
+		return readAtts(e, null, target);
+	}
+
+	public static Map<String, String> readAtts(Element e, String txtAttName, Map<String, String> target) throws Exception {
 		if (null == target) {
 			target = new TreeMap<String, String>();
 		}
@@ -76,6 +80,14 @@ public class XbrlDockUtilsXml implements XbrlDockUtilsConsts {
 
 			if (!XbrlDockUtils.isEmpty(av)) {
 				target.put(an, av);
+			}
+		}
+		
+		if ( null != txtAttName ) {
+			String tx = e.getTextContent();
+			if (!XbrlDockUtils.isEmpty(tx)) {
+				tx = tx.replaceAll("\\s+", " ").trim();
+				target.put(txtAttName, tx);
 			}
 		}
 

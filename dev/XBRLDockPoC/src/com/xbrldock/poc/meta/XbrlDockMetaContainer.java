@@ -21,6 +21,7 @@ import com.xbrldock.utils.XbrlDockUtilsJson;
 @SuppressWarnings({ "rawtypes", "unchecked" })
 public class XbrlDockMetaContainer implements XbrlDockMetaConsts {
 
+	final XbrlDockMetaManager metaManager;
 	final Map<String, Object> metaInfo;
 
 	private ArrayList<String> queue = new ArrayList<>();
@@ -42,13 +43,15 @@ public class XbrlDockMetaContainer implements XbrlDockMetaConsts {
 	XbrlDockDevCounter cntLinkTypes = new XbrlDockDevCounter("LinkTypeCounts", true);
 	XbrlDockDevCounter cntArcRoles = new XbrlDockDevCounter("ArcRoleCounts", true);
 
-	public XbrlDockMetaContainer(Map<String, Object> mi) {
-		this.metaInfo = mi;
+	public XbrlDockMetaContainer(XbrlDockMetaManager mm, Map<String, Object> mi) {
+		metaManager = mm;
+		metaInfo = mi;
 		updated = false;
 	}
 
 	public Map getUrlContent(String url) {
-		return contentByURL.get(url);
+		String key = XbrlDockUtils.getPostfix(url, XDC_URL_PSEP);
+		return contentByURL.get(key);
 	}
 
 	public Map getHead() {
@@ -56,21 +59,17 @@ public class XbrlDockMetaContainer implements XbrlDockMetaConsts {
 	}
 
 	void setUrlContent(Map content) throws Exception {
-		contentByURL.put(currentUrl, content);
+		String key = XbrlDockUtils.getPostfix(currentUrl, XDC_URL_PSEP);
+		contentByURL.put(key, content);
 
-		Map<String, Map<String, Object>> items = (Map<String, Map<String, Object>>) content.get(XDC_METATOKEN_items);
-
-		if (null != items) {
-			for (Map.Entry<String, Map<String, Object>> ei : items.entrySet()) {
-				registerNSItem(ei.getValue().get("name"), ei.getKey());
-			}
+		Map<String, Map<String, Object>> items = (Map<String, Map<String, Object>>) content.getOrDefault(XDC_METATOKEN_items, Collections.EMPTY_MAP);
+		for (Map.Entry<String, Map<String, Object>> ei : items.entrySet()) {
+			registerNSItem(ei.getValue().get("name"), ei.getKey());
 		}
-		Map<String, String> incl = (Map) content.getOrDefault(XDC_METATOKEN_includes, Collections.EMPTY_MAP);
 
-		if (null != incl) {
-			for (Map.Entry<String, String> ie : incl.entrySet()) {
-				optQueue(ie.getKey(), ie.getValue());
-			}
+		Map<String, String> incl = (Map) content.getOrDefault(XDC_METATOKEN_includes, Collections.EMPTY_MAP);
+		for (Map.Entry<String, String> ie : incl.entrySet()) {
+			optQueue(ie.getKey(), ie.getValue());
 		}
 	}
 
@@ -97,11 +96,20 @@ public class XbrlDockMetaContainer implements XbrlDockMetaConsts {
 
 		optQueue(realUrl, callerNamespace);
 
-		Map m = XbrlDockUtils.safeGet(contentByURL, realUrl, MAP_CREATOR);
-		m = XbrlDockUtils.safeGet(m, XDC_METATOKEN_items, MAP_CREATOR);
-		m = XbrlDockUtils.safeGet(m, id, MAP_CREATOR);
+		String key = XbrlDockUtils.getPostfix(realUrl, XDC_URL_PSEP);
 
-		m.put(XDC_METATOKEN_url, realUrl);
+		Map m = metaManager.getKnownItemForKey(key, id);
+
+		if (null == m) {
+			m = XbrlDockUtils.safeGet(contentByURL, key, MAP_CREATOR);
+			m = XbrlDockUtils.safeGet(m, XDC_METATOKEN_items, MAP_CREATOR);
+			m = XbrlDockUtils.safeGet(m, id, MAP_CREATOR);
+
+			m.put(XDC_METATOKEN_url, realUrl);
+			m.put("id", id);
+		} else {
+//			XbrlDock.log(EventLevel.Trace, "External item resolved", m);
+		}
 
 		updated = true;
 
@@ -123,7 +131,8 @@ public class XbrlDockMetaContainer implements XbrlDockMetaConsts {
 		path = XbrlDockUtils.cutPostfix(currentUrl, "/");
 		currentNS = queueNS.remove(currentUrl);
 
-		currentContent = XbrlDockUtils.safeGet(contentByURL, currentUrl, MAP_CREATOR);
+		String key = XbrlDockUtils.getPostfix(currentUrl, XDC_URL_PSEP);
+		currentContent = XbrlDockUtils.safeGet(contentByURL, key, MAP_CREATOR);
 
 		return currentUrl;
 	}
@@ -198,7 +207,7 @@ public class XbrlDockMetaContainer implements XbrlDockMetaConsts {
 	}
 
 	void addLink(Map<String, String> linkInfo) {
-		ArrayList<Map<String, String>> links = XbrlDockUtils.safeGet(contentByURL.get(currentUrl), XDC_METATOKEN_links, ARRAY_CREATOR);
+		ArrayList<Map<String, String>> links = XbrlDockUtils.safeGet(currentContent, XDC_METATOKEN_links, ARRAY_CREATOR);
 		links.add(linkInfo);
 		updated = true;
 	}

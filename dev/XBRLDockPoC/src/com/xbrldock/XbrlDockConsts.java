@@ -10,6 +10,7 @@ public interface XbrlDockConsts {
 	String XDC_SEP_FILE = "_";
 	String XDC_SEP_PATH = ".";
 	String XDC_SEP_ID = ":";
+	String XDC_SEP_ITEMID = "#";
 
 	String XDC_CHARSET_UTF8 = StandardCharsets.UTF_8.name();// "UTF-8";
 	String XDC_FMT_TIMESTAMP = "yyyy-MM-dd'T'HH_mm_ss";

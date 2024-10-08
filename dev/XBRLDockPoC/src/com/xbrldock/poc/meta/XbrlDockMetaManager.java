@@ -4,9 +4,12 @@ import java.io.File;
 import java.io.InputStream;
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 import java.util.TreeMap;
+import java.util.TreeSet;
 
 import org.w3c.dom.Element;
 import org.w3c.dom.Node;
@@ -74,6 +77,8 @@ public class XbrlDockMetaManager implements XbrlDockMetaConsts, XbrlDockConsts.G
 		}
 
 		if (taxSource.isDirectory()) {
+			importIssues.reset();
+
 			XbrlDockMetaContainer mc = getMetaContainer(taxSource, true);
 
 			mc.optSave(taxonomyStoreRoot);
@@ -89,7 +94,7 @@ public class XbrlDockMetaManager implements XbrlDockMetaConsts, XbrlDockConsts.G
 
 		Map<String, Object> metaInfo = XbrlDockPocUtils.readMeta(schemaRoot);
 
-		XbrlDockMetaContainer metaContainer = new XbrlDockMetaContainer(metaInfo);
+		XbrlDockMetaContainer metaContainer = new XbrlDockMetaContainer(this, metaInfo);
 
 		ArrayList<String> metaEntryPoints = (ArrayList<String>) metaInfo.get(XDC_METAINFO_entryPointRefs);
 
@@ -101,7 +106,7 @@ public class XbrlDockMetaManager implements XbrlDockMetaConsts, XbrlDockConsts.G
 					XbrlDock.log(EventLevel.Error, "getMetaContainer - invalid entry point", ep);
 				}
 			}
-		} else if ( null != metaEntryPoints ){
+		} else if (null != metaEntryPoints) {
 			for (String ep : metaEntryPoints) {
 				metaContainer.optQueue(ep, null);
 			}
@@ -113,20 +118,16 @@ public class XbrlDockMetaManager implements XbrlDockMetaConsts, XbrlDockConsts.G
 		Map rewrite = XbrlDockUtils.simpleGet(metaInfo, XDC_METAINFO_urlRewrite);
 		XbrlDockUtilsNet.setRewrite(fMIDir, rewrite);
 
-		Collection<String> ownedUrls = rewrite.keySet();
+		Collection<String> ownedUrls = new TreeSet<>();
+
+		for (Object s : rewrite.keySet()) {
+			ownedUrls.add(XbrlDockUtils.getPostfix((String) s, XDC_URL_PSEP));
+		}
 
 		String url;
 		while (null != (url = metaContainer.getQueuedItem())) {
-			Map cachedContent = null;
-			
 			String key = XbrlDockUtils.getPostfix(url, XDC_URL_PSEP);
-
-			for (XbrlDockMetaContainer tm : taxonomies.values()) {
-				cachedContent = tm.getUrlContent(url);
-				if (null != cachedContent) {
-					break;
-				}
-			}
+			Map cachedContent = getKnownContentForKey(key);
 
 			if (null == cachedContent) {
 				try (InputStream is = XbrlDockUtilsNet.resolveEntityStream(url)) {
@@ -137,21 +138,21 @@ public class XbrlDockMetaManager implements XbrlDockMetaConsts, XbrlDockConsts.G
 					XbrlDockMetaContainer mcData = null;
 
 					for (String s : ownedUrls) {
-						if (url.startsWith(s)) {
+						if (key.startsWith(s)) {
 							mcData = metaContainer;
 							break;
 						}
 					}
 
 					if (null == mcData) {
-						
+
 						key = key.split("/")[0];
 						mcData = XbrlDockUtils.safeGet(taxonomies, key, new ItemCreator<XbrlDockMetaContainer>() {
 							@Override
 							public XbrlDockMetaContainer create(Object key, Object... hints) {
 								TreeMap<String, Object> mi = new TreeMap<String, Object>();
 								XbrlDockUtils.simpleSet(mi, key, XDC_METAINFO_pkgInfo, "identifier");
-								return new XbrlDockMetaContainer(mi);
+								return new XbrlDockMetaContainer(XbrlDockMetaManager.this, mi);
 							}
 						});
 
@@ -172,9 +173,20 @@ public class XbrlDockMetaManager implements XbrlDockMetaConsts, XbrlDockConsts.G
 		}
 
 		if (cache) {
-			for (String s : ownedUrls) {
-				String tKey = XbrlDockUtils.getPostfix(s, XDC_URL_PSEP);
-				taxonomies.put(tKey, metaContainer);
+			Set<String> alienKeys = new TreeSet<>(metaContainer.contentByURL.keySet());
+			
+			for (String prefix : ownedUrls) {
+				for (Iterator<String> iak = alienKeys.iterator(); iak.hasNext(); ) {
+					String ak = iak.next();
+					if ( ak.startsWith(prefix) ) {
+						iak.remove();
+					}
+				}
+				taxonomies.put(prefix, metaContainer);
+			}
+			
+			for (String ak : alienKeys) {
+				metaContainer.contentByURL.remove(ak);
 			}
 		}
 
@@ -185,6 +197,32 @@ public class XbrlDockMetaManager implements XbrlDockMetaConsts, XbrlDockConsts.G
 		XbrlDock.log(EventLevel.Error, importIssues);
 
 		return metaContainer;
+	}
+
+	public Map getKnownItemForKey(String key, String id) {
+		Map ret = null;
+
+		Map cachedContent = getKnownContentForKey(key);
+
+		if (null != cachedContent) {
+			ret = null;
+			ret = XbrlDockUtils.simpleGet(cachedContent, XDC_METATOKEN_items, id);
+		}
+
+		return ret;
+	}
+
+	private Map getKnownContentForKey(String key) {
+		Map cachedContent = null;
+
+		for (XbrlDockMetaContainer tm : taxonomies.values()) {
+			cachedContent = tm.getUrlContent(key);
+			if (null != cachedContent) {
+				break;
+			}
+		}
+
+		return cachedContent;
 	}
 
 	private void readSchema(Element eDoc, XbrlDockMetaContainer metaContainer, XbrlDockMetaContainer mcData) throws Exception {
@@ -221,12 +259,17 @@ public class XbrlDockMetaManager implements XbrlDockMetaConsts, XbrlDockConsts.G
 				sl = e.getAttribute("xlink:href");
 				break;
 			case "element":
-				em = mcData.getItem(itemId, ns);
-				XbrlDockUtilsXml.readAtts(e, em);
+				if (XbrlDockUtils.isEmpty(itemId)) {
+					itemId = e.getAttribute("name");
+				}
+				if (!XbrlDockUtils.isEmpty(itemId)) {
+					em = mcData.getItem(itemId, ns);
+					XbrlDockUtilsXml.readAtts(e, null, em);
+				}
 				break;
 			case "roleType":
 				em = mcData.getItem(itemId, ns);
-				XbrlDockUtilsXml.readAtts(e, em);
+				XbrlDockUtilsXml.readAtts(e, null, em);
 				XbrlDockUtilsXml.readChildNodes(e, em);
 
 				break;
@@ -249,6 +292,8 @@ public class XbrlDockMetaManager implements XbrlDockMetaConsts, XbrlDockConsts.G
 		Map<String, Object> content = new TreeMap<>();
 		List<Map<String, String>> arcs = new ArrayList<>();
 
+		String url = mcData.getCurrentUrl();
+
 		for (int idx = 0; idx < nc; ++idx) {
 			Element e = (Element) nl.item(idx);
 			String tagName = e.getTagName();
@@ -262,37 +307,49 @@ public class XbrlDockMetaManager implements XbrlDockMetaConsts, XbrlDockConsts.G
 
 			Map em = null;
 
+			boolean storeInContent = !XbrlDockUtils.isEmpty(label);
+
 			switch (lt) {
 			case "locator":
+//				String r = e.getAttribute("xlink:href");
+//				if ( r.contains("severities")) {
+//					XbrlDock.log(EventLevel.Debug, "hopp", r);
+//				}
 				em = mcData.getItem(e);
 				break;
 			case "resource":
 				switch (tn) {
 				case "label":
 				case "message":
-				case "valueAssertion":
-					em = XbrlDockUtilsXml.readAtts(e, null);
-					em.put("value", e.getTextContent());
 					break;
 				case "reference":
 					Map rm = XbrlDockUtilsXml.readChildNodes(e, null);
 					int refIdx = mcData.storeDocumentRef(rm);
-					content.put(roleID + "_" + label, refIdx);
-//						content.put(roleID + "_" + label,  allRefs.size());
-//						allRefs.add(rm);
-
+					content.put(roleID + XDC_SEP_ID + label, refIdx);
+					storeInContent = false;
+					break;
+				default:
+					String iid = e.getAttribute("id");
+					if ( XbrlDockUtils.isEmpty(iid)) {
+						iid = roleID + XDC_SEP_ID + label;
+					}
+					em = mcData.getItem(url, iid, null);
+					em.put("id", iid);
+					em.put(XDC_METATOKEN_tagName, tn);
+					XbrlDockUtilsXml.readAtts(e, "value", em);
 					break;
 				}
 				break;
 			case "arc":
-				Map<String, String> am = XbrlDockUtilsXml.readAtts(e, null);
+				Map<String, String> am = XbrlDockUtilsXml.readAtts(e, null, null);
 				am.put("xlink:role", roleID);
 				arcs.add(am);
+				storeInContent = false;
 				break;
 			case "extended":
 			case "simple":
 			case "":
-				// do nothing
+				storeInContent = false;
 				break;
 			default:
 				XbrlDockException.wrap(null, "Unhandled linktype", lt, mcData.getCurrentUrl());
@@ -300,14 +357,15 @@ public class XbrlDockMetaManager implements XbrlDockMetaConsts, XbrlDockConsts.G
 			}
 
 			mcData.addLinkType(lt + " --- " + tagName);
-//				cntLinkTypes.add(lt + " --- " + tagName);
 
-			if (null != em) {
-				content.put(roleID + "_" + label, em);
+			if (storeInContent) {
+				if (null == em) {
+					em = XbrlDockUtilsXml.readAtts(e, "value", null);
+					em.put(XDC_METATOKEN_url, url + "#" + em.get("id"));
+				}
+				content.put(roleID + XDC_SEP_ID + label, em);
 			}
 		}
-
-//		String url = metaContainer.getCurrentUrl();
 
 		for (Map<String, String> am : arcs) {
 			String roleID = am.get("xlink:role");
@@ -316,13 +374,11 @@ public class XbrlDockMetaManager implements XbrlDockMetaConsts, XbrlDockConsts.G
 			ar = XbrlDockUtils.getPostfix(ar, "/");
 
 			mcData.addArcRole(ar);
-//				cntArcRoles.add(ar);
-//				cntArcRoles.add(" <TOTAL> ");
 
 			String fromId = am.get("xlink:from");
-			Map from = (Map) content.get(roleID + "_" + fromId);
+			Map from = (Map) content.get(roleID + XDC_SEP_ID + fromId);
 			String toId = am.get("xlink:to");
-			Object toVal = content.get(roleID + "_" + toId);
+			Object toVal = content.get(roleID + XDC_SEP_ID + toId);
 			Map to = (toVal instanceof Map) ? (Map) toVal : null;
 
 			if ((null == from) || (null == toVal)) {
@@ -338,7 +394,11 @@ public class XbrlDockMetaManager implements XbrlDockMetaConsts, XbrlDockConsts.G
 			case "assertion-unsatisfied-message":
 				String labelType = (String) to.get("xlink:role");
 				if (null == labelType) {
-					importIssues.add("Missing labelType - " + ar);
+					if (XbrlDockUtils.isEqual("prohibited", am.get("use"))) {
+						// that's OK
+					} else {
+						importIssues.add("Missing labelType -  " + ar);
+					}
 				} else {
 					labelType = XbrlDockUtils.getPostfix(labelType, "/");
 					mcData.setLabel(to.get("xml:lang"), idFrom, labelType, to.get("value"));
@@ -351,7 +411,6 @@ public class XbrlDockMetaManager implements XbrlDockMetaConsts, XbrlDockConsts.G
 				} else {
 					mcData.setDocumentRef(from, toVal);
 				}
-//					XbrlDockUtils.safeGet(refRefs, from.get("id"), SET_CREATOR).add(toVal);
 				break;
 			case "all":
 			case "dimension-default":
@@ -363,31 +422,24 @@ public class XbrlDockMetaManager implements XbrlDockMetaConsts, XbrlDockConsts.G
 			default:
 
 				if ((null == to) || (null == from)) {
-					importIssues.add("Missing link endpoints - " + ar);
+					importIssues.add("Missing link endpoints -  " + ar);
 					break;
 //					XbrlDockException.wrap(null, "Both should be items", url, am);
 				}
 				String idTo = XbrlDockPocUtils.getGlobalItemId(to);
+				
+				if (idFrom.contains("#null#")) {
+					importIssues.add("Missing link endpoints -  " + ar);
+					break;
+//					XbrlDockException.wrap(null, "Both should be items", url, am);
+				}
 
 				am.remove("xlink:type");
 				am.put("xlink:arcrole", ar);
 				am.put("xlink:from", idFrom);
 				am.put("xlink:to", idTo);
-//				am.put("xbrlDock:url", url);
-//					am.put("xbrlDock:url", url.substring(taxRoot.length()));
-
-//					if ("ias_1_2024-03-27_role-810000".equals(roleID)) {
-//						if ("ifrs-full_CapitalRequirementsAxis".equals(idFrom)) {
-//							XbrlDock.log(EventLevel.Debug, "now");
-//						}
-//					}
 
 				mcData.addLink(am);
-//					links.add(am);
-
-//					Map lm = XbrlDockUtils.safeGet(links, idFrom, MAP_CREATOR);
-//					ArrayList ls = XbrlDockUtils.safeGet(lm, ar, ARRAY_CREATOR);
-//					ls.add(am);
 
 				break;
 //			default:
@@ -398,8 +450,4 @@ public class XbrlDockMetaManager implements XbrlDockMetaConsts, XbrlDockConsts.G
 			}
 		}
 	}
-
-//		loaded(url, linkbases);
-//	}
-
 }
