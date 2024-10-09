@@ -14,7 +14,7 @@ import com.xbrldock.utils.XbrlDockUtilsConsts;
 import com.xbrldock.utils.XbrlDockUtilsJson;
 
 @SuppressWarnings({"unchecked", "rawtypes"})
-public abstract class XbrlDock implements XbrlDockConsts, XbrlDockUtilsConsts, XbrlDockConsts.GenApp {
+public abstract class XbrlDock implements XbrlDockConsts, XbrlDockUtilsConsts {
 
 	private static XbrlDock XBRLDOCK;
 	private static PrintStream PS_LOG = System.out;
@@ -109,9 +109,8 @@ public abstract class XbrlDock implements XbrlDockConsts, XbrlDockUtilsConsts, X
 			XBRLDOCK.handleLog(level, params);
 		}
 	}
-
-	@Override
-	public <RetType> RetType callAgent(String agentId, String command, Object... params) throws Exception {
+	
+	public static GenAgent getAgent(String agentId) throws Exception {
 		Map cfg = XbrlDockUtils.simpleGet(APP_CONFIG, XDC_CFGTOKEN_app, XDC_CFGTOKEN_agents, agentId);
 		
 		GenAgent agent = XbrlDockUtils.safeGet(XBRLDOCK.agents, agentId, new ItemCreator<GenAgent>() {
@@ -125,7 +124,12 @@ public abstract class XbrlDock implements XbrlDockConsts, XbrlDockUtilsConsts, X
 			}
 		});
 		
+		return agent;
+	}
+
+	public static <RetType> RetType callAgent(String agentId, String command, Object... params) throws Exception {
 		Object ret = null;
+		GenAgent agent = getAgent(agentId);
 		
 		if ( !XbrlDockUtils.isEmpty(command) ) {
 			ret = agent.process(command, params);

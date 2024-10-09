@@ -20,26 +20,27 @@
       },
       "gui" : {
         "javaClass" : "com.xbrldock.poc.gui.XbrlDockGuiWorkbench",
+        "name" : "XBRLDock PoC Workbench",
         "location" : {
           "x" : 50,
           "y" : 50
         },
         "dimension" : {
-          "x" : 1000,
+          "x" : 1400,
           "y" : 600
-        }
+        },
+        "members" : [ {
+          "id" : "metaManager",
+          "javaClass" : "com.xbrldock.poc.gui.XbrlDockGuiMetaManagerPanel",
+          "name" : "Taxonomy Manager",
+          "members" : [ ]
+        }, {
+          "id" : "esefConn",
+          "javaClass" : "com.xbrldock.poc.gui.XbrlDockGuiEsefConnectorPanel",
+          "name" : "ESEF Connector",
+          "members" : [ ]
+        } ]
       }
-    }
-  },
-  "gui" : {
-    "javaClass" : "com.xbrldock.poc.gui.XbrlDockGuiWorkbench",
-    "location" : {
-      "x" : 50,
-      "y" : 50
-    },
-    "dimension" : {
-      "x" : 1000,
-      "y" : 600
     }
   }
 }

@@ -18,6 +18,8 @@ public interface XbrlDockPocConsts extends XbrlDockConsts, XbrlDockUtilsConsts {
 	String XDC_CMD_METAMGR_IMPORT = "import";
 	String XDC_CMD_METAMGR_GETMC = "getMC";
 
+	String XDC_CMD_WORKBENCH_SELECT = "select";
+
 	String XDC_METAINFO_dir = "xdc_metaInfoDir";
 	String XDC_METAINFO_urlRewrite = "xdc_urlRewrite";
 	String XDC_METAINFO_pkgInfo = "xdc_pkgInfo";

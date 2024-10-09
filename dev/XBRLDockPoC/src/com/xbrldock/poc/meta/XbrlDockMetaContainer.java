@@ -152,13 +152,13 @@ public class XbrlDockMetaContainer implements XbrlDockMetaConsts {
 	boolean optQueue(String url, String targetNs) {
 		url = XbrlDockUtils.optExtendRef(url, path);
 		
-		if ( url.split("//").length > 2 ) {
-			XbrlDock.log(EventLevel.Warning, "Sorry?", url);
-		}
-
-		if ( url.contains("xsdesef_cor") ) {
-			XbrlDock.log(EventLevel.Warning, "Sorry?", url);
-		}
+//		if ( url.split("//").length > 2 ) {
+//			XbrlDock.log(EventLevel.Warning, "Sorry?", url);
+//		}
+//
+//		if ( url.contains("xsdesef_cor") ) {
+//			XbrlDock.log(EventLevel.Warning, "Sorry?", url);
+//		}
 
 		if (null != currentContent) {
 			Map incl = XbrlDockUtils.safeGet(currentContent, XDC_METATOKEN_includes, SORTEDMAP_CREATOR);

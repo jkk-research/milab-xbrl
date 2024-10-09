@@ -2,128 +2,129 @@ package com.xbrldock.poc.gui;
 
 import java.awt.BorderLayout;
 import java.awt.Container;
-import java.awt.FlowLayout;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.util.Collection;
+import java.util.Map;
 
-import javax.swing.JButton;
-import javax.swing.JComboBox;
+import javax.swing.JComponent;
 import javax.swing.JFrame;
 import javax.swing.JPanel;
 import javax.swing.JScrollPane;
+import javax.swing.JTree;
+import javax.swing.event.TreeSelectionEvent;
+import javax.swing.event.TreeSelectionListener;
+import javax.swing.tree.DefaultMutableTreeNode;
+import javax.swing.tree.DefaultTreeModel;
+import javax.swing.tree.TreeSelectionModel;
 
-import com.xbrldock.poc.XbrlDockPoc;
-import com.xbrldock.poc.meta.XbrlDockMetaTaxonomy;
+import com.xbrldock.XbrlDockConsts;
+import com.xbrldock.XbrlDockException;
+import com.xbrldock.utils.XbrlDockUtils;
 import com.xbrldock.utils.XbrlDockUtilsGui;
 
-//@SuppressWarnings({ "rawtypes", "unchecked" })
-public class XbrlDockGuiWorkbench extends JFrame implements XbrlDockGuiConsts {
+@SuppressWarnings({ "rawtypes", /* "unchecked" */ })
+public class XbrlDockGuiWorkbench extends JFrame implements XbrlDockGuiConsts, XbrlDockConsts.GenAgent {
 	private static final long serialVersionUID = 1L;
 
-	XbrlDockPoc xbrlDock;
+	DefaultMutableTreeNode rootNode;
+	DefaultTreeModel panelModel;
+	JTree panelTree;
+	JPanel pnlRight;
 
-	XbrlDockMetaTaxonomy taxonomy;
+	class WBNode extends DefaultMutableTreeNode {
+		private static final long serialVersionUID = 1L;
 
-	XbrlDockGuiRoleTree roleTree;
-	XbrlDockGuiItemInfoGrid itemGrid;
-	
-	JComboBox<String> cbLang = new JComboBox<String>();
-	JComboBox<String> cbEntryPoint = new JComboBox<String>();
+		JComponent comp;
+
+		public WBNode(Object o) {
+			super(o);
+		}
+
+		@Override
+		public String toString() {
+			return XbrlDockUtils.simpleGet(getUserObject(), XDC_GEN_TOKEN_name);
+		}
+
+		JComponent getComp() {
+			if (null == comp) {
+				try {
+					comp = XbrlDockUtils.createObject(null, (Map) getUserObject());
+				} catch (Exception e) {
+					XbrlDockException.wrap(e, "Workbench node component creation", getUserObject());
+				}
+			}
+
+			return comp;
+		}
+	}
 
 	ActionListener al = new ActionListener() {
-
 		@Override
 		public void actionPerformed(ActionEvent e) {
 			switch (e.getActionCommand()) {
-			case XDC_APP_SHOWITEMS:
-				itemGrid.displayItems(roleTree.getRelatedItems());
-				break;
-			case XDC_APP_SETLANG:
-				int li = cbLang.getSelectedIndex();
-				taxonomy.setLang( (0 == li) ? null : cbLang.getItemAt(li));
-				roleTree.invalidate();
-				roleTree.revalidate();
-				roleTree.repaint();
-				break;
+			}
+		}
+	};
+	
+	TreeSelectionListener tsl = new TreeSelectionListener() {
+		
+		@Override
+		public void valueChanged(TreeSelectionEvent e) {
+			Object o = panelTree.getSelectionPath().getPath()[1];
+			
+			if ( o instanceof WBNode ) {
+				JComponent comp = ((WBNode)o).getComp();
+				
+				pnlRight.removeAll();
+				pnlRight.add(comp, BorderLayout.CENTER);
+				
+				pnlRight.revalidate();
+				pnlRight.repaint();
 			}
 		}
 	};
 
-	public XbrlDockGuiWorkbench(XbrlDockPoc xbrlDock) throws Exception {
-		super("XBRLDock PoC Workbench");
+	public XbrlDockGuiWorkbench() throws Exception {
+		rootNode = new DefaultMutableTreeNode();
+		panelModel = new DefaultTreeModel(rootNode);
+		panelTree = new JTree(panelModel);
+		panelTree.setRootVisible(false);
 
-		this.xbrlDock = xbrlDock;
-		
-		roleTree = new XbrlDockGuiRoleTree(xbrlDock);
-		itemGrid = new XbrlDockGuiItemInfoGrid(xbrlDock);
+		TreeSelectionModel tsm = panelTree.getSelectionModel();
+		tsm.setSelectionMode(TreeSelectionModel.SINGLE_TREE_SELECTION);
+		tsm.addTreeSelectionListener(tsl);
+
+		pnlRight = new JPanel(new BorderLayout());
+
+		Container cp = getContentPane();
+		cp.add(XbrlDockUtilsGui.createSplit(true, new JScrollPane(panelTree), pnlRight, 0.2), BorderLayout.CENTER);
 
 		setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
 	}
 
-	public void display() {
-		pack();
-
-//		Map cfg = XbrlDock.getSubConfig(null, XDC_CFGTOKEN_gui);
-//
-//		setLocation((int) XbrlDock.getConfig(cfg, 10, XDC_CFG_GEOM_location, XDC_CFG_GEOM_x), (int) XbrlDock.getConfig(cfg, 10, XDC_CFG_GEOM_location, XDC_CFG_GEOM_y));
-//		setSize((int) XbrlDock.getConfig(cfg, 200, XDC_CFG_GEOM_dimension, XDC_CFG_GEOM_x), (int) XbrlDock.getConfig(cfg, 100, XDC_CFG_GEOM_dimension, XDC_CFG_GEOM_y));
-
-		setLocation(50, 50);
-		setSize(1000, 800);
-
-		JPanel pnlTree = new JPanel(new BorderLayout());
-		pnlTree.add(new JScrollPane(roleTree), BorderLayout.CENTER);
-		
-		JPanel pnlTreeActions = new JPanel(new FlowLayout());
-
-		JButton bt = new JButton(XDC_APP_SHOWITEMS);
-		bt.setActionCommand(XDC_APP_SHOWITEMS);
-		bt.addActionListener(al);
-		pnlTreeActions.add(bt);
-		
-		pnlTree.add(pnlTreeActions, BorderLayout.SOUTH);
-		
-		JPanel pnlTop = new JPanel(new BorderLayout());
-		
-		cbLang.setActionCommand(XDC_APP_SETLANG);
-		cbLang.addActionListener(al);
-		pnlTop.add(cbLang, BorderLayout.EAST);
-
-		cbEntryPoint.setActionCommand(XDC_APP_SETENTRYPOINT);
-		cbEntryPoint.addActionListener(al);
-		pnlTop.add(cbEntryPoint, BorderLayout.CENTER);
-
-
-		Container cp = getContentPane();
-		cp.add(pnlTop, BorderLayout.NORTH);
-		cp.add(XbrlDockUtilsGui.createSplit(true, pnlTree, itemGrid, 0.2), BorderLayout.CENTER);
-
+	@Override
+	public <RetType> RetType process(String command, Object... params) throws Exception {
+		// TODO Auto-generated method stub
+		return null;
 	}
 
-	public void showTaxonomy(String taxonomyId) throws Exception {
+	@Override
+	public void initModule(Map config) throws Exception {
+		pack();
 
-		taxonomy = xbrlDock.getTaxMgr().loadTaxonomy(taxonomyId);
+		setTitle(XbrlDockUtils.simpleGet(config, XDC_GEN_TOKEN_name));
+		XbrlDockGuiUtils.placementLoad(this, config);
 
-		roleTree.setTaxonomy(taxonomy);
-		itemGrid.setTaxonomy(taxonomy);
-		
-		cbLang.removeAllItems();
-		cbLang.addItem("<< id >>");
-		for ( String lang : taxonomy.getLanguages() ) {
-			cbLang.addItem(lang);
+		rootNode.removeAllChildren();
+
+		for (Object m : (Collection) XbrlDockUtils.simpleGet(config, XDC_GEN_TOKEN_members)) {
+			rootNode.add(new WBNode(m));
 		}
 
-		cbEntryPoint.removeAllItems();
-		cbEntryPoint.addItem("<< all >>");
-		for ( String ep : taxonomy.getEntryPoints() ) {
-			cbEntryPoint.addItem(ep);
-		}
+		panelModel.reload();
 
-		if (!isVisible()) {
-			display();
-			setVisible(true);
-		}
-
+		setVisible(true);
 	}
 
 }

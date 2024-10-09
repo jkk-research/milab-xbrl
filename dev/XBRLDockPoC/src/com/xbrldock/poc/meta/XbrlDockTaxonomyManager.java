@@ -29,7 +29,7 @@ public class XbrlDockTaxonomyManager implements XbrlDockMetaConsts, XbrlDockCons
 	}
 
 	@Override
-	public void initModule(GenApp app, Map config) throws Exception {
+	public void initModule(Map config) throws Exception {
 		String dataRoot = XbrlDockUtils.simpleGet(config, XDC_CFGTOKEN_dirStore);
 		this.taxonomyStoreRoot = new File(dataRoot);
 		XbrlDockUtilsFile.ensureDir(taxonomyStoreRoot);

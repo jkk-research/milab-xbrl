@@ -86,7 +86,7 @@ public class XbrlDockPocReportInfoExtender implements XbrlDockPocConsts, XbrlDoc
 			}
 			break;
 		case XDC_REP_SEG_Fact:
-			ret = (String) data.get(XDC_FACT_TOKEN_id);
+			ret = (String) data.get(XDC_GEN_TOKEN_id);
 			if (XbrlDockUtils.isEmpty(ret)) {
 				ret = "fact-" + (factCount++);
 			}

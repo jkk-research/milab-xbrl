@@ -100,6 +100,9 @@ public class XbrlDockUtilsNet implements XbrlDockUtilsConsts {
 			String p = ep.getKey();
 			if (url.startsWith(p)) {
 				fCache = new File(ep.getValue(), url.substring(p.length()));
+				if ( !fCache.isFile() ) {
+					XbrlDockException.wrap(null, "Missing resolved cache file", fCache.getAbsolutePath(), "for url", url);
+				}
 				break;
 			}
 		}

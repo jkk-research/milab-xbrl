@@ -38,10 +38,11 @@ public class XbrlDockPocApp extends XbrlDock implements XbrlDockPocConsts {
 		String urlCacheRoot = XbrlDockUtils.simpleGet(APP_CONFIG, XDC_CFGTOKEN_app, XDC_CFGTOKEN_dirUrlCache);
 		XbrlDockUtilsNet.setCacheRoot(urlCacheRoot);
 
-		XbrlDockException.DUMP_STACK_TRACE = null;
+//		XbrlDockException.DUMP_STACK_TRACE = null;
 		
 		if (Boolean.TRUE.equals(XbrlDockUtils.simpleGet(APP_CONFIG, XDC_CFGTOKEN_env, XDC_CFGTOKEN_AGENT_gui))) {
-			callAgent(XDC_CFGTOKEN_AGENT_gui, null);
+			callAgent(XDC_CFGTOKEN_AGENT_gui, XDC_CMD_WORKBENCH_SELECT, XDC_CFGTOKEN_AGENT_metaManager);
+			return;
 		}
 
 //		@formatter:off  

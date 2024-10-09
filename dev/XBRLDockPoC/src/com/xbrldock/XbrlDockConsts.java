@@ -55,12 +55,13 @@ public interface XbrlDockConsts {
 		Init, Begin, Process, End, Release
 	}
 	
-	public interface GenApp {
-		<RetType> RetType callAgent(String agentId, String command, Object... params) throws Exception;
-	}
-	
+//	public interface GenApp {
+//		GenAgent getAgent(String agentId) throws Exception;
+//		<RetType> RetType callAgent(String agentId, String command, Object... params) throws Exception;
+//	}
+//	
 	public interface GenAgent {
-		void initModule(GenApp app, Map config) throws Exception;
+		void initModule(Map config) throws Exception;
 		<RetType> RetType process(String command, Object... params) throws Exception;
 	}
 	
@@ -93,16 +94,16 @@ public interface XbrlDockConsts {
 	
 	String XDC_ENTITY_ID_TYPE_ = "";
 	String XDC_ENTITY_ID_TYPE_LEI = "lei";
-	
+
+	String XDC_GEN_TOKEN_id = "id";
+	String XDC_GEN_TOKEN_name = "name";
+	String XDC_GEN_TOKEN_value = "value";
+	String XDC_GEN_TOKEN_members = "members";
 
 	String XDC_ENTITY_TOKEN_idType = "idType";
-	String XDC_ENTITY_TOKEN_id = "id";
-	String XDC_ENTITY_TOKEN_name = "name";
 	String XDC_ENTITY_TOKEN_urlSource = "urlSource";
 
-	
 	String XDC_REPORT_TOKEN_source = "source";
-	String XDC_REPORT_TOKEN_id = "id";
 	String XDC_REPORT_TOKEN_periodEnd = "periodEnd";
 	String XDC_REPORT_TOKEN_published = "published";
 	String XDC_REPORT_TOKEN_entityId = "entityId";
@@ -123,7 +124,6 @@ public interface XbrlDockConsts {
 	String XDC_REPORT_TOKEN_localMetaInfPath = "localMetaInfPath";
 
 	
-	String XDC_FACT_TOKEN_id = "id";
 	String XDC_FACT_TOKEN_scenario = "scenario";
 	String XDC_FACT_TOKEN_context = "context";
 	
@@ -140,7 +140,6 @@ public interface XbrlDockConsts {
 	String XDC_FACT_TOKEN_concept = "concept";
 	String XDC_FACT_TOKEN_entity = "entity";
 	String XDC_FACT_TOKEN_dimensions = "dimensions";
-	String XDC_FACT_TOKEN_value = "value";
 	
 	String XDC_FACT_TOKEN_format = "format";
 	String XDC_FACT_TOKEN_decimals = "decimals";

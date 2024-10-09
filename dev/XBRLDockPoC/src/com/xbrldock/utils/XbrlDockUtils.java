@@ -102,6 +102,10 @@ public class XbrlDockUtils implements XbrlDockUtilsConsts {
 		return sb;
 	}
 
+	public static int getInt(Object root, Object... path) {
+		return ((Number)simpleGet(root, path)).intValue();
+	}
+
 	public static <RetType> RetType simpleGet(Object root, Object... path) {
 		if ((path.length == 1) && ((String) path[0]).contains(".")) {
 			path = ((String) path[0]).split("\\.");
@@ -219,7 +223,7 @@ public class XbrlDockUtils implements XbrlDockUtilsConsts {
 		RetType ob = (RetType) Class.forName((String) config.get(XDC_CFGTOKEN_javaClass)).getConstructor().newInstance();
 
 		if (ob instanceof GenAgent) {
-			((GenAgent) ob).initModule((GenApp) owner, config);
+			((GenAgent) ob).initModule(config);
 		}
 
 		return ob;

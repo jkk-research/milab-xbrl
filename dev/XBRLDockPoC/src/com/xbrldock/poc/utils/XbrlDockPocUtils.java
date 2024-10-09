@@ -92,11 +92,11 @@ public class XbrlDockPocUtils extends XbrlDockUtils implements XbrlDockPocConsts
 					String epRef = ch.getAttribute("href");
 					epRef = XbrlDockUtils.optCleanUrl(epRef);
 
-					if (epRef.contains("01-01.xsdesef_cor-gen-en.xml")) {
-						epRef = epRef.replace("01-01.xsdesef_cor-gen-en.xml", "01-01_cor.xsd");
-					} else if (epRef.contains("01-01.xsdesef_cor-lab-en.xml")) {
-						epRef = epRef.replace("01-01.xsdesef_cor-lab-en.xml", "01-01_cor.xsd");
-					}
+//					if (epRef.contains("01-01.xsdesef_cor-gen-en.xml")) {
+//						epRef = epRef.replace("01-01.xsdesef_cor-gen-en.xml", "01-01_cor.xsd");
+//					} else if (epRef.contains("01-01.xsdesef_cor-lab-en.xml")) {
+//						epRef = epRef.replace("01-01.xsdesef_cor-lab-en.xml", "01-01_cor.xsd");
+//					}
 
 					epRefs.add(epRef);
 					allRefs.add(epRef);

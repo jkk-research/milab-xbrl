@@ -200,7 +200,7 @@ public class XbrlDockFormatXhtml implements XbrlDockFormatConsts, XbrlDockPocCon
 				if (!XbrlDockUtils.isEmpty(ctxId)) {
 					segmentData.clear();
 
-					segmentData.put(XDC_FACT_TOKEN_id, e.getAttribute("id"));
+					segmentData.put(XDC_GEN_TOKEN_id, e.getAttribute("id"));
 
 					String valOrig = e.getTextContent().trim();
 					String fmtCode = e.getAttribute("format");
@@ -215,7 +215,7 @@ public class XbrlDockFormatXhtml implements XbrlDockFormatConsts, XbrlDockPocCon
 
 					if (!XbrlDockUtils.isEmpty(fmtCode)) {
 						segmentData.put(XDC_FACT_TOKEN_xbrldockOrigValue, valOrig);
-						segmentData.put(XDC_FACT_TOKEN_value, valOrig);
+						segmentData.put(XDC_GEN_TOKEN_value, valOrig);
 						segmentData.put(XDC_FACT_TOKEN_format, fmtCode);
 						for (String xt : cvtKeys) {
 							Object v = e.getAttribute(xt);
@@ -253,7 +253,7 @@ public class XbrlDockFormatXhtml implements XbrlDockFormatConsts, XbrlDockPocCon
 							}
 						} while (!last);
 
-						segmentData.put(XDC_FACT_TOKEN_value, XbrlDockUtils.toString(merge));
+						segmentData.put(XDC_GEN_TOKEN_value, XbrlDockUtils.toString(merge));
 						segmentData.put(XDC_FACT_TOKEN_xbrldockFactType, XDC_FACT_VALTYPE_text);
 					}
 
