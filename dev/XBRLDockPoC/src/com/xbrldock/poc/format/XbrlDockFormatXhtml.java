@@ -200,7 +200,7 @@ public class XbrlDockFormatXhtml implements XbrlDockFormatConsts, XbrlDockPocCon
 				if (!XbrlDockUtils.isEmpty(ctxId)) {
 					segmentData.clear();
 
-					segmentData.put(XDC_GEN_TOKEN_id, e.getAttribute("id"));
+					segmentData.put(XDC_EXT_TOKEN_id, e.getAttribute("id"));
 
 					String valOrig = e.getTextContent().trim();
 					String fmtCode = e.getAttribute("format");

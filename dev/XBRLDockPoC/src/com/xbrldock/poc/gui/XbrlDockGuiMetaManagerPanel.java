@@ -1,6 +1,7 @@
 package com.xbrldock.poc.gui;
 
 import java.awt.BorderLayout;
+import java.awt.Dimension;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.util.ArrayList;
@@ -18,21 +19,35 @@ import javax.swing.table.AbstractTableModel;
 
 import com.xbrldock.XbrlDock;
 import com.xbrldock.XbrlDockConsts.GenAgent;
+import com.xbrldock.utils.XbrlDockUtils;
 import com.xbrldock.utils.XbrlDockUtilsGui;
 
 @SuppressWarnings({ "rawtypes", /*"unchecked"*/ })
 public class XbrlDockGuiMetaManagerPanel extends JPanel implements XbrlDockGuiConsts, GenAgent {
 	private static final long serialVersionUID = 1L;
 	
-	GenAgent metaManager;
-	
-	ArrayList<String> attNames = new ArrayList<>();
+	LabeledAccess[] attNames = {
+			new LabeledAccess("Identifier", "", XDC_METAINFO_pkgInfo, XDC_EXT_TOKEN_identifier),
+			new LabeledAccess("File count", FMT_COLL, XDC_METATOKEN_includes),
+			new LabeledAccess("Requires", FMT_COLL, XDC_GEN_TOKEN_requires),
+			new LabeledAccess("Entry points", FMT_COLL, XDC_METAINFO_entryPoints),
+	};
 
-	ArrayList<Map> items = new ArrayList<>();
-	Map selItem;
+	ArrayList<Object> items = new ArrayList<>();
+	Object selItem;
 
 	class GridModel extends AbstractTableModel {
 		private static final long serialVersionUID = 1L;
+
+		@Override
+		public int getColumnCount() {
+			return attNames.length;
+		}
+
+		@Override
+		public String getColumnName(int column) {
+			return attNames[column].label;
+		}
 
 		@Override
 		public int getRowCount() {
@@ -40,19 +55,8 @@ public class XbrlDockGuiMetaManagerPanel extends JPanel implements XbrlDockGuiCo
 		}
 
 		@Override
-		public int getColumnCount() {
-			return attNames.size();
-		}
-
-		@Override
-		public String getColumnName(int column) {
-			return attNames.get(column);
-		}
-
-		@Override
 		public Object getValueAt(int rowIndex, int columnIndex) {
-			String k = attNames.get(columnIndex);
-			return items.get(rowIndex).get(k);
+			return attNames[columnIndex].get(items.get(rowIndex));
 		}
 	}
 
@@ -62,12 +66,14 @@ public class XbrlDockGuiMetaManagerPanel extends JPanel implements XbrlDockGuiCo
 	JLabel lbDropZone;
 	
 	JEditorPane txtInfo;
+	String placeholder;
 
 
 	ActionListener al = new ActionListener() {
 		@Override
 		public void actionPerformed(ActionEvent e) {
 			switch (e.getActionCommand()) {
+			
 			}
 		}
 	};
@@ -75,26 +81,28 @@ public class XbrlDockGuiMetaManagerPanel extends JPanel implements XbrlDockGuiCo
 	public XbrlDockGuiMetaManagerPanel() throws Exception {
 		super(new BorderLayout());		
 		
-//		mdlGrid = new GridModel();
-//		tblGrid = new JTable(mdlGrid);
-		tblGrid = new JTable();
+		mdlGrid = new GridModel();
+		tblGrid = new JTable(mdlGrid);
 
 		ListSelectionModel lm = tblGrid.getSelectionModel();
 		lm.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
 		lm.addListSelectionListener(new ListSelectionListener() {
 			@Override
 			public void valueChanged(ListSelectionEvent e) {
-				if (!e.getValueIsAdjusting()) {}
+				if (!e.getValueIsAdjusting()) {
+					int sr = tblGrid.getSelectedRow();					
+					selItem = (-1 == sr) ? null : items.get(sr);
+					updateDescPanel();
+				}
 			}
 		});
 		
 		txtInfo = new JEditorPane();
 		txtInfo.setContentType("text/html");
 		txtInfo.setEditable(false);
-		
-		txtInfo.setText("<html><body>Here comes the description of the selected taxonomy</body></html>");
-		
+						
 		lbDropZone = new JLabel("Drop zone for new taxonomy");
+		lbDropZone.setMaximumSize(new Dimension(50, 500));
 		
 		JPanel pnlTop = new JPanel(new BorderLayout());
 
@@ -102,13 +110,34 @@ public class XbrlDockGuiMetaManagerPanel extends JPanel implements XbrlDockGuiCo
 		add(XbrlDockUtilsGui.createSplit(false, pnlTop, new JScrollPane(txtInfo), 0.2), BorderLayout.CENTER);
 	}
 
-	@Override
-	public void initModule(Map config) throws Exception {
-		metaManager = XbrlDock.getAgent(XDC_CFGTOKEN_AGENT_metaManager);
+	protected void updateDescPanel() {
+		String txt = ( null == selItem ) ? placeholder : FMT_TOHTML.toString(selItem);
+		
+		int cp = txtInfo.getCaretPosition();
+
+		txtInfo.setText("<html><body>" + txt + "</body></html>");
+		
+		txtInfo.setCaretPosition(cp);
 	}
 
 	@Override
-	public <RetType> RetType process(String command, Object... params) throws Exception {
+	public void initModule(Map config) throws Exception {
+		Map metaCatalog = XbrlDock.callAgent(XDC_CFGTOKEN_AGENT_metaManager, XDC_CMD_METAMGR_GETCATALOG);
+		placeholder = XbrlDockUtils.simpleGet(config, XDC_GEN_TOKEN_placeholder);
+		
+		items.clear();
+		for ( Object c : metaCatalog.values() ) {
+			items.add(c);
+		}
+		
+		mdlGrid.fireTableDataChanged();
+		
+		updateDescPanel();
+
+	}
+
+	@Override
+	public <RetType> RetType process(String command, Object... params) {
 		// TODO Auto-generated method stub
 		return null;
 	}

@@ -3,7 +3,6 @@ package com.xbrldock.poc.meta;
 import java.io.File;
 import java.io.InputStream;
 import java.util.ArrayList;
-import java.util.Collection;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
@@ -22,16 +21,18 @@ import com.xbrldock.dev.XbrlDockDevCounter;
 import com.xbrldock.poc.utils.XbrlDockPocUtils;
 import com.xbrldock.utils.XbrlDockUtils;
 import com.xbrldock.utils.XbrlDockUtilsFile;
+import com.xbrldock.utils.XbrlDockUtilsJson;
 import com.xbrldock.utils.XbrlDockUtilsNet;
 import com.xbrldock.utils.XbrlDockUtilsXml;
 
 @SuppressWarnings({ "rawtypes", "unchecked" })
 public class XbrlDockMetaManager implements XbrlDockMetaConsts, XbrlDockConsts.GenAgent {
 
-	File taxonomyStoreRoot;
+	File metaStoreRoot;
 	File dirInput;
 
-	private final Map<String, XbrlDockMetaContainer> taxonomies = new TreeMap<>();
+	private final Map<String, Map> metaCatalog = new TreeMap<>();
+	private final Map<String, XbrlDockMetaContainer> mcByUrl = new TreeMap<>();
 
 	XbrlDockDevCounter importIssues = new XbrlDockDevCounter("Import issues", true);
 
@@ -41,17 +42,26 @@ public class XbrlDockMetaManager implements XbrlDockMetaConsts, XbrlDockConsts.G
 	@Override
 	public void initModule(Map config) throws Exception {
 		String dataRoot = XbrlDockUtils.simpleGet(config, XDC_CFGTOKEN_dirStore);
-		this.taxonomyStoreRoot = new File(dataRoot);
-		XbrlDockUtilsFile.ensureDir(taxonomyStoreRoot);
+		this.metaStoreRoot = new File(dataRoot);
+		XbrlDockUtilsFile.ensureDir(metaStoreRoot);
 
 		String inputRoot = XbrlDockUtils.simpleGet(config, XDC_CFGTOKEN_dirInput);
 		this.dirInput = new File(inputRoot);
+
+		File fc = new File(metaStoreRoot, XDC_FNAME_METACATALOG);
+		if (fc.isFile()) {
+			Map mc = XbrlDockUtilsJson.readJson(fc);
+			metaCatalog.putAll(mc);
+		}
 	}
 
 	@Override
 	public <RetType> RetType process(String command, Object... params) throws Exception {
 		Object ret = null;
 		switch (command) {
+		case XDC_CMD_METAMGR_GETCATALOG:
+			ret = metaCatalog;
+			break;
 		case XDC_CMD_METAMGR_IMPORT:
 			importTaxonomy((File) params[0]);
 			break;
@@ -81,7 +91,7 @@ public class XbrlDockMetaManager implements XbrlDockMetaConsts, XbrlDockConsts.G
 
 			XbrlDockMetaContainer mc = getMetaContainer(taxSource, true);
 
-			mc.optSave(taxonomyStoreRoot);
+			mc.optSave(metaStoreRoot);
 
 //			XbrlDock.log(EventLevel.Trace, mc.metaInfo);
 
@@ -117,16 +127,10 @@ public class XbrlDockMetaManager implements XbrlDockMetaConsts, XbrlDockConsts.G
 		Map rewrite = XbrlDockUtils.simpleGet(metaInfo, XDC_METAINFO_urlRewrite);
 		XbrlDockUtilsNet.setRewrite(fMIDir, rewrite);
 
-		Collection<String> ownedUrls = new TreeSet<>();
-
-		for (Object s : rewrite.keySet()) {
-			ownedUrls.add(XbrlDockUtils.getPostfix((String) s, XDC_URL_PSEP));
-		}
-
 		String url;
 		while (null != (url = metaContainer.getQueuedItem())) {
 			String key = XbrlDockUtils.getPostfix(url, XDC_URL_PSEP);
-			Map cachedContent = getKnownContentForKey(key);
+			Map cachedContent = getKnownContentForKey(key, metaContainer);
 
 			if (null == cachedContent) {
 				try (InputStream is = XbrlDockUtilsNet.resolveEntityStream(url)) {
@@ -136,7 +140,7 @@ public class XbrlDockMetaManager implements XbrlDockMetaConsts, XbrlDockConsts.G
 
 					XbrlDockMetaContainer mcData = null;
 
-					for (String s : ownedUrls) {
+					for (String s : metaContainer.ownedUrls) {
 						if (key.startsWith(s)) {
 							mcData = metaContainer;
 							break;
@@ -146,14 +150,14 @@ public class XbrlDockMetaManager implements XbrlDockMetaConsts, XbrlDockConsts.G
 					if (null == mcData) {
 
 						key = key.split("/")[0];
-						mcData = XbrlDockUtils.safeGet(taxonomies, key, new ItemCreator<XbrlDockMetaContainer>() {
+						mcData = XbrlDockUtils.safeGet(mcByUrl, key, new ItemCreator<XbrlDockMetaContainer>() {
 							@Override
 							public XbrlDockMetaContainer create(Object key, Object... hints) {
-								TreeMap<String, Object> mi = new TreeMap<String, Object>();
-								XbrlDockUtils.simpleSet(mi, key, XDC_METAINFO_pkgInfo, "identifier");
-								return new XbrlDockMetaContainer(XbrlDockMetaManager.this, mi);
+								return new XbrlDockMetaContainer(XbrlDockMetaManager.this, (String) key);
 							}
 						});
+
+						metaContainer.requires.add(mcData);
 
 						mcData.setCurrentUrl(url);
 					}
@@ -174,14 +178,14 @@ public class XbrlDockMetaManager implements XbrlDockMetaConsts, XbrlDockConsts.G
 		if (cache) {
 			Set<String> alienKeys = new TreeSet<>(metaContainer.contentByURL.keySet());
 
-			for (String prefix : ownedUrls) {
+			for (String prefix : metaContainer.ownedUrls) {
 				for (Iterator<String> iak = alienKeys.iterator(); iak.hasNext();) {
 					String ak = iak.next();
 					if (ak.startsWith(prefix)) {
 						iak.remove();
 					}
 				}
-				taxonomies.put(prefix, metaContainer);
+				mcByUrl.put(prefix, metaContainer);
 			}
 
 			for (String ak : alienKeys) {
@@ -189,8 +193,15 @@ public class XbrlDockMetaManager implements XbrlDockMetaConsts, XbrlDockConsts.G
 			}
 		}
 
-		for (XbrlDockMetaContainer mc : taxonomies.values()) {
-			mc.optSave(taxonomyStoreRoot);
+		boolean updateCatalog = false;
+		for (XbrlDockMetaContainer mc : mcByUrl.values()) {
+			if (mc.optSave(metaStoreRoot)) {
+				updateCatalog = true;
+				metaCatalog.put(mc.getId(), mc.metaInfo);
+			}
+		}
+		if (updateCatalog) {
+			XbrlDockUtilsJson.writeJson(new File(metaStoreRoot, XDC_FNAME_METACATALOG), metaCatalog);
 		}
 
 		if (!importIssues.isEmpty()) {
@@ -200,10 +211,10 @@ public class XbrlDockMetaManager implements XbrlDockMetaConsts, XbrlDockConsts.G
 		return metaContainer;
 	}
 
-	public Map getKnownItemForKey(String key, String id) {
+	public Map getKnownItemForKey(String key, String id, XbrlDockMetaContainer metaContainer) {
 		Map ret = null;
 
-		Map cachedContent = getKnownContentForKey(key);
+		Map cachedContent = getKnownContentForKey(key, metaContainer);
 
 		if (null != cachedContent) {
 			ret = null;
@@ -213,12 +224,13 @@ public class XbrlDockMetaManager implements XbrlDockMetaConsts, XbrlDockConsts.G
 		return ret;
 	}
 
-	private Map getKnownContentForKey(String key) {
+	private Map getKnownContentForKey(String key, XbrlDockMetaContainer metaContainer) {
 		Map cachedContent = null;
 
-		for (XbrlDockMetaContainer tm : taxonomies.values()) {
+		for (XbrlDockMetaContainer tm : mcByUrl.values()) {
 			cachedContent = tm.getUrlContent(key);
 			if (null != cachedContent) {
+				metaContainer.requires.add(tm);
 				break;
 			}
 		}

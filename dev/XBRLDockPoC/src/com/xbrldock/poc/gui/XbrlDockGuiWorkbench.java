@@ -43,7 +43,7 @@ public class XbrlDockGuiWorkbench extends JFrame implements XbrlDockGuiConsts, X
 
 		@Override
 		public String toString() {
-			return XbrlDockUtils.simpleGet(getUserObject(), XDC_GEN_TOKEN_name);
+			return XbrlDockUtils.simpleGet(getUserObject(), XDC_EXT_TOKEN_name);
 		}
 
 		JComponent getComp() {
@@ -113,7 +113,7 @@ public class XbrlDockGuiWorkbench extends JFrame implements XbrlDockGuiConsts, X
 	public void initModule(Map config) throws Exception {
 		pack();
 
-		setTitle(XbrlDockUtils.simpleGet(config, XDC_GEN_TOKEN_name));
+		setTitle(XbrlDockUtils.simpleGet(config, XDC_EXT_TOKEN_name));
 		XbrlDockGuiUtils.placementLoad(this, config);
 
 		rootNode.removeAllChildren();

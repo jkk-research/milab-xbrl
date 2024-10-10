@@ -17,6 +17,42 @@ public class XbrlDockUtils implements XbrlDockUtilsConsts {
 		return (null == o1) ? (null == o2) : (null != o2) && o1.equals(o2);
 	}
 
+	public static String camel2Label(String str) {
+		if (isEmpty(str)) {
+			return "";
+		}
+
+		StringBuilder sb = new StringBuilder();
+		boolean upBefore = true;
+		boolean toUpper = true;
+
+		for (int i = 0; i < str.length(); ++i) {
+			char c = str.charAt(i);
+
+			if (Character.isUpperCase(c)) {
+				if (!upBefore) {
+					sb.append(" ");
+					upBefore = true;
+				}
+			} else if ( c == '_' ){
+				sb.append("::");
+				toUpper = true;
+				continue;
+			} else {
+				upBefore = false;
+			}
+			
+			if ( toUpper ) {
+				c = Character.toUpperCase(c);
+				toUpper = false;
+			}
+			
+			sb.append(c);
+		}
+
+		return sb.toString();
+	}
+
 	public static String getCommonPrefix(String a, String b) {
 		if (isEmpty(a)) {
 			return b;
@@ -103,7 +139,7 @@ public class XbrlDockUtils implements XbrlDockUtilsConsts {
 	}
 
 	public static int getInt(Object root, Object... path) {
-		return ((Number)simpleGet(root, path)).intValue();
+		return ((Number) simpleGet(root, path)).intValue();
 	}
 
 	public static <RetType> RetType simpleGet(Object root, Object... path) {
@@ -173,7 +209,7 @@ public class XbrlDockUtils implements XbrlDockUtilsConsts {
 
 	public static String getPostfix(String strSrc, String pfSep) {
 		int sep = strSrc.lastIndexOf(pfSep);
-		return  (-1 == sep) ? strSrc : strSrc.substring(sep + pfSep.length());
+		return (-1 == sep) ? strSrc : strSrc.substring(sep + pfSep.length());
 	}
 
 	public static String cutPostfix(String strSrc, String pfSep) {
@@ -183,7 +219,7 @@ public class XbrlDockUtils implements XbrlDockUtilsConsts {
 
 	public static String replacePostfix(String strSrc, String pfSep, String postfix) {
 		int sep = strSrc.lastIndexOf(pfSep);
-		return  (-1 == sep) ? strSrc : strSrc.substring(0, sep + pfSep.length()) + postfix;
+		return (-1 == sep) ? strSrc : strSrc.substring(0, sep + pfSep.length()) + postfix;
 	}
 
 	private static SimpleDateFormat sdfTime = new SimpleDateFormat(XDC_FMT_TIMESTAMP);
@@ -242,7 +278,7 @@ public class XbrlDockUtils implements XbrlDockUtilsConsts {
 	public static String optCleanUrl(String url) {
 		int psp = url.indexOf(XDC_URL_PSEP) + XDC_URL_PSEP.length();
 		String rr = url.substring(psp);
-		if ( rr.contains("//") ) {
+		if (rr.contains("//")) {
 			url = url.substring(0, psp) + rr.replaceAll("/+", "/");
 		}
 

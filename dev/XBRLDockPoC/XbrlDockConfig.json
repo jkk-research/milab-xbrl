@@ -33,6 +33,7 @@
           "id" : "metaManager",
           "javaClass" : "com.xbrldock.poc.gui.XbrlDockGuiMetaManagerPanel",
           "name" : "Taxonomy Manager",
+          "placeholder" : "Select a taxonomy in the list above to see its properties.",
           "members" : [ ]
         }, {
           "id" : "esefConn",

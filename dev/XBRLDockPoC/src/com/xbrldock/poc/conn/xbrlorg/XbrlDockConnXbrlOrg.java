@@ -451,8 +451,8 @@ public class XbrlDockConnXbrlOrg implements XbrlDockConnXbrlOrgConsts, XbrlDockP
 				String eid = XDC_ENTITY_ID_TYPE_LEI + XDC_SEP_ID + XbrlDockUtils.simpleGet(atts, XDC_XBRLORG_TOKEN_identifier);
 				entityData = XbrlDockUtils.safeGet(entities, eid, MAP_CREATOR);
 				
-				entityData.put(XDC_GEN_TOKEN_id, eid);
-				entityData.put(XDC_GEN_TOKEN_name, atts.get( XDC_XBRLORG_TOKEN_name));
+				entityData.put(XDC_EXT_TOKEN_id, eid);
+				entityData.put(XDC_EXT_TOKEN_name, atts.get( XDC_XBRLORG_TOKEN_name));
 				entityData.put(XDC_ENTITY_TOKEN_urlSource, XbrlDockUtils.simpleGet(i, XDC_JSONAPI_TOKEN_links, XDC_JSONAPI_TOKEN_self));
 
 				locEnt.put(id, entityData);
@@ -483,7 +483,7 @@ public class XbrlDockConnXbrlOrg implements XbrlDockConnXbrlOrgConsts, XbrlDockP
 				Map filingData = XbrlDockUtils.safeGet(filings, id, MAP_CREATOR);
 
 				filingData.put(XDC_REPORT_TOKEN_source, sourceName);
-				filingData.put(XDC_GEN_TOKEN_id, id);
+				filingData.put(XDC_EXT_TOKEN_id, id);
 				filingData.put(XDC_REPORT_TOKEN_sourceAtts, atts);
 
 				filingData.put(XDC_REPORT_TOKEN_periodEnd, atts.get(XDC_XBRLORG_TOKEN_period_end));
@@ -496,8 +496,8 @@ public class XbrlDockConnXbrlOrg implements XbrlDockConnXbrlOrgConsts, XbrlDockP
 
 				linkId = XbrlDockUtils.simpleGet(i, XDC_JSONAPI_TOKEN_relationships, XDC_XBRLORG_TOKEN_entity, XDC_JSONAPI_TOKEN_data, XDC_JSONAPI_TOKEN_id);
 				entityData = (Map) locEnt.get(linkId);
-				filingData.put(XDC_REPORT_TOKEN_entityId, entityData.get(XDC_GEN_TOKEN_id));
-				filingData.put(XDC_REPORT_TOKEN_entityName, entityData.get(XDC_GEN_TOKEN_name));
+				filingData.put(XDC_REPORT_TOKEN_entityId, entityData.get(XDC_EXT_TOKEN_id));
+				filingData.put(XDC_REPORT_TOKEN_entityName, entityData.get(XDC_EXT_TOKEN_name));
 
 				++newCount;
 				if (null != updated) {

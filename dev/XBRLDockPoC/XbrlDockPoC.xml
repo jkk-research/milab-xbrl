@@ -1,22 +1,23 @@
 <?xml version="1.0" encoding="UTF-8" standalone="no"?>
 <project default="create_run_jar" name="Create Runnable Jar for Project XBRLDockPoC with libraries in sub-folder">
-    <!--this file was created by Eclipse Runnable JAR Export Wizard-->
-    <!--ANT 1.7 is required                                        -->
-    <!--define folder properties-->
-    <property name="dir.buildfile" value="."/>
-    <property name="dir.workspace" value="/Users/lkedves/work/eclipse"/>
-    <property name="dir.jarfile" value="${dir.buildfile}/jar"/>
-    <target name="create_run_jar">
-        <jar destfile="${dir.jarfile}/XbrlDockPoC.jar">
-            <manifest>
-                <attribute name="Main-Class" value="com.xbrldock.XbrlDock"/>
-                <attribute name="Class-Path" value=". xdplib/json-simple-1.1.1.jar xdplib/commons-compress-1.23.0.jar"/>
-            </manifest>
-            <fileset dir="${dir.buildfile}/bin"/>
-        </jar>
-        <delete dir="${dir.jarfile}/xdplib"/>
-        <mkdir dir="${dir.jarfile}/xdplib"/>
-        <copy file="${dir.buildfile}/lib/json/json-simple-1.1.1.jar" todir="${dir.jarfile}/xdplib"/>
-        <copy file="${dir.buildfile}/lib/zip/commons-compress-1.23.0.jar" todir="${dir.jarfile}/xdplib"/>
-    </target>
+	<!--this file was created by Eclipse Runnable JAR Export Wizard-->
+	<!--ANT 1.7 is required                                        -->
+	<!--define folder properties-->
+	<property name="dir.buildfile" value="." />
+	<property name="dir.workspace" value="/Users/lkedves/work/eclipse" />
+	<property name="dir.jarfile" value="${dir.buildfile}/jar" />
+	<target name="create_run_jar">
+		<jar destfile="${dir.jarfile}/XbrlDockPoC.jar">
+			<manifest>
+				<attribute name="Main-Class" value="com.xbrldock.XbrlDock" />
+				<attribute name="Class-Path" value=". xdplib/json-simple-1.1.1.jar xdplib/commons-compress-1.23.0.jar xdplib/mvel2-2.4.15.Final.jar" />
+			</manifest>
+			<fileset dir="${dir.buildfile}/bin" />
+		</jar>
+		<delete dir="${dir.jarfile}/xdplib" />
+		<mkdir dir="${dir.jarfile}/xdplib" />
+		<copy file="${dir.buildfile}/lib/json/json-simple-1.1.1.jar" todir="${dir.jarfile}/xdplib" />
+		<copy file="${dir.buildfile}/lib/zip/commons-compress-1.23.0.jar" todir="${dir.jarfile}/xdplib" />
+		<copy file="${dir.buildfile}/lib/expr/mvel2-2.4.15.Final.jar" todir="${dir.jarfile}/xdplib" />
+	</target>
 </project>

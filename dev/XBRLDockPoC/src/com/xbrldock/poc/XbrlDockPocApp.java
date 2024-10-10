@@ -12,8 +12,8 @@ import com.xbrldock.utils.XbrlDockUtilsNet;
 //@SuppressWarnings({ "rawtypes" })
 public class XbrlDockPocApp extends XbrlDock implements XbrlDockPocConsts {
 
-	boolean skip = false;
-	EventLevel logAbove = EventLevel.Trace;
+	boolean skip = true;
+	EventLevel logAbove = EventLevel.Context;
 
 	Object[] logContext = null;
 
@@ -38,8 +38,6 @@ public class XbrlDockPocApp extends XbrlDock implements XbrlDockPocConsts {
 		String urlCacheRoot = XbrlDockUtils.simpleGet(APP_CONFIG, XDC_CFGTOKEN_app, XDC_CFGTOKEN_dirUrlCache);
 		XbrlDockUtilsNet.setCacheRoot(urlCacheRoot);
 
-//		XbrlDockException.DUMP_STACK_TRACE = null;
-		
 		if (Boolean.TRUE.equals(XbrlDockUtils.simpleGet(APP_CONFIG, XDC_CFGTOKEN_env, XDC_CFGTOKEN_AGENT_gui))) {
 			callAgent(XDC_CFGTOKEN_AGENT_gui, XDC_CMD_WORKBENCH_SELECT, XDC_CFGTOKEN_AGENT_metaManager);
 			return;
@@ -78,6 +76,12 @@ public class XbrlDockPocApp extends XbrlDock implements XbrlDockPocConsts {
 
 //		callAgent(XDC_CFGTOKEN_AGENT_metaManager, XDC_CMD_METAMGR_IMPORT, new File("ext/XBRLDock/taxonomy/import/us-gaap-2024"));
 
+		if ( skip ) {
+			return;
+		}
+		
+		XbrlDockException.DUMP_STACK_TRACE = null;
+		logAbove = EventLevel.Trace;
 		checkReports();
 
 //		checkReport(
@@ -104,7 +108,7 @@ public class XbrlDockPocApp extends XbrlDock implements XbrlDockPocConsts {
 						try {
 //							XbrlDockPocUtils.readMeta(f);
 							XbrlDockMetaContainer mc = callAgent(XDC_CFGTOKEN_AGENT_metaManager, XDC_CMD_METAMGR_GETMC, f);
-//							XbrlDock.log(EventLevel.Info, mc.getHead());
+							XbrlDock.log(EventLevel.Info, mc.getId());
 						} catch (Throwable e) {
 							XbrlDock.log(EventLevel.Trace, "load exception", e);
 						}

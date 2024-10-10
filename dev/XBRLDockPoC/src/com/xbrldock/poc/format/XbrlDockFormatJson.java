@@ -115,7 +115,7 @@ public class XbrlDockFormatJson implements XbrlDockFormatConsts, XbrlDockPocCons
 				Map<String, Object> fd = (Map<String, Object>) fe.getValue();
 				Map<String, Object> dim = (Map<String, Object>) fd.remove(XDC_FACT_TOKEN_dimensions);
 
-				factData.put(XDC_GEN_TOKEN_id, fe.getKey());
+				factData.put(XDC_EXT_TOKEN_id, fe.getKey());
 				factData.put(XDC_GEN_TOKEN_value, fd.remove(XDC_GEN_TOKEN_value));
 				factData.put(XDC_FACT_TOKEN_concept, dim.remove(XDC_FACT_TOKEN_concept));
 

@@ -95,10 +95,14 @@ public interface XbrlDockConsts {
 	String XDC_ENTITY_ID_TYPE_ = "";
 	String XDC_ENTITY_ID_TYPE_LEI = "lei";
 
-	String XDC_GEN_TOKEN_id = "id";
-	String XDC_GEN_TOKEN_name = "name";
 	String XDC_GEN_TOKEN_value = "value";
 	String XDC_GEN_TOKEN_members = "members";
+	String XDC_GEN_TOKEN_requires = "requires";
+	String XDC_GEN_TOKEN_placeholder = "placeholder";
+	
+	String XDC_EXT_TOKEN_id = "id";
+	String XDC_EXT_TOKEN_name = "name";
+	String XDC_EXT_TOKEN_identifier = "identifier";
 
 	String XDC_ENTITY_TOKEN_idType = "idType";
 	String XDC_ENTITY_TOKEN_urlSource = "urlSource";

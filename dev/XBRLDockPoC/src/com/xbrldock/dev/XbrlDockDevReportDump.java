@@ -54,7 +54,7 @@ public class XbrlDockDevReportDump implements XbrlDockDevConsts, XbrlDockPocCons
 			ctxDef.put(ret, new TreeMap<String, Object>(data));
 			break;
 		case XDC_REP_SEG_Fact:
-			ret = (String) data.get(XDC_GEN_TOKEN_id);
+			ret = (String) data.get(XDC_EXT_TOKEN_id);
 			break;
 		}
 

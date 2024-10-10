@@ -15,6 +15,7 @@ public interface XbrlDockPocConsts extends XbrlDockConsts, XbrlDockUtilsConsts {
 	String XDC_CFGTOKEN_AGENT_manualReports = "manualReports";
 	String XDC_CFGTOKEN_AGENT_gui = "gui";
 	
+	String XDC_CMD_METAMGR_GETCATALOG = "getCatalog";
 	String XDC_CMD_METAMGR_IMPORT = "import";
 	String XDC_CMD_METAMGR_GETMC = "getMC";
 
@@ -25,6 +26,7 @@ public interface XbrlDockPocConsts extends XbrlDockConsts, XbrlDockUtilsConsts {
 	String XDC_METAINFO_pkgInfo = "xdc_pkgInfo";
 	String XDC_METAINFO_entryPoints = "xdc_entryPoints";
 	String XDC_METAINFO_entryPointRefs = "xdc_entryPointRefs";
+	String XDC_METAINFO_ownedUrls = "xdc_ownedUrls";
 
 	String XDC_METATOKEN_content = "xdc_content";
 	
@@ -48,6 +50,8 @@ public interface XbrlDockPocConsts extends XbrlDockConsts, XbrlDockUtilsConsts {
 	
 	String XDC_FNAME_METAINF = "META-INF";
 	String XDC_FNAME_REPORTS = "reports";
+	
+	String XDC_FNAME_METACATALOG = "metaCatalog.json";
 	
 	String XDC_FNAME_CATALOG = "catalog.xml";
 	String XDC_FNAME_TAXPACK = "taxonomyPackage.xml";
