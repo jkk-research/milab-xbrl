@@ -13,7 +13,7 @@ import com.xbrldock.dev.XbrlDockDevReportDump;
 import com.xbrldock.poc.conn.xbrlorg.XbrlDockConnXbrlOrg;
 import com.xbrldock.poc.format.XbrlDockFormatJson;
 import com.xbrldock.poc.format.XbrlDockFormatXhtml;
-import com.xbrldock.poc.gui.XbrlDockGuiApp;
+import com.xbrldock.poc.gui.XbrlDockGuiMetaTaxonomyPanel;
 import com.xbrldock.poc.meta.XbrlDockMetaTaxonomy;
 import com.xbrldock.poc.meta.XbrlDockTaxonomyManager;
 import com.xbrldock.utils.XbrlDockUtils;
@@ -121,7 +121,7 @@ public class XbrlDockPoc extends XbrlDock implements XbrlDockPocConsts {
 
 			break;
 		case "app":
-			XbrlDockGuiApp frame = new XbrlDockGuiApp(this);
+			XbrlDockGuiMetaTaxonomyPanel frame = new XbrlDockGuiMetaTaxonomyPanel(this);
 
 			frame.showTaxonomy("/xbrl.ifrs.org/taxonomy/2024-03-27/");
 

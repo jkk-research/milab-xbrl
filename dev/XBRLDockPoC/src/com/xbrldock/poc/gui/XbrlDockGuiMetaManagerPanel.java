@@ -4,6 +4,8 @@ import java.awt.BorderLayout;
 import java.awt.Dimension;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.awt.event.MouseAdapter;
+import java.awt.event.MouseEvent;
 import java.util.ArrayList;
 import java.util.Map;
 
@@ -97,6 +99,16 @@ public class XbrlDockGuiMetaManagerPanel extends JPanel implements XbrlDockGuiCo
 			}
 		});
 		
+		tblGrid.addMouseListener(new MouseAdapter() {
+			@Override
+			public void mouseClicked(MouseEvent e) {
+				if ( 1 < e.getClickCount()) {
+					String selId = XbrlDockUtils.simpleGet(selItem, XDC_METAINFO_pkgInfo, XDC_EXT_TOKEN_identifier);
+					XbrlDock.callAgent(XDC_CFGTOKEN_AGENT_gui, XDC_CMD_GEN_SELECT, XDC_CFGTOKEN_AGENT_metaManager, selId);
+				}
+			}
+		});
+		
 		txtInfo = new JEditorPane();
 		txtInfo.setContentType("text/html");
 		txtInfo.setEditable(false);
@@ -137,7 +149,7 @@ public class XbrlDockGuiMetaManagerPanel extends JPanel implements XbrlDockGuiCo
 	}
 
 	@Override
-	public <RetType> RetType process(String command, Object... params) {
+	public Object process(String command, Object... params) {
 		// TODO Auto-generated method stub
 		return null;
 	}

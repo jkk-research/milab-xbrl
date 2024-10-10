@@ -24,16 +24,16 @@ import javax.swing.table.AbstractTableModel;
 
 import com.xbrldock.XbrlDockException;
 import com.xbrldock.poc.XbrlDockPoc;
+import com.xbrldock.poc.meta.XbrlDockMetaContainer;
 import com.xbrldock.poc.meta.XbrlDockMetaTaxonomy;
 import com.xbrldock.utils.XbrlDockUtilsGui;
 
 //@SuppressWarnings({ "rawtypes", "unchecked" })
 @SuppressWarnings({ "rawtypes" })
-public class XbrlDockGuiItemInfoGrid extends JPanel implements XbrlDockGuiConsts {
+public class XbrlDockGuiMetaItemInfoGrid extends JPanel implements XbrlDockGuiConsts {
 	private static final long serialVersionUID = 1L;
 
-	XbrlDockPoc xbrlDock;
-	XbrlDockMetaTaxonomy taxonomy;
+	XbrlDockMetaContainer taxonomy;
 
 	ArrayList<String> attNames = new ArrayList<>();
 
@@ -107,10 +107,8 @@ public class XbrlDockGuiItemInfoGrid extends JPanel implements XbrlDockGuiConsts
 
 	JTabbedPane tpItem;
 
-	public XbrlDockGuiItemInfoGrid(XbrlDockPoc xbrlDock) {
+	public XbrlDockGuiMetaItemInfoGrid() {
 		super(new BorderLayout());
-
-		this.xbrlDock = xbrlDock;
 
 		mdlGrid = new GridModel();
 		tblGrid = new JTable(mdlGrid);
@@ -217,7 +215,7 @@ public class XbrlDockGuiItemInfoGrid extends JPanel implements XbrlDockGuiConsts
 		add(sp, BorderLayout.CENTER);
 	}
 
-	public void setTaxonomy(XbrlDockMetaTaxonomy taxonomy) throws Exception {
+	public void setTaxonomy(XbrlDockMetaContainer taxonomy) throws Exception {
 
 		this.taxonomy = taxonomy;
 

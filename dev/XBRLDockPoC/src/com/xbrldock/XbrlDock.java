@@ -13,7 +13,7 @@ import com.xbrldock.utils.XbrlDockUtils;
 import com.xbrldock.utils.XbrlDockUtilsConsts;
 import com.xbrldock.utils.XbrlDockUtilsJson;
 
-@SuppressWarnings({"unchecked", "rawtypes"})
+@SuppressWarnings({ "unchecked", "rawtypes" })
 public abstract class XbrlDock implements XbrlDockConsts, XbrlDockUtilsConsts {
 
 	private static XbrlDock XBRLDOCK;
@@ -27,8 +27,8 @@ public abstract class XbrlDock implements XbrlDockConsts, XbrlDockUtilsConsts {
 	public static void main(String[] args) {
 		try {
 			Map cfgData = XbrlDockUtilsJson.readJson(XDC_FNAME_CONFIG);
-			
-			if ( null != cfgData ) {
+
+			if (null != cfgData) {
 				APP_CONFIG.putAll(cfgData);
 			}
 
@@ -38,12 +38,12 @@ public abstract class XbrlDock implements XbrlDockConsts, XbrlDockUtilsConsts {
 
 			Properties props = System.getProperties();
 			Set<Object> pks = new TreeSet<>(Collections.reverseOrder());
-			pks.addAll( props.keySet());
+			pks.addAll(props.keySet());
 			for (Object k : pks) {
 				String pk = XbrlDockUtils.toString(k);
 				addConfig(pk, props.getProperty(pk));
 			}
-			
+
 			for (String a : args) {
 				if (a.startsWith("-")) {
 					String name = a.substring(1);
@@ -62,27 +62,27 @@ public abstract class XbrlDock implements XbrlDockConsts, XbrlDockUtilsConsts {
 			}
 
 			XBRLDOCK = XbrlDockUtils.createObject(null, XbrlDockUtils.safeGet(APP_CONFIG, XDC_CFGTOKEN_app, MAP_CREATOR));
-			
+
 			XBRLDOCK.run();
-			
+
 		} catch (Throwable t) {
 			XbrlDock.log(EventLevel.Exception, t);
 		}
-		
+
 		PS_LOG.println("**********************");
 		PS_LOG.println("*                    *");
 		PS_LOG.println("*      Complete      *");
 		PS_LOG.println("*                    *");
 		PS_LOG.println("**********************");
 	}
-	
+
 	protected abstract void run() throws Exception;
 
 	static void addConfig(String key, Object val) {
 		Object[] path = key.split("\\.");
-		
-		Map root = XbrlDockUtils.isEqual(XDC_CFGPREFIX_xbrldock, path[0]) ? APP_CONFIG : XbrlDockUtils.safeGet(APP_CONFIG, XDC_CFGTOKEN_env, MAP_CREATOR);		
-			
+
+		Map root = XbrlDockUtils.isEqual(XDC_CFGPREFIX_xbrldock, path[0]) ? APP_CONFIG : XbrlDockUtils.safeGet(APP_CONFIG, XDC_CFGTOKEN_env, MAP_CREATOR);
+
 		XbrlDockUtils.simpleSet(root, val, path);
 	}
 
@@ -109,10 +109,10 @@ public abstract class XbrlDock implements XbrlDockConsts, XbrlDockUtilsConsts {
 			XBRLDOCK.handleLog(level, params);
 		}
 	}
-	
-	public static GenAgent getAgent(String agentId) throws Exception {
+
+	public static GenAgent getAgent(String agentId) {
 		Map cfg = XbrlDockUtils.simpleGet(APP_CONFIG, XDC_CFGTOKEN_app, XDC_CFGTOKEN_agents, agentId);
-		
+
 		GenAgent agent = XbrlDockUtils.safeGet(XBRLDOCK.agents, agentId, new ItemCreator<GenAgent>() {
 			@Override
 			public GenAgent create(Object key, Object... hints) {
@@ -123,18 +123,24 @@ public abstract class XbrlDock implements XbrlDockConsts, XbrlDockUtilsConsts {
 				}
 			}
 		});
-		
+
 		return agent;
 	}
 
-	public static <RetType> RetType callAgent(String agentId, String command, Object... params) throws Exception {
+	public static <RetType> RetType callAgent(String agentId, String command, Object... params) {
 		Object ret = null;
-		GenAgent agent = getAgent(agentId);
-		
-		if ( !XbrlDockUtils.isEmpty(command) ) {
-			ret = agent.process(command, params);
+
+		try {
+			GenAgent agent = getAgent(agentId);
+
+			if (!XbrlDockUtils.isEmpty(command)) {
+				ret = agent.process(command, params);
+			}
+
+		} catch (Throwable e) {
+			return XbrlDockException.wrap(e, "callAgent", agentId, command, params);
 		}
-		
+
 		return (RetType) ret;
 	}
 

@@ -62,7 +62,7 @@ public interface XbrlDockConsts {
 //	
 	public interface GenAgent {
 		void initModule(Map config) throws Exception;
-		<RetType> RetType process(String command, Object... params) throws Exception;
+		Object process(String command, Object... params) throws Exception;
 	}
 	
 	interface ItemCreator<Type> {

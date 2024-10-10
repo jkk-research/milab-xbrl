@@ -111,7 +111,7 @@ public class XbrlDockConnXbrlOrg implements XbrlDockConnXbrlOrgConsts, XbrlDockP
 	}
 	
 	@Override
-	public <RetType> RetType process(String command, Object... params) throws Exception {
+	public Object process(String command, Object... params) throws Exception {
 		Object ret = null;
 		
 		switch (command) {
@@ -120,7 +120,7 @@ public class XbrlDockConnXbrlOrg implements XbrlDockConnXbrlOrgConsts, XbrlDockP
 			break;
 		}
 		
-		return (RetType) ret;
+		return ret;
 
 	}
 

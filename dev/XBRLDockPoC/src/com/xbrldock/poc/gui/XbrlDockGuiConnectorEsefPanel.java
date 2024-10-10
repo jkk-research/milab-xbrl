@@ -20,7 +20,7 @@ import com.xbrldock.XbrlDockConsts.GenAgent;
 import com.xbrldock.utils.XbrlDockUtilsGui;
 
 @SuppressWarnings({ "rawtypes", /*"unchecked"*/ })
-public class XbrlDockGuiEsefConnectorPanel extends JPanel implements XbrlDockGuiConsts, GenAgent {
+public class XbrlDockGuiConnectorEsefPanel extends JPanel implements XbrlDockGuiConsts, GenAgent {
 	private static final long serialVersionUID = 1L;
 	
 	GenAgent esefConn;
@@ -69,7 +69,7 @@ public class XbrlDockGuiEsefConnectorPanel extends JPanel implements XbrlDockGui
 		}
 	};
 
-	public XbrlDockGuiEsefConnectorPanel() throws Exception {
+	public XbrlDockGuiConnectorEsefPanel() throws Exception {
 		super(new BorderLayout());		
 		
 //		mdlGrid = new GridModel();
@@ -100,7 +100,7 @@ public class XbrlDockGuiEsefConnectorPanel extends JPanel implements XbrlDockGui
 	}
 
 	@Override
-	public <RetType> RetType process(String command, Object... params) throws Exception {
+	public Object process(String command, Object... params) throws Exception {
 		// TODO Auto-generated method stub
 		return null;
 	}

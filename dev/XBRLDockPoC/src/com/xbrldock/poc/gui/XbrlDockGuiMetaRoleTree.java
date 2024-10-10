@@ -13,18 +13,19 @@ import javax.swing.tree.DefaultTreeModel;
 import javax.swing.tree.TreeNode;
 import javax.swing.tree.TreePath;
 
+import com.xbrldock.XbrlDockConsts.GenAgent;
 import com.xbrldock.poc.XbrlDockPoc;
+import com.xbrldock.poc.meta.XbrlDockMetaContainer;
 import com.xbrldock.poc.meta.XbrlDockMetaTaxonomy;
 import com.xbrldock.utils.XbrlDockUtils;
 
 @SuppressWarnings({ "rawtypes", "unchecked" })
-public class XbrlDockGuiRoleTree extends JTree implements XbrlDockGuiConsts {
+public class XbrlDockGuiMetaRoleTree extends JTree implements XbrlDockGuiConsts {
 	private static final long serialVersionUID = 1L;
 
 	private static final ArrayList<ItemNode> LEAF = new ArrayList<>();
 
-	XbrlDockPoc xbrlDock;
-	XbrlDockMetaTaxonomy taxonomy;
+	XbrlDockMetaContainer taxonomy;
 
 	class ItemNode implements TreeNode {
 
@@ -135,14 +136,12 @@ public class XbrlDockGuiRoleTree extends JTree implements XbrlDockGuiConsts {
 	ItemNode tnRoot = new ItemNode();
 	DefaultTreeModel tm = new DefaultTreeModel(tnRoot);
 
-	public XbrlDockGuiRoleTree(XbrlDockPoc xbrlDock) {
-		this.xbrlDock = xbrlDock;
+	public XbrlDockGuiMetaRoleTree() {
 		setRootVisible(false);
-
 		setModel(tm);
 	}
 
-	public void setTaxonomy(XbrlDockMetaTaxonomy taxonomy) throws Exception {
+	public void setTaxonomy(XbrlDockMetaContainer taxonomy) throws Exception {
 
 		this.taxonomy = taxonomy;
 

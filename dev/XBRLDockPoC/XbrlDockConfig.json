@@ -33,14 +33,18 @@
           "id" : "metaManager",
           "javaClass" : "com.xbrldock.poc.gui.XbrlDockGuiMetaManagerPanel",
           "name" : "Taxonomy Manager",
-          "placeholder" : "Select a taxonomy in the list above to see its properties.",
-          "members" : [ ]
+          "placeholder" : "Select a taxonomy in the list above to see its properties."
         }, {
           "id" : "esefConn",
           "javaClass" : "com.xbrldock.poc.gui.XbrlDockGuiEsefConnectorPanel",
-          "name" : "ESEF Connector",
-          "members" : [ ]
-        } ]
+          "name" : "ESEF Connector"
+        } ],
+        "childPanels" : {
+          "metaManager" : {
+            "javaClass" : "com.xbrldock.poc.gui.XbrlDockGuiMetaManagerPanel",
+            "name" : "XBRLDock PoC Taxonomy Viewer - "
+          }
+        }
       }
     }
   }

@@ -56,7 +56,7 @@ public class XbrlDockMetaManager implements XbrlDockMetaConsts, XbrlDockConsts.G
 	}
 
 	@Override
-	public <RetType> RetType process(String command, Object... params) throws Exception {
+	public Object process(String command, Object... params) throws Exception {
 		Object ret = null;
 		switch (command) {
 		case XDC_CMD_METAMGR_GETCATALOG:
@@ -73,7 +73,7 @@ public class XbrlDockMetaManager implements XbrlDockMetaConsts, XbrlDockConsts.G
 			break;
 		}
 
-		return (RetType) ret;
+		return ret;
 	}
 
 	private void importTaxonomy(File taxSource) throws Exception {

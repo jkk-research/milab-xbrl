@@ -1,31 +1,31 @@
 package com.xbrldock.poc.gui;
 
 import java.awt.BorderLayout;
-import java.awt.Container;
 import java.awt.FlowLayout;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.util.Map;
 
 import javax.swing.JButton;
 import javax.swing.JComboBox;
-import javax.swing.JFrame;
+import javax.swing.JOptionPane;
 import javax.swing.JPanel;
 import javax.swing.JScrollPane;
 
-import com.xbrldock.poc.XbrlDockPoc;
-import com.xbrldock.poc.meta.XbrlDockMetaTaxonomy;
+import com.xbrldock.XbrlDockException;
+import com.xbrldock.XbrlDockConsts.GenAgent;
+import com.xbrldock.poc.meta.XbrlDockMetaContainer;
+import com.xbrldock.utils.XbrlDockUtils;
 import com.xbrldock.utils.XbrlDockUtilsGui;
 
 //@SuppressWarnings({ "rawtypes", "unchecked" })
-public class XbrlDockGuiApp extends JFrame implements XbrlDockGuiConsts {
+public class XbrlDockGuiMetaTaxonomyPanel extends JPanel implements XbrlDockGuiConsts, GenAgent {
 	private static final long serialVersionUID = 1L;
 
-	XbrlDockPoc xbrlDock;
+	XbrlDockMetaContainer taxonomy;
 
-	XbrlDockMetaTaxonomy taxonomy;
-
-	XbrlDockGuiRoleTree roleTree;
-	XbrlDockGuiItemInfoGrid itemGrid;
+	XbrlDockGuiMetaRoleTree roleTree;
+	XbrlDockGuiMetaItemInfoGrid itemGrid;
 	
 	JComboBox<String> cbLang = new JComboBox<String>();
 	JComboBox<String> cbEntryPoint = new JComboBox<String>();
@@ -40,7 +40,7 @@ public class XbrlDockGuiApp extends JFrame implements XbrlDockGuiConsts {
 				break;
 			case XDC_APP_SETLANG:
 				int li = cbLang.getSelectedIndex();
-				taxonomy.setLang( (0 == li) ? null : cbLang.getItemAt(li));
+//				taxonomy.setLang( (0 == li) ? null : cbLang.getItemAt(li));
 				roleTree.invalidate();
 				roleTree.revalidate();
 				roleTree.repaint();
@@ -49,27 +49,9 @@ public class XbrlDockGuiApp extends JFrame implements XbrlDockGuiConsts {
 		}
 	};
 
-	public XbrlDockGuiApp(XbrlDockPoc xbrlDock) throws Exception {
-		super("XBRLDock PoC");
-
-		this.xbrlDock = xbrlDock;
-		
-		roleTree = new XbrlDockGuiRoleTree(xbrlDock);
-		itemGrid = new XbrlDockGuiItemInfoGrid(xbrlDock);
-
-		setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
-	}
-
-	public void display() {
-		pack();
-
-//		Map cfg = XbrlDock.getSubConfig(null, XDC_CFGTOKEN_gui);
-//
-//		setLocation((int) XbrlDock.getConfig(cfg, 10, XDC_CFG_GEOM_location, XDC_CFG_GEOM_x), (int) XbrlDock.getConfig(cfg, 10, XDC_CFG_GEOM_location, XDC_CFG_GEOM_y));
-//		setSize((int) XbrlDock.getConfig(cfg, 200, XDC_CFG_GEOM_dimension, XDC_CFG_GEOM_x), (int) XbrlDock.getConfig(cfg, 100, XDC_CFG_GEOM_dimension, XDC_CFG_GEOM_y));
-		
-		setLocation(50, 50);
-		setSize(1000, 800);
+	public XbrlDockGuiMetaTaxonomyPanel() throws Exception {
+		roleTree = new XbrlDockGuiMetaRoleTree();
+		itemGrid = new XbrlDockGuiMetaItemInfoGrid();
 
 		JPanel pnlTree = new JPanel(new BorderLayout());
 		pnlTree.add(new JScrollPane(roleTree), BorderLayout.CENTER);
@@ -94,13 +76,33 @@ public class XbrlDockGuiApp extends JFrame implements XbrlDockGuiConsts {
 		pnlTop.add(cbEntryPoint, BorderLayout.CENTER);
 
 
-		Container cp = getContentPane();
-		cp.add(pnlTop, BorderLayout.NORTH);
-		cp.add(XbrlDockUtilsGui.createSplit(true, pnlTree, itemGrid, 0.2), BorderLayout.CENTER);
-
+		add(pnlTop, BorderLayout.NORTH);
+		add(XbrlDockUtilsGui.createSplit(true, pnlTree, itemGrid, 0.2), BorderLayout.CENTER);
+	}
+	
+	@Override
+	public void initModule(Map config) throws Exception {
+		// TODO Auto-generated method stub
+		
+	}
+	
+	@Override
+	public Object process(String command, Object... params) throws Exception {
+		Object ret = null;
+		switch (command) {
+		case XDC_CMD_GEN_SELECT:
+			showTaxonomy((String) params[1]);
+			break;
+		default:
+			XbrlDockException.wrap(null, "Unhandled agent command", command, params);
+			break;
+		}
+		
+		return ret;
 	}
 
 	public void showTaxonomy(String taxonomyId) throws Exception {
+		JOptionPane.showMessageDialog(this, "Display taxonomy " + taxonomyId);
 
 		taxonomy = xbrlDock.getTaxMgr().loadTaxonomy(taxonomyId);
 
@@ -117,11 +119,6 @@ public class XbrlDockGuiApp extends JFrame implements XbrlDockGuiConsts {
 		cbEntryPoint.addItem("<< all >>");
 		for ( String ep : taxonomy.getEntryPoints() ) {
 			cbEntryPoint.addItem(ep);
-		}
-
-		if (!isVisible()) {
-			display();
-			setVisible(true);
 		}
 
 	}
