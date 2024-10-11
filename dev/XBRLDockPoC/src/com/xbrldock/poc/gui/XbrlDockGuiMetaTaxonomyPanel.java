@@ -40,7 +40,7 @@ public class XbrlDockGuiMetaTaxonomyPanel extends JPanel implements XbrlDockGuiC
 				itemGrid.displayItems(roleTree.getRelatedItems());
 				break;
 			case XDC_APP_SETLANG:
-				int li = cbLang.getSelectedIndex();
+//				int li = cbLang.getSelectedIndex();
 //				taxonomy.setLang( (0 == li) ? null : cbLang.getItemAt(li));
 				roleTree.invalidate();
 				roleTree.revalidate();
@@ -51,6 +51,8 @@ public class XbrlDockGuiMetaTaxonomyPanel extends JPanel implements XbrlDockGuiC
 	};
 
 	public XbrlDockGuiMetaTaxonomyPanel() throws Exception {
+		super(new BorderLayout());
+		
 		roleTree = new XbrlDockGuiMetaRoleTree();
 		itemGrid = new XbrlDockGuiMetaItemInfoGrid();
 
@@ -118,7 +120,7 @@ public class XbrlDockGuiMetaTaxonomyPanel extends JPanel implements XbrlDockGuiC
 
 		cbEntryPoint.removeAllItems();
 		cbEntryPoint.addItem("<< all >>");
-		Collection<Map> ep = (Collection<Map>) mi.getOrDefault(XDC_METAINFO_entryPoints, Collections.EMPTY_MAP);
+		Collection<Map> ep = (Collection<Map>) mi.getOrDefault(XDC_METAINFO_entryPoints, Collections.EMPTY_LIST);
 
 		for ( Map ee : ep ) {
 			cbEntryPoint.addItem((String) ee.getOrDefault(XDC_EXT_TOKEN_name, "???"));

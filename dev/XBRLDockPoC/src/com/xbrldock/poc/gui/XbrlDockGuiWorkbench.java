@@ -9,10 +9,10 @@ import java.awt.event.WindowEvent;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.Map;
+import java.util.TreeMap;
 
 import javax.swing.JComponent;
 import javax.swing.JFrame;
-import javax.swing.JOptionPane;
 import javax.swing.JPanel;
 import javax.swing.JScrollPane;
 import javax.swing.JTree;
@@ -37,10 +37,12 @@ public class XbrlDockGuiWorkbench extends JFrame implements XbrlDockGuiConsts, X
 
 		WBNode node;
 
-		ChildFrame(WBNode node, JComponent mainComp) {
+		ChildFrame(String titlePrefix, WBNode node, JComponent mainComp) {
 			getContentPane().add(mainComp, BorderLayout.CENTER);
 			setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
 			addWindowStateListener(childWindowListener);
+			
+			setTitle(titlePrefix + node.toString());
 
 			pack();
 		}
@@ -81,8 +83,10 @@ public class XbrlDockGuiWorkbench extends JFrame implements XbrlDockGuiConsts, X
 
 		WBNode getChildById(String id, ItemCreator<WBNode> ic, Object... params) {
 			WBNode wbn;
+			
+			int cc = getChildCount();
 
-			if (0 < getChildCount()) {
+			if (0 < cc) {
 				for (Object n : children) {
 					wbn = (WBNode) n;
 					if (XbrlDockUtils.isEqual(wbn.id, id)) {
@@ -93,6 +97,8 @@ public class XbrlDockGuiWorkbench extends JFrame implements XbrlDockGuiConsts, X
 			wbn = ic.create(id, params);
 
 			add(wbn);
+			
+			panelModel.nodesWereInserted(this, new int[] {cc});
 
 			return wbn;
 		}
@@ -142,14 +148,18 @@ public class XbrlDockGuiWorkbench extends JFrame implements XbrlDockGuiConsts, X
 		@Override
 		public WBNode create(Object key, Object... hints) {
 			try {
-				WBNode n = new WBNode((String) key, null);
 				Map cfg = childConfigs.get(hints[0]);
+
+				Map<String, Object> childData = new TreeMap<String, Object>();
+				childData.put(XDC_EXT_TOKEN_name, key);
+				
+				WBNode n = new WBNode((String) key, childData);
 				JComponent mainPanel = n.getComp(cfg);
 
 				if (mainPanel instanceof GenAgent) {
 					((GenAgent) mainPanel).process(XDC_CMD_GEN_SELECT, hints);
 				}
-				n.frm = new ChildFrame(n, mainPanel);
+				n.frm = new ChildFrame((String) cfg.get(XDC_EXT_TOKEN_name), n, mainPanel);
 				return n;
 			} catch (Throwable e) {
 				return XbrlDockException.wrap(e, "Activating child frame", key, hints);

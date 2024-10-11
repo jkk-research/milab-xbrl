@@ -208,16 +208,25 @@ public class XbrlDockUtils implements XbrlDockUtilsConsts {
 	}
 
 	public static String getPostfix(String strSrc, String pfSep) {
+		if ( isEmpty(strSrc) ) {
+			return "";
+		}
 		int sep = strSrc.lastIndexOf(pfSep);
 		return (-1 == sep) ? strSrc : strSrc.substring(sep + pfSep.length());
 	}
 
 	public static String cutPostfix(String strSrc, String pfSep) {
+		if ( isEmpty(strSrc) ) {
+			return "";
+		}
 		int sep = strSrc.lastIndexOf(pfSep);
 		return (-1 == sep) ? strSrc : strSrc.substring(0, sep);
 	}
 
 	public static String replacePostfix(String strSrc, String pfSep, String postfix) {
+		if ( isEmpty(strSrc) ) {
+			return "";
+		}
 		int sep = strSrc.lastIndexOf(pfSep);
 		return (-1 == sep) ? strSrc : strSrc.substring(0, sep + pfSep.length()) + postfix;
 	}

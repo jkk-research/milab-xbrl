@@ -314,15 +314,23 @@ public class XbrlDockMetaContainer implements XbrlDockMetaConsts {
 			contentByURL.putAll(XbrlDockUtilsJson.readJson(new File(fDir, XDC_TAXONOMYDATA_FNAME)));
 			references.putAll(XbrlDockUtilsJson.readJson(new File(fDir, XDC_TAXONOMYREFS_FNAME)));
 
-			ownedUrls.addAll(XbrlDockUtils.simpleGet(metaInfo, XDC_METAINFO_ownedUrls));
-			loaded.addAll(XbrlDockUtils.simpleGet(metaInfo, XDC_METATOKEN_includes));
-			requires.addAll(XbrlDockUtils.simpleGet(metaInfo, XDC_GEN_TOKEN_requires));
+			loadSet(ownedUrls, XDC_METAINFO_ownedUrls);
+			loadSet(loaded, XDC_METATOKEN_includes);
+//			requires.addAll(XbrlDockUtils.simpleGet(metaInfo, XDC_GEN_TOKEN_requires));
 
 			updated = false;
 
 			return true;
 		} else {
 			return false;
+		}
+	}
+
+	private void loadSet(Collection c, String metaKey) {
+		c.clear();
+		Collection src = XbrlDockUtils.simpleGet(metaInfo, metaKey);
+		if (null != src) {
+			c.addAll(src);
 		}
 	}
 
@@ -333,11 +341,23 @@ public class XbrlDockMetaContainer implements XbrlDockMetaConsts {
 	}
 
 	public Map peekItem(String id) {
-		return Collections.EMPTY_MAP;
+		Map m = null;
+		int sp = id.indexOf(XDC_SEP_ITEMID);
+
+		if (-1 != sp) {
+			String fileId = id.substring(0, sp);
+			String itemId = id.substring(sp + XDC_SEP_ITEMID.length());
+			m = metaManager.getKnownItemForKey(fileId, itemId, this);
+
+			if (null == m) {
+				m = XbrlDockUtils.simpleGet(contentByURL, fileId, XDC_METATOKEN_items, itemId);
+			}
+		}
+		return (null == m) ? Collections.EMPTY_MAP : m;
 	}
 
 	public String getItemLabel(String id) {
-		return id;
+		return XbrlDockUtils.getPostfix(id, XDC_SEP_ITEMID);
 	}
 
 	public void visit(String itemType, GenProcessor lp, Object... params) {

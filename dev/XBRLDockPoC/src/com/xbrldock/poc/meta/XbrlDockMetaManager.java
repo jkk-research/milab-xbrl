@@ -3,6 +3,8 @@ package com.xbrldock.poc.meta;
 import java.io.File;
 import java.io.InputStream;
 import java.util.ArrayList;
+import java.util.Collection;
+import java.util.Collections;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
@@ -38,6 +40,8 @@ public class XbrlDockMetaManager implements XbrlDockMetaConsts, XbrlDockConsts.G
 	XbrlDockDevCounter importIssues = new XbrlDockDevCounter("Import issues", true);
 
 	public static boolean LOAD_CACHE = false;
+	
+	ArrayList<String> cacheQueue = new ArrayList<>();
 	ItemCreator<XbrlDockMetaContainer> cacheLoader = new ItemCreator<XbrlDockMetaContainer>() {
 		@Override
 		public XbrlDockMetaContainer create(Object key, Object... hints) {
@@ -53,6 +57,11 @@ public class XbrlDockMetaManager implements XbrlDockMetaConsts, XbrlDockConsts.G
 					for (String prefix : mc.ownedUrls) {
 						mcByUrl.put(prefix, mc);
 					}
+					for (String r : (Collection<String>) mi.getOrDefault( XDC_GEN_TOKEN_requires, Collections.EMPTY_LIST)) {
+						if( !mcById.keySet().contains(r) && !cacheQueue.contains(r)) {
+							cacheQueue.add(r);
+						}
+					}
 				} catch (Exception e) {
 					return XbrlDockException.wrap(e, "Cache load failed", key, mi);
 				}
@@ -61,15 +70,30 @@ public class XbrlDockMetaManager implements XbrlDockMetaConsts, XbrlDockConsts.G
 			return mc;
 		}
 	};
-
-//	ItemCreator<XbrlDockMetaContainer> alienCreator = new ItemCreator<XbrlDockMetaContainer>() {
-//		@Override
-//		public XbrlDockMetaContainer create(Object key, Object... hints) {
-//			XbrlDockMetaContainer mc = new XbrlDockMetaContainer(XbrlDockMetaManager.this, (String) key);
-//			mcById.put((String) key, mc);
-//			return mc;
-//		}
-//	};
+	
+	XbrlDockMetaContainer loadFromCache(String id) {
+		XbrlDockMetaContainer ret = mcById.get(id);
+		if ( null != ret ) {
+			return ret;
+		}
+		
+		Map<String, XbrlDockMetaContainer> loaded = new TreeMap<>();
+		cacheQueue.add(id);
+		
+		while ( !cacheQueue.isEmpty() ) {
+			String mcid = cacheQueue.get(0);
+			loaded.put(mcid, XbrlDockUtils.safeGet( mcById, mcid, cacheLoader));
+			cacheQueue.remove(0);
+		}
+		
+		for ( XbrlDockMetaContainer mc : loaded.values() ) {
+			for (String r : (Collection<String>) mc.metaInfo.getOrDefault( XDC_GEN_TOKEN_requires, Collections.EMPTY_LIST)) {
+				mc.requires.add(loaded.get(r));
+			}
+		}
+		
+		return loaded.get(id);
+	}
 
 	public XbrlDockMetaManager() {
 	}
@@ -93,8 +117,7 @@ public class XbrlDockMetaManager implements XbrlDockMetaConsts, XbrlDockConsts.G
 	@Override
 	public Object process(String command, Object... params) throws Exception {
 		Object ret = null;
-		XbrlDockMetaContainer mc;
-		String id;
+//		XbrlDockMetaContainer mc;
 
 		switch (command) {
 		case XDC_CMD_METAMGR_GETCATALOG:
@@ -104,12 +127,10 @@ public class XbrlDockMetaManager implements XbrlDockMetaConsts, XbrlDockConsts.G
 			importTaxonomy((File) params[0]);
 			break;
 		case XDC_CMD_METAMGR_GETMC:
-			id = (String) params[0];
-			mc = XbrlDockUtils.safeGet(mcById, id, cacheLoader);
-			ret = mc;
+			ret = loadFromCache((String) params[0]);
 			break;
 		case XDC_CMD_METAMGR_LOADMC:
-			ret = getMetaContainer((File) params[0], false);
+			ret = buildMetaContainer((File) params[0], false);
 			break;
 		default:
 			XbrlDockException.wrap(null, "Unhandled agent command", command, params);
@@ -132,7 +153,7 @@ public class XbrlDockMetaManager implements XbrlDockMetaConsts, XbrlDockConsts.G
 		if (taxSource.isDirectory()) {
 			importIssues.reset();
 
-			XbrlDockMetaContainer mc = getMetaContainer(taxSource, true);
+			XbrlDockMetaContainer mc = buildMetaContainer(taxSource, true);
 
 			mc.optSave();
 
@@ -143,7 +164,7 @@ public class XbrlDockMetaManager implements XbrlDockMetaConsts, XbrlDockConsts.G
 		}
 	}
 
-	public XbrlDockMetaContainer getMetaContainer(File schemaRoot, boolean cache, String... entryPoints) throws Exception {
+	public XbrlDockMetaContainer buildMetaContainer(File schemaRoot, boolean cache, String... entryPoints) throws Exception {
 		XbrlDock.log(EventLevel.Context, "Loading MetaContainer from", schemaRoot.getPath());
 
 		Map<String, Object> metaInfo = XbrlDockPocUtils.readMeta(schemaRoot);
@@ -192,7 +213,8 @@ public class XbrlDockMetaManager implements XbrlDockMetaConsts, XbrlDockConsts.G
 
 					if (null == mcData) {
 						key = key.split("/")[0];
-						mcData = XbrlDockUtils.safeGet(mcByUrl, key, cacheLoader);
+//						mcData = XbrlDockUtils.safeGet(mcByUrl, key, cacheLoader);
+						mcData = loadFromCache(key);
 						mcData.setCurrentUrl(url);
 
 						metaContainer.requires.add(mcData);

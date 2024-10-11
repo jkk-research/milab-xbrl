@@ -26,8 +26,7 @@ import com.xbrldock.XbrlDockException;
 import com.xbrldock.poc.meta.XbrlDockMetaContainer;
 import com.xbrldock.utils.XbrlDockUtilsGui;
 
-//@SuppressWarnings({ "rawtypes", "unchecked" })
-@SuppressWarnings({ "rawtypes" })
+@SuppressWarnings({ "rawtypes", "unchecked" })
 public class XbrlDockGuiMetaItemInfoGrid extends JPanel implements XbrlDockGuiConsts {
 	private static final long serialVersionUID = 1L;
 
@@ -125,7 +124,7 @@ public class XbrlDockGuiMetaItemInfoGrid extends JPanel implements XbrlDockGuiCo
 						selItem = (-1 == sr) ? null : items.get(sr);
 						mdlItem.fireTableDataChanged();
 
-						String itemId = (String) selItem.get("id");
+						String itemId = (String) selItem.get(XDC_METATOKEN_url);
 
 						StringBuilder sbText = new StringBuilder();
 
