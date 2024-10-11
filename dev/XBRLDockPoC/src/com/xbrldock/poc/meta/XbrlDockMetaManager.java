@@ -32,9 +32,44 @@ public class XbrlDockMetaManager implements XbrlDockMetaConsts, XbrlDockConsts.G
 	File dirInput;
 
 	private final Map<String, Map> metaCatalog = new TreeMap<>();
+	private final Map<String, XbrlDockMetaContainer> mcById = new TreeMap<>();
 	private final Map<String, XbrlDockMetaContainer> mcByUrl = new TreeMap<>();
 
 	XbrlDockDevCounter importIssues = new XbrlDockDevCounter("Import issues", true);
+
+	public static boolean LOAD_CACHE = false;
+	ItemCreator<XbrlDockMetaContainer> cacheLoader = new ItemCreator<XbrlDockMetaContainer>() {
+		@Override
+		public XbrlDockMetaContainer create(Object key, Object... hints) {
+			String s = XbrlDockUtils.getPostfix((String) key, XDC_URL_PSEP);
+			Map<String, Object> mi = XbrlDockUtils.simpleGet(metaCatalog, s);
+
+			XbrlDockMetaContainer mc = (null == mi) ? new XbrlDockMetaContainer(XbrlDockMetaManager.this, (String) key)
+					: new XbrlDockMetaContainer(XbrlDockMetaManager.this, mi);
+
+			if (LOAD_CACHE) {
+				try {
+					mc.load();
+					for (String prefix : mc.ownedUrls) {
+						mcByUrl.put(prefix, mc);
+					}
+				} catch (Exception e) {
+					return XbrlDockException.wrap(e, "Cache load failed", key, mi);
+				}
+			}
+
+			return mc;
+		}
+	};
+
+//	ItemCreator<XbrlDockMetaContainer> alienCreator = new ItemCreator<XbrlDockMetaContainer>() {
+//		@Override
+//		public XbrlDockMetaContainer create(Object key, Object... hints) {
+//			XbrlDockMetaContainer mc = new XbrlDockMetaContainer(XbrlDockMetaManager.this, (String) key);
+//			mcById.put((String) key, mc);
+//			return mc;
+//		}
+//	};
 
 	public XbrlDockMetaManager() {
 	}
@@ -58,6 +93,9 @@ public class XbrlDockMetaManager implements XbrlDockMetaConsts, XbrlDockConsts.G
 	@Override
 	public Object process(String command, Object... params) throws Exception {
 		Object ret = null;
+		XbrlDockMetaContainer mc;
+		String id;
+
 		switch (command) {
 		case XDC_CMD_METAMGR_GETCATALOG:
 			ret = metaCatalog;
@@ -66,6 +104,11 @@ public class XbrlDockMetaManager implements XbrlDockMetaConsts, XbrlDockConsts.G
 			importTaxonomy((File) params[0]);
 			break;
 		case XDC_CMD_METAMGR_GETMC:
+			id = (String) params[0];
+			mc = XbrlDockUtils.safeGet(mcById, id, cacheLoader);
+			ret = mc;
+			break;
+		case XDC_CMD_METAMGR_LOADMC:
 			ret = getMetaContainer((File) params[0], false);
 			break;
 		default:
@@ -91,7 +134,7 @@ public class XbrlDockMetaManager implements XbrlDockMetaConsts, XbrlDockConsts.G
 
 			XbrlDockMetaContainer mc = getMetaContainer(taxSource, true);
 
-			mc.optSave(metaStoreRoot);
+			mc.optSave();
 
 //			XbrlDock.log(EventLevel.Trace, mc.metaInfo);
 
@@ -148,18 +191,11 @@ public class XbrlDockMetaManager implements XbrlDockMetaConsts, XbrlDockConsts.G
 					}
 
 					if (null == mcData) {
-
 						key = key.split("/")[0];
-						mcData = XbrlDockUtils.safeGet(mcByUrl, key, new ItemCreator<XbrlDockMetaContainer>() {
-							@Override
-							public XbrlDockMetaContainer create(Object key, Object... hints) {
-								return new XbrlDockMetaContainer(XbrlDockMetaManager.this, (String) key);
-							}
-						});
+						mcData = XbrlDockUtils.safeGet(mcByUrl, key, cacheLoader);
+						mcData.setCurrentUrl(url);
 
 						metaContainer.requires.add(mcData);
-
-						mcData.setCurrentUrl(url);
 					}
 
 					if (url.endsWith(XDC_FEXT_SCHEMA)) {
@@ -191,11 +227,13 @@ public class XbrlDockMetaManager implements XbrlDockMetaConsts, XbrlDockConsts.G
 			for (String ak : alienKeys) {
 				metaContainer.contentByURL.remove(ak);
 			}
+
+			mcById.put(metaContainer.getId(), metaContainer);
 		}
 
 		boolean updateCatalog = false;
 		for (XbrlDockMetaContainer mc : mcByUrl.values()) {
-			if (mc.optSave(metaStoreRoot)) {
+			if (mc.optSave()) {
 				updateCatalog = true;
 				metaCatalog.put(mc.getId(), mc.metaInfo);
 			}

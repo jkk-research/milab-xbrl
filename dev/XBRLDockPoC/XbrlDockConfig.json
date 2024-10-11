@@ -36,12 +36,12 @@
           "placeholder" : "Select a taxonomy in the list above to see its properties."
         }, {
           "id" : "esefConn",
-          "javaClass" : "com.xbrldock.poc.gui.XbrlDockGuiEsefConnectorPanel",
+          "javaClass" : "com.xbrldock.poc.gui.XbrlDockGuiConnectorEsefPanel",
           "name" : "ESEF Connector"
         } ],
         "childPanels" : {
           "metaManager" : {
-            "javaClass" : "com.xbrldock.poc.gui.XbrlDockGuiMetaManagerPanel",
+            "javaClass" : "com.xbrldock.poc.gui.XbrlDockGuiMetaTaxonomyPanel",
             "name" : "XBRLDock PoC Taxonomy Viewer - "
           }
         }

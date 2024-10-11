@@ -2,6 +2,7 @@ package com.xbrldock.poc.meta;
 
 import java.io.File;
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.Collections;
 import java.util.HashSet;
 import java.util.Map;
@@ -13,6 +14,7 @@ import java.util.TreeSet;
 import org.w3c.dom.Element;
 
 import com.xbrldock.XbrlDock;
+import com.xbrldock.XbrlDockException;
 import com.xbrldock.dev.XbrlDockDevCounter;
 import com.xbrldock.poc.utils.XbrlDockPocUtils;
 import com.xbrldock.utils.XbrlDockUtils;
@@ -27,23 +29,22 @@ public class XbrlDockMetaContainer implements XbrlDockMetaConsts {
 
 	final Map<String, Object> metaInfo;
 
-	private ArrayList<String> queue = new ArrayList<>();
-	Map<String, String> queueNS = new TreeMap<>();
+	Set<String> ownedUrls = new TreeSet<>();
 	private Set<String> loaded = new TreeSet<>();
 
+	Map<String, Map<String, Object>> contentByURL = new TreeMap<>();
+	Map references = new TreeMap<>();
+	Map<String, Map<String, Object>> labels = new TreeMap<>();
+	Map<String, Object> itemsByNS = new TreeMap<>();
+
+	boolean updated;
+
+	private ArrayList<String> queue = new ArrayList<>();
+	Map<String, String> queueNS = new TreeMap<>();
 	String currentUrl;
 	String currentNS;
 	String path;
 	Map currentContent;
-
-	Set<String> ownedUrls = new TreeSet<>();
-
-	Map references = new TreeMap<>();
-	Map<String, Map<String, Object>> labels = new TreeMap<>();
-	Map<String, Map<String, Object>> contentByURL = new TreeMap<>();
-	Map<String, Object> itemsByNS = new TreeMap<>();
-
-	boolean updated;
 
 	XbrlDockDevCounter cntLinkTypes = new XbrlDockDevCounter("LinkTypeCounts", true);
 	XbrlDockDevCounter cntArcRoles = new XbrlDockDevCounter("ArcRoleCounts", true);
@@ -79,7 +80,7 @@ public class XbrlDockMetaContainer implements XbrlDockMetaConsts {
 		return contentByURL.get(key);
 	}
 
-	public Map getHead() {
+	public Map getMetaInfo() {
 		return metaInfo;
 	}
 
@@ -248,10 +249,10 @@ public class XbrlDockMetaContainer implements XbrlDockMetaConsts {
 		updated = true;
 	}
 
-	public boolean optSave(File taxonomyStoreRoot) throws Exception {
+	public boolean optSave() throws Exception {
 		if (updated) {
 			String id = getId();
-			File fDir = new File(taxonomyStoreRoot, id);
+			File fDir = new File(metaManager.metaStoreRoot, id);
 			XbrlDockUtilsFile.ensureDir(fDir);
 
 			XbrlDock.log(EventLevel.Trace, "Saving MetaContainer", id);
@@ -266,12 +267,27 @@ public class XbrlDockMetaContainer implements XbrlDockMetaConsts {
 					reqIds.add(m.getId());
 				}
 			}
-			
-			if ( !reqIds.isEmpty() ) {
-				metaInfo.put(XDC_GEN_TOKEN_requires, new ArrayList(reqIds));				
+
+			if (!reqIds.isEmpty()) {
+				metaInfo.put(XDC_GEN_TOKEN_requires, new ArrayList(reqIds));
 			}
 
 			metaInfo.put(XDC_METAINFO_ownedUrls, new ArrayList(ownedUrls));
+			metaInfo.put(XDC_FACT_TOKEN_language, new ArrayList(labels.keySet()));
+
+			CounterProcessor cnt = new CounterProcessor();
+
+			visit(XDC_METATOKEN_items, cnt);
+			metaInfo.put(XDC_METATOKEN_items, cnt.getCount());
+			cnt.process(null, ProcessorAction.Init);
+
+			visit(XDC_METATOKEN_links, cnt);
+			metaInfo.put(XDC_METATOKEN_links, cnt.getCount());
+			cnt.process(null, ProcessorAction.Init);
+
+			visit(XDC_METATOKEN_references, cnt);
+			metaInfo.put(XDC_METATOKEN_references, cnt.getCount());
+			cnt.process(null, ProcessorAction.Init);
 
 			XbrlDockUtilsJson.writeJson(new File(fDir, XDC_TAXONOMYHEAD_FNAME), metaInfo);
 			XbrlDockUtilsJson.writeJson(new File(fDir, XDC_TAXONOMYDATA_FNAME), contentByURL);
@@ -289,10 +305,114 @@ public class XbrlDockMetaContainer implements XbrlDockMetaConsts {
 		return false;
 	}
 
+	public boolean load() throws Exception {
+		String id = getId();
+		File fDir = new File(metaManager.metaStoreRoot, id);
+
+		if (fDir.isDirectory()) {
+//		metaInfo.putAll(XbrlDockUtilsJson.readJson(new File(fDir, XDC_TAXONOMYHEAD_FNAME)));
+			contentByURL.putAll(XbrlDockUtilsJson.readJson(new File(fDir, XDC_TAXONOMYDATA_FNAME)));
+			references.putAll(XbrlDockUtilsJson.readJson(new File(fDir, XDC_TAXONOMYREFS_FNAME)));
+
+			ownedUrls.addAll(XbrlDockUtils.simpleGet(metaInfo, XDC_METAINFO_ownedUrls));
+			loaded.addAll(XbrlDockUtils.simpleGet(metaInfo, XDC_METATOKEN_includes));
+			requires.addAll(XbrlDockUtils.simpleGet(metaInfo, XDC_GEN_TOKEN_requires));
+
+			updated = false;
+
+			return true;
+		} else {
+			return false;
+		}
+	}
+
 	public String getId() {
 		String id = XbrlDockUtils.simpleGet(metaInfo, XDC_METAINFO_pkgInfo, XDC_EXT_TOKEN_identifier);
 		id = XbrlDockUtils.getPostfix(id, XDC_URL_PSEP);
 		return id;
 	}
 
+	public Map peekItem(String id) {
+		return Collections.EMPTY_MAP;
+	}
+
+	public String getItemLabel(String id) {
+		return id;
+	}
+
+	public void visit(String itemType, GenProcessor lp, Object... params) {
+		Map m = null;
+		Collection c;
+
+		try {
+
+			switch (itemType) {
+			case XDC_METATOKEN_items:
+				for (Map ce : contentByURL.values()) {
+					m = (Map) ce.getOrDefault(itemType, Collections.EMPTY_MAP);
+					if ((null != m) && !m.isEmpty()) {
+						lp.process(null, ProcessorAction.Begin);
+						for (Object e : m.entrySet()) {
+							lp.process(e, ProcessorAction.Process);
+						}
+						lp.process(null, ProcessorAction.End);
+					}
+				}
+				break;
+			case XDC_METATOKEN_links:
+				for (Map ce : contentByURL.values()) {
+					c = (Collection) ce.getOrDefault(itemType, Collections.EMPTY_LIST);
+					if ((null != c) && !c.isEmpty()) {
+						lp.process(null, ProcessorAction.Begin);
+						for (Object e : c) {
+							lp.process(e, ProcessorAction.Process);
+						}
+						lp.process(null, ProcessorAction.End);
+					}
+				}
+				break;
+			case XDC_METATOKEN_references:
+				c = (Collection) references.getOrDefault(itemType, Collections.EMPTY_LIST);
+				if ((null != c) && !c.isEmpty()) {
+					lp.process(null, ProcessorAction.Begin);
+					for (Object e : c) {
+						lp.process(e, ProcessorAction.Process);
+					}
+					lp.process(null, ProcessorAction.End);
+				}
+				break;
+			case XDC_METATOKEN_refLinks:
+				m = (Map) references.getOrDefault(itemType, Collections.EMPTY_MAP);
+				if ((null != m) && !m.isEmpty()) {
+					for (Object e : m.entrySet()) {
+						Map.Entry me = (Map.Entry) e;
+						lp.process(me.getKey(), ProcessorAction.Begin);
+						for (Object v : (Collection) me.getValue()) {
+							lp.process(v, ProcessorAction.Process);
+						}
+						lp.process(e, ProcessorAction.End);
+					}
+				}
+
+				break;
+			case XDC_METATOKEN_labels:
+				m = XbrlDockUtils.simpleGet(labels, params[1], params[0]);
+				break;
+			default:
+				XbrlDockException.wrap(null, "Unknown visit item type", getId(), itemType);
+			}
+
+			if ((null != m) && !m.isEmpty()) {
+				lp.process(null, ProcessorAction.Begin);
+				for (Object e : m.entrySet()) {
+					lp.process(e, ProcessorAction.Process);
+				}
+				lp.process(null, ProcessorAction.End);
+			}
+
+		} catch (Throwable e) {
+			XbrlDockException.wrap(e, "MetaContainer visit processor exception", getId(), itemType, params);
+		}
+
+	}
 }

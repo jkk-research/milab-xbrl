@@ -20,6 +20,7 @@ import javax.swing.event.TreeSelectionEvent;
 import javax.swing.event.TreeSelectionListener;
 import javax.swing.tree.DefaultMutableTreeNode;
 import javax.swing.tree.DefaultTreeModel;
+import javax.swing.tree.TreePath;
 import javax.swing.tree.TreeSelectionModel;
 
 import com.xbrldock.XbrlDockConsts;
@@ -36,14 +37,16 @@ public class XbrlDockGuiWorkbench extends JFrame implements XbrlDockGuiConsts, X
 
 		WBNode node;
 
-		ChildFrame(WBNode node) {
-			getContentPane().add(node.getComp(), BorderLayout.CENTER);
+		ChildFrame(WBNode node, JComponent mainComp) {
+			getContentPane().add(mainComp, BorderLayout.CENTER);
 			setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
 			addWindowStateListener(childWindowListener);
 
 			pack();
 		}
 	}
+
+	Map<Object, Map> childConfigs;
 
 	WBNode rootNode;
 	DefaultTreeModel panelModel;
@@ -76,7 +79,7 @@ public class XbrlDockGuiWorkbench extends JFrame implements XbrlDockGuiConsts, X
 			return XbrlDockUtils.simpleGet(getUserObject(), XDC_EXT_TOKEN_name);
 		}
 
-		WBNode getChildById(String id, ItemCreator<WBNode> ic) {
+		WBNode getChildById(String id, ItemCreator<WBNode> ic, Object... params) {
 			WBNode wbn;
 
 			if (0 < getChildCount()) {
@@ -87,7 +90,7 @@ public class XbrlDockGuiWorkbench extends JFrame implements XbrlDockGuiConsts, X
 					}
 				}
 			}
-			wbn = ic.create(id);
+			wbn = ic.create(id, params);
 
 			add(wbn);
 
@@ -100,10 +103,10 @@ public class XbrlDockGuiWorkbench extends JFrame implements XbrlDockGuiConsts, X
 			frm.requestFocus();
 		}
 
-		JComponent getComp() {
+		JComponent getComp(Map config) {
 			if (null == comp) {
 				try {
-					comp = XbrlDockUtils.createObject(null, (Map) getUserObject());
+					comp = XbrlDockUtils.createObject(config);
 				} catch (Exception e) {
 					XbrlDockException.wrap(e, "Workbench node component creation", getUserObject());
 				}
@@ -125,10 +128,31 @@ public class XbrlDockGuiWorkbench extends JFrame implements XbrlDockGuiConsts, X
 
 		@Override
 		public void valueChanged(TreeSelectionEvent e) {
-			Object o = panelTree.getSelectionPath().getPath()[1];
+			Object[] sp = panelTree.getSelectionPath().getPath();
 
-			if (o instanceof WBNode) {
-				selectRightPanel((WBNode) o);
+			switch (sp.length) {
+			case 2:
+				selectRightPanel((WBNode) sp[1]);
+				break;
+			}
+		}
+	};
+
+	ItemCreator<WBNode> childCreator = new ItemCreator<XbrlDockGuiWorkbench.WBNode>() {
+		@Override
+		public WBNode create(Object key, Object... hints) {
+			try {
+				WBNode n = new WBNode((String) key, null);
+				Map cfg = childConfigs.get(hints[0]);
+				JComponent mainPanel = n.getComp(cfg);
+
+				if (mainPanel instanceof GenAgent) {
+					((GenAgent) mainPanel).process(XDC_CMD_GEN_SELECT, hints);
+				}
+				n.frm = new ChildFrame(n, mainPanel);
+				return n;
+			} catch (Throwable e) {
+				return XbrlDockException.wrap(e, "Activating child frame", key, hints);
 			}
 		}
 	};
@@ -151,16 +175,6 @@ public class XbrlDockGuiWorkbench extends JFrame implements XbrlDockGuiConsts, X
 		setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
 	}
 
-	ItemCreator<WBNode> childCreator = new ItemCreator<XbrlDockGuiWorkbench.WBNode>() {
-
-		@Override
-		public WBNode create(Object key, Object... hints) {
-			WBNode n = new WBNode((String) key, null);
-			n.frm = new ChildFrame(n);
-			return n;
-		}
-	};
-
 	@Override
 	public Object process(String command, Object... params) throws Exception {
 		Object ret = null;
@@ -169,13 +183,15 @@ public class XbrlDockGuiWorkbench extends JFrame implements XbrlDockGuiConsts, X
 			WBNode wbn = rootNode.getChildById((String) params[0], null);
 
 			if (params.length == 1) {
+				TreePath tp = new TreePath(wbn);
+				panelTree.setSelectionPath(tp);
 				selectRightPanel(wbn);
 			} else {
-				wbn = wbn.getChildById((String) params[1], childCreator);
+				wbn = wbn.getChildById((String) params[1], childCreator, params);
 
 				wbn.focusFrame();
 
-				JOptionPane.showMessageDialog(this, XbrlDockUtils.sbAppend(new StringBuilder("Select hit"), " ", true, params));
+//				JOptionPane.showMessageDialog(this, XbrlDockUtils.sbAppend(new StringBuilder("Select hit"), " ", true, params));
 			}
 			break;
 		default:
@@ -199,13 +215,15 @@ public class XbrlDockGuiWorkbench extends JFrame implements XbrlDockGuiConsts, X
 			rootNode.add(new WBNode(XbrlDockUtils.simpleGet(m, XDC_EXT_TOKEN_id), m));
 		}
 
+		childConfigs = XbrlDockUtils.simpleGet(config, XDC_GEN_TOKEN_childPanels);
+
 		panelModel.reload();
 
 		setVisible(true);
 	}
 
 	private void selectRightPanel(WBNode wbn) {
-		JComponent comp = wbn.getComp();
+		JComponent comp = wbn.getComp((Map) wbn.getUserObject());
 
 		pnlRight.removeAll();
 		pnlRight.add(comp, BorderLayout.CENTER);

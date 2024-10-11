@@ -30,9 +30,12 @@ public class XbrlDockGuiMetaManagerPanel extends JPanel implements XbrlDockGuiCo
 	
 	LabeledAccess[] attNames = {
 			new LabeledAccess("Identifier", "", XDC_METAINFO_pkgInfo, XDC_EXT_TOKEN_identifier),
-			new LabeledAccess("File count", FMT_COLL, XDC_METATOKEN_includes),
 			new LabeledAccess("Requires", FMT_COLL, XDC_GEN_TOKEN_requires),
+			new LabeledAccess("File count", FMT_COLL, XDC_METATOKEN_includes),
 			new LabeledAccess("Entry points", FMT_COLL, XDC_METAINFO_entryPoints),
+			new LabeledAccess("Items", 0L, XDC_METATOKEN_items),
+			new LabeledAccess("Links", 0L, XDC_METATOKEN_links),
+			new LabeledAccess("References", 0L, XDC_METATOKEN_references),
 	};
 
 	ArrayList<Object> items = new ArrayList<>();

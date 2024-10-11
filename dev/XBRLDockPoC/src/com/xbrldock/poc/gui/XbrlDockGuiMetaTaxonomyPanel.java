@@ -4,21 +4,22 @@ import java.awt.BorderLayout;
 import java.awt.FlowLayout;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.util.Collection;
+import java.util.Collections;
 import java.util.Map;
 
 import javax.swing.JButton;
 import javax.swing.JComboBox;
-import javax.swing.JOptionPane;
 import javax.swing.JPanel;
 import javax.swing.JScrollPane;
 
-import com.xbrldock.XbrlDockException;
+import com.xbrldock.XbrlDock;
 import com.xbrldock.XbrlDockConsts.GenAgent;
+import com.xbrldock.XbrlDockException;
 import com.xbrldock.poc.meta.XbrlDockMetaContainer;
-import com.xbrldock.utils.XbrlDockUtils;
 import com.xbrldock.utils.XbrlDockUtilsGui;
 
-//@SuppressWarnings({ "rawtypes", "unchecked" })
+@SuppressWarnings({ "rawtypes", "unchecked" })
 public class XbrlDockGuiMetaTaxonomyPanel extends JPanel implements XbrlDockGuiConsts, GenAgent {
 	private static final long serialVersionUID = 1L;
 
@@ -102,24 +103,29 @@ public class XbrlDockGuiMetaTaxonomyPanel extends JPanel implements XbrlDockGuiC
 	}
 
 	public void showTaxonomy(String taxonomyId) throws Exception {
-		JOptionPane.showMessageDialog(this, "Display taxonomy " + taxonomyId);
+//		JOptionPane.showMessageDialog(this, "Display taxonomy " + taxonomyId);
 
-		taxonomy = xbrlDock.getTaxMgr().loadTaxonomy(taxonomyId);
-
-		roleTree.setTaxonomy(taxonomy);
-		itemGrid.setTaxonomy(taxonomy);
+		taxonomy = XbrlDock.callAgent(XDC_CFGTOKEN_AGENT_metaManager, XDC_CMD_METAMGR_GETMC, taxonomyId);
+		
+		Map mi = taxonomy.getMetaInfo();
 		
 		cbLang.removeAllItems();
 		cbLang.addItem("<< id >>");
-		for ( String lang : taxonomy.getLanguages() ) {
+		Collection<String> l = (Collection<String>) mi.getOrDefault(XDC_FACT_TOKEN_language, Collections.EMPTY_LIST);
+		for ( String lang : l ) {
 			cbLang.addItem(lang);
 		}
 
 		cbEntryPoint.removeAllItems();
 		cbEntryPoint.addItem("<< all >>");
-		for ( String ep : taxonomy.getEntryPoints() ) {
-			cbEntryPoint.addItem(ep);
+		Collection<Map> ep = (Collection<Map>) mi.getOrDefault(XDC_METAINFO_entryPoints, Collections.EMPTY_MAP);
+
+		for ( Map ee : ep ) {
+			cbEntryPoint.addItem((String) ee.getOrDefault(XDC_EXT_TOKEN_name, "???"));
 		}
+
+		roleTree.setTaxonomy(taxonomy);
+		itemGrid.setTaxonomy(taxonomy);
 
 	}
 

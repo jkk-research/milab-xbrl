@@ -143,9 +143,9 @@ public class XbrlDockUtils implements XbrlDockUtilsConsts {
 	}
 
 	public static <RetType> RetType simpleGet(Object root, Object... path) {
-		if ((path.length == 1) && ((String) path[0]).contains(".")) {
-			path = ((String) path[0]).split("\\.");
-		}
+//		if ((path.length == 1) && ((String) path[0]).contains(".")) {
+//			path = ((String) path[0]).split("\\.");
+//		}
 
 		Object curr = root;
 
@@ -255,7 +255,7 @@ public class XbrlDockUtils implements XbrlDockUtilsConsts {
 		return String.format("%02x%s%02x", h1, sep, h2);
 	}
 
-	public static <RetType> RetType createObject(Object owner, Map config) throws Exception {
+	public static <RetType> RetType createObject(Map config) throws Exception {
 		RetType ob = (RetType) Class.forName((String) config.get(XDC_CFGTOKEN_javaClass)).getConstructor().newInstance();
 
 		if (ob instanceof GenAgent) {

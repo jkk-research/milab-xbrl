@@ -13,6 +13,55 @@ import com.xbrldock.XbrlDockException;
 
 @SuppressWarnings({ "rawtypes", "unchecked" })
 public interface XbrlDockUtilsConsts extends XbrlDockConsts {
+	
+	class CounterProcessor<ItemType> implements GenProcessor<ItemType> {
+		long begin;
+		long process;
+		long end;
+
+		@Override
+		public boolean process(ItemType item, ProcessorAction action) throws Exception {
+			switch ( action ) {
+			case Begin:
+				++begin;
+				break;
+			case End:
+				++end;
+				break;
+			case Init:
+				begin = process = end = 0;
+				break;
+			case Process:
+				++process;
+				break;
+			case Release:
+				break;
+			}
+			return true;
+		}
+		
+		public long getCount() {
+			return process;
+		}
+		
+		public long getDepth() {
+			return begin-end;
+		}
+		
+		public long getCount(ProcessorAction action) {
+			switch ( action ) {
+			case Begin:
+				return begin;
+			case End:
+				return end;
+			case Process:
+				return process;
+			default:
+				return 0;
+			}
+		}
+		
+	}
 
 	class ItemCreatorSimple<Type> implements ItemCreator<Type> {
 

@@ -61,7 +61,7 @@ public abstract class XbrlDock implements XbrlDockConsts, XbrlDockUtilsConsts {
 				}
 			}
 
-			XBRLDOCK = XbrlDockUtils.createObject(null, XbrlDockUtils.safeGet(APP_CONFIG, XDC_CFGTOKEN_app, MAP_CREATOR));
+			XBRLDOCK = XbrlDockUtils.createObject(XbrlDockUtils.safeGet(APP_CONFIG, XDC_CFGTOKEN_app, MAP_CREATOR));
 
 			XBRLDOCK.run();
 
@@ -117,7 +117,7 @@ public abstract class XbrlDock implements XbrlDockConsts, XbrlDockUtilsConsts {
 			@Override
 			public GenAgent create(Object key, Object... hints) {
 				try {
-					return XbrlDockUtils.createObject(XBRLDOCK, cfg);
+					return XbrlDockUtils.createObject(cfg);
 				} catch (Exception e) {
 					return XbrlDockException.wrap(e, "getModule", agentId, cfg);
 				}

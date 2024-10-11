@@ -23,9 +23,7 @@ import javax.swing.event.ListSelectionListener;
 import javax.swing.table.AbstractTableModel;
 
 import com.xbrldock.XbrlDockException;
-import com.xbrldock.poc.XbrlDockPoc;
 import com.xbrldock.poc.meta.XbrlDockMetaContainer;
-import com.xbrldock.poc.meta.XbrlDockMetaTaxonomy;
 import com.xbrldock.utils.XbrlDockUtilsGui;
 
 //@SuppressWarnings({ "rawtypes", "unchecked" })
@@ -120,8 +118,6 @@ public class XbrlDockGuiMetaItemInfoGrid extends JPanel implements XbrlDockGuiCo
 			public void valueChanged(ListSelectionEvent e) {
 				if (!e.getValueIsAdjusting()) {
 					int sr = tblGrid.getSelectedRow();
-					StringBuilder sbText = null;
-					StringBuilder sbRefs = null;
 
 					if (-1 == sr) {
 						selItem = null;
@@ -131,44 +127,115 @@ public class XbrlDockGuiMetaItemInfoGrid extends JPanel implements XbrlDockGuiCo
 
 						String itemId = (String) selItem.get("id");
 
-						Map<String, Object> labels = taxonomy.getItemLabels(itemId, "en");
-						if (null != labels) {
-							sbText = new StringBuilder("<html><body><table>\n");
-							for (Map.Entry<String, Object> le : labels.entrySet()) {
-								sbText.append("\t<tr><td>").append(le.getKey()).append("</td><td>").append(le.getValue()).append("</td></tr>\n");
-							}
-							sbText.append("</table></body></html>");
+						StringBuilder sbText = new StringBuilder();
 
-							txtItem.setText(sbText.toString());
+						taxonomy.visit(XDC_METATOKEN_labels, new GenProcessor<Map.Entry<String, Object>>() {
+							@Override
+							public boolean process(Map.Entry<String, Object> le, ProcessorAction action) throws Exception {
+								switch (action) {
+								case Process:
+									sbText.append("\t<tr><td>").append(le.getKey()).append("</td><td>").append(le.getValue()).append("</td></tr>\n");
+									break;
+								default:
+									break;
+								}
+								return true;
+							}
+						}, itemId, "en");
+
+						if (!sbText.isEmpty()) {
+							sbText.insert(0, "<html><body><table>\n").append("</table></body></html>");
+							tpItem.setEnabledAt(1, true);
+						} else {
+							tpItem.setEnabledAt(1, false);
 						}
 
-						Iterable<Map<String, Object>> refs = taxonomy.getItemRefs(itemId);
-						if (null != refs) {
-							for (Map<String, Object> re : refs) {
-								if (null == sbRefs) {
-									sbRefs = new StringBuilder("<html><body><table>\n");
-								} else {
-									sbRefs.append("\t<tr colspan=2><td> --- </td></tr>\n");
-								}
-								for (Map.Entry<String, Object> le : re.entrySet()) {
-									String k = le.getKey();
-									Object v = le.getValue();
+						txtItem.setText(sbText.toString());
 
-									if (k.endsWith(":URI")) {
-										v = "<a href=\"" + v + "\">" + v + "</a>";
+//						Map<String, Object> labels = taxonomy.getItemLabels(itemId, "en");
+//						if (null != labels) {
+//							sbText = new StringBuilder("<html><body><table>\n");
+//							for (Map.Entry<String, Object> le : labels.entrySet()) {
+//								sbText.append("\t<tr><td>").append(le.getKey()).append("</td><td>").append(le.getValue()).append("</td></tr>\n");
+//							}
+//							sbText.append("</table></body></html>");
+//
+//							txtItem.setText(sbText.toString());
+//						}
+
+						tpItem.setEnabledAt(1, !sbText.isEmpty());
+
+						StringBuilder sbRefs = new StringBuilder();
+						txtRefs.setText("");
+
+						taxonomy.visit(XDC_METATOKEN_refLinks, new GenProcessor<Map<String, Object>>() {
+							boolean cont = false;
+
+							@Override
+							public boolean process(Map<String, Object> re, ProcessorAction action) throws Exception {
+								switch (action) {
+								case Begin:
+									sbRefs.append("<html><body><table>\n");
+									break;
+								case Process:
+
+									if (cont) {
+										sbRefs.append("\t<tr colspan=2><td> --- </td></tr>\n");
+									} else {
+										cont = true;
 									}
-									sbRefs.append("\t<tr><td>").append(k).append("</td><td>").append(v).append("</td></tr>\n");
+									for (Map.Entry<String, Object> le : re.entrySet()) {
+										String k = le.getKey();
+										Object v = le.getValue();
+
+										if (k.endsWith(":URI")) {
+											v = "<a href=\"" + v + "\">" + v + "</a>";
+										}
+										sbRefs.append("\t<tr><td>").append(k).append("</td><td>").append(v).append("</td></tr>\n");
+									}
+									break;
+								case End:
+									sbRefs.append("</table></body></html>");
+									txtRefs.setText(sbRefs.toString());
+									break;
+								default:
+									break;
 								}
+								return true;
 							}
-							sbRefs.append("</table></body></html>");
+						});
 
-							txtRefs.setText(sbRefs.toString());
+						tpItem.setEnabledAt(2, !sbRefs.isEmpty());
 
-						}
+//						if ( !sbRefs.isEmpty() ) {
+//						Iterable<Map<String, Object>> refs = taxonomy.getItemRefs(itemId);
+//						if (null != refs) {
+//							for (Map<String, Object> re : refs) {
+//								if (null == sbRefs) {
+//									sbRefs = new StringBuilder("<html><body><table>\n");
+//								} else {
+//									sbRefs.append("\t<tr colspan=2><td> --- </td></tr>\n");
+//								}
+//								for (Map.Entry<String, Object> le : re.entrySet()) {
+//									String k = le.getKey();
+//									Object v = le.getValue();
+//
+//									if (k.endsWith(":URI")) {
+//										v = "<a href=\"" + v + "\">" + v + "</a>";
+//									}
+//									sbRefs.append("\t<tr><td>").append(k).append("</td><td>").append(v).append("</td></tr>\n");
+//								}
+//							}
+//							sbRefs.append("</table></body></html>");
+
+//							txtRefs.setText(sbRefs.toString());
+//							tpItem.setEnabledAt(2, true);
+//						} else {
+//							tpItem.setEnabledAt(2, false);
+//						}
 					}
 
-					tpItem.setEnabledAt(1, (null != sbText));
-					tpItem.setEnabledAt(2, (null != sbRefs));
+//					tpItem.setEnabledAt(2, (null != sbRefs));
 
 					int si = tpItem.getSelectedIndex();
 					if (!tpItem.isEnabledAt(si)) {
@@ -220,11 +287,26 @@ public class XbrlDockGuiMetaItemInfoGrid extends JPanel implements XbrlDockGuiCo
 		this.taxonomy = taxonomy;
 
 		Set<String> s = new TreeSet<>();
-		for (String ii : taxonomy.getItemIds()) {
-			for (String k : taxonomy.getItem(ii).keySet()) {
-				s.add(k);
+
+		taxonomy.visit(XDC_METATOKEN_items, new GenProcessor<Map.Entry<String, Map>>() {
+			@Override
+			public boolean process(Map.Entry<String, Map> l, ProcessorAction action) throws Exception {
+				switch (action) {
+				case Process:
+					s.addAll(l.getValue().keySet());
+					break;
+				default:
+					break;
+				}
+				return true;
 			}
-		}
+		});
+
+//		for (String ii : taxonomy.getItemIds()) {
+//			for (Object k : taxonomy.peekItem(ii).keySet()) {
+//				s.add((String) k);
+//			}
+//		}
 
 		attNames.clear();
 		attNames.addAll(s);
@@ -236,7 +318,7 @@ public class XbrlDockGuiMetaItemInfoGrid extends JPanel implements XbrlDockGuiCo
 		items.clear();
 
 		for (String i : ids) {
-			items.add(taxonomy.getItem(i));
+			items.add(taxonomy.peekItem(i));
 		}
 
 		mdlGrid.fireTableDataChanged();

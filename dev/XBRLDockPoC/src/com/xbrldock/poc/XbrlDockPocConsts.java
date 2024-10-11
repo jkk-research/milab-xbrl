@@ -16,8 +16,9 @@ public interface XbrlDockPocConsts extends XbrlDockConsts, XbrlDockUtilsConsts {
 	String XDC_CFGTOKEN_AGENT_gui = "gui";
 	
 	String XDC_CMD_METAMGR_GETCATALOG = "getCatalog";
-	String XDC_CMD_METAMGR_IMPORT = "import";
 	String XDC_CMD_METAMGR_GETMC = "getMC";
+	String XDC_CMD_METAMGR_IMPORT = "import";
+	String XDC_CMD_METAMGR_LOADMC = "loadMC";
 
 	String XDC_CMD_GEN_SELECT = "select";
 
@@ -34,6 +35,7 @@ public interface XbrlDockPocConsts extends XbrlDockConsts, XbrlDockUtilsConsts {
 	String XDC_METATOKEN_links = "links";
 	String XDC_METATOKEN_references = "references";
 	String XDC_METATOKEN_refLinks = "refLinks";
+	String XDC_METATOKEN_labels = "labels";
 	String XDC_METATOKEN_includes = "includes";
 	String XDC_METATOKEN_url = "xdc_url";
 	String XDC_METATOKEN_tagName = "xdc_tagName";

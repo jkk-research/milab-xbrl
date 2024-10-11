@@ -13,10 +13,7 @@ import javax.swing.tree.DefaultTreeModel;
 import javax.swing.tree.TreeNode;
 import javax.swing.tree.TreePath;
 
-import com.xbrldock.XbrlDockConsts.GenAgent;
-import com.xbrldock.poc.XbrlDockPoc;
 import com.xbrldock.poc.meta.XbrlDockMetaContainer;
-import com.xbrldock.poc.meta.XbrlDockMetaTaxonomy;
 import com.xbrldock.utils.XbrlDockUtils;
 
 @SuppressWarnings({ "rawtypes", "unchecked" })
@@ -48,7 +45,7 @@ public class XbrlDockGuiMetaRoleTree extends JTree implements XbrlDockGuiConsts 
 			this.parent = parent;
 
 			this.id = id;
-			this.item = taxonomy.getItem(id);
+			this.item = taxonomy.peekItem(id);
 			this.roleLinks = roleLinks;
 
 			label = id;
@@ -85,7 +82,7 @@ public class XbrlDockGuiMetaRoleTree extends JTree implements XbrlDockGuiConsts 
 				}
 			} else {
 				target.add(id);
-				for (ItemNode c : optLoadChildren() ) {
+				for (ItemNode c : optLoadChildren()) {
 					c.collectChildren(target);
 				}
 			}
@@ -128,7 +125,7 @@ public class XbrlDockGuiMetaRoleTree extends JTree implements XbrlDockGuiConsts 
 
 		@Override
 		public String toString() {
-			return (null == taxonomy) ? id : taxonomy.toString(id);
+			return (null == taxonomy) ? id : taxonomy.getItemLabel(id);
 		}
 
 	}
@@ -149,17 +146,28 @@ public class XbrlDockGuiMetaRoleTree extends JTree implements XbrlDockGuiConsts 
 
 		Map<String, ItemNode> roles = new TreeMap<>();
 
-		for (Map<String, String> l : taxonomy.getLinks()) {
-			String roleName = l.get("xlink:role");
-			ItemNode rn = XbrlDockUtils.safeGet(roles, roleName, new XbrlDockUtils.ItemCreator<ItemNode>() {
-				@Override
-				public ItemNode create(Object key, Object... hints) {
-					return new ItemNode((String) key, tnRoot, new ArrayList<Map<String, String>>());
-				}
-			});
+		taxonomy.visit(XDC_METATOKEN_links, new GenProcessor<Map<String, String>>() {
+			@Override
+			public boolean process(Map<String, String> l, ProcessorAction action) throws Exception {
+				switch (action) {
+				case Process:
+					String roleName = l.get("xlink:role");
+					ItemNode rn = XbrlDockUtils.safeGet(roles, roleName, new XbrlDockUtils.ItemCreator<ItemNode>() {
+						@Override
+						public ItemNode create(Object key, Object... hints) {
+							return new ItemNode((String) key, tnRoot, new ArrayList<Map<String, String>>());
+						}
+					});
 
-			rn.roleLinks.add(l);
-		}
+					rn.roleLinks.add(l);
+
+					break;
+				default:
+					break;
+				}
+				return true;
+			}
+		});
 
 		Set<String> roleItems = new TreeSet<>();
 
@@ -186,7 +194,7 @@ public class XbrlDockGuiMetaRoleTree extends JTree implements XbrlDockGuiConsts 
 		}
 
 		tm.reload();
-		
+
 		invalidate();
 		repaint();
 	}

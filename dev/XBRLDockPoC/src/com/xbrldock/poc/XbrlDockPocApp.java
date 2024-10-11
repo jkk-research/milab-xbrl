@@ -5,6 +5,7 @@ import java.io.File;
 import com.xbrldock.XbrlDock;
 import com.xbrldock.XbrlDockException;
 import com.xbrldock.poc.meta.XbrlDockMetaContainer;
+import com.xbrldock.poc.meta.XbrlDockMetaManager;
 import com.xbrldock.utils.XbrlDockUtils;
 import com.xbrldock.utils.XbrlDockUtilsFile;
 import com.xbrldock.utils.XbrlDockUtilsNet;
@@ -39,6 +40,7 @@ public class XbrlDockPocApp extends XbrlDock implements XbrlDockPocConsts {
 		XbrlDockUtilsNet.setCacheRoot(urlCacheRoot);
 
 		if (Boolean.TRUE.equals(XbrlDockUtils.simpleGet(APP_CONFIG, XDC_CFGTOKEN_env, XDC_CFGTOKEN_AGENT_gui))) {
+			XbrlDockMetaManager.LOAD_CACHE = true;
 			callAgent(XDC_CFGTOKEN_AGENT_gui, XDC_CMD_GEN_SELECT, XDC_CFGTOKEN_AGENT_metaManager);
 			return;
 		}
@@ -91,7 +93,7 @@ public class XbrlDockPocApp extends XbrlDock implements XbrlDockPocConsts {
 	void checkReport(String repRoot) throws Exception {
 		File f = new File(repRoot);
 
-		callAgent(XDC_CFGTOKEN_AGENT_metaManager, XDC_CMD_METAMGR_GETMC, f);
+		callAgent(XDC_CFGTOKEN_AGENT_metaManager, XDC_CMD_METAMGR_LOADMC, f);
 	}
 
 	void checkReports() throws Exception {
@@ -107,7 +109,7 @@ public class XbrlDockPocApp extends XbrlDock implements XbrlDockPocConsts {
 
 						try {
 //							XbrlDockPocUtils.readMeta(f);
-							XbrlDockMetaContainer mc = callAgent(XDC_CFGTOKEN_AGENT_metaManager, XDC_CMD_METAMGR_GETMC, f);
+							XbrlDockMetaContainer mc = callAgent(XDC_CFGTOKEN_AGENT_metaManager, XDC_CMD_METAMGR_LOADMC, f);
 							XbrlDock.log(EventLevel.Info, mc.getId());
 						} catch (Throwable e) {
 							XbrlDock.log(EventLevel.Trace, "load exception", e);

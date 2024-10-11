@@ -121,7 +121,7 @@ public class XbrlDockPoc extends XbrlDock implements XbrlDockPocConsts {
 
 			break;
 		case "app":
-			XbrlDockGuiMetaTaxonomyPanel frame = new XbrlDockGuiMetaTaxonomyPanel(this);
+			XbrlDockGuiMetaTaxonomyPanel frame = new XbrlDockGuiMetaTaxonomyPanel();
 
 			frame.showTaxonomy("/xbrl.ifrs.org/taxonomy/2024-03-27/");
 
