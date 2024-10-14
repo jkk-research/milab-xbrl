@@ -100,6 +100,7 @@ public interface XbrlDockConsts {
 	String XDC_GEN_TOKEN_requires = "requires";
 	String XDC_GEN_TOKEN_placeholder = "placeholder";
 	String XDC_GEN_TOKEN_childPanels = "childPanels";
+	String XDC_GEN_TOKEN_type = "type";
 	
 	
 	String XDC_EXT_TOKEN_id = "id";

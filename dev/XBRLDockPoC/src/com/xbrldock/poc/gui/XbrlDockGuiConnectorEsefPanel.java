@@ -13,53 +13,35 @@ import javax.swing.JTable;
 import javax.swing.ListSelectionModel;
 import javax.swing.event.ListSelectionEvent;
 import javax.swing.event.ListSelectionListener;
-import javax.swing.table.AbstractTableModel;
 
 import com.xbrldock.XbrlDock;
 import com.xbrldock.XbrlDockConsts.GenAgent;
+import com.xbrldock.poc.conn.xbrlorg.XbrlDockConnXbrlOrgConsts;
+import com.xbrldock.utils.XbrlDockUtils;
 import com.xbrldock.utils.XbrlDockUtilsGui;
 
-@SuppressWarnings({ "rawtypes", /*"unchecked"*/ })
-public class XbrlDockGuiConnectorEsefPanel extends JPanel implements XbrlDockGuiConsts, GenAgent {
+@SuppressWarnings({ "rawtypes", /* "unchecked" */ })
+public class XbrlDockGuiConnectorEsefPanel extends JPanel implements XbrlDockGuiConsts, XbrlDockConnXbrlOrgConsts, GenAgent {
 	private static final long serialVersionUID = 1L;
-	
-	GenAgent esefConn;
-	
-	ArrayList<String> attNames = new ArrayList<>();
 
 	ArrayList<Map> items = new ArrayList<>();
 	Map selItem;
 
-	class GridModel extends AbstractTableModel {
-		private static final long serialVersionUID = 1L;
+//@formatter:off  
 
-		@Override
-		public int getRowCount() {
-			return items.size();
-		}
+	XbrlDockGuiUtilsGridModel mdlGrid = new XbrlDockGuiUtilsGridModel(items, 
+			new LabeledAccess("Identifier", "", XDC_REPORT_TOKEN_sourceAtts, XDC_XBRLORG_TOKEN_fxo_id),
+			new LabeledAccess("Start", "", XDC_REPORT_TOKEN_startDate), 
+			new LabeledAccess("End", "", XDC_REPORT_TOKEN_endDate),
+			new LabeledAccess("Entity", "", XDC_REPORT_TOKEN_entityName), 
+			new LabeledAccess("Namespaces", FMT_MAP, XDC_REPORT_TOKEN_namespaces)
+	);
+//@formatter:on
 
-		@Override
-		public int getColumnCount() {
-			return attNames.size();
-		}
-
-		@Override
-		public String getColumnName(int column) {
-			return attNames.get(column);
-		}
-
-		@Override
-		public Object getValueAt(int rowIndex, int columnIndex) {
-			String k = attNames.get(columnIndex);
-			return items.get(rowIndex).get(k);
-		}
-	}
-
-	GridModel mdlGrid;
 	JTable tblGrid;
-	
-	JEditorPane txtInfo;
 
+	JEditorPane txtInfo;
+	String placeholder;
 
 	ActionListener al = new ActionListener() {
 		@Override
@@ -70,33 +52,55 @@ public class XbrlDockGuiConnectorEsefPanel extends JPanel implements XbrlDockGui
 	};
 
 	public XbrlDockGuiConnectorEsefPanel() throws Exception {
-		super(new BorderLayout());		
-		
-//		mdlGrid = new GridModel();
-//		tblGrid = new JTable(mdlGrid);
-		tblGrid = new JTable();
+		super(new BorderLayout());
+
+		tblGrid = new JTable(mdlGrid);
 
 		ListSelectionModel lm = tblGrid.getSelectionModel();
 		lm.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
 		lm.addListSelectionListener(new ListSelectionListener() {
 			@Override
 			public void valueChanged(ListSelectionEvent e) {
-				if (!e.getValueIsAdjusting()) {}
+				if (!e.getValueIsAdjusting()) {
+					int sr = tblGrid.getSelectedRow();
+					selItem = (-1 == sr) ? null : items.get(sr);
+					updateDescPanel();
+				}
 			}
 		});
-		
+
 		txtInfo = new JEditorPane();
 		txtInfo.setContentType("text/html");
 		txtInfo.setEditable(false);
 		
-		txtInfo.setText("<html><body>Here comes the description of the selected report</body></html>");
-		
+//		txtInfo.setText("<html><body>Here comes the description of the selected report</body></html>");
+
 		add(XbrlDockUtilsGui.createSplit(false, new JScrollPane(tblGrid), new JScrollPane(txtInfo), 0.2), BorderLayout.CENTER);
+	}
+
+	protected void updateDescPanel() {
+		String txt = (null == selItem) ? placeholder : FMT_TOHTML.toString(selItem);
+
+		int cp = txtInfo.getCaretPosition();
+
+		txtInfo.setText("<html><body>" + txt + "</body></html>");
+
+		txtInfo.setCaretPosition(cp);
 	}
 
 	@Override
 	public void initModule(Map config) throws Exception {
-		esefConn = XbrlDock.getAgent(XDC_CFGTOKEN_AGENT_esefConn);
+		Map metaCatalog = XbrlDock.callAgent(XDC_CFGTOKEN_AGENT_esefConn, XDC_CMD_GEN_GETCATALOG);
+		placeholder = XbrlDockUtils.simpleGet(config, XDC_GEN_TOKEN_placeholder);
+
+		for (Object rep : ((Map) XbrlDockUtils.simpleGet(metaCatalog, XDC_CONN_CAT_TOKEN_filings)).values()) {
+			items.add((Map) rep);
+		}
+
+		mdlGrid.fireTableDataChanged();
+		
+		updateDescPanel();
+
 	}
 
 	@Override

@@ -15,7 +15,7 @@ public interface XbrlDockPocConsts extends XbrlDockConsts, XbrlDockUtilsConsts {
 	String XDC_CFGTOKEN_AGENT_manualReports = "manualReports";
 	String XDC_CFGTOKEN_AGENT_gui = "gui";
 	
-	String XDC_CMD_METAMGR_GETCATALOG = "getCatalog";
+	String XDC_CMD_GEN_GETCATALOG = "getCatalog";
 	String XDC_CMD_METAMGR_GETMC = "getMC";
 	String XDC_CMD_METAMGR_IMPORT = "import";
 	String XDC_CMD_METAMGR_LOADMC = "loadMC";

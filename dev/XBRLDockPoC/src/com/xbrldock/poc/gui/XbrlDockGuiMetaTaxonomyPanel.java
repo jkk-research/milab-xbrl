@@ -27,7 +27,8 @@ public class XbrlDockGuiMetaTaxonomyPanel extends JPanel implements XbrlDockGuiC
 
 	XbrlDockGuiMetaRoleTree roleTree;
 	XbrlDockGuiMetaItemInfoGrid itemGrid;
-	
+
+	JComboBox<String> cbType = new JComboBox<String>();
 	JComboBox<String> cbLang = new JComboBox<String>();
 	JComboBox<String> cbEntryPoint = new JComboBox<String>();
 
@@ -35,16 +36,22 @@ public class XbrlDockGuiMetaTaxonomyPanel extends JPanel implements XbrlDockGuiC
 
 		@Override
 		public void actionPerformed(ActionEvent e) {
+			int li;
+
 			switch (e.getActionCommand()) {
 			case XDC_APP_SHOWITEMS:
 				itemGrid.displayItems(roleTree.getRelatedItems());
 				break;
 			case XDC_APP_SETLANG:
-//				int li = cbLang.getSelectedIndex();
-//				taxonomy.setLang( (0 == li) ? null : cbLang.getItemAt(li));
+//			int li = cbLang.getSelectedIndex();
+//			taxonomy.setLang( (0 == li) ? null : cbLang.getItemAt(li));
 				roleTree.invalidate();
 				roleTree.revalidate();
 				roleTree.repaint();
+				break;
+			case XDC_APP_SETROLETYPE:
+				li = cbType.getSelectedIndex();
+				roleTree.setRoleType( (0 == li) ? null : cbType.getItemAt(li) );
 				break;
 			}
 		}
@@ -52,24 +59,28 @@ public class XbrlDockGuiMetaTaxonomyPanel extends JPanel implements XbrlDockGuiC
 
 	public XbrlDockGuiMetaTaxonomyPanel() throws Exception {
 		super(new BorderLayout());
-		
+
 		roleTree = new XbrlDockGuiMetaRoleTree();
 		itemGrid = new XbrlDockGuiMetaItemInfoGrid();
 
 		JPanel pnlTree = new JPanel(new BorderLayout());
 		pnlTree.add(new JScrollPane(roleTree), BorderLayout.CENTER);
-		
+
+		cbType.setActionCommand(XDC_APP_SETROLETYPE);
+		cbType.addActionListener(al);
+		pnlTree.add(cbType, BorderLayout.NORTH);
+
 		JPanel pnlTreeActions = new JPanel(new FlowLayout());
 
 		JButton bt = new JButton(XDC_APP_SHOWITEMS);
 		bt.setActionCommand(XDC_APP_SHOWITEMS);
 		bt.addActionListener(al);
 		pnlTreeActions.add(bt);
-		
+
 		pnlTree.add(pnlTreeActions, BorderLayout.SOUTH);
-		
+
 		JPanel pnlTop = new JPanel(new BorderLayout());
-		
+
 		cbLang.setActionCommand(XDC_APP_SETLANG);
 		cbLang.addActionListener(al);
 		pnlTop.add(cbLang, BorderLayout.EAST);
@@ -78,17 +89,16 @@ public class XbrlDockGuiMetaTaxonomyPanel extends JPanel implements XbrlDockGuiC
 		cbEntryPoint.addActionListener(al);
 		pnlTop.add(cbEntryPoint, BorderLayout.CENTER);
 
-
 		add(pnlTop, BorderLayout.NORTH);
 		add(XbrlDockUtilsGui.createSplit(true, pnlTree, itemGrid, 0.2), BorderLayout.CENTER);
 	}
-	
+
 	@Override
 	public void initModule(Map config) throws Exception {
 		// TODO Auto-generated method stub
-		
+
 	}
-	
+
 	@Override
 	public Object process(String command, Object... params) throws Exception {
 		Object ret = null;
@@ -100,7 +110,7 @@ public class XbrlDockGuiMetaTaxonomyPanel extends JPanel implements XbrlDockGuiC
 			XbrlDockException.wrap(null, "Unhandled agent command", command, params);
 			break;
 		}
-		
+
 		return ret;
 	}
 
@@ -108,13 +118,13 @@ public class XbrlDockGuiMetaTaxonomyPanel extends JPanel implements XbrlDockGuiC
 //		JOptionPane.showMessageDialog(this, "Display taxonomy " + taxonomyId);
 
 		taxonomy = XbrlDock.callAgent(XDC_CFGTOKEN_AGENT_metaManager, XDC_CMD_METAMGR_GETMC, taxonomyId);
-		
+
 		Map mi = taxonomy.getMetaInfo();
-		
+
 		cbLang.removeAllItems();
 		cbLang.addItem("<< id >>");
 		Collection<String> l = (Collection<String>) mi.getOrDefault(XDC_FACT_TOKEN_language, Collections.EMPTY_LIST);
-		for ( String lang : l ) {
+		for (String lang : l) {
 			cbLang.addItem(lang);
 		}
 
@@ -122,12 +132,18 @@ public class XbrlDockGuiMetaTaxonomyPanel extends JPanel implements XbrlDockGuiC
 		cbEntryPoint.addItem("<< all >>");
 		Collection<Map> ep = (Collection<Map>) mi.getOrDefault(XDC_METAINFO_entryPoints, Collections.EMPTY_LIST);
 
-		for ( Map ee : ep ) {
+		for (Map ee : ep) {
 			cbEntryPoint.addItem((String) ee.getOrDefault(XDC_EXT_TOKEN_name, "???"));
 		}
 
 		roleTree.setTaxonomy(taxonomy);
 		itemGrid.setTaxonomy(taxonomy);
+
+		cbType.removeAllItems();
+		cbType.addItem("<< all >>");
+		for (String rt : roleTree.getRoleTypes() ) {
+			cbType.addItem(rt);
+		}
 
 	}
 

@@ -47,9 +47,9 @@ public class XbrlDockPocApp extends XbrlDock implements XbrlDockPocConsts {
 
 //		@formatter:off  
 		String[] years = { 
-				"2019", 
-				"2020", 
-				"2021", 
+//				"2019", 
+//				"2020", 
+//				"2021", 
 				"2022", 
 				};
 //		@formatter:on
@@ -78,16 +78,16 @@ public class XbrlDockPocApp extends XbrlDock implements XbrlDockPocConsts {
 
 //		callAgent(XDC_CFGTOKEN_AGENT_metaManager, XDC_CMD_METAMGR_IMPORT, new File("ext/XBRLDock/taxonomy/import/us-gaap-2024"));
 
-		if ( skip ) {
-			return;
-		}
+//		if ( skip ) {
+//			return;
+//		}
 		
-		XbrlDockException.DUMP_STACK_TRACE = null;
-		logAbove = EventLevel.Trace;
-		checkReports();
+//		XbrlDockException.DUMP_STACK_TRACE = null;
+//		logAbove = EventLevel.Trace;
+//		checkReports();
 
-//		checkReport(
-//				"ext/XBRLDock/sources/xbrl.org/filings/lei/32/bd/74780000L0GQ5QG49R37/74780000L0GQ5QG49R37-2022-12-31-ESEF-HR-1/74780000L0GQ5QG49R37-2022-12-31/ATPL-2022-12-31-hr/META-INF");
+		checkReport(
+				"ext/XBRLDock/sources/xbrl.org/filings/lei/25/7a/549300HB18MY7I4M4L84/549300HB18MY7I4M4L84-2023-12-31-ESEF-DK-0/549300HB18MY7I4M4L84-2023-12-31-en/549300HB18MY7I4M4L84-2023-12-31-en/META-INF");
 	}
 
 	void checkReport(String repRoot) throws Exception {

@@ -120,7 +120,7 @@ public class XbrlDockMetaManager implements XbrlDockMetaConsts, XbrlDockConsts.G
 //		XbrlDockMetaContainer mc;
 
 		switch (command) {
-		case XDC_CMD_METAMGR_GETCATALOG:
+		case XDC_CMD_GEN_GETCATALOG:
 			ret = metaCatalog;
 			break;
 		case XDC_CMD_METAMGR_IMPORT:
@@ -154,10 +154,12 @@ public class XbrlDockMetaManager implements XbrlDockMetaConsts, XbrlDockConsts.G
 			importIssues.reset();
 
 			XbrlDockMetaContainer mc = buildMetaContainer(taxSource, true);
+			
+			saveChanges();
 
-			mc.optSave();
+//			mc.optSave();
 
-//			XbrlDock.log(EventLevel.Trace, mc.metaInfo);
+			XbrlDock.log(EventLevel.Trace, mc.metaInfo);
 
 //			XbrlDock.log(EventLevel.Trace, "Schema stats", mc.cntLinkTypes, mc.cntArcRoles);
 
@@ -253,22 +255,29 @@ public class XbrlDockMetaManager implements XbrlDockMetaConsts, XbrlDockConsts.G
 			mcById.put(metaContainer.getId(), metaContainer);
 		}
 
-		boolean updateCatalog = false;
-		for (XbrlDockMetaContainer mc : mcByUrl.values()) {
-			if (mc.optSave()) {
-				updateCatalog = true;
-				metaCatalog.put(mc.getId(), mc.metaInfo);
-			}
-		}
-		if (updateCatalog) {
-			XbrlDockUtilsJson.writeJson(new File(metaStoreRoot, XDC_FNAME_METACATALOG), metaCatalog);
-		}
+		saveChanges();
 
 		if (!importIssues.isEmpty()) {
 			XbrlDock.log(EventLevel.Error, importIssues);
 		}
 
 		return metaContainer;
+	}
+
+	private void saveChanges() throws Exception {
+		boolean updateCatalog = false;
+		
+		for (Map.Entry<String, XbrlDockMetaContainer> mce : mcById.entrySet()) {
+			XbrlDockMetaContainer mc = mce.getValue();
+			if (mc.optSave()) {
+				updateCatalog = true;
+				metaCatalog.put(mce.getKey(), mc.metaInfo);
+			}
+		}
+		
+		if (updateCatalog) {
+			XbrlDockUtilsJson.writeJson(new File(metaStoreRoot, XDC_FNAME_METACATALOG), metaCatalog);
+		}
 	}
 
 	public Map getKnownItemForKey(String key, String id, XbrlDockMetaContainer metaContainer) {
@@ -376,8 +385,8 @@ public class XbrlDockMetaManager implements XbrlDockMetaConsts, XbrlDockConsts.G
 			String label = e.getAttribute("xlink:label");
 
 			String lt = e.getAttribute("xlink:type");
-			Node role = e.getParentNode().getAttributes().getNamedItem("xlink:role");
-			String roleID = (null == role) ? "" : XbrlDockUtils.getPostfix(role.getTextContent(), "/");
+			Element eParent = (Element) e.getParentNode();
+			String roleID = XbrlDockUtils.getPostfix(eParent.getAttribute("xlink:role"), XDC_URL_PSEP);
 
 			Map em = null;
 
@@ -417,6 +426,7 @@ public class XbrlDockMetaManager implements XbrlDockMetaConsts, XbrlDockConsts.G
 			case "arc":
 				Map<String, String> am = XbrlDockUtilsXml.readAtts(e, null, null);
 				am.put("xlink:role", roleID);
+				am.put(XDC_GEN_TOKEN_type, XbrlDockUtils.getPostfix(eParent.getTagName(), ":"));
 				arcs.add(am);
 				storeInContent = false;
 				break;

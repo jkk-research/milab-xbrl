@@ -10,7 +10,8 @@
       },
       "esefConn" : {
         "javaClass" : "com.xbrldock.poc.conn.xbrlorg.XbrlDockConnXbrlOrg",
-        "dirStore" : "sources/xbrl.org",
+        "name" : "xbrl.org",
+        "dirStore" : "ext/XBRLDock/sources/xbrl.org",
         "dirInput" : "ext/XBRLDock/sources/xbrl.org"
       },
       "manualReports" : {
@@ -37,7 +38,8 @@
         }, {
           "id" : "esefConn",
           "javaClass" : "com.xbrldock.poc.gui.XbrlDockGuiConnectorEsefPanel",
-          "name" : "ESEF Connector"
+          "name" : "ESEF Connector",
+          "placeholder" : "Select a report in the list above to see its properties."
         } ],
         "childPanels" : {
           "metaManager" : {

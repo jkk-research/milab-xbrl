@@ -29,8 +29,8 @@ public class XbrlDockConnXbrlOrg implements XbrlDockConnXbrlOrgConsts, XbrlDockP
 
 	String urlRoot = "https://filings.xbrl.org/";
 
-	File dataRoot;
-	File cacheRoot;
+	File dirStore;
+	File dirInput;
 
 	Map catalog;
 
@@ -80,34 +80,22 @@ public class XbrlDockConnXbrlOrg implements XbrlDockConnXbrlOrgConsts, XbrlDockP
 	public XbrlDockConnXbrlOrg() {
 		// TODO Auto-generated constructor stub
 	}
-
-	public XbrlDockConnXbrlOrg(String rootPath, String cachePath) throws Exception {
-		dataRoot = new File(rootPath);
-		cacheRoot = new File(cachePath);
-
-		if (!dataRoot.exists()) {
-			dataRoot.mkdirs();
-		}
-		
-		testMode = true;
-
-		catalog = XbrlDockUtilsJson.readJson(new File(dataRoot, PATH_CATALOG));
-
-		if (null == catalog) {
-			catalog = new TreeMap();
-			refresh(null);
-		} else {
-			Map entities = XbrlDockUtils.safeGet(catalog, XDC_CONN_CAT_TOKEN_entities, MAP_CREATOR);
-			Map langs = XbrlDockUtils.safeGet(catalog, XDC_CONN_CAT_TOKEN_languages, MAP_CREATOR);
-			Map filings = XbrlDockUtils.safeGet(catalog, XDC_CONN_CAT_TOKEN_filings, MAP_CREATOR);
-			XbrlDock.log(EventLevel.Trace, "Read filing count", filings.size(), "Entity count", entities.size(), "Language count", langs.size());
-		}
-	}
 	
 	@Override
-	public void initModule( Map config) {
-		// TODO Auto-generated method stub
+	public void initModule( Map config) throws Exception {
+
+		dirInput = new File((String) XbrlDockUtils.simpleGet(config, XDC_CFGTOKEN_dirInput));
+		XbrlDockUtilsFile.ensureDir(dirInput);
 		
+		dirStore = new File((String) XbrlDockUtils.simpleGet(config, XDC_CFGTOKEN_dirStore));
+		XbrlDockUtilsFile.ensureDir(dirStore);
+		
+		File fc = new File(dirStore, PATH_CATALOG);
+		if (fc.isFile()) {
+			catalog = XbrlDockUtilsJson.readJson(fc);
+		}
+
+		testMode = true;
 	}
 	
 	@Override
@@ -115,6 +103,9 @@ public class XbrlDockConnXbrlOrg implements XbrlDockConnXbrlOrgConsts, XbrlDockP
 		Object ret = null;
 		
 		switch (command) {
+		case XDC_CMD_GEN_GETCATALOG:
+			ret = catalog;
+			break;
 		default:
 			XbrlDockException.wrap(null, "Unhandled agent command", command, params);
 			break;
@@ -198,7 +189,7 @@ public class XbrlDockConnXbrlOrg implements XbrlDockConnXbrlOrgConsts, XbrlDockP
 			String localPath = (String) filingData.get( (null == keyPath) ? XDC_REPORT_TOKEN_localPath : keyPath );
 
 			if (!XbrlDockUtils.isEmpty(localPath)) {
-				ret = new File(cacheRoot, localPath);
+				ret = new File(dirInput, localPath);
 
 				if (!ret.exists()) {
 					ret = null;
@@ -287,7 +278,7 @@ public class XbrlDockConnXbrlOrg implements XbrlDockConnXbrlOrgConsts, XbrlDockP
 		String path = (String) filingData.get( XDC_REPORT_TOKEN_localFilingPath);
 
 		if (!XbrlDockUtils.isEmpty(path)) {
-			ret = new File(cacheRoot, path);
+			ret = new File(dirInput, path);
 			if (ret.isFile()) {
 				path = (String) filingData.get( XDC_REPORT_TOKEN_localMetaInfPath);
 				if (!XbrlDockUtils.isEmpty(path)) {
@@ -310,7 +301,7 @@ public class XbrlDockConnXbrlOrg implements XbrlDockConnXbrlOrgConsts, XbrlDockP
 
 		filingData.put(XDC_REPORT_TOKEN_localPath, path);
 		
-		File fDir = new File(cacheRoot, path);
+		File fDir = new File(dirInput, path);
 		XbrlDockUtilsFile.ensureDir(fDir);
 
 		String zipFile = XbrlDockUtils.getPostfix(zipUrl, "/");
@@ -410,7 +401,7 @@ public class XbrlDockConnXbrlOrg implements XbrlDockConnXbrlOrgConsts, XbrlDockP
 
 	private boolean storeRelativePath(Map filingData, Object key, File file) throws IOException {
 		if (null != file) {
-			String path = file.getCanonicalPath().substring(cacheRoot.getCanonicalPath().length() + 1);
+			String path = file.getCanonicalPath().substring(dirInput.getCanonicalPath().length() + 1);
 			filingData.put(key,  path);
 			return true;
 		} else {

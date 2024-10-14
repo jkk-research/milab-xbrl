@@ -353,7 +353,8 @@ public class XbrlDockMetaContainer implements XbrlDockMetaConsts {
 				m = XbrlDockUtils.simpleGet(contentByURL, fileId, XDC_METATOKEN_items, itemId);
 			}
 		}
-		return (null == m) ? Collections.EMPTY_MAP : m;
+		return m;
+//		return (null == m) ? Collections.EMPTY_MAP : m;
 	}
 
 	public String getItemLabel(String id) {

@@ -24,6 +24,9 @@ public class XbrlDockGuiMetaRoleTree extends JTree implements XbrlDockGuiConsts 
 
 	XbrlDockMetaContainer taxonomy;
 
+	Set<String> roleTypes = new TreeSet<>();
+	String selRoleType;
+
 	class ItemNode implements TreeNode {
 
 		TreeNode parent;
@@ -130,6 +133,7 @@ public class XbrlDockGuiMetaRoleTree extends JTree implements XbrlDockGuiConsts 
 
 	}
 
+	ArrayList<ItemNode> allRoleNodes = new ArrayList<>();
 	ItemNode tnRoot = new ItemNode();
 	DefaultTreeModel tm = new DefaultTreeModel(tnRoot);
 
@@ -138,11 +142,35 @@ public class XbrlDockGuiMetaRoleTree extends JTree implements XbrlDockGuiConsts 
 		setModel(tm);
 	}
 
+	public Collection<String> getRoleTypes() {
+		return roleTypes;
+	}
+
+	public void setRoleType(String rt) {
+		if (!XbrlDockUtils.isEqual(rt, selRoleType)) {
+			this.selRoleType = rt;
+
+			tnRoot.children.clear();
+			for (ItemNode in : allRoleNodes) {
+				if ((null == selRoleType) || XbrlDockUtils.isEqual(in.item.get(XDC_GEN_TOKEN_type), selRoleType)) {
+					tnRoot.children.add(in);
+				}
+			}
+			
+			tm.reload();
+
+			invalidate();
+			repaint();
+		}
+	}
+
 	public void setTaxonomy(XbrlDockMetaContainer taxonomy) throws Exception {
 
 		this.taxonomy = taxonomy;
 
+		allRoleNodes.clear();
 		tnRoot.children.clear();
+		roleTypes.clear();
 
 		Map<String, ItemNode> roles = new TreeMap<>();
 
@@ -152,12 +180,21 @@ public class XbrlDockGuiMetaRoleTree extends JTree implements XbrlDockGuiConsts 
 				switch (action) {
 				case Process:
 					String roleName = l.get("xlink:role");
+					String roleType = l.get(XDC_GEN_TOKEN_type);
+
+					roleTypes.add(roleType);
+
 					ItemNode rn = XbrlDockUtils.safeGet(roles, roleName, new XbrlDockUtils.ItemCreator<ItemNode>() {
 						@Override
 						public ItemNode create(Object key, Object... hints) {
 							return new ItemNode((String) key, tnRoot, new ArrayList<Map<String, String>>());
 						}
 					});
+					
+					if ( null == rn.item ) {
+						rn.item = new TreeMap();
+						rn.item.put(XDC_GEN_TOKEN_type, roleType);
+					}
 
 					rn.roleLinks.add(l);
 
@@ -191,6 +228,7 @@ public class XbrlDockGuiMetaRoleTree extends JTree implements XbrlDockGuiConsts 
 			}
 
 			tnRoot.children.add(rn);
+			allRoleNodes.add(rn);
 		}
 
 		tm.reload();
