@@ -13,7 +13,7 @@ import com.xbrldock.XbrlDockException;
 
 @SuppressWarnings({ "rawtypes", "unchecked" })
 public interface XbrlDockUtilsConsts extends XbrlDockConsts {
-	
+
 	class CounterProcessor<ItemType> implements GenProcessor<ItemType> {
 		long begin;
 		long process;
@@ -21,7 +21,7 @@ public interface XbrlDockUtilsConsts extends XbrlDockConsts {
 
 		@Override
 		public boolean process(ItemType item, ProcessorAction action) throws Exception {
-			switch ( action ) {
+			switch (action) {
 			case Begin:
 				++begin;
 				break;
@@ -39,17 +39,17 @@ public interface XbrlDockUtilsConsts extends XbrlDockConsts {
 			}
 			return true;
 		}
-		
+
 		public long getCount() {
 			return process;
 		}
-		
+
 		public long getDepth() {
-			return begin-end;
+			return begin - end;
 		}
-		
+
 		public long getCount(ProcessorAction action) {
-			switch ( action ) {
+			switch (action) {
 			case Begin:
 				return begin;
 			case End:
@@ -60,7 +60,7 @@ public interface XbrlDockUtilsConsts extends XbrlDockConsts {
 				return 0;
 			}
 		}
-		
+
 	}
 
 	class ItemCreatorSimple<Type> implements ItemCreator<Type> {
@@ -82,29 +82,29 @@ public interface XbrlDockUtilsConsts extends XbrlDockConsts {
 	}
 
 	interface ObjectFormatter<ObType> {
-		public String toString(ObType ob);
+		public String toString(ObType value, Object root, Object... hints);
 	}
 
 	ObjectFormatter<Collection> FMT_COLL = new ObjectFormatter<Collection>() {
 		@Override
-		public String toString(Collection ob) {
-			int l = (null == ob) ? 0 : ob.size();
+		public String toString(Collection value, Object root, Object... hints) {
+			int l = (null == value) ? 0 : value.size();
 			return "[ " + l + " ]";
 		}
 	};
 
 	ObjectFormatter<Map> FMT_MAP = new ObjectFormatter<Map>() {
 		@Override
-		public String toString(Map ob) {
-			int l = (null == ob) ? 0 : ob.size();
+		public String toString(Map value, Object root, Object... hints) {
+			int l = (null == value) ? 0 : value.size();
 			return "{ " + l + " }";
 		}
 	};
 
 	ObjectFormatter<Object> FMT_TOHTML = new ObjectFormatter<Object>() {
 		@Override
-		public String toString(Object ob) {
-			return append(new StringBuilder(), "", ob).toString();
+		public String toString(Object value, Object root, Object... hints) {
+			return (null == value) ? "" : append(new StringBuilder(), "", value).toString();
 		}
 
 		StringBuilder append(StringBuilder sb, String indent, Object ob) {
@@ -115,7 +115,7 @@ public interface XbrlDockUtilsConsts extends XbrlDockConsts {
 
 				if (!map.isEmpty()) {
 					sb.append("<ul> \n");
-					
+
 					String i = indent + "  ";
 					for (Map.Entry<String, Object> e : map.entrySet()) {
 						sb.append(i).append("<li><b>").append(XbrlDockUtils.camel2Label(e.getKey())).append(":</b>  ");
@@ -168,7 +168,7 @@ public interface XbrlDockUtilsConsts extends XbrlDockConsts {
 
 		public <RetType> RetType get(Object from) {
 			Object ret = XbrlDockUtils.simpleGet(from, path);
-			return (RetType) ((null == fmt) ? (null == ret) ? defVal : ret : fmt.toString(ret));
+			return (RetType) ((null == fmt) ? (null == ret) ? defVal : ret : fmt.toString(ret, from, path));
 		}
 	}
 

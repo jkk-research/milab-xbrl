@@ -103,7 +103,7 @@ public class XbrlDockGuiMetaTaxonomyPanel extends JPanel implements XbrlDockGuiC
 	public Object process(String command, Object... params) throws Exception {
 		Object ret = null;
 		switch (command) {
-		case XDC_CMD_GEN_SELECT:
+		case XDC_CMD_GEN_SETMAIN:
 			showTaxonomy((String) params[1]);
 			break;
 		default:

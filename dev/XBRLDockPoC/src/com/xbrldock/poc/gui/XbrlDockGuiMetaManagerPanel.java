@@ -101,7 +101,7 @@ public class XbrlDockGuiMetaManagerPanel extends JPanel implements XbrlDockGuiCo
 	}
 
 	protected void updateDescPanel() {
-		String txt = (null == selItem) ? placeholder : FMT_TOHTML.toString(selItem);
+		String txt = (null == selItem) ? placeholder : FMT_TOHTML.toString(selItem, null);
 
 		int cp = txtInfo.getCaretPosition();
 

@@ -106,6 +106,17 @@ public class XbrlDockConnXbrlOrg implements XbrlDockConnXbrlOrgConsts, XbrlDockP
 		case XDC_CMD_GEN_GETCATALOG:
 			ret = catalog;
 			break;
+		case XDC_CMD_CONN_VISITREPORT:
+			String id = (String) params[0];
+			Map filingInfo = XbrlDockUtils.simpleGet(catalog, XDC_CONN_CAT_TOKEN_filings, id);
+			File fRep = getFiling(id);
+			
+			ReportFormatHandler fh = new XbrlDockFormatXhtml();
+			ReportDataHandler dh = (ReportDataHandler) params[1];
+			loadReport(fh, dh, filingInfo, fRep);
+
+			break;
+			
 		default:
 			XbrlDockException.wrap(null, "Unhandled agent command", command, params);
 			break;

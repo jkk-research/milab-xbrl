@@ -54,7 +54,6 @@ public class XbrlDockFormatXhtml implements XbrlDockFormatConsts, XbrlDockPocCon
 
 			String defLang = XbrlDockUtils.isEmpty(forcedLang) ? eHtml.getAttribute("xml:lang") : forcedLang;
 
-			
 			NodeList nl = eHtml.getElementsByTagName("*");
 			int nodeCount = nl.getLength();
 
@@ -64,7 +63,7 @@ public class XbrlDockFormatXhtml implements XbrlDockFormatConsts, XbrlDockPocCon
 			Map<String, Element> continuation = new TreeMap<>();
 //			ArrayList<String> schemas = new ArrayList<>();
 //			Map<String, String> namespaces = new TreeMap<>();
-			
+
 //			String repStart = null;
 //			String repEnd = null;
 
@@ -91,17 +90,17 @@ public class XbrlDockFormatXhtml implements XbrlDockFormatConsts, XbrlDockPocCon
 					if (XbrlDockUtils.isEmpty(sVal)) {
 						String cs = getInfo(e, "xbrli:startDate");
 						segmentData.put(XDC_FACT_TOKEN_startDate, cs);
-						
+
 //						if ( (null == repStart) || (0 > repStart.compareTo(sVal)) ) {
 //							repStart = sVal;
 //						}
-						
+
 						String ce = getInfo(e, "xbrli:endDate");
 						segmentData.put(XDC_FACT_TOKEN_endDate, ce);
 //						if ( (null == repEnd) || (0 < repEnd.compareTo(sVal)) ) {
 //							repEnd = sVal;
 //						}
-						
+
 //						dataHandler.addContextRange(cs, ce);
 
 					} else {
@@ -155,7 +154,7 @@ public class XbrlDockFormatXhtml implements XbrlDockFormatConsts, XbrlDockPocCon
 					break;
 				case "xbrli:unit":
 					segmentData.clear();
-					
+
 					segmentData.put(XDC_FACT_TOKEN_unit, e.getAttribute("id"));
 
 					sVal = getInfo(e, "xbrli:unitNumerator");
@@ -173,8 +172,7 @@ public class XbrlDockFormatXhtml implements XbrlDockFormatConsts, XbrlDockPocCon
 					break;
 				}
 			}
-			
-			
+
 			NamedNodeMap headAtts = eHtml.getAttributes();
 			for (int i = headAtts.getLength(); i-- > 0;) {
 				Node n = headAtts.item(i);
@@ -187,12 +185,12 @@ public class XbrlDockFormatXhtml implements XbrlDockFormatConsts, XbrlDockPocCon
 						String ref = attName.substring(si + 1);
 
 						dataHandler.addNamespace(ref, sVal);
-						
+
 //						namespaces.put(ref, sVal);
 					}
 				}
 			}
-			
+
 			for (int idx = 0; idx < nodeCount; ++idx) {
 				Element e = (Element) nl.item(idx);
 				String ctxId = e.getAttribute("contextRef");
@@ -200,7 +198,9 @@ public class XbrlDockFormatXhtml implements XbrlDockFormatConsts, XbrlDockPocCon
 				if (!XbrlDockUtils.isEmpty(ctxId)) {
 					segmentData.clear();
 
-					segmentData.put(XDC_EXT_TOKEN_id, e.getAttribute("id"));
+					segmentData.put(XDC_FACT_TOKEN_context, ctxId);
+					segmentData.put(XDC_FACT_TOKEN_unit, e.getAttribute("unitRef"));
+					segmentData.put(XDC_FACT_TOKEN_concept, e.getAttribute("name"));
 
 					String valOrig = e.getTextContent().trim();
 					String fmtCode = e.getAttribute("format");
@@ -253,8 +253,17 @@ public class XbrlDockFormatXhtml implements XbrlDockFormatConsts, XbrlDockPocCon
 							}
 						} while (!last);
 
-						segmentData.put(XDC_GEN_TOKEN_value, XbrlDockUtils.toString(merge));
-						segmentData.put(XDC_FACT_TOKEN_xbrldockFactType, XDC_FACT_VALTYPE_text);
+						String txtVal = XbrlDockUtils.toString(merge);
+						segmentData.put(XDC_GEN_TOKEN_value, txtVal);
+						if (txtVal.length() > XbrlDockFormatUtils.TXT_CLIP_LENGTH) {
+							segmentData.put(XDC_FACT_TOKEN_xbrldockFactType, XDC_FACT_VALTYPE_text);
+							String id = dataHandler.processSegment(XDC_REP_SEG_Fact, segmentData);
+							segmentData.put(XDC_EXT_TOKEN_id, id);
+							segmentData.put(XDC_GEN_TOKEN_value, txtVal.substring( XbrlDockFormatUtils.TXT_CLIP_LENGTH - 3) + "...");
+							segmentData.put(XDC_FACT_TOKEN_xbrldockFactType, XDC_FACT_VALTYPE_textClip);
+						} else {
+							segmentData.put(XDC_FACT_TOKEN_xbrldockFactType, XDC_FACT_VALTYPE_string);
+						}
 					}
 
 					dataHandler.processSegment(XDC_REP_SEG_Fact, segmentData);

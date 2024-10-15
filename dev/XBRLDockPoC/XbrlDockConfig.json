@@ -45,6 +45,10 @@
           "metaManager" : {
             "javaClass" : "com.xbrldock.poc.gui.XbrlDockGuiMetaTaxonomyPanel",
             "name" : "XBRLDock PoC Taxonomy Viewer - "
+          },
+          "esefConn" : {
+            "javaClass" : "com.xbrldock.poc.gui.XbrlDockGuiReportPanel",
+            "name" : "XBRLDock PoC Report Viewer - "
           }
         }
       }

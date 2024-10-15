@@ -17,7 +17,7 @@ import com.xbrldock.utils.XbrlDockUtilsJson;
 import com.xbrldock.utils.XbrlDockUtilsNet;
 import com.xbrldock.utils.XbrlDockUtilsXml;
 
-@SuppressWarnings({ "rawtypes", "unchecked" })
+@SuppressWarnings({ "rawtypes" })
 public class XbrlDockTaxonomyManager implements XbrlDockMetaConsts, XbrlDockConsts.GenAgent {
 
 	File taxonomyStoreRoot;

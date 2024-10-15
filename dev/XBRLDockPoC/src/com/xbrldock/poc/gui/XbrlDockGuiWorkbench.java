@@ -157,7 +157,7 @@ public class XbrlDockGuiWorkbench extends JFrame implements XbrlDockGuiConsts, X
 				JComponent mainPanel = n.getComp(cfg);
 
 				if (mainPanel instanceof GenAgent) {
-					((GenAgent) mainPanel).process(XDC_CMD_GEN_SELECT, hints);
+					((GenAgent) mainPanel).process(XDC_CMD_GEN_SETMAIN, hints);
 				}
 				n.frm = new ChildFrame((String) cfg.get(XDC_EXT_TOKEN_name), n, mainPanel);
 				return n;

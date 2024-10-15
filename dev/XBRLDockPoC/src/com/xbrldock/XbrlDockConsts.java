@@ -86,6 +86,7 @@ public interface XbrlDockConsts {
 			
 	String XDC_FACT_VALTYPE_number = "number";
 	String XDC_FACT_VALTYPE_string = "string";
+	String XDC_FACT_VALTYPE_textClip = "textClip";
 	String XDC_FACT_VALTYPE_text = "text";
 	String XDC_FACT_VALTYPE_date = "date";
 	String XDC_FACT_VALTYPE_bool = "bool";

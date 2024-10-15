@@ -3,7 +3,6 @@ package com.xbrldock.poc;
 import java.io.File;
 
 import com.xbrldock.XbrlDock;
-import com.xbrldock.XbrlDockException;
 import com.xbrldock.poc.meta.XbrlDockMetaContainer;
 import com.xbrldock.poc.meta.XbrlDockMetaManager;
 import com.xbrldock.utils.XbrlDockUtils;

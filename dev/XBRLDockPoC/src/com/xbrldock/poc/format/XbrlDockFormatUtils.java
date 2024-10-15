@@ -6,6 +6,8 @@ import com.xbrldock.utils.XbrlDockUtils;
 
 public class XbrlDockFormatUtils implements XbrlDockFormatConsts {
 	
+	public static int TXT_CLIP_LENGTH = 100;
+	
 	public static boolean canBeXbrl(File f) {
 		return f.isFile() && canBeXbrl(f.getName());
 	}
