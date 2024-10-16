@@ -19,6 +19,7 @@ public interface XbrlDockPocConsts extends XbrlDockConsts, XbrlDockUtilsConsts {
 	String XDC_CMD_GEN_SETMAIN = "setMain";
 	String XDC_CMD_GEN_SELECT = "select";
 	String XDC_CMD_GEN_ACTIVATE = "activate";
+	String XDC_CMD_GEN_FILTER = "filter";
 
 	String XDC_CMD_CONN_VISITREPORT = "visitReport";
 

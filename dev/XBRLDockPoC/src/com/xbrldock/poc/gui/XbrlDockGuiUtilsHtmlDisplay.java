@@ -6,8 +6,7 @@ import javax.swing.JScrollPane;
 
 import com.xbrldock.utils.XbrlDockUtils;
 
-public class XbrlDockGuiUtilsHtmlDisplay extends JEditorPane implements XbrlDockGuiConsts.ComponentWrapper<JComponent>, XbrlDockGuiConsts {
-	private static final long serialVersionUID = 1L;
+public class XbrlDockGuiUtilsHtmlDisplay implements XbrlDockGuiConsts.ComponentWrapper<JComponent>, XbrlDockGuiConsts {
 	
 	String placeholder;
 	JEditorPane txtInfo;

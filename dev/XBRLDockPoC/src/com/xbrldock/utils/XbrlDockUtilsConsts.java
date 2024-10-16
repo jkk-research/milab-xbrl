@@ -7,6 +7,7 @@ import java.util.HashSet;
 import java.util.Map;
 import java.util.Set;
 import java.util.TreeMap;
+import java.util.TreeSet;
 
 import com.xbrldock.XbrlDockConsts;
 import com.xbrldock.XbrlDockException;
@@ -175,6 +176,7 @@ public interface XbrlDockUtilsConsts extends XbrlDockConsts {
 	ItemCreator<Map> MAP_CREATOR = new ItemCreatorSimple<>(HashMap.class);
 	ItemCreator<Map> SORTEDMAP_CREATOR = new ItemCreatorSimple<>(TreeMap.class);
 	ItemCreator<Set> SET_CREATOR = new ItemCreatorSimple<>(HashSet.class);
+	ItemCreator<Set> SORTEDSET_CREATOR = new ItemCreatorSimple<>(TreeSet.class);
 	ItemCreator<ArrayList> ARRAY_CREATOR = new ItemCreatorSimple<>(ArrayList.class);
 
 }

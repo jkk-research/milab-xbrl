@@ -16,7 +16,7 @@ import javax.swing.table.AbstractTableModel;
 
 import com.xbrldock.XbrlDockException;
 
-@SuppressWarnings("rawtypes")
+@SuppressWarnings({ "rawtypes", "unchecked"})
 public class XbrlDockGuiUtilsGrid implements XbrlDockGuiConsts.ComponentWrapper<JComponent>, XbrlDockGuiConsts {
 
 	class GridModel extends AbstractTableModel {
@@ -49,7 +49,7 @@ public class XbrlDockGuiUtilsGrid implements XbrlDockGuiConsts.ComponentWrapper<
 		public Object getValueAt(int rowIndex, int columnIndex) {
 			if (showRowNum) {
 				if (0 == columnIndex) {
-					return rowIndex;
+					return rowIndex + 1;
 				}
 				--columnIndex;
 			}
@@ -118,7 +118,7 @@ public class XbrlDockGuiUtilsGrid implements XbrlDockGuiConsts.ComponentWrapper<
 		}
 	}
 
-	public void updateItems(boolean clear, GenProcessor<ArrayList> loader) {
+	public void updateItems(boolean clear, GenProcessor loader) {
 		if (clear) {
 			items.clear();
 		}

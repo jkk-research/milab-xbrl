@@ -156,7 +156,7 @@ public class XbrlDockGuiMetaRoleTree extends JTree implements XbrlDockGuiConsts 
 					tnRoot.children.add(in);
 				}
 			}
-			
+
 			tm.reload();
 
 			invalidate();
@@ -190,8 +190,8 @@ public class XbrlDockGuiMetaRoleTree extends JTree implements XbrlDockGuiConsts 
 							return new ItemNode((String) key, tnRoot, new ArrayList<Map<String, String>>());
 						}
 					});
-					
-					if ( null == rn.item ) {
+
+					if (null == rn.item) {
 						rn.item = new TreeMap();
 						rn.item.put(XDC_GEN_TOKEN_type, roleType);
 					}
@@ -240,9 +240,12 @@ public class XbrlDockGuiMetaRoleTree extends JTree implements XbrlDockGuiConsts 
 	public Collection<String> getRelatedItems() {
 		Set<String> items = new TreeSet<>();
 
-		for (TreePath tp : getSelectionPaths()) {
-			ItemNode n = (ItemNode) tp.getLastPathComponent();
-			n.collectChildren(items);
+		TreePath[] sp = getSelectionPaths();
+		if (null != sp) {
+			for (TreePath tp : sp) {
+				ItemNode n = (ItemNode) tp.getLastPathComponent();
+				n.collectChildren(items);
+			}
 		}
 
 		return items;

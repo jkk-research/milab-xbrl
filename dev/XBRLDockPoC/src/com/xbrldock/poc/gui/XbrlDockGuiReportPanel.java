@@ -2,18 +2,19 @@ package com.xbrldock.poc.gui;
 
 import java.awt.BorderLayout;
 import java.util.ArrayList;
+import java.util.Enumeration;
+import java.util.HashSet;
 import java.util.Map;
 import java.util.Set;
 import java.util.TreeMap;
 import java.util.TreeSet;
 
 import javax.swing.JPanel;
-import javax.swing.JScrollPane;
-import javax.swing.JTree;
 import javax.swing.event.TreeSelectionEvent;
 import javax.swing.event.TreeSelectionListener;
 import javax.swing.tree.DefaultMutableTreeNode;
-import javax.swing.tree.DefaultTreeModel;
+import javax.swing.tree.TreeNode;
+import javax.swing.tree.TreePath;
 import javax.swing.tree.TreeSelectionModel;
 
 import com.xbrldock.XbrlDock;
@@ -51,12 +52,88 @@ public class XbrlDockGuiReportPanel extends JPanel implements XbrlDockGuiConsts,
 	);
 //@formatter:on
 
-	DefaultMutableTreeNode ctxRoot;
-	DefaultTreeModel ctxModel;
-	JTree ctxTree;
+	GenProcessor ctxTreeLoader = new GenProcessor() {
+		DefaultMutableTreeNode lastHead = null;
+
+		@Override
+		public boolean process(Object item, ProcessorAction action) throws Exception {
+			if (action == ProcessorAction.Process) {
+				for (String hKey : ctxHierarchy.keySet()) {
+					DefaultMutableTreeNode n = new DefaultMutableTreeNode(hKey);
+					int sep = hKey.indexOf(":");
+
+					if (-1 == sep) {
+						((DefaultMutableTreeNode) item).add(n);
+						lastHead = n;
+					} else {
+						lastHead.add(n);
+					}
+				}
+			}
+			return true;
+		}
+	};
+
+	TreeSelectionListener ctxTreeSelListener = new TreeSelectionListener() {
+		@Override
+		public void valueChanged(TreeSelectionEvent e) {
+			Object sel = ((TreeSelectionModel) e.getSource()).getSelectionPath().getLastPathComponent();
+			if (sel instanceof DefaultMutableTreeNode) {
+				ctxFilter = ctxHierarchy.get(((DefaultMutableTreeNode) sel).getUserObject());
+			} else {
+				ctxFilter = null;
+			}
+			updateFactGrid();
+		}
+	};
+
+	XbrlDockGuiUtilsTree ctxTree = new XbrlDockGuiUtilsTree(CTX_ROOT, true, TreeSelectionModel.SINGLE_TREE_SELECTION, ctxTreeSelListener);
+
+	GenProcessor conceptTreeLoader = new GenProcessor<DefaultMutableTreeNode>() {
+		@Override
+		public boolean process(DefaultMutableTreeNode item, ProcessorAction action) throws Exception {
+			if (action == ProcessorAction.Process) {
+				for (Map.Entry<String, Set> ec : conceptHierarchy.entrySet()) {
+					DefaultMutableTreeNode n = new DefaultMutableTreeNode(namespaces.get(ec.getKey()));
+					item.add(n);
+					for (Object o : ec.getValue()) {
+						n.add(new DefaultMutableTreeNode(o));
+					}
+				}
+			}
+			return true;
+		}
+	};
+
+	TreeSelectionListener conceptTreeSelListener = new TreeSelectionListener() {
+		@Override
+		public void valueChanged(TreeSelectionEvent e) {
+			conceptFilter.clear();
+
+			for (TreePath tp : ((TreeSelectionModel) e.getSource()).getSelectionPaths()) {
+				Object sel = tp.getLastPathComponent();
+				if (sel instanceof DefaultMutableTreeNode) {
+					addNodeRec((DefaultMutableTreeNode) sel);
+				}
+			}
+			updateFactGrid();
+		}
+
+		private void addNodeRec(DefaultMutableTreeNode sel) {
+			conceptFilter.add(sel.getUserObject());
+			for (Enumeration<TreeNode> ce = sel.children(); ce.hasMoreElements();) {
+				addNodeRec((DefaultMutableTreeNode) ce.nextElement());
+			}
+		}
+	};
+
+	XbrlDockGuiUtilsTree conceptTree = new XbrlDockGuiUtilsTree("", false, TreeSelectionModel.DISCONTIGUOUS_TREE_SELECTION, conceptTreeSelListener);
 
 	Map<String, Set> ctxHierarchy = new TreeMap<>();
 	Set ctxFilter;
+
+	Map<String, Set> conceptHierarchy = new TreeMap<>();
+	Set conceptFilter = new HashSet();
 
 	ArrayList<Map> facts = new ArrayList();
 	ArrayList<Map> txts = new ArrayList();
@@ -132,6 +209,12 @@ public class XbrlDockGuiReportPanel extends JPanel implements XbrlDockGuiConsts,
 				} else {
 					facts.add(cloneData);
 				}
+
+				String concept = XbrlDockUtils.simpleGet(data, XDC_FACT_TOKEN_concept);
+				int sep = concept.indexOf(":");
+
+				XbrlDockUtils.safeGet(conceptHierarchy, concept.substring(0, sep), SORTEDSET_CREATOR).add(concept);
+
 				break;
 			}
 
@@ -148,29 +231,11 @@ public class XbrlDockGuiReportPanel extends JPanel implements XbrlDockGuiConsts,
 	public XbrlDockGuiReportPanel() throws Exception {
 		super(new BorderLayout());
 
-		ctxRoot = new DefaultMutableTreeNode(CTX_ROOT);
-		ctxModel = new DefaultTreeModel(ctxRoot);
-		ctxTree = new JTree(ctxModel);
-		ctxTree.setRootVisible(true);
-
-		TreeSelectionModel tsm = ctxTree.getSelectionModel();
-		tsm.setSelectionMode(TreeSelectionModel.SINGLE_TREE_SELECTION);
-
-		tsm.addTreeSelectionListener(new TreeSelectionListener() {
-			@Override
-			public void valueChanged(TreeSelectionEvent e) {
-				Object sel = ctxTree.getSelectionPath().getLastPathComponent();
-				if ( sel instanceof DefaultMutableTreeNode ) {
-					ctxFilter = ctxHierarchy.get(((DefaultMutableTreeNode)sel).getUserObject());
-				} else {
-					ctxFilter = null;
-				}
-				updateFactGrid();
-			}
-		});
-
 		factGrid.setShowRowNum(true);
-		add(XbrlDockUtilsGui.createSplit(true, new JScrollPane(ctxTree), factGrid.getComp(), 0.2), BorderLayout.CENTER);
+		JPanel pnlLeft = new JPanel(new BorderLayout());
+
+		pnlLeft.add(XbrlDockUtilsGui.createSplit(false, conceptTree.getComp(), ctxTree.getComp(), 0.4), BorderLayout.CENTER);
+		add(XbrlDockUtilsGui.createSplit(true, pnlLeft, factGrid.getComp(), 0.2), BorderLayout.CENTER);
 	}
 
 	@Override
@@ -188,24 +253,10 @@ public class XbrlDockGuiReportPanel extends JPanel implements XbrlDockGuiConsts,
 
 			XbrlDock.callAgent(XDC_CFGTOKEN_AGENT_esefConn, XDC_CMD_CONN_VISITREPORT, params[1], dh);
 
+			ctxTree.updateItems(true, ctxTreeLoader);
+			conceptTree.updateItems(true, conceptTreeLoader);
+
 			updateFactGrid();
-
-			DefaultMutableTreeNode lastHead = null;
-
-			ctxRoot.removeAllChildren();
-			for (String hKey : ctxHierarchy.keySet()) {
-				DefaultMutableTreeNode n = new DefaultMutableTreeNode(hKey);
-				int sep = hKey.indexOf(":");
-
-				if (-1 == sep) {
-					ctxRoot.add(n);
-					lastHead = n;
-				} else {
-					lastHead.add(n);
-				}
-			}
-
-			ctxModel.reload();
 
 			break;
 		default:
@@ -222,8 +273,12 @@ public class XbrlDockGuiReportPanel extends JPanel implements XbrlDockGuiConsts,
 			@Override
 			public boolean process(ArrayList items, ProcessorAction action) throws Exception {
 				for (Object f : facts) {
-					if ((null == ctxFilter) || ctxFilter.contains(XbrlDockUtils.simpleGet(f, XDC_FACT_TOKEN_context))) {
-						items.add(f);
+					Object ctx = XbrlDockUtils.simpleGet(f, XDC_FACT_TOKEN_context);
+					if ((null == ctxFilter) || ctxFilter.contains(ctx)) {
+						Object concept = XbrlDockUtils.simpleGet(f, XDC_FACT_TOKEN_concept);
+						if (conceptFilter.isEmpty() || conceptFilter.contains(concept)) {
+							items.add(f);
+						}
 					}
 				}
 				return true;

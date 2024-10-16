@@ -1,10 +1,15 @@
 package com.xbrldock.poc.gui;
 
 import java.awt.BorderLayout;
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
 import java.util.ArrayList;
 import java.util.Map;
 
+import javax.swing.JButton;
 import javax.swing.JPanel;
+import javax.swing.JScrollPane;
+import javax.swing.JTextArea;
 
 import com.xbrldock.XbrlDock;
 import com.xbrldock.XbrlDockConsts.GenAgent;
@@ -12,8 +17,9 @@ import com.xbrldock.XbrlDockException;
 import com.xbrldock.poc.conn.xbrlorg.XbrlDockConnXbrlOrgConsts;
 import com.xbrldock.utils.XbrlDockUtils;
 import com.xbrldock.utils.XbrlDockUtilsGui;
+import com.xbrldock.utils.XbrlDockUtilsMvel;
 
-@SuppressWarnings({ "rawtypes", "unchecked"})
+@SuppressWarnings({ "rawtypes", "unchecked" })
 public class XbrlDockGuiConnectorEsefPanel extends JPanel implements XbrlDockGuiConsts, XbrlDockConnXbrlOrgConsts, GenAgent {
 	private static final long serialVersionUID = 1L;
 
@@ -27,14 +33,55 @@ public class XbrlDockGuiConnectorEsefPanel extends JPanel implements XbrlDockGui
 	);
 //@formatter:on
 
+	Map metaCatalog;
+
+	JTextArea taFilter;
+	JButton btFilter;
+
+	String filter;
+	Object mvelFilter;
+
 	XbrlDockGuiUtilsHtmlDisplay repInfo;
+
+	ActionListener al = new ActionListener() {
+
+		@Override
+		public void actionPerformed(ActionEvent e) {
+			String cmd = e.getActionCommand();
+
+			switch (cmd) {
+			case XDC_CMD_GEN_FILTER:
+				String txt = taFilter.getText().trim();
+				if (!XbrlDockUtils.isEqual(txt, filter)) {
+					filter = txt;
+					mvelFilter = XbrlDockUtils.isEmpty(filter) ? null : XbrlDockUtilsMvel.compile(filter);
+
+					updateReportGrid();
+				}
+				break;
+			default:
+				XbrlDockException.wrap(null, "Unknown command", cmd);
+				break;
+			}
+		}
+	};
 
 	public XbrlDockGuiConnectorEsefPanel() throws Exception {
 		super(new BorderLayout());
 
 		repInfo = new XbrlDockGuiUtilsHtmlDisplay();
+
+		taFilter = new JTextArea();
+		btFilter = XbrlDockGuiUtils.createBtn(XDC_CMD_GEN_FILTER, al, JButton.class);
+
+		JPanel pnlFilter = new JPanel(new BorderLayout());
+		pnlFilter.add(XbrlDockGuiUtils.setTitle(new JScrollPane(taFilter), "Filter report list"), BorderLayout.CENTER);
+		pnlFilter.add(btFilter, BorderLayout.EAST);
+
+		JPanel pnlTop = new JPanel(new BorderLayout());
+		pnlTop.add(XbrlDockUtilsGui.createSplit(false, pnlFilter, XbrlDockGuiUtils.setTitle(reportGrid, "Reports"), 0.2), BorderLayout.CENTER);
 		
-		add(XbrlDockUtilsGui.createSplit(false, reportGrid.getComp(), repInfo.getComp(), 0.2), BorderLayout.CENTER);
+		add(XbrlDockUtilsGui.createSplit(false, pnlTop, XbrlDockGuiUtils.setTitle(repInfo, "Selected report information"), 0.2), BorderLayout.CENTER);
 	}
 
 	protected void updateDescPanel(Object selItem) {
@@ -43,26 +90,33 @@ public class XbrlDockGuiConnectorEsefPanel extends JPanel implements XbrlDockGui
 
 	@Override
 	public void initModule(Map config) throws Exception {
-		Map metaCatalog = XbrlDock.callAgent(XDC_CFGTOKEN_AGENT_esefConn, XDC_CMD_GEN_GETCATALOG);
+		metaCatalog = XbrlDock.callAgent(XDC_CFGTOKEN_AGENT_esefConn, XDC_CMD_GEN_GETCATALOG);
 		repInfo.setPlaceholder(XbrlDockUtils.simpleGet(config, XDC_GEN_TOKEN_placeholder));
-		
+
+		updateReportGrid();
+
+		updateDescPanel(null);
+	}
+
+	private void updateReportGrid() {
 		reportGrid.updateItems(true, new GenProcessor<ArrayList>() {
 			@Override
 			public boolean process(ArrayList items, ProcessorAction action) throws Exception {
 				for (Object rep : ((Map) XbrlDockUtils.simpleGet(metaCatalog, XDC_CONN_CAT_TOKEN_filings)).values()) {
-					items.add(rep);
+
+					if ((null == mvelFilter) || (Boolean) XbrlDockUtilsMvel.evalCompiled(mvelFilter, rep)) {
+						items.add(rep);
+					}
 				}
 				return true;
 			}
 		});
-		
-		updateDescPanel(null);
 	}
 
 	@Override
 	public Object process(String command, Object... params) throws Exception {
 		Object ret = null;
-		
+
 		switch (command) {
 		case XDC_CMD_GEN_SELECT:
 			updateDescPanel(params[0]);
@@ -75,7 +129,7 @@ public class XbrlDockGuiConnectorEsefPanel extends JPanel implements XbrlDockGui
 			XbrlDockException.wrap(null, "Unhandled agent command", command, params);
 			break;
 		}
-		
+
 		return ret;
 
 	}
