@@ -5,9 +5,9 @@ import java.io.FileFilter;
 import java.io.IOException;
 import java.io.OutputStream;
 import java.nio.file.Files;
+import java.util.Collection;
 import java.util.Enumeration;
 import java.util.HashSet;
-import java.util.Iterator;
 import java.util.Set;
 
 import org.apache.commons.compress.archivers.zip.ZipArchiveEntry;
@@ -15,6 +15,17 @@ import org.apache.commons.compress.archivers.zip.ZipFile;
 import org.apache.commons.compress.utils.IOUtils;
 
 public class XbrlDockUtilsFile implements XbrlDockUtilsConsts {
+	
+	public static boolean storeRelativePath(File root, File f, Object target, Object ... keyPath) throws IOException {
+		if (null != f) {
+			String path = f.getCanonicalPath().substring(root.getCanonicalPath().length() + 1);
+			XbrlDockUtils.simpleSet(target, path, keyPath);
+			return true;
+		} else {
+			return false;
+		}
+	}
+
 	public interface FileProcessor extends GenProcessor<File> {
 	}
 	
@@ -41,8 +52,8 @@ public class XbrlDockUtilsFile implements XbrlDockUtilsConsts {
 			return ret;
 		}
 		
-		public Iterator<File> getFound() {
-			return found.iterator();
+		public Collection<File> getFound() {
+			return found;
 		}
 	};
 	

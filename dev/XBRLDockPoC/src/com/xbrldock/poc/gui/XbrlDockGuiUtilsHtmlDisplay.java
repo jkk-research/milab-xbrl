@@ -33,7 +33,13 @@ public class XbrlDockGuiUtilsHtmlDisplay implements XbrlDockGuiConsts.ComponentW
 		String content = XbrlDockUtils.isEmpty(txt) ? placeholder : txt;
 
 		int cp = txtInfo.getCaretPosition();
+		
+		if ( cp > txt.length() ) {
+			cp = txt.length();
+		}
 
+//		XbrlDock.log(EventLevel.Trace, "Text area caret position", cp);
+		
 		txtInfo.setText("<html><body>" + content + "</body></html>");
 
 		txtInfo.setCaretPosition(cp);

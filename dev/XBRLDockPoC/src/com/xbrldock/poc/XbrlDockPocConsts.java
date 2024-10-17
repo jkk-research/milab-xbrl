@@ -20,6 +20,7 @@ public interface XbrlDockPocConsts extends XbrlDockConsts, XbrlDockUtilsConsts {
 	String XDC_CMD_GEN_SELECT = "select";
 	String XDC_CMD_GEN_ACTIVATE = "activate";
 	String XDC_CMD_GEN_FILTER = "filter";
+	String XDC_CMD_GEN_TEST01 = "test01";
 
 	String XDC_CMD_CONN_VISITREPORT = "visitReport";
 
@@ -56,12 +57,12 @@ public interface XbrlDockPocConsts extends XbrlDockConsts, XbrlDockUtilsConsts {
 
 	
 	String XDC_FNAME_METAINF = "META-INF";
-	String XDC_FNAME_REPORTS = "reports";
+	String XDC_FNAME_FILINGREPORTS = "reports";
 	
 	String XDC_FNAME_METACATALOG = "metaCatalog.json";
 	
-	String XDC_FNAME_CATALOG = "catalog.xml";
-	String XDC_FNAME_TAXPACK = "taxonomyPackage.xml";
+	String XDC_FNAME_FILINGCATALOG = "catalog.xml";
+	String XDC_FNAME_FILINGTAXPACK = "taxonomyPackage.xml";
 
 	
 	public interface XDModSourceConnector extends GenAgent {

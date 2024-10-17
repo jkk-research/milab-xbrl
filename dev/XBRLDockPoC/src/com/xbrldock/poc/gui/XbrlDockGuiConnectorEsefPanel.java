@@ -14,6 +14,7 @@ import javax.swing.JTextArea;
 import com.xbrldock.XbrlDock;
 import com.xbrldock.XbrlDockConsts.GenAgent;
 import com.xbrldock.XbrlDockException;
+import com.xbrldock.dev.XbrlDockDevReportStats;
 import com.xbrldock.poc.conn.xbrlorg.XbrlDockConnXbrlOrgConsts;
 import com.xbrldock.utils.XbrlDockUtils;
 import com.xbrldock.utils.XbrlDockUtilsGui;
@@ -59,6 +60,12 @@ public class XbrlDockGuiConnectorEsefPanel extends JPanel implements XbrlDockGui
 					updateReportGrid();
 				}
 				break;
+			case XDC_CMD_GEN_TEST01:
+				XbrlDockDevReportStats stats = new XbrlDockDevReportStats();
+				XbrlDock.callAgent(XDC_CFGTOKEN_AGENT_esefConn, XDC_CMD_GEN_TEST01, stats);
+				
+				XbrlDock.log(EventLevel.Info, "Test visit sats", stats);
+				break;
 			default:
 				XbrlDockException.wrap(null, "Unknown command", cmd);
 				break;
@@ -77,6 +84,9 @@ public class XbrlDockGuiConnectorEsefPanel extends JPanel implements XbrlDockGui
 		JPanel pnlFilter = new JPanel(new BorderLayout());
 		pnlFilter.add(XbrlDockGuiUtils.setTitle(new JScrollPane(taFilter), "Filter report list"), BorderLayout.CENTER);
 		pnlFilter.add(btFilter, BorderLayout.EAST);
+		
+		pnlFilter.add(XbrlDockGuiUtils.createBtn(XDC_CMD_GEN_TEST01, al, JButton.class), BorderLayout.WEST);
+
 
 		JPanel pnlTop = new JPanel(new BorderLayout());
 		pnlTop.add(XbrlDockUtilsGui.createSplit(false, pnlFilter, XbrlDockGuiUtils.setTitle(reportGrid, "Reports"), 0.2), BorderLayout.CENTER);

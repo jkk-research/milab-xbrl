@@ -103,7 +103,7 @@ public class XbrlDockPocApp extends XbrlDock implements XbrlDockPocConsts {
 			@Override
 			public boolean process(File f, ProcessorAction action) {
 				if ((action == ProcessorAction.Begin) && XbrlDockUtils.isEqual(XDC_FNAME_METAINF, f.getName())) {
-					if (new File(f, XDC_FNAME_CATALOG).isFile()) {
+					if (new File(f, XDC_FNAME_FILINGCATALOG).isFile()) {
 //						XbrlDock.log(EventLevel.Trace, "MIF found", f.getPath());
 
 						try {

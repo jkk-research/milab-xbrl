@@ -47,7 +47,7 @@ public class XbrlDockPocUtils extends XbrlDockUtils implements XbrlDockPocConsts
 		NodeList nl;
 		int nc;
 
-		File fCat = new File(fMetaInf, XDC_FNAME_CATALOG);
+		File fCat = new File(fMetaInf, XDC_FNAME_FILINGCATALOG);
 		Element eCatalog = XbrlDockUtilsXml.parseDoc(fCat).getDocumentElement();
 
 		String base = eCatalog.getAttribute("xml:base");
@@ -73,7 +73,7 @@ public class XbrlDockPocUtils extends XbrlDockUtils implements XbrlDockPocConsts
 			}
 		}
 
-		File fTax = new File(fMetaInf, XDC_FNAME_TAXPACK);
+		File fTax = new File(fMetaInf, XDC_FNAME_FILINGTAXPACK);
 		Element eTaxPack = XbrlDockUtilsXml.parseDoc(fTax).getDocumentElement();
 
 		Set epRefs = new TreeSet();
