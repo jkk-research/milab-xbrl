@@ -130,7 +130,7 @@ public class XbrlDockGuiMetaItemInfoGrid extends JPanel implements XbrlDockGuiCo
 
 						taxonomy.visit(XDC_METATOKEN_labels, new GenProcessor<Map.Entry<String, Object>>() {
 							@Override
-							public boolean process(Map.Entry<String, Object> le, ProcessorAction action) throws Exception {
+							public boolean process(ProcessorAction action, Map.Entry<String, Object> le) throws Exception {
 								switch (action) {
 								case Process:
 									sbText.append("\t<tr><td>").append(le.getKey()).append("</td><td>").append(le.getValue()).append("</td></tr>\n");
@@ -171,7 +171,7 @@ public class XbrlDockGuiMetaItemInfoGrid extends JPanel implements XbrlDockGuiCo
 							boolean cont = false;
 
 							@Override
-							public boolean process(Map<String, Object> re, ProcessorAction action) throws Exception {
+							public boolean process(ProcessorAction action, Map<String, Object> re) throws Exception {
 								switch (action) {
 								case Begin:
 									sbRefs.append("<html><body><table>\n");
@@ -289,7 +289,7 @@ public class XbrlDockGuiMetaItemInfoGrid extends JPanel implements XbrlDockGuiCo
 
 		taxonomy.visit(XDC_METATOKEN_items, new GenProcessor<Map.Entry<String, Map>>() {
 			@Override
-			public boolean process(Map.Entry<String, Map> l, ProcessorAction action) throws Exception {
+			public boolean process(ProcessorAction action, Map.Entry<String, Map> l) throws Exception {
 				switch (action) {
 				case Process:
 					s.addAll(l.getValue().keySet());

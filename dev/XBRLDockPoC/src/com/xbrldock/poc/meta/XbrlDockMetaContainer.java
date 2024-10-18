@@ -279,15 +279,15 @@ public class XbrlDockMetaContainer implements XbrlDockMetaConsts {
 
 			visit(XDC_METATOKEN_items, cnt);
 			metaInfo.put(XDC_METATOKEN_items, cnt.getCount());
-			cnt.process(null, ProcessorAction.Init);
+			cnt.process(ProcessorAction.Init, null);
 
 			visit(XDC_METATOKEN_links, cnt);
 			metaInfo.put(XDC_METATOKEN_links, cnt.getCount());
-			cnt.process(null, ProcessorAction.Init);
+			cnt.process(ProcessorAction.Init, null);
 
 			visit(XDC_METATOKEN_references, cnt);
 			metaInfo.put(XDC_METATOKEN_references, cnt.getCount());
-			cnt.process(null, ProcessorAction.Init);
+			cnt.process(ProcessorAction.Init, null);
 
 			XbrlDockUtilsJson.writeJson(new File(fDir, XDC_TAXONOMYHEAD_FNAME), metaInfo);
 			XbrlDockUtilsJson.writeJson(new File(fDir, XDC_TAXONOMYDATA_FNAME), contentByURL);
@@ -372,11 +372,11 @@ public class XbrlDockMetaContainer implements XbrlDockMetaConsts {
 				for (Map ce : contentByURL.values()) {
 					m = (Map) ce.getOrDefault(itemType, Collections.EMPTY_MAP);
 					if ((null != m) && !m.isEmpty()) {
-						lp.process(null, ProcessorAction.Begin);
+						lp.process(ProcessorAction.Begin, null);
 						for (Object e : m.entrySet()) {
-							lp.process(e, ProcessorAction.Process);
+							lp.process(ProcessorAction.Process, e);
 						}
-						lp.process(null, ProcessorAction.End);
+						lp.process(ProcessorAction.End, null);
 					}
 				}
 				break;
@@ -384,22 +384,22 @@ public class XbrlDockMetaContainer implements XbrlDockMetaConsts {
 				for (Map ce : contentByURL.values()) {
 					c = (Collection) ce.getOrDefault(itemType, Collections.EMPTY_LIST);
 					if ((null != c) && !c.isEmpty()) {
-						lp.process(null, ProcessorAction.Begin);
+						lp.process(ProcessorAction.Begin, null);
 						for (Object e : c) {
-							lp.process(e, ProcessorAction.Process);
+							lp.process(ProcessorAction.Process, e);
 						}
-						lp.process(null, ProcessorAction.End);
+						lp.process(ProcessorAction.End, null);
 					}
 				}
 				break;
 			case XDC_METATOKEN_references:
 				c = (Collection) references.getOrDefault(itemType, Collections.EMPTY_LIST);
 				if ((null != c) && !c.isEmpty()) {
-					lp.process(null, ProcessorAction.Begin);
+					lp.process(ProcessorAction.Begin, null);
 					for (Object e : c) {
-						lp.process(e, ProcessorAction.Process);
+						lp.process(ProcessorAction.Process, e);
 					}
-					lp.process(null, ProcessorAction.End);
+					lp.process(ProcessorAction.End, null);
 				}
 				break;
 			case XDC_METATOKEN_refLinks:
@@ -407,11 +407,11 @@ public class XbrlDockMetaContainer implements XbrlDockMetaConsts {
 				if ((null != m) && !m.isEmpty()) {
 					for (Object e : m.entrySet()) {
 						Map.Entry me = (Map.Entry) e;
-						lp.process(me.getKey(), ProcessorAction.Begin);
+						lp.process(ProcessorAction.Begin, me.getKey());
 						for (Object v : (Collection) me.getValue()) {
-							lp.process(v, ProcessorAction.Process);
+							lp.process(ProcessorAction.Process, v);
 						}
-						lp.process(e, ProcessorAction.End);
+						lp.process(ProcessorAction.End, e);
 					}
 				}
 
@@ -424,11 +424,11 @@ public class XbrlDockMetaContainer implements XbrlDockMetaConsts {
 			}
 
 			if ((null != m) && !m.isEmpty()) {
-				lp.process(null, ProcessorAction.Begin);
+				lp.process(ProcessorAction.Begin, null);
 				for (Object e : m.entrySet()) {
-					lp.process(e, ProcessorAction.Process);
+					lp.process(ProcessorAction.Process, e);
 				}
-				lp.process(null, ProcessorAction.End);
+				lp.process(ProcessorAction.End, null);
 			}
 
 		} catch (Throwable e) {

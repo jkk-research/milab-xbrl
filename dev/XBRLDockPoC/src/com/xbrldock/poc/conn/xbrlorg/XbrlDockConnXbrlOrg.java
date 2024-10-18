@@ -17,6 +17,7 @@ import com.xbrldock.XbrlDockException;
 import com.xbrldock.dev.XbrlDockDevCounter;
 import com.xbrldock.dev.XbrlDockDevMonitor;
 import com.xbrldock.poc.XbrlDockPocConsts;
+import com.xbrldock.poc.conn.XbrlDockConnReportLoader;
 import com.xbrldock.poc.conn.XbrlDockConnUtils;
 import com.xbrldock.poc.format.XbrlDockFormatUtils;
 import com.xbrldock.poc.format.XbrlDockFormatXhtml;
@@ -83,32 +84,42 @@ public class XbrlDockConnXbrlOrg implements XbrlDockConnXbrlOrgConsts, XbrlDockP
 			break;
 		case XDC_CMD_GEN_TEST01:
 			Map<String, Map> filings = XbrlDockUtils.simpleGet(catalog, XDC_CONN_CAT_TOKEN_filings);
-			
+
 			File fRoot = new File(dirInput, XDC_FNAME_CONNFILINGS);
 			Set<String> msgs = new TreeSet<>();
-			
+
 			XbrlDockDevMonitor mon = new XbrlDockDevMonitor("Report count", 100);
 			XbrlDockDevCounter cnt = new XbrlDockDevCounter("Visit errors", true);
-			
-			for ( Map.Entry<String, Map> fe : filings.entrySet() ) {
+
+			XbrlDockConnReportLoader dh = new XbrlDockConnReportLoader(dirStore);
+
+			for (Map.Entry<String, Map> fe : filings.entrySet()) {
 				mon.step();
 
 				String id = fe.getKey();
 				Map filingData = fe.getValue();
-				
-				File dir = XbrlDockConnUtils.getFilingDir(fRoot, true, filingData);
-				if ( dir.isDirectory() ) {
+
+				File dataDir = XbrlDockConnUtils.getFilingDir(dirStore, filingData, true, false);
+
+				if (new File(dataDir, XDC_FNAME_REPDATA).isFile()) {
+//					continue;
+				}
+
+				File dir = XbrlDockConnUtils.getFilingDir(fRoot, filingData, true, false);
+				if (dir.isDirectory()) {
 					msgs.clear();
 					File rep = XbrlDockConnUtils.findReportInFilingDir(dir, msgs);
-					
-					if ( (null != rep) && rep.isFile() ) {
-						if ( !msgs.isEmpty() ) {
+
+					if ((null != rep) && rep.isFile()) {
+						if (!msgs.isEmpty()) {
 							XbrlDock.log(EventLevel.Warning, "Report found", id, "with warnings", msgs);
 							cnt.add("Warning " + msgs);
 						}
-						
+
+						dh.setReportData(filingData);
+
 						ReportFormatHandler fh = new XbrlDockFormatXhtml();
-						ReportDataHandler dh = (ReportDataHandler) params[0];
+//						ReportDataHandler dh = (ReportDataHandler) params[0];
 						loadReport(fh, dh, filingData, rep);
 
 					} else {
@@ -120,19 +131,26 @@ public class XbrlDockConnXbrlOrg implements XbrlDockConnXbrlOrgConsts, XbrlDockP
 					cnt.add("Filing directory not found " + msgs);
 				}
 			}
-			
+
 			XbrlDock.log(EventLevel.Trace, "Visit complete", mon.getCount(), cnt);
-			
+
 			break;
 		case XDC_CMD_CONN_VISITREPORT:
 			String id = (String) params[0];
+			ReportDataHandler dhv = (ReportDataHandler) params[1];
+
 			Map filingInfo = XbrlDockUtils.simpleGet(catalog, XDC_CONN_CAT_TOKEN_filings, id);
-			File fRep = getFiling(id);
 
-			ReportFormatHandler fh = new XbrlDockFormatXhtml();
-			ReportDataHandler dh = (ReportDataHandler) params[1];
-			loadReport(fh, dh, filingInfo, fRep);
+			File dataDir = XbrlDockConnUtils.getFilingDir(dirStore, filingInfo, true, false);
+			File fRep = new File(dataDir, XDC_FNAME_REPDATA);
+			if (fRep.isFile()) {
+				XbrlDockConnReportLoader.readCsv(fRep, dhv);
+			} else {
+				fRep = getFiling(id);
 
+				ReportFormatHandler fh = new XbrlDockFormatXhtml();
+				loadReport(fh, dhv, filingInfo, fRep);
+			}
 			break;
 
 		default:
@@ -182,18 +200,18 @@ public class XbrlDockConnXbrlOrg implements XbrlDockConnXbrlOrgConsts, XbrlDockP
 
 		Map<String, Map<String, Object>> filings = XbrlDockUtils.simpleGet(catalog, XDC_CONN_CAT_TOKEN_filings);
 
-		visitor.process(null, ProcessorAction.Begin);
+		visitor.process(ProcessorAction.Begin, null);
 
 		for (Map.Entry<String, Map<String, Object>> fe : filings.entrySet()) {
 			String k = fe.getKey();
 			Map<String, Object> fd = fe.getValue();
 
 			try {
-				if ((null == filter) || filter.process(fd, ProcessorAction.Process)) {
+				if ((null == filter) || filter.process(ProcessorAction.Process, fd)) {
 					if (pm.step()) {
 //						break;
 					}
-					boolean cont = visitor.process(fd, ProcessorAction.Process);
+					boolean cont = visitor.process(ProcessorAction.Process, fd);
 
 					if (!cont) {
 						break;
@@ -204,7 +222,7 @@ public class XbrlDockConnXbrlOrg implements XbrlDockConnXbrlOrgConsts, XbrlDockP
 			}
 		}
 
-		visitor.process(null, ProcessorAction.End);
+		visitor.process(ProcessorAction.End, null);
 	}
 
 	@Override
@@ -376,11 +394,11 @@ public class XbrlDockConnXbrlOrg implements XbrlDockConnXbrlOrgConsts, XbrlDockP
 		boolean metaOK = rf.check(fDir);
 
 		File fMetaInf = rf.getFile(XDC_FNAME_METAINF);
-		
+
 //		rf.process(null, ProcessorAction.Init);
 //		XbrlDockUtilsFile.processFiles(fDir, rf, null, true, false);
-		
-		if ( metaOK ) {
+
+		if (metaOK) {
 			XbrlDockUtilsFile.storeRelativePath(dirInput, fMetaInf, filingData, XDC_REPORT_TOKEN_localMetaInfPath);
 		} else {
 			XbrlDock.log(EventLevel.Error, "META_INF not found", filingID, fDir.getCanonicalPath());
@@ -394,7 +412,7 @@ public class XbrlDockConnXbrlOrg implements XbrlDockConnXbrlOrgConsts, XbrlDockP
 		}
 
 		File fReports = rf.getFile(XDC_FNAME_FILINGREPORTS);
-		
+
 		if ((null == ret) || !ret.isFile()) {
 			if (null != fReports) {
 				File[] rc = fReports.listFiles(filingCandidate);
@@ -403,7 +421,7 @@ public class XbrlDockConnXbrlOrg implements XbrlDockConnXbrlOrgConsts, XbrlDockP
 					ret = rc[0];
 					packStatus = (1 == rc.length) ? XDC_CONN_PACKAGE_PROC_MSG_reportFoundSingle : XDC_CONN_PACKAGE_PROC_MSG_reportFoundMulti;
 				} else {
-					repColl.process(null, ProcessorAction.Init);
+					repColl.process(ProcessorAction.Init, null);
 					XbrlDockUtilsFile.processFiles(fReports, repColl, filingCandidate);
 					Collection<File> fc = repColl.getFound();
 					if (!fc.isEmpty()) {

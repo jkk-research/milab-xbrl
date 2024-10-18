@@ -16,6 +16,11 @@ import org.apache.commons.compress.utils.IOUtils;
 
 public class XbrlDockUtilsFile implements XbrlDockUtilsConsts {
 	
+	public static boolean checkPathBound(File root, String path) throws IOException {
+		File f = new File(root, path);
+		return f.getCanonicalPath().startsWith(root.getCanonicalPath());
+	}
+
 	public static boolean storeRelativePath(File root, File f, Object target, Object ... keyPath) throws IOException {
 		if (null != f) {
 			String path = f.getCanonicalPath().substring(root.getCanonicalPath().length() + 1);
@@ -34,7 +39,7 @@ public class XbrlDockUtilsFile implements XbrlDockUtilsConsts {
 		public int limit = Integer.MAX_VALUE;
 		
 		@Override
-		public boolean process(File f, ProcessorAction action) {
+		public boolean process(ProcessorAction action, File f) {
 			boolean ret = true;
 			
 			switch ( action ) {
@@ -71,13 +76,13 @@ public class XbrlDockUtilsFile implements XbrlDockUtilsConsts {
 		if ( f.exists() ) {
 			if ( f.isFile() ) {
 				if ((null == fileFilter) || fileFilter.accept(f) ) {
-					if ( proc.process(f, ProcessorAction.Process) ) {
+					if ( proc.process(ProcessorAction.Process, f) ) {
 						count = 1;
 					}
 				}
 			} else {
 				if (dirCallBefore) {
-					if ( !proc.process(f, ProcessorAction.Begin) ) {
+					if ( !proc.process(ProcessorAction.Begin, f) ) {
 						return 0;
 					}
 				}
@@ -87,7 +92,7 @@ public class XbrlDockUtilsFile implements XbrlDockUtilsConsts {
 				}
 				
 				if (dirCallAfter) {
-					proc.process(f, ProcessorAction.End);
+					proc.process(ProcessorAction.End, f);
 				}
 			}
 		}

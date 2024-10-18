@@ -56,7 +56,7 @@ public class XbrlDockGuiReportPanel extends JPanel implements XbrlDockGuiConsts,
 		DefaultMutableTreeNode lastHead = null;
 
 		@Override
-		public boolean process(Object item, ProcessorAction action) throws Exception {
+		public boolean process(ProcessorAction action, Object item) throws Exception {
 			if (action == ProcessorAction.Process) {
 				for (String hKey : ctxHierarchy.keySet()) {
 					DefaultMutableTreeNode n = new DefaultMutableTreeNode(hKey);
@@ -91,7 +91,7 @@ public class XbrlDockGuiReportPanel extends JPanel implements XbrlDockGuiConsts,
 
 	GenProcessor conceptTreeLoader = new GenProcessor<DefaultMutableTreeNode>() {
 		@Override
-		public boolean process(DefaultMutableTreeNode item, ProcessorAction action) throws Exception {
+		public boolean process(ProcessorAction action, DefaultMutableTreeNode item) throws Exception {
 			if (action == ProcessorAction.Process) {
 				for (Map.Entry<String, Set> ec : conceptHierarchy.entrySet()) {
 					DefaultMutableTreeNode n = new DefaultMutableTreeNode(namespaces.get(ec.getKey()));
@@ -188,8 +188,8 @@ public class XbrlDockGuiReportPanel extends JPanel implements XbrlDockGuiConsts,
 					key = XbrlDockUtils.sbAppend(null, "/", true, cloneData.get(XDC_FACT_TOKEN_startDate), cloneData.get(XDC_FACT_TOKEN_endDate)).toString();
 				}
 
-				Object dim = cloneData.get(XDC_FACT_TOKEN_dimensions);
-				if (null != dim) {
+				String dim = XbrlDockUtils.toString(cloneData.get(XDC_FACT_TOKEN_dimensions));
+				if (!XbrlDockUtils.isEmpty(dim)) {
 					key = key + ":" + dim.toString();
 				}
 
@@ -271,7 +271,7 @@ public class XbrlDockGuiReportPanel extends JPanel implements XbrlDockGuiConsts,
 	private void updateFactGrid() {
 		factGrid.updateItems(true, new GenProcessor<ArrayList>() {
 			@Override
-			public boolean process(ArrayList items, ProcessorAction action) throws Exception {
+			public boolean process(ProcessorAction action, ArrayList items) throws Exception {
 				for (Object f : facts) {
 					Object ctx = XbrlDockUtils.simpleGet(f, XDC_FACT_TOKEN_context);
 					if ((null == ctxFilter) || ctxFilter.contains(ctx)) {

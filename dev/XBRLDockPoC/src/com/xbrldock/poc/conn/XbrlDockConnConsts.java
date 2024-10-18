@@ -10,6 +10,8 @@ import com.xbrldock.poc.format.XbrlDockFormatUtils;
 public interface XbrlDockConnConsts extends XbrlDockPocConsts, XbrlDockFormatConsts {
 
 	String XDC_FNAME_CONNCATALOG = "catalog.json";
+	String XDC_FNAME_REPDATA = "data.csv";
+	String XDC_FNAME_REPTEXT = "text.csv";
 	
 	String XDC_FNAME_CONNFILINGS = "filings";
 	

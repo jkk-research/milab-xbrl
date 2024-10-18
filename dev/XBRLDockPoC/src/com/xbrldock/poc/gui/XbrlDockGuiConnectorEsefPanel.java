@@ -111,7 +111,7 @@ public class XbrlDockGuiConnectorEsefPanel extends JPanel implements XbrlDockGui
 	private void updateReportGrid() {
 		reportGrid.updateItems(true, new GenProcessor<ArrayList>() {
 			@Override
-			public boolean process(ArrayList items, ProcessorAction action) throws Exception {
+			public boolean process(ProcessorAction action, ArrayList items) throws Exception {
 				for (Object rep : ((Map) XbrlDockUtils.simpleGet(metaCatalog, XDC_CONN_CAT_TOKEN_filings)).values()) {
 
 					if ((null == mvelFilter) || (Boolean) XbrlDockUtilsMvel.evalCompiled(mvelFilter, rep)) {

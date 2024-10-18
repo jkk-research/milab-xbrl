@@ -34,19 +34,19 @@ public class XbrlDockUtils implements XbrlDockUtilsConsts {
 					sb.append(" ");
 					upBefore = true;
 				}
-			} else if ( c == '_' ){
+			} else if (c == '_') {
 				sb.append("::");
 				toUpper = true;
 				continue;
 			} else {
 				upBefore = false;
 			}
-			
-			if ( toUpper ) {
+
+			if (toUpper) {
 				c = Character.toUpperCase(c);
 				toUpper = false;
 			}
-			
+
 			sb.append(c);
 		}
 
@@ -72,6 +72,23 @@ public class XbrlDockUtils implements XbrlDockUtilsConsts {
 	public static int safeCompare(Object v1, Object v2) {
 		return (null == v1) ? (null == v2) ? 0 : 1 : (null == v2) ? 1 : ((Comparable) v1).compareTo(v2);
 	};
+
+	public static <KeyType> Map optCopyFields(Map from, Map to, KeyType... keys) {
+		if (null == to) {
+			to = new HashMap();
+		} else {
+			to.clear();
+		}
+		
+		for (KeyType k : keys) {
+			Object val = from.get(k);
+			if (null != val) {
+				to.put(k, val);
+			}
+		}
+
+		return to;
+	}
 
 	public static void ensureArrSize(ArrayList arr, int idx) {
 		for (int i = arr.size(); i <= idx; ++i) {
@@ -208,7 +225,7 @@ public class XbrlDockUtils implements XbrlDockUtilsConsts {
 	}
 
 	public static String getPostfix(String strSrc, String pfSep) {
-		if ( isEmpty(strSrc) ) {
+		if (isEmpty(strSrc)) {
 			return "";
 		}
 		int sep = strSrc.lastIndexOf(pfSep);
@@ -216,7 +233,7 @@ public class XbrlDockUtils implements XbrlDockUtilsConsts {
 	}
 
 	public static String cutPostfix(String strSrc, String pfSep) {
-		if ( isEmpty(strSrc) ) {
+		if (isEmpty(strSrc)) {
 			return "";
 		}
 		int sep = strSrc.lastIndexOf(pfSep);
@@ -224,7 +241,7 @@ public class XbrlDockUtils implements XbrlDockUtilsConsts {
 	}
 
 	public static String replacePostfix(String strSrc, String pfSep, String postfix) {
-		if ( isEmpty(strSrc) ) {
+		if (isEmpty(strSrc)) {
 			return "";
 		}
 		int sep = strSrc.lastIndexOf(pfSep);

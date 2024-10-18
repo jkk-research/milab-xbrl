@@ -15,7 +15,7 @@ public class XbrlDockConnUtils implements XbrlDockConnConsts {
 		Map<String, File> specFiles = new TreeMap<String, File>();
 
 		@Override
-		public boolean process(File f, ProcessorAction action) {
+		public boolean process(ProcessorAction action, File f) {
 			switch (action) {
 			case Init:
 				specFiles.clear();
@@ -45,7 +45,7 @@ public class XbrlDockConnUtils implements XbrlDockConnConsts {
 		}
 
 		public boolean check(File fDir) throws Exception {
-			process(null, ProcessorAction.Init);
+			process(ProcessorAction.Init, null);
 			XbrlDockUtilsFile.processFiles(fDir, this, null, true, false);
 			return isOK();
 		}
@@ -59,10 +59,10 @@ public class XbrlDockConnUtils implements XbrlDockConnConsts {
 		}
 	};
 
-	public static File getFilingDir(File root, boolean addHash, Map filingData) throws Exception {
+	public static File getFilingDir(File root, Map filingData, boolean addHash, boolean createIfMissing) throws Exception {
 		String entityId = (String) filingData.get(XDC_REPORT_TOKEN_entityId);
 		String filingId = (String) filingData.get(XDC_EXT_TOKEN_id);
-		
+
 		String[] eid = entityId.split(XDC_SEP_ID); // idType:idValue !!
 		String path = addHash ? XbrlDockUtils.getHash2(eid[1], File.separator) : "";
 		path = XbrlDockUtils.sbAppend(null, File.separator, false, eid[0], path, eid[1], filingId).toString();
@@ -70,8 +70,9 @@ public class XbrlDockConnUtils implements XbrlDockConnConsts {
 		filingData.put(XDC_REPORT_TOKEN_localPath, path);
 
 		File fDir = new File(root, path);
-//		XbrlDockUtilsFile.ensureDir(fDir);
-
+		if (createIfMissing) {
+			XbrlDockUtilsFile.ensureDir(fDir);
+		}
 		return fDir;
 	};
 
@@ -95,21 +96,21 @@ public class XbrlDockConnUtils implements XbrlDockConnConsts {
 
 			if (0 < rc.length) {
 				ret = rc[0];
-				if ( 1 < rc.length) {
+				if (1 < rc.length) {
 					msgs.add(XDC_CONN_PACKAGE_PROC_MSG_reportFoundMulti);
 				}
 			} else {
 				XbrlDockUtilsFile.FileCollector repColl = new XbrlDockUtilsFile.FileCollector();
 
-				repColl.process(null, ProcessorAction.Init);
+				repColl.process(ProcessorAction.Init, null);
 				XbrlDockUtilsFile.processFiles(fReports, repColl, XBRL_FILTER);
 				Collection<File> fc = repColl.getFound();
-				if ( !fc.isEmpty() ) {
+				if (!fc.isEmpty()) {
 					ret = fc.iterator().next();
 
 					msgs.add(XDC_CONN_PACKAGE_PROC_MSG_reportMisplaced);
-					
-					if ( 1 < fc.size()) {
+
+					if (1 < fc.size()) {
 						msgs.add(XDC_CONN_PACKAGE_PROC_MSG_reportFoundMulti);
 					}
 				}
@@ -123,8 +124,8 @@ public class XbrlDockConnUtils implements XbrlDockConnConsts {
 				if (0 < rc.length) {
 					ret = rc[0];
 					msgs.add(XDC_CONN_PACKAGE_PROC_MSG_reportMisplaced);
-					
-					if ( 1 < rc.length) {
+
+					if (1 < rc.length) {
 						msgs.add(XDC_CONN_PACKAGE_PROC_MSG_reportFoundMulti);
 					}
 				}

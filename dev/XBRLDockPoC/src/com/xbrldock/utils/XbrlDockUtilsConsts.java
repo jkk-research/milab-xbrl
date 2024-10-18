@@ -21,7 +21,7 @@ public interface XbrlDockUtilsConsts extends XbrlDockConsts {
 		long end;
 
 		@Override
-		public boolean process(ItemType item, ProcessorAction action) throws Exception {
+		public boolean process(ProcessorAction action, ItemType item) throws Exception {
 			switch (action) {
 			case Begin:
 				++begin;

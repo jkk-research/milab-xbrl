@@ -44,7 +44,7 @@ public class XbrlDockGuiUtilsTree implements XbrlDockGuiConsts.ComponentWrapper<
 		}
 
 		try {
-			loader.process(rootNode, ProcessorAction.Process);
+			loader.process(ProcessorAction.Process, rootNode);
 		} catch (Exception e) {
 			XbrlDockException.wrap(e, "Grid updateItems");
 		}
