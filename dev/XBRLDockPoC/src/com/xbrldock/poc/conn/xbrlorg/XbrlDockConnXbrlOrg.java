@@ -85,6 +85,8 @@ public class XbrlDockConnXbrlOrg implements XbrlDockConnXbrlOrgConsts, XbrlDockP
 		case XDC_CMD_GEN_TEST01:
 			Map<String, Map> filings = XbrlDockUtils.simpleGet(catalog, XDC_CONN_CAT_TOKEN_filings);
 
+			// XbrlDockConnXbrlOrgTest.exportHun(dirInput, filings);
+			
 			File fRoot = new File(dirInput, XDC_FNAME_CONNFILINGS);
 			Set<String> msgs = new TreeSet<>();
 
@@ -144,7 +146,7 @@ public class XbrlDockConnXbrlOrg implements XbrlDockConnXbrlOrgConsts, XbrlDockP
 			File dataDir = XbrlDockConnUtils.getFilingDir(dirStore, filingInfo, true, false);
 			File fRep = new File(dataDir, XDC_FNAME_REPDATA);
 			if (fRep.isFile()) {
-				XbrlDockConnReportLoader.readCsv(fRep, dhv);
+				XbrlDockConnReportLoader.readCsv(fRep, filingInfo, dhv);
 			} else {
 				fRep = getFiling(id);
 

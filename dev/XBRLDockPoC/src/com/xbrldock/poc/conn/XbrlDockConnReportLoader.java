@@ -4,6 +4,7 @@ import java.io.BufferedReader;
 import java.io.File;
 import java.io.FileReader;
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Map;
@@ -168,7 +169,7 @@ public class XbrlDockConnReportLoader implements XbrlDockConnConsts, XbrlDockPoc
 		return repId + "\n  Namespaces: " + nsRefs + "\n  Contexts:" + ctxDef + "\n  Units:" + unitDef;
 	}
 
-	public static void readCsv(File f, ReportDataHandler dataHandler) throws Exception {
+	public static void readCsv(File f, Map filingInfo, ReportDataHandler dataHandler) throws Exception {
 
 		int colCount = 0;
 		ArrayList<String> colNames = null;
@@ -193,6 +194,22 @@ public class XbrlDockConnReportLoader implements XbrlDockConnConsts, XbrlDockPoc
 				if (null == colNames) {
 					colNames = new ArrayList<>(values);
 					colCount = colNames.size();
+					
+					dataHandler.beginReport(XbrlDockUtils.simpleGet(filingInfo, XDC_EXT_TOKEN_id));
+					
+					Map<String, String> ns = XbrlDockUtils.simpleGet(filingInfo, XDC_REPORT_TOKEN_namespaces);
+					if ( null != ns ) {
+						for ( Map.Entry<String, String> ne : ns.entrySet() ) {
+							dataHandler.addNamespace(ne.getKey(), ne.getValue());
+						}
+					}
+					
+					Collection<String> tx = XbrlDockUtils.simpleGet(filingInfo, XDC_REPORT_TOKEN_schemas);
+					if ( null != tx ) {
+						for (String t : tx ) {
+							dataHandler.addTaxonomy(t);
+						}
+					}
 				} else {
 					for (int i = 0; i < colCount; ++i) {
 						fact.put(colNames.get(i), values.get(i));

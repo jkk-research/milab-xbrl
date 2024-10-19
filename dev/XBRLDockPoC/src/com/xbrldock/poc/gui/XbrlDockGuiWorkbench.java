@@ -2,15 +2,19 @@ package com.xbrldock.poc.gui;
 
 import java.awt.BorderLayout;
 import java.awt.Container;
+import java.awt.Image;
+import java.awt.Taskbar;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.WindowAdapter;
 import java.awt.event.WindowEvent;
+import java.net.URL;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.Map;
 import java.util.TreeMap;
 
+import javax.imageio.ImageIO;
 import javax.swing.JComponent;
 import javax.swing.JFrame;
 import javax.swing.JPanel;
@@ -25,6 +29,7 @@ import javax.swing.tree.TreeSelectionModel;
 
 import com.xbrldock.XbrlDockConsts;
 import com.xbrldock.XbrlDockException;
+import com.xbrldock.poc.XbrlDockPocApp;
 import com.xbrldock.utils.XbrlDockUtils;
 import com.xbrldock.utils.XbrlDockUtilsGui;
 
@@ -38,15 +43,19 @@ public class XbrlDockGuiWorkbench extends JFrame implements XbrlDockGuiConsts, X
 		WBNode node;
 
 		ChildFrame(String titlePrefix, WBNode node, JComponent mainComp) {
+			setIconImage(appImage);
+
 			getContentPane().add(mainComp, BorderLayout.CENTER);
 			setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
 			addWindowStateListener(childWindowListener);
-			
+
 			setTitle(titlePrefix + node.toString());
 
 			pack();
 		}
 	}
+
+	Image appImage;
 
 	Map<Object, Map> childConfigs;
 
@@ -83,7 +92,7 @@ public class XbrlDockGuiWorkbench extends JFrame implements XbrlDockGuiConsts, X
 
 		WBNode getChildById(String id, ItemCreator<WBNode> ic, Object... params) {
 			WBNode wbn;
-			
+
 			int cc = getChildCount();
 
 			if (0 < cc) {
@@ -97,8 +106,8 @@ public class XbrlDockGuiWorkbench extends JFrame implements XbrlDockGuiConsts, X
 			wbn = ic.create(id, params);
 
 			add(wbn);
-			
-			panelModel.nodesWereInserted(this, new int[] {cc});
+
+			panelModel.nodesWereInserted(this, new int[] { cc });
 
 			return wbn;
 		}
@@ -152,7 +161,7 @@ public class XbrlDockGuiWorkbench extends JFrame implements XbrlDockGuiConsts, X
 
 				Map<String, Object> childData = new TreeMap<String, Object>();
 				childData.put(XDC_EXT_TOKEN_name, key);
-				
+
 				WBNode n = new WBNode((String) key, childData);
 				JComponent mainPanel = n.getComp(cfg);
 
@@ -183,6 +192,18 @@ public class XbrlDockGuiWorkbench extends JFrame implements XbrlDockGuiConsts, X
 		cp.add(XbrlDockUtilsGui.createSplit(true, new JScrollPane(panelTree), pnlRight, 0.2), BorderLayout.CENTER);
 
 		setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
+
+		URL iconIrl = XbrlDockPocApp.class.getResource("XBRLDock.jpg");
+		appImage = ImageIO.read(iconIrl);
+		setIconImage(appImage);
+
+		try {
+			final Taskbar taskbar = Taskbar.getTaskbar();
+			taskbar.setIconImage(appImage);
+		} catch (Throwable e) {
+			XbrlDockException.swallow(e, "Setting frame dock image");
+		}
+
 	}
 
 	@Override

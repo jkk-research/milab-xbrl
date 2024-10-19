@@ -2,6 +2,7 @@
   "app" : {
     "javaClass" : "com.xbrldock.poc.XbrlDockPocApp",
     "dirUrlCache" : "work/urlcache",
+    "gui" : true,
     "agents" : {
       "metaManager" : {
         "javaClass" : "com.xbrldock.poc.meta.XbrlDockMetaManager",
