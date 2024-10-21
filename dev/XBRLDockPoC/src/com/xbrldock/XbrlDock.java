@@ -2,6 +2,7 @@ package com.xbrldock;
 
 import java.io.PrintStream;
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.Collections;
 import java.util.Map;
 import java.util.Properties;
@@ -60,6 +61,16 @@ public abstract class XbrlDock implements XbrlDockConsts, XbrlDockUtilsConsts {
 					APP_ARGS.add(a);
 				}
 			}
+			
+			String userName = XbrlDockUtils.simpleGet(APP_CONFIG, XDC_CFGTOKEN_env, "user", "name");
+			Map<String, Collection> ufm = XbrlDockUtils.simpleGet(APP_CONFIG, XDC_CFGTOKEN_app, XDC_CFGTOKEN_userFlags);
+			Map<String, Boolean> fm = XbrlDockUtils.safeGet(APP_CONFIG, XDC_CFGTOKEN_userFlags, SORTEDMAP_CREATOR);
+			
+			if ( null != ufm ) {
+				for ( Map.Entry<String, Collection> ufe: ufm.entrySet()) {
+					fm.put(ufe.getKey(), ufe.getValue().contains(userName));
+				}
+			}
 
 			XBRLDOCK = XbrlDockUtils.createObject(XbrlDockUtils.safeGet(APP_CONFIG, XDC_CFGTOKEN_app, MAP_CREATOR));
 
@@ -90,6 +101,10 @@ public abstract class XbrlDock implements XbrlDockConsts, XbrlDockUtilsConsts {
 
 	protected static void handleLogDefault(EventLevel level, Object... params) {
 		handleLogDefault(PS_LOG, level, params);
+	}
+
+	public static boolean checkFlag(String flag) {
+		return Boolean.TRUE.equals(XbrlDockUtils.simpleGet(APP_CONFIG, XDC_CFGTOKEN_userFlags, flag));
 	}
 
 	public static void handleLogDefault(PrintStream target, EventLevel level, Object... params) {

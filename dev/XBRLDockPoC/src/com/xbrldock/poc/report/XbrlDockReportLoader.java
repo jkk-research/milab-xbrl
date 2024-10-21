@@ -1,4 +1,4 @@
-package com.xbrldock.poc.conn;
+package com.xbrldock.poc.report;
 
 import java.io.BufferedReader;
 import java.io.File;
@@ -13,11 +13,12 @@ import java.util.TreeMap;
 
 import com.xbrldock.XbrlDockException;
 import com.xbrldock.poc.XbrlDockPocConsts;
+import com.xbrldock.poc.conn.XbrlDockConnUtils;
 import com.xbrldock.utils.XbrlDockUtils;
 import com.xbrldock.utils.XbrlDockUtilsCsv;
 
 @SuppressWarnings({ "rawtypes", "unchecked" })
-public class XbrlDockConnReportLoader implements XbrlDockConnConsts, XbrlDockPocConsts.ReportDataHandler {
+public class XbrlDockReportLoader implements XbrlDockReportConsts, XbrlDockPocConsts.ReportDataHandler {
 
 	final File dataRoot;
 
@@ -38,7 +39,7 @@ public class XbrlDockConnReportLoader implements XbrlDockConnConsts, XbrlDockPoc
 	XbrlDockUtilsCsv.CsvWriter cwData = new XbrlDockUtilsCsv.CsvWriter(FACT_DATA_FIELDS);
 	XbrlDockUtilsCsv.CsvWriter cwText = new XbrlDockUtilsCsv.CsvWriter(FACT_TEXT_FIELDS);
 
-	public XbrlDockConnReportLoader(File dataRoot) {
+	public XbrlDockReportLoader(File dataRoot) {
 		this.dataRoot = dataRoot;
 	}
 

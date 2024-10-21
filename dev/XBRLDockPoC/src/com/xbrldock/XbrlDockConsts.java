@@ -36,12 +36,15 @@ public interface XbrlDockConsts {
 
 	String XDC_CFGTOKEN_env = "env";
 
-	String XDC_CFGTOKEN_javaClass = "javaClass";
 	String XDC_CFGTOKEN_app = "app";
+	String XDC_CFGTOKEN_userFlags = "userFlags";
 	String XDC_CFGTOKEN_gui = "gui";
+	String XDC_CFGTOKEN_javaClass = "javaClass";
 	String XDC_CFGTOKEN_agents = "agents";
 	String XDC_CFGTOKEN_dirUrlCache = "dirUrlCache";
 	String XDC_CFGTOKEN_ = "";
+
+	String XDC_FLAG_ADMIN = "admin";
 
 	int KEY_ADD = -1;
 	int KEY_SIZE = -2;

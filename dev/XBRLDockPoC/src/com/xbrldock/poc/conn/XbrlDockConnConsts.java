@@ -6,12 +6,11 @@ import java.io.FileFilter;
 import com.xbrldock.poc.XbrlDockPocConsts;
 import com.xbrldock.poc.format.XbrlDockFormatConsts;
 import com.xbrldock.poc.format.XbrlDockFormatUtils;
+import com.xbrldock.poc.report.XbrlDockReportConsts;
 
-public interface XbrlDockConnConsts extends XbrlDockPocConsts, XbrlDockFormatConsts {
+public interface XbrlDockConnConsts extends XbrlDockPocConsts, XbrlDockFormatConsts, XbrlDockReportConsts {
 
 	String XDC_FNAME_CONNCATALOG = "catalog.json";
-	String XDC_FNAME_REPDATA = "data.csv";
-	String XDC_FNAME_REPTEXT = "text.csv";
 	
 	String XDC_FNAME_CONNFILINGS = "filings";
 	

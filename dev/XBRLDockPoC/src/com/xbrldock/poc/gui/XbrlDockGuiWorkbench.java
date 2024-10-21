@@ -201,7 +201,7 @@ public class XbrlDockGuiWorkbench extends JFrame implements XbrlDockGuiConsts, X
 			final Taskbar taskbar = Taskbar.getTaskbar();
 			taskbar.setIconImage(appImage);
 		} catch (Throwable e) {
-			XbrlDockException.swallow(e, "Setting frame dock image");
+//			XbrlDockException.swallow(e, "Setting frame dock image");
 		}
 
 	}

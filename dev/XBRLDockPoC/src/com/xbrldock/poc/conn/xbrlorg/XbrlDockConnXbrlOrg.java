@@ -17,10 +17,10 @@ import com.xbrldock.XbrlDockException;
 import com.xbrldock.dev.XbrlDockDevCounter;
 import com.xbrldock.dev.XbrlDockDevMonitor;
 import com.xbrldock.poc.XbrlDockPocConsts;
-import com.xbrldock.poc.conn.XbrlDockConnReportLoader;
 import com.xbrldock.poc.conn.XbrlDockConnUtils;
 import com.xbrldock.poc.format.XbrlDockFormatUtils;
 import com.xbrldock.poc.format.XbrlDockFormatXhtml;
+import com.xbrldock.poc.report.XbrlDockReportLoader;
 import com.xbrldock.poc.utils.XbrlDockPocReportInfoExtender;
 import com.xbrldock.utils.XbrlDockUtils;
 import com.xbrldock.utils.XbrlDockUtilsFile;
@@ -93,7 +93,7 @@ public class XbrlDockConnXbrlOrg implements XbrlDockConnXbrlOrgConsts, XbrlDockP
 			XbrlDockDevMonitor mon = new XbrlDockDevMonitor("Report count", 100);
 			XbrlDockDevCounter cnt = new XbrlDockDevCounter("Visit errors", true);
 
-			XbrlDockConnReportLoader dh = new XbrlDockConnReportLoader(dirStore);
+			XbrlDockReportLoader dh = new XbrlDockReportLoader(dirStore);
 
 			for (Map.Entry<String, Map> fe : filings.entrySet()) {
 				mon.step();
@@ -146,7 +146,7 @@ public class XbrlDockConnXbrlOrg implements XbrlDockConnXbrlOrgConsts, XbrlDockP
 			File dataDir = XbrlDockConnUtils.getFilingDir(dirStore, filingInfo, true, false);
 			File fRep = new File(dataDir, XDC_FNAME_REPDATA);
 			if (fRep.isFile()) {
-				XbrlDockConnReportLoader.readCsv(fRep, filingInfo, dhv);
+				XbrlDockReportLoader.readCsv(fRep, filingInfo, dhv);
 			} else {
 				fRep = getFiling(id);
 
