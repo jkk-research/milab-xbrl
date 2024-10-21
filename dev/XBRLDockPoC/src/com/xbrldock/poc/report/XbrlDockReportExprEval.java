@@ -11,8 +11,7 @@ import com.xbrldock.utils.XbrlDockUtilsMvel;
 
 @SuppressWarnings({ "rawtypes", "unchecked" })
 public class XbrlDockReportExprEval implements XbrlDockReportConsts, XbrlDockPocConsts.ReportDataHandler {
-	private boolean byContext;
-	private GenProcessor<Map> resultProc;
+	private ExprResultProcessor resultProc;
 
 	private String exprStr;
 	private Object exprComp;
@@ -22,8 +21,8 @@ public class XbrlDockReportExprEval implements XbrlDockReportConsts, XbrlDockPoc
 	private Map evalCtx = new TreeMap<>();
 	private boolean inited;
 
-	public void setExpression(String expr, boolean byContext, GenProcessor<Map> resultProc) {
-		this.byContext = byContext;
+	public void setExpression(String expr, ExprResultProcessor resultProc) {
+		this.resultProc = resultProc;
 		this.exprStr = expr;
 		exprComp = XbrlDockUtilsMvel.compile(expr);
 	}
@@ -53,13 +52,13 @@ public class XbrlDockReportExprEval implements XbrlDockReportConsts, XbrlDockPoc
 
 		String segIdKey = XbrlDockReportUtils.getSegmentIdKey(segment);
 		String segId = (String) data.get(segIdKey);
-		if ( XbrlDockUtils.isEmpty(segId) ) {
+		if (XbrlDockUtils.isEmpty(segId)) {
 			segId = segment + "-" + (segContent.size() + 1);
 		}
 
 		Object ret = segId;
 
-		switch ( segment ) {
+		switch (segment) {
 		case XDC_REP_SEG_Unit:
 		case XDC_REP_SEG_Context:
 			segContent.put(segId, new TreeMap<String, Object>(data));
@@ -69,17 +68,15 @@ public class XbrlDockReportExprEval implements XbrlDockReportConsts, XbrlDockPoc
 			String ctxId = (String) data.get(XDC_FACT_TOKEN_context);
 
 			try {
-				if ( !inited ) {
+				if (!inited) {
 					inited = true;
-					if ( null != resultProc ) {
-						data.put(XDC_EXPR_result, ret);
-						if ( !resultProc.process(ProcessorAction.Init, segData) ) {
-							return XDC_RETVAL_STOP;
-						}
+					data.put(XDC_EXPR_result, ret);
+					if (!resultProc.process(ProcessorAction.Init, segData)) {
+						return XDC_RETVAL_STOP;
 					}
 				}
 
-				if ( byContext ) {
+				if (resultProc.isByContext()) {
 					XbrlDockUtils.safeGet(segContent, ctxId, SET_CREATOR).add(new TreeMap<String, Object>(data));
 				} else {
 					ret = evaluate(data);
@@ -100,8 +97,8 @@ public class XbrlDockReportExprEval implements XbrlDockReportConsts, XbrlDockPoc
 	@Override
 	public void endReport() {
 		try {
-			if ( inited ) {
-				if ( byContext ) {
+			if (inited) {
+				if (resultProc.isByContext()) {
 					Map<String, Collection<Map>> ctxFacts = XbrlDockUtils.simpleGet(segData, XDC_REP_SEG_Fact);
 					for (Map.Entry<String, Collection<Map>> cfe : ctxFacts.entrySet()) {
 						String ctxId = cfe.getKey();
@@ -121,18 +118,18 @@ public class XbrlDockReportExprEval implements XbrlDockReportConsts, XbrlDockPoc
 	}
 
 	private Object evaluate(Map data) throws Exception {
-		Object ret = XbrlDockUtilsMvel.evalCompiled(exprComp, evalCtx);
-		
 		evalCtx.clear();
 		evalCtx.putAll(data);
-		
-		if ( null != resultProc ) {
-			evalCtx.put(XDC_EXPR_result, ret);
-			if ( !resultProc.process(ProcessorAction.Process, evalCtx) ) {
-				ret = XDC_RETVAL_STOP;
-			}
+
+		Object ret = XbrlDockUtilsMvel.evalCompiled(exprComp, evalCtx);
+
+		evalCtx.put(XDC_EXPR_result, ret);
+
+
+		if (!resultProc.process(ProcessorAction.Process, evalCtx)) {
+			ret = XDC_RETVAL_STOP;
 		}
-		
+
 		return ret;
 	}
 }

@@ -3,6 +3,9 @@
     "javaClass" : "com.xbrldock.poc.XbrlDockPocApp",
     "dirUrlCache" : "work/urlcache",
     "gui" : true,
+    "userFlags" : {
+      "admin" : [ "lkedves" ]
+    },
     "agents" : {
       "metaManager" : {
         "javaClass" : "com.xbrldock.poc.meta.XbrlDockMetaManager",

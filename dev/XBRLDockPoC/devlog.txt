@@ -1,3 +1,7 @@
+"DK".equals(sourceAtts.country)
+"cmn:TypeOfAuditorAssistance".equals(concept)
+"gsd:EmailOfReportingEntity".equals(concept)
+
 *** 20240923 ***
 
 2024-09-23T15_18_15 Trace Data count, 9261

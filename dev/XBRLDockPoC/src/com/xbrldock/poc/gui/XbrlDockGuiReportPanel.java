@@ -259,6 +259,12 @@ public class XbrlDockGuiReportPanel extends JPanel implements XbrlDockGuiConsts,
 			updateFactGrid();
 
 			break;
+		case XDC_CMD_GEN_SELECT:
+			// fact selected
+			break;
+		case XDC_CMD_GEN_ACTIVATE:
+			// fact activated
+			break;
 		default:
 			XbrlDockException.wrap(null, "Unhandled agent command", command, params);
 			break;

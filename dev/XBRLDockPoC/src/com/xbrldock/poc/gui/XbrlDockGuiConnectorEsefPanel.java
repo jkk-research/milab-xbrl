@@ -18,6 +18,7 @@ import com.xbrldock.XbrlDockException;
 import com.xbrldock.dev.XbrlDockDevReportStats;
 import com.xbrldock.poc.conn.xbrlorg.XbrlDockConnXbrlOrgConsts;
 import com.xbrldock.poc.report.XbrlDockReportExprEval;
+import com.xbrldock.poc.report.XbrlDockReportUtils;
 import com.xbrldock.utils.XbrlDockUtils;
 import com.xbrldock.utils.XbrlDockUtilsGui;
 import com.xbrldock.utils.XbrlDockUtilsMvel;
@@ -45,7 +46,8 @@ public class XbrlDockGuiConnectorEsefPanel extends JPanel implements XbrlDockGui
 	JTextArea factFilterTA;
 	JCheckBox chkByCtx;
 	XbrlDockReportExprEval factFilterEval;
-	
+	XbrlDockReportUtils.SimpleMatchTester factFilterTest = new XbrlDockReportUtils.SimpleMatchTester();
+
 	JButton btFilter;
 
 	XbrlDockGuiUtilsHtmlDisplay repInfo;
@@ -59,18 +61,18 @@ public class XbrlDockGuiConnectorEsefPanel extends JPanel implements XbrlDockGui
 			switch (cmd) {
 			case XDC_CMD_GEN_FILTER:
 //				boolean update = false;
-				
+
 				String txt = repFilterTA.getText().trim();
 				if (!XbrlDockUtils.isEqual(txt, repFilterStr)) {
 //					update = true;
 					repFilterStr = txt;
 					repFilterOb = XbrlDockUtils.isEmpty(repFilterStr) ? null : XbrlDockUtilsMvel.compile(repFilterStr);
 				}
-				
+
 //				if ( update) 
-				{
-					updateReportGrid();
-				}
+			{
+				updateReportGrid();
+			}
 				break;
 			case XDC_CMD_GEN_TEST01:
 				XbrlDockDevReportStats stats = new XbrlDockDevReportStats();
@@ -92,17 +94,17 @@ public class XbrlDockGuiConnectorEsefPanel extends JPanel implements XbrlDockGui
 
 		repFilterTA = new JTextArea();
 		btFilter = XbrlDockGuiUtils.createBtn(XDC_CMD_GEN_FILTER, al, JButton.class);
-		
+
 		factFilterTA = new JTextArea();
 		chkByCtx = new JCheckBox("Group facts by context");
+		factFilterEval = new XbrlDockReportExprEval();
 
 		JPanel pnlFactFilter = new JPanel(new BorderLayout());
 		pnlFactFilter.add(new JScrollPane(factFilterTA), BorderLayout.CENTER);
 		pnlFactFilter.add(chkByCtx, BorderLayout.SOUTH);
-		
+
 		JPanel pnlFilterInput = new JPanel(new BorderLayout());
-		pnlFilterInput.add(XbrlDockUtilsGui.createSplit(true, 
-				XbrlDockGuiUtils.setTitle(new JScrollPane(repFilterTA), "Filter report list"), 
+		pnlFilterInput.add(XbrlDockUtilsGui.createSplit(true, XbrlDockGuiUtils.setTitle(new JScrollPane(repFilterTA), "Filter report list"),
 				XbrlDockGuiUtils.setTitle(pnlFactFilter, "Filter reports by fact content"), 0.5), BorderLayout.CENTER);
 
 		JPanel pnlFilter = new JPanel(new BorderLayout());
@@ -137,26 +139,39 @@ public class XbrlDockGuiConnectorEsefPanel extends JPanel implements XbrlDockGui
 		reportGrid.updateItems(true, new GenProcessor<ArrayList>() {
 			@Override
 			public boolean process(ProcessorAction action, ArrayList items) throws Exception {
-				
+
 				String txt = factFilterTA.getText().trim();
-				
-				GenProcessor<Map> factFilterTest = null;
-				
-				factFilterEval.setExpression(txt, chkByCtx.isSelected(), factFilterTest);
+				boolean factExpr = !XbrlDockUtils.isEmpty(txt);
 
-				
-				for (Object rep : ((Map) XbrlDockUtils.simpleGet(metaCatalog, XDC_CONN_CAT_TOKEN_filings)).values()) {
+				if (factExpr) {
+					factFilterTest.setByContext(chkByCtx.isSelected());
+					factFilterEval.setExpression(txt, factFilterTest);
+					
+					XbrlDock.log(EventLevel.Trace, "Fact expr testing", txt);
+				}
 
-					if ((null != repFilterOb) && ! (Boolean) XbrlDockUtilsMvel.evalCompiled(repFilterOb, rep)) {
+				for (Map.Entry<String, Object> re : ((Map<String, Object>) XbrlDockUtils.simpleGet(metaCatalog, XDC_CONN_CAT_TOKEN_filings)).entrySet()) {
+					Object rep = re.getValue();
+
+					if ((null != repFilterOb) && !(Boolean) XbrlDockUtilsMvel.evalCompiled(repFilterOb, rep)) {
 						continue;
 					}
-					
-					if ( null != factFilterTest ) {
+
+					if (factExpr) {
+						String repId = re.getKey();
+						XbrlDock.log(EventLevel.Trace, "   on report", repId);
 						
+						XbrlDock.callAgent(XDC_CFGTOKEN_AGENT_esefConn, XDC_CMD_CONN_VISITREPORT, repId, factFilterEval);
+						
+						if ( !factFilterTest.isMatch()) {
+							continue;
+						}
 					}
-					
+
 					items.add(rep);
 				}
+				
+				XbrlDock.log(EventLevel.Trace, "Match", items.size());
 				return true;
 			}
 		});

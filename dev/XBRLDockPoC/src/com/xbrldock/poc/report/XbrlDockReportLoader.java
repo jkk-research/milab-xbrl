@@ -228,7 +228,11 @@ public class XbrlDockReportLoader implements XbrlDockReportConsts, XbrlDockPocCo
 						dataHandler.processSegment(XDC_REP_SEG_Unit, segment);
 					}
 
-					dataHandler.processSegment(XDC_REP_SEG_Fact, fact);
+					String ret = dataHandler.processSegment(XDC_REP_SEG_Fact, fact);
+					
+					if ( XDC_RETVAL_STOP.equals(ret)) {
+						break;
+					}
 				}
 			}
 		} finally {
