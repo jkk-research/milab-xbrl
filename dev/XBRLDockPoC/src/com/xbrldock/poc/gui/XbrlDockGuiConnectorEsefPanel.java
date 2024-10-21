@@ -7,6 +7,7 @@ import java.util.ArrayList;
 import java.util.Map;
 
 import javax.swing.JButton;
+import javax.swing.JCheckBox;
 import javax.swing.JPanel;
 import javax.swing.JScrollPane;
 import javax.swing.JTextArea;
@@ -16,6 +17,7 @@ import com.xbrldock.XbrlDockConsts.GenAgent;
 import com.xbrldock.XbrlDockException;
 import com.xbrldock.dev.XbrlDockDevReportStats;
 import com.xbrldock.poc.conn.xbrlorg.XbrlDockConnXbrlOrgConsts;
+import com.xbrldock.poc.report.XbrlDockReportExprEval;
 import com.xbrldock.utils.XbrlDockUtils;
 import com.xbrldock.utils.XbrlDockUtilsGui;
 import com.xbrldock.utils.XbrlDockUtilsMvel;
@@ -36,11 +38,15 @@ public class XbrlDockGuiConnectorEsefPanel extends JPanel implements XbrlDockGui
 
 	Map metaCatalog;
 
-	JTextArea taFilter;
-	JButton btFilter;
+	JTextArea repFilterTA;
+	String repFilterStr;
+	Object repFilterOb;
 
-	String filter;
-	Object mvelFilter;
+	JTextArea factFilterTA;
+	JCheckBox chkByCtx;
+	XbrlDockReportExprEval factFilterEval;
+	
+	JButton btFilter;
 
 	XbrlDockGuiUtilsHtmlDisplay repInfo;
 
@@ -52,11 +58,17 @@ public class XbrlDockGuiConnectorEsefPanel extends JPanel implements XbrlDockGui
 
 			switch (cmd) {
 			case XDC_CMD_GEN_FILTER:
-				String txt = taFilter.getText().trim();
-				if (!XbrlDockUtils.isEqual(txt, filter)) {
-					filter = txt;
-					mvelFilter = XbrlDockUtils.isEmpty(filter) ? null : XbrlDockUtilsMvel.compile(filter);
-
+//				boolean update = false;
+				
+				String txt = repFilterTA.getText().trim();
+				if (!XbrlDockUtils.isEqual(txt, repFilterStr)) {
+//					update = true;
+					repFilterStr = txt;
+					repFilterOb = XbrlDockUtils.isEmpty(repFilterStr) ? null : XbrlDockUtilsMvel.compile(repFilterStr);
+				}
+				
+//				if ( update) 
+				{
 					updateReportGrid();
 				}
 				break;
@@ -78,11 +90,23 @@ public class XbrlDockGuiConnectorEsefPanel extends JPanel implements XbrlDockGui
 
 		repInfo = new XbrlDockGuiUtilsHtmlDisplay();
 
-		taFilter = new JTextArea();
+		repFilterTA = new JTextArea();
 		btFilter = XbrlDockGuiUtils.createBtn(XDC_CMD_GEN_FILTER, al, JButton.class);
+		
+		factFilterTA = new JTextArea();
+		chkByCtx = new JCheckBox("Group facts by context");
+
+		JPanel pnlFactFilter = new JPanel(new BorderLayout());
+		pnlFactFilter.add(new JScrollPane(factFilterTA), BorderLayout.CENTER);
+		pnlFactFilter.add(chkByCtx, BorderLayout.SOUTH);
+		
+		JPanel pnlFilterInput = new JPanel(new BorderLayout());
+		pnlFilterInput.add(XbrlDockUtilsGui.createSplit(true, 
+				XbrlDockGuiUtils.setTitle(new JScrollPane(repFilterTA), "Filter report list"), 
+				XbrlDockGuiUtils.setTitle(pnlFactFilter, "Filter reports by fact content"), 0.5), BorderLayout.CENTER);
 
 		JPanel pnlFilter = new JPanel(new BorderLayout());
-		pnlFilter.add(XbrlDockGuiUtils.setTitle(new JScrollPane(taFilter), "Filter report list"), BorderLayout.CENTER);
+		pnlFilter.add(pnlFilterInput, BorderLayout.CENTER);
 		pnlFilter.add(btFilter, BorderLayout.EAST);
 
 		if (XbrlDock.checkFlag(XDC_FLAG_ADMIN)) {
@@ -113,11 +137,25 @@ public class XbrlDockGuiConnectorEsefPanel extends JPanel implements XbrlDockGui
 		reportGrid.updateItems(true, new GenProcessor<ArrayList>() {
 			@Override
 			public boolean process(ProcessorAction action, ArrayList items) throws Exception {
+				
+				String txt = factFilterTA.getText().trim();
+				
+				GenProcessor<Map> factFilterTest = null;
+				
+				factFilterEval.setExpression(txt, chkByCtx.isSelected(), factFilterTest);
+
+				
 				for (Object rep : ((Map) XbrlDockUtils.simpleGet(metaCatalog, XDC_CONN_CAT_TOKEN_filings)).values()) {
 
-					if ((null == mvelFilter) || (Boolean) XbrlDockUtilsMvel.evalCompiled(mvelFilter, rep)) {
-						items.add(rep);
+					if ((null != repFilterOb) && ! (Boolean) XbrlDockUtilsMvel.evalCompiled(repFilterOb, rep)) {
+						continue;
 					}
+					
+					if ( null != factFilterTest ) {
+						
+					}
+					
+					items.add(rep);
 				}
 				return true;
 			}

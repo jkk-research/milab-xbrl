@@ -64,6 +64,8 @@ public interface XbrlDockPocConsts extends XbrlDockConsts, XbrlDockUtilsConsts {
 	String XDC_FNAME_FILINGCATALOG = "catalog.xml";
 	String XDC_FNAME_FILINGTAXPACK = "taxonomyPackage.xml";
 
+	String XDC_RETVAL_STOP = "xbrl_Stop";
+
 	
 	public interface XDModSourceConnector extends GenAgent {
 		int refresh(Collection<String> updated) throws Exception;
