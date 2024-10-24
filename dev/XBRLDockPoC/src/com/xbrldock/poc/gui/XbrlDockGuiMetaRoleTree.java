@@ -26,6 +26,7 @@ public class XbrlDockGuiMetaRoleTree extends JTree implements XbrlDockGuiConsts 
 
 	Set<String> roleTypes = new TreeSet<>();
 	String selRoleType;
+	Set<String> urlSet;
 
 	class ItemNode implements TreeNode {
 
@@ -150,18 +151,34 @@ public class XbrlDockGuiMetaRoleTree extends JTree implements XbrlDockGuiConsts 
 		if (!XbrlDockUtils.isEqual(rt, selRoleType)) {
 			this.selRoleType = rt;
 
-			tnRoot.children.clear();
-			for (ItemNode in : allRoleNodes) {
-				if ((null == selRoleType) || XbrlDockUtils.isEqual(in.item.get(XDC_GEN_TOKEN_type), selRoleType)) {
-					tnRoot.children.add(in);
-				}
-			}
-
-			tm.reload();
-
-			invalidate();
-			repaint();
+			rebuildTree();
 		}
+	}
+
+	public void setUrlSet(Set<String> us) {
+		this.urlSet = us;
+		rebuildTree();
+	}
+
+	private void rebuildTree() {
+		tnRoot.children.clear();
+		for (ItemNode in : allRoleNodes) {
+			if ((null != selRoleType) && !XbrlDockUtils.isEqual(in.item.get(XDC_GEN_TOKEN_type), selRoleType)) {
+				continue;
+			}
+			
+			String url = "";
+			if ( (null != urlSet) && !urlSet.contains(url)) {
+				continue;
+			}
+			
+			tnRoot.children.add(in);
+		}
+
+		tm.reload();
+
+		invalidate();
+		repaint();
 	}
 
 	public void setTaxonomy(XbrlDockMetaContainer taxonomy) throws Exception {

@@ -7,6 +7,9 @@ import java.awt.event.ActionListener;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.Map;
+import java.util.Set;
+import java.util.TreeMap;
+import java.util.TreeSet;
 
 import javax.swing.JButton;
 import javax.swing.JComboBox;
@@ -17,6 +20,7 @@ import com.xbrldock.XbrlDock;
 import com.xbrldock.XbrlDockConsts.GenAgent;
 import com.xbrldock.XbrlDockException;
 import com.xbrldock.poc.meta.XbrlDockMetaContainer;
+import com.xbrldock.utils.XbrlDockUtils;
 import com.xbrldock.utils.XbrlDockUtilsGui;
 
 @SuppressWarnings({ "rawtypes", "unchecked" })
@@ -24,6 +28,7 @@ public class XbrlDockGuiMetaTaxonomyPanel extends JPanel implements XbrlDockGuiC
 	private static final long serialVersionUID = 1L;
 
 	XbrlDockMetaContainer taxonomy;
+	Map<String, Set<String>> entryPointUrls = new TreeMap<>();
 
 	XbrlDockGuiMetaRoleTree roleTree;
 	XbrlDockGuiMetaItemInfoGrid itemGrid;
@@ -53,6 +58,8 @@ public class XbrlDockGuiMetaTaxonomyPanel extends JPanel implements XbrlDockGuiC
 				li = cbType.getSelectedIndex();
 				roleTree.setRoleType( (0 == li) ? null : cbType.getItemAt(li) );
 				break;
+			case XDC_APP_SETENTRYPOINT:
+				roleTree.setUrlSet(entryPointUrls.get(cbEntryPoint.getSelectedItem()));
 			}
 		}
 	};
@@ -131,9 +138,21 @@ public class XbrlDockGuiMetaTaxonomyPanel extends JPanel implements XbrlDockGuiC
 		cbEntryPoint.removeAllItems();
 		cbEntryPoint.addItem("<< all >>");
 		Collection<Map> ep = (Collection<Map>) mi.getOrDefault(XDC_METAINFO_entryPoints, Collections.EMPTY_LIST);
+		
+		int cnt = 0;
 
 		for (Map ee : ep) {
-			cbEntryPoint.addItem((String) ee.getOrDefault(XDC_EXT_TOKEN_name, "???"));
+			++cnt;
+			String epName = (String) ee.getOrDefault(XDC_EXT_TOKEN_name, "Entry point " + cnt);
+			cbEntryPoint.addItem(epName);
+			
+			Set<String> fls = new TreeSet<String>();
+			Collection<String> eps = (Collection<String>) ee.getOrDefault(XDC_METAINFO_entryPointRefs, Collections.EMPTY_LIST);
+			for ( String epl : eps ) {
+				taxonomy.collectLinks(fls, XbrlDockUtils.getPostfix(epl, XDC_URL_PSEP));
+			}
+			
+			entryPointUrls.put(epName, fls);
 		}
 
 		roleTree.setTaxonomy(taxonomy);

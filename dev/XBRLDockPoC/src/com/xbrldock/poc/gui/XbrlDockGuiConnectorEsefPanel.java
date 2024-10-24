@@ -99,13 +99,15 @@ public class XbrlDockGuiConnectorEsefPanel extends JPanel implements XbrlDockGui
 		chkByCtx = new JCheckBox("Group facts by context");
 		factFilterEval = new XbrlDockReportExprEval();
 
-		JPanel pnlFactFilter = new JPanel(new BorderLayout());
-		pnlFactFilter.add(new JScrollPane(factFilterTA), BorderLayout.CENTER);
-		pnlFactFilter.add(chkByCtx, BorderLayout.SOUTH);
+//		JPanel pnlFactFilter = new JPanel(new BorderLayout());
+//		pnlFactFilter.add(new JScrollPane(factFilterTA), BorderLayout.CENTER);
+//		pnlFactFilter.add(chkByCtx, BorderLayout.SOUTH);
 
 		JPanel pnlFilterInput = new JPanel(new BorderLayout());
-		pnlFilterInput.add(XbrlDockUtilsGui.createSplit(true, XbrlDockGuiUtils.setTitle(new JScrollPane(repFilterTA), "Filter report list"),
-				XbrlDockGuiUtils.setTitle(pnlFactFilter, "Filter reports by fact content"), 0.5), BorderLayout.CENTER);
+		pnlFilterInput.add(XbrlDockUtilsGui.createSplit(true, 
+				XbrlDockGuiUtils.setTitle(new JScrollPane(repFilterTA), "Filter report list"),
+				XbrlDockGuiUtils.setTitle(new JScrollPane(factFilterTA), "Filter reports by fact content"), 0.5), BorderLayout.CENTER);
+//		XbrlDockGuiUtils.setTitle(pnlFactFilter, "Filter reports by fact content"), 0.5), BorderLayout.CENTER);
 
 		JPanel pnlFilter = new JPanel(new BorderLayout());
 		pnlFilter.add(pnlFilterInput, BorderLayout.CENTER);

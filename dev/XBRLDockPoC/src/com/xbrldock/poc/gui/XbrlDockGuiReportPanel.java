@@ -2,6 +2,7 @@ package com.xbrldock.poc.gui;
 
 import java.awt.BorderLayout;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.Enumeration;
 import java.util.HashSet;
 import java.util.Map;
@@ -58,16 +59,30 @@ public class XbrlDockGuiReportPanel extends JPanel implements XbrlDockGuiConsts,
 		@Override
 		public boolean process(ProcessorAction action, Object item) throws Exception {
 			if (action == ProcessorAction.Process) {
+				DefaultMutableTreeNode root = (DefaultMutableTreeNode) item;
+				
+				Set<String> emptyKeys = new TreeSet<>();
+
 				for (String hKey : ctxHierarchy.keySet()) {
 					DefaultMutableTreeNode n = new DefaultMutableTreeNode(hKey);
 					int sep = hKey.indexOf(":");
 
 					if (-1 == sep) {
-						((DefaultMutableTreeNode) item).add(n);
+						root.add(n);
 						lastHead = n;
 					} else {
+						if ( null == lastHead ) {
+							String hk = hKey.substring(0, sep);
+							emptyKeys.add(hk);
+							lastHead = new DefaultMutableTreeNode(hk);
+							root.add(lastHead);
+						}
 						lastHead.add(n);
 					}
+				}
+				
+				for ( String ek : emptyKeys ) {
+					ctxHierarchy.put(ek, Collections.EMPTY_SET);
 				}
 			}
 			return true;

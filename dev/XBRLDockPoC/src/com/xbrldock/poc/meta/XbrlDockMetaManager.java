@@ -131,6 +131,10 @@ public class XbrlDockMetaManager implements XbrlDockMetaConsts, XbrlDockConsts.G
 		case XDC_CMD_METAMGR_LOADMC:
 			ret = buildMetaContainer((File) params[0], false);
 			break;
+		case XDC_CMD_GEN_TEST01:
+			File f = new File(dirInput, "esef_taxonomy_2022_v1.1");
+			ret = importTaxonomy(f);
+			break;
 		default:
 			XbrlDockException.wrap(null, "Unhandled agent command", command, params);
 			break;
@@ -139,7 +143,9 @@ public class XbrlDockMetaManager implements XbrlDockMetaConsts, XbrlDockConsts.G
 		return ret;
 	}
 
-	private void importTaxonomy(File taxSource) throws Exception {
+	private XbrlDockMetaContainer importTaxonomy(File taxSource) throws Exception {
+		XbrlDockMetaContainer mc = null;
+		
 		File fTempDir = null;
 
 		if (taxSource.isFile() && taxSource.getName().endsWith(XDC_FEXT_ZIP)) {
@@ -152,7 +158,7 @@ public class XbrlDockMetaManager implements XbrlDockMetaConsts, XbrlDockConsts.G
 		if (taxSource.isDirectory()) {
 			importIssues.reset();
 
-			XbrlDockMetaContainer mc = buildMetaContainer(taxSource, true);
+			 mc = buildMetaContainer(taxSource, true);
 			
 			saveChanges();
 
@@ -163,6 +169,8 @@ public class XbrlDockMetaManager implements XbrlDockMetaConsts, XbrlDockConsts.G
 //			XbrlDock.log(EventLevel.Trace, "Schema stats", mc.cntLinkTypes, mc.cntArcRoles);
 
 		}
+		
+		return mc;
 	}
 
 	public XbrlDockMetaContainer buildMetaContainer(File schemaRoot, boolean cache, String... entryPoints) throws Exception {
@@ -250,6 +258,22 @@ public class XbrlDockMetaManager implements XbrlDockMetaConsts, XbrlDockConsts.G
 			for (String ak : alienKeys) {
 				metaContainer.contentByURL.remove(ak);
 			}
+			
+			alienKeys = new TreeSet<>(metaContainer.fileLinks.keySet());
+
+			for (String prefix : metaContainer.ownedUrls) {
+				for (Iterator<String> iak = alienKeys.iterator(); iak.hasNext();) {
+					String ak = iak.next();
+					if (ak.startsWith(prefix)) {
+						iak.remove();
+					}
+				}
+			}
+
+			for (String ak : alienKeys) {
+				metaContainer.fileLinks.remove(ak);
+			}
+			
 
 			mcById.put(metaContainer.getId(), metaContainer);
 		}

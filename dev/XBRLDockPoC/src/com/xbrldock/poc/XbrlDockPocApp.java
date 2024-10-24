@@ -48,9 +48,9 @@ public class XbrlDockPocApp extends XbrlDock implements XbrlDockPocConsts {
 
 //		@formatter:off  
 		String[] years = { 
-//				"2019", 
-//				"2020", 
-//				"2021", 
+				"2019", 
+				"2020", 
+				"2021", 
 				"2022", 
 				};
 //		@formatter:on
@@ -58,26 +58,26 @@ public class XbrlDockPocApp extends XbrlDock implements XbrlDockPocConsts {
 		for (String year : years) {
 			switch (year) {
 			case "2019":
-				callAgent(XDC_CFGTOKEN_AGENT_metaManager, XDC_CMD_METAMGR_IMPORT, new File("ext/XBRLDock/taxonomy/import/IFRST_2019-03-27"));
-				callAgent(XDC_CFGTOKEN_AGENT_metaManager, XDC_CMD_METAMGR_IMPORT, new File("ext/XBRLDock/taxonomy/import/esef_taxonomy_2019"));
+				callAgent(XDC_CFGTOKEN_AGENT_metaManager, XDC_CMD_METAMGR_IMPORT, new File("work/input/taxonomies/IFRST_2019-03-27"));
+				callAgent(XDC_CFGTOKEN_AGENT_metaManager, XDC_CMD_METAMGR_IMPORT, new File("work/input/taxonomies/esef_taxonomy_2019"));
 				break;
 			case "2020":
-				callAgent(XDC_CFGTOKEN_AGENT_metaManager, XDC_CMD_METAMGR_IMPORT, new File("ext/XBRLDock/taxonomy/import/IFRST_2020-03-16"));
-				callAgent(XDC_CFGTOKEN_AGENT_metaManager, XDC_CMD_METAMGR_IMPORT, new File("ext/XBRLDock/taxonomy/import/esef_taxonomy_2020"));
+				callAgent(XDC_CFGTOKEN_AGENT_metaManager, XDC_CMD_METAMGR_IMPORT, new File("work/input/taxonomies/IFRST_2020-03-16"));
+				callAgent(XDC_CFGTOKEN_AGENT_metaManager, XDC_CMD_METAMGR_IMPORT, new File("work/input/taxonomies/esef_taxonomy_2020"));
 				break;
 			case "2021":
-				callAgent(XDC_CFGTOKEN_AGENT_metaManager, XDC_CMD_METAMGR_IMPORT, new File("ext/XBRLDock/taxonomy/import/IFRST_2021-03-24"));
-				callAgent(XDC_CFGTOKEN_AGENT_metaManager, XDC_CMD_METAMGR_IMPORT, new File("ext/XBRLDock/taxonomy/import/esef_taxonomy_2021"));
+				callAgent(XDC_CFGTOKEN_AGENT_metaManager, XDC_CMD_METAMGR_IMPORT, new File("work/input/taxonomies/IFRST_2021-03-24"));
+				callAgent(XDC_CFGTOKEN_AGENT_metaManager, XDC_CMD_METAMGR_IMPORT, new File("work/input/taxonomies/esef_taxonomy_2021"));
 				break;
 			case "2022":
-				callAgent(XDC_CFGTOKEN_AGENT_metaManager, XDC_CMD_METAMGR_IMPORT, new File("ext/XBRLDock/taxonomy/import/IFRSAT-2022-03-24"));
-				callAgent(XDC_CFGTOKEN_AGENT_metaManager, XDC_CMD_METAMGR_IMPORT, new File("ext/XBRLDock/taxonomy/import/esef_taxonomy_2022_v1.1"));
+				callAgent(XDC_CFGTOKEN_AGENT_metaManager, XDC_CMD_METAMGR_IMPORT, new File("work/input/taxonomies/IFRSAT-2022-03-24"));
+				callAgent(XDC_CFGTOKEN_AGENT_metaManager, XDC_CMD_METAMGR_IMPORT, new File("work/input/taxonomies/esef_taxonomy_2022_v1.1"));
 				break;
 			}
 		}
 //
 
-//		callAgent(XDC_CFGTOKEN_AGENT_metaManager, XDC_CMD_METAMGR_IMPORT, new File("ext/XBRLDock/taxonomy/import/us-gaap-2024"));
+//		callAgent(XDC_CFGTOKEN_AGENT_metaManager, XDC_CMD_METAMGR_IMPORT, new File("work/input/taxonomies/us-gaap-2024"));
 
 //		if ( skip ) {
 //			return;
@@ -87,8 +87,8 @@ public class XbrlDockPocApp extends XbrlDock implements XbrlDockPocConsts {
 //		logAbove = EventLevel.Trace;
 //		checkReports();
 
-		checkReport(
-				"ext/XBRLDock/sources/xbrl.org/filings/lei/25/7a/549300HB18MY7I4M4L84/549300HB18MY7I4M4L84-2023-12-31-ESEF-DK-0/549300HB18MY7I4M4L84-2023-12-31-en/549300HB18MY7I4M4L84-2023-12-31-en/META-INF");
+//		checkReport(
+//				"ext/XBRLDock/sources/xbrl.org/filings/lei/25/7a/549300HB18MY7I4M4L84/549300HB18MY7I4M4L84-2023-12-31-ESEF-DK-0/549300HB18MY7I4M4L84-2023-12-31-en/549300HB18MY7I4M4L84-2023-12-31-en/META-INF");
 	}
 
 	void checkReport(String repRoot) throws Exception {

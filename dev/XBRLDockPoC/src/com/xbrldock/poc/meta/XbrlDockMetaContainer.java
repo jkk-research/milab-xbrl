@@ -37,6 +37,8 @@ public class XbrlDockMetaContainer implements XbrlDockMetaConsts {
 	Map<String, Map<String, Object>> labels = new TreeMap<>();
 	Map<String, Object> itemsByNS = new TreeMap<>();
 
+	Map<String, Set<String>> fileLinks = new TreeMap<>();
+
 	boolean updated;
 
 	private ArrayList<String> queue = new ArrayList<>();
@@ -172,17 +174,13 @@ public class XbrlDockMetaContainer implements XbrlDockMetaConsts {
 	boolean optQueue(String url, String targetNs) {
 		url = XbrlDockUtils.optExtendRef(url, path);
 
-//		if ( url.split("//").length > 2 ) {
-//			XbrlDock.log(EventLevel.Warning, "Sorry?", url);
-//		}
-//
-//		if ( url.contains("xsdesef_cor") ) {
-//			XbrlDock.log(EventLevel.Warning, "Sorry?", url);
-//		}
-
 		if (null != currentContent) {
 			Map incl = XbrlDockUtils.safeGet(currentContent, XDC_METATOKEN_includes, SORTEDMAP_CREATOR);
 			incl.put(url, targetNs);
+		}
+
+		if ((null != currentUrl) && !XbrlDockUtils.isEqual(url, currentUrl)) {
+			XbrlDockUtils.safeGet(fileLinks, XbrlDockUtils.getPostfix(currentUrl, XDC_URL_PSEP), SORTEDSET_CREATOR).add(XbrlDockUtils.getPostfix(url, XDC_URL_PSEP));
 		}
 
 		if (loaded.contains(url) || queue.contains(url)) {
@@ -274,6 +272,11 @@ public class XbrlDockMetaContainer implements XbrlDockMetaConsts {
 
 			metaInfo.put(XDC_METAINFO_ownedUrls, new ArrayList(ownedUrls));
 			metaInfo.put(XDC_FACT_TOKEN_language, new ArrayList(labels.keySet()));
+			
+			Map<String, ArrayList<String>> mfl = XbrlDockUtils.safeGet(metaInfo, XDC_METATOKEN_fileLinks, SORTEDMAP_CREATOR);
+			for ( Map.Entry<String, Set<String>> efl : fileLinks.entrySet() ) {
+				mfl.put(efl.getKey(), new ArrayList(efl.getValue()));
+			}
 
 			CounterProcessor cnt = new CounterProcessor();
 
@@ -317,6 +320,12 @@ public class XbrlDockMetaContainer implements XbrlDockMetaConsts {
 			loadSet(ownedUrls, XDC_METAINFO_ownedUrls);
 			loadSet(loaded, XDC_METATOKEN_includes);
 //			requires.addAll(XbrlDockUtils.simpleGet(metaInfo, XDC_GEN_TOKEN_requires));
+			
+			Map<String, ArrayList<String>> fl = (Map<String, ArrayList<String>>) metaInfo.getOrDefault(XDC_METATOKEN_fileLinks, Collections.EMPTY_MAP);
+			fileLinks.clear();
+			for (Map.Entry<String, ArrayList<String>> fle : fl.entrySet()) {
+				fileLinks.put(fle.getKey(), new TreeSet<String>(fle.getValue()));
+			}
 
 			updated = false;
 
@@ -359,6 +368,24 @@ public class XbrlDockMetaContainer implements XbrlDockMetaConsts {
 
 	public String getItemLabel(String id) {
 		return XbrlDockUtils.getPostfix(id, XDC_SEP_ITEMID);
+	}
+
+	public int collectLinks(Set<String> target, String url) {
+		if ( target.add(url) ) {
+			Set<String> links = fileLinks.get(url);
+			
+			if ( null != links ) {
+				for ( String l : links ) {
+					collectLinks(target, l);
+				}
+			} else {
+				for ( XbrlDockMetaContainer mc : requires ) {
+					mc.collectLinks(target, url);
+				}
+			}
+		}
+		
+		return target.size();
 	}
 
 	public void visit(String itemType, GenProcessor lp, Object... params) {

@@ -142,7 +142,7 @@ public class XbrlDockGuiMetaItemInfoGrid extends JPanel implements XbrlDockGuiCo
 							}
 						}, itemId, "en");
 
-						if (!sbText.isEmpty()) {
+						if (0 < sbText.length()) {
 							sbText.insert(0, "<html><body><table>\n").append("</table></body></html>");
 							tpItem.setEnabledAt(1, true);
 						} else {
@@ -162,7 +162,7 @@ public class XbrlDockGuiMetaItemInfoGrid extends JPanel implements XbrlDockGuiCo
 //							txtItem.setText(sbText.toString());
 //						}
 
-						tpItem.setEnabledAt(1, !sbText.isEmpty());
+						tpItem.setEnabledAt(1, 0 < sbText.length());
 
 						StringBuilder sbRefs = new StringBuilder();
 						txtRefs.setText("");
@@ -204,7 +204,7 @@ public class XbrlDockGuiMetaItemInfoGrid extends JPanel implements XbrlDockGuiCo
 							}
 						});
 
-						tpItem.setEnabledAt(2, !sbRefs.isEmpty());
+						tpItem.setEnabledAt(2, 0 < sbRefs.length() );
 
 //						if ( !sbRefs.isEmpty() ) {
 //						Iterable<Map<String, Object>> refs = taxonomy.getItemRefs(itemId);

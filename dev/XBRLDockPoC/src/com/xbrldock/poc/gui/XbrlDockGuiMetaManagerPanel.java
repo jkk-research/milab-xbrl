@@ -10,6 +10,7 @@ import java.util.ArrayList;
 import java.util.Map;
 
 import javax.swing.JButton;
+import javax.swing.JComponent;
 import javax.swing.JEditorPane;
 import javax.swing.JPanel;
 import javax.swing.JScrollPane;
@@ -51,7 +52,16 @@ public class XbrlDockGuiMetaManagerPanel extends JPanel implements XbrlDockGuiCo
 	ActionListener al = new ActionListener() {
 		@Override
 		public void actionPerformed(ActionEvent e) {
-			switch (e.getActionCommand()) {
+			String cmd = e.getActionCommand();
+			
+			switch (cmd) {
+			case XDC_CMD_GEN_TEST01:
+				XbrlDock.callAgent(XDC_CFGTOKEN_AGENT_metaManager, XDC_CMD_GEN_TEST01, selItem);
+				break;
+			default:
+//				XbrlDockException.wrap(null, "Unknown command", cmd);
+				XbrlDock.log(EventLevel.Error, "Unknown command", cmd);
+				break;
 
 			}
 		}
@@ -88,15 +98,27 @@ public class XbrlDockGuiMetaManagerPanel extends JPanel implements XbrlDockGuiCo
 		txtInfo = new JEditorPane();
 		txtInfo.setContentType("text/html");
 		txtInfo.setEditable(false);
+		
+		JComponent right;
 
 		dropZone = new JButton("<html><body>Taxonomy<br>drop zone</body></html>");
 		dropZone.setBorder(new EtchedBorder(EtchedBorder.LOWERED));
 		dropZone.setMaximumSize(new Dimension(50, 500));
+		right = dropZone;
+		
+		if (XbrlDock.checkFlag(XDC_FLAG_ADMIN)) {
+			JPanel pnlRight = new JPanel(new BorderLayout());
+
+			pnlRight.add(dropZone, BorderLayout.CENTER);
+			pnlRight.add(XbrlDockGuiUtils.createBtn(XDC_CMD_GEN_TEST01, al, JButton.class), BorderLayout.SOUTH);
+			right = pnlRight;
+		}
+
 
 		JPanel pnlTop = new JPanel(new BorderLayout());
 
 		pnlTop.add(new JScrollPane(tblGrid), BorderLayout.CENTER);
-		pnlTop.add(dropZone, BorderLayout.EAST);
+		pnlTop.add(right, BorderLayout.EAST);
 		add(XbrlDockUtilsGui.createSplit(false, pnlTop, new JScrollPane(txtInfo), 0.2), BorderLayout.CENTER);
 	}
 
