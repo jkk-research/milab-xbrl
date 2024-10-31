@@ -3,6 +3,7 @@ package com.xbrldock.utils;
 import java.awt.event.ActionListener;
 
 import javax.swing.AbstractButton;
+import javax.swing.JComboBox;
 import javax.swing.JComponent;
 import javax.swing.JSplitPane;
 import javax.swing.border.TitledBorder;
@@ -34,9 +35,17 @@ public class XbrlDockUtilsGui implements XbrlDockUtilsConsts {
 		}
 	}
 
-	public static void setActive(AbstractButton ab, String cmd, ActionListener al) {
+	public static JComboBox<?> setActive(JComboBox<?> cb, String cmd, ActionListener al) {
+		cb.addActionListener(al);
+		cb.setActionCommand(cmd);
+		setTitle(cb, XbrlDockUtils.camel2Label(cmd));
+		return cb;
+	}
+
+	public static AbstractButton setActive(AbstractButton ab, String cmd, ActionListener al) {
 		ab.addActionListener(al);
 		ab.setActionCommand(cmd);
 		ab.setText(XbrlDockUtils.camel2Label(cmd));
+		return ab;
 	}
 }

@@ -26,6 +26,9 @@ import com.xbrldock.utils.XbrlDockUtilsGui;
 @SuppressWarnings({ "rawtypes", "unchecked" })
 public class XbrlDockGuiMetaTaxonomyPanel extends JPanel implements XbrlDockGuiConsts, GenAgent {
 	private static final long serialVersionUID = 1L;
+	
+	private static final String XDC_APP_SHOWITEMS = "showItems";
+
 
 	XbrlDockMetaContainer taxonomy;
 	Map<String, Set<String>> entryPointUrls = new TreeMap<>();

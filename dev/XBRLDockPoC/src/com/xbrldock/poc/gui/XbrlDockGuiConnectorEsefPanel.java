@@ -11,6 +11,7 @@ import javax.swing.JCheckBox;
 import javax.swing.JPanel;
 import javax.swing.JScrollPane;
 import javax.swing.JTextArea;
+import javax.swing.ListSelectionModel;
 
 import com.xbrldock.XbrlDock;
 import com.xbrldock.XbrlDockConsts.GenAgent;
@@ -28,7 +29,9 @@ public class XbrlDockGuiConnectorEsefPanel extends JPanel implements XbrlDockGui
 	private static final long serialVersionUID = 1L;
 
 //@formatter:off  
-	XbrlDockGuiUtilsGrid reportGrid = new XbrlDockGuiUtilsGrid(this, 
+	XbrlDockGuiWidgetGrid reportGrid = new XbrlDockGuiWidgetGrid(
+			ListSelectionModel.SINGLE_SELECTION, new String[] {XDC_GRIDCOL_ROWNUM, XDC_GRIDCOL_SELECTED},
+			
 			new LabeledAccess("Entity", "", XDC_REPORT_TOKEN_entityName), 
 			new LabeledAccess("Identifier", "", XDC_REPORT_TOKEN_sourceAtts, XDC_XBRLORG_TOKEN_fxo_id),
 			new LabeledAccess("Start", "", XDC_REPORT_TOKEN_startDate), 
@@ -60,25 +63,28 @@ public class XbrlDockGuiConnectorEsefPanel extends JPanel implements XbrlDockGui
 
 			switch (cmd) {
 			case XDC_CMD_GEN_FILTER:
-//				boolean update = false;
-
 				String txt = repFilterTA.getText().trim();
 				if (!XbrlDockUtils.isEqual(txt, repFilterStr)) {
-//					update = true;
 					repFilterStr = txt;
 					repFilterOb = XbrlDockUtils.isEmpty(repFilterStr) ? null : XbrlDockUtilsMvel.compile(repFilterStr);
 				}
-
-//				if ( update) 
-			{
 				updateReportGrid();
-			}
 				break;
 			case XDC_CMD_GEN_TEST01:
 				XbrlDockDevReportStats stats = new XbrlDockDevReportStats();
 				XbrlDock.callAgent(XDC_CFGTOKEN_AGENT_esefConn, XDC_CMD_GEN_TEST01, stats);
 
 				XbrlDock.log(EventLevel.Info, "Test visit sats", stats);
+				break;
+			case XDC_GUICMD_PICK:
+				updateDescPanel(((WidgetEvent)e).getUserOb());
+				break;
+			case XDC_GUICMD_SELCHG:
+				
+				break;
+			case XDC_GUICMD_ACTIVATE:
+				String selId = XbrlDockUtils.simpleGet(((WidgetEvent)e).getUserOb(), XDC_EXT_TOKEN_id);
+				XbrlDock.callAgent(XDC_CFGTOKEN_AGENT_gui, XDC_CMD_GEN_SELECT, XDC_CFGTOKEN_AGENT_esefConn, selId);
 				break;
 			default:
 				XbrlDockException.wrap(null, "Unknown command", cmd);
@@ -96,17 +102,17 @@ public class XbrlDockGuiConnectorEsefPanel extends JPanel implements XbrlDockGui
 		btFilter = XbrlDockGuiUtils.createBtn(XDC_CMD_GEN_FILTER, al, JButton.class);
 
 		factFilterTA = new JTextArea();
-		chkByCtx = new JCheckBox("Group facts by context");
 		factFilterEval = new XbrlDockReportExprEval();
 
+//		chkByCtx = new JCheckBox("Group facts by context");
 //		JPanel pnlFactFilter = new JPanel(new BorderLayout());
 //		pnlFactFilter.add(new JScrollPane(factFilterTA), BorderLayout.CENTER);
 //		pnlFactFilter.add(chkByCtx, BorderLayout.SOUTH);
 
 		JPanel pnlFilterInput = new JPanel(new BorderLayout());
 		pnlFilterInput.add(XbrlDockUtilsGui.createSplit(true, 
-				XbrlDockGuiUtils.setTitle(new JScrollPane(repFilterTA), "Filter report list"),
-				XbrlDockGuiUtils.setTitle(new JScrollPane(factFilterTA), "Filter reports by fact content"), 0.5), BorderLayout.CENTER);
+				XbrlDockGuiUtils.setTitle(new JScrollPane(repFilterTA), "Filter by report data"),
+				XbrlDockGuiUtils.setTitle(new JScrollPane(factFilterTA), "Filter by fact data"), 0.5), BorderLayout.CENTER);
 //		XbrlDockGuiUtils.setTitle(pnlFactFilter, "Filter reports by fact content"), 0.5), BorderLayout.CENTER);
 
 		JPanel pnlFilter = new JPanel(new BorderLayout());
@@ -121,6 +127,8 @@ public class XbrlDockGuiConnectorEsefPanel extends JPanel implements XbrlDockGui
 		pnlTop.add(XbrlDockUtilsGui.createSplit(false, pnlFilter, XbrlDockGuiUtils.setTitle(reportGrid, "Reports"), 0.2), BorderLayout.CENTER);
 
 		add(XbrlDockUtilsGui.createSplit(false, pnlTop, XbrlDockGuiUtils.setTitle(repInfo, "Selected report information"), 0.2), BorderLayout.CENTER);
+		
+		reportGrid.setActionListener(al, XDC_GUICMD_ACTIVATE, XDC_GUICMD_PICK);
 	}
 
 	protected void updateDescPanel(Object selItem) {

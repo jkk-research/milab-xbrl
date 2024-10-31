@@ -2,6 +2,8 @@
 "cmn:TypeOfAuditorAssistance".equals(concept)
 "gsd:EmailOfReportingEntity".equals(concept)
 
+http://xbrl.ifrs.org/taxonomy/2019-03-27/full_ifrs/full_ifrs-cor_2019-03-27.xsd#ifrs-full_AccrualsAndDeferredIncomeClassifiedAsCurrentAbstract
+
 *** 20240923 ***
 
 2024-09-23T15_18_15 Trace Data count, 9261

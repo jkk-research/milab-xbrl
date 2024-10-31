@@ -11,6 +11,7 @@ import java.util.TreeMap;
 import java.util.TreeSet;
 
 import javax.swing.JPanel;
+import javax.swing.ListSelectionModel;
 import javax.swing.event.TreeSelectionEvent;
 import javax.swing.event.TreeSelectionListener;
 import javax.swing.tree.DefaultMutableTreeNode;
@@ -40,7 +41,9 @@ public class XbrlDockGuiReportPanel extends JPanel implements XbrlDockGuiConsts,
 		}
 	};
 //@formatter:off  
-	XbrlDockGuiUtilsGrid factGrid = new XbrlDockGuiUtilsGrid(this, 
+	XbrlDockGuiWidgetGrid factGrid = new XbrlDockGuiWidgetGrid( 
+			ListSelectionModel.SINGLE_SELECTION, new String[] {XDC_GRIDCOL_ROWNUM},
+			
 			new LabeledAccess("Entity", fmtCtx, XDC_FACT_TOKEN_entity), 
 			new LabeledAccess("Instant", fmtCtx, XDC_FACT_TOKEN_instant),
 			new LabeledAccess("Start", fmtCtx, XDC_FACT_TOKEN_startDate),
@@ -102,7 +105,8 @@ public class XbrlDockGuiReportPanel extends JPanel implements XbrlDockGuiConsts,
 		}
 	};
 
-	XbrlDockGuiUtilsTree ctxTree = new XbrlDockGuiUtilsTree(CTX_ROOT, true, TreeSelectionModel.SINGLE_TREE_SELECTION, ctxTreeSelListener);
+//XbrlDockGuiUtilsTree ctxTree = new XbrlDockGuiUtilsTree(CTX_ROOT, true, TreeSelectionModel.SINGLE_TREE_SELECTION, ctxTreeSelListener);
+	XbrlDockGuiWidgetTree ctxTree = new XbrlDockGuiWidgetTree(CTX_ROOT, true, TreeSelectionModel.SINGLE_TREE_SELECTION);
 
 	GenProcessor conceptTreeLoader = new GenProcessor<DefaultMutableTreeNode>() {
 		@Override
@@ -142,7 +146,8 @@ public class XbrlDockGuiReportPanel extends JPanel implements XbrlDockGuiConsts,
 		}
 	};
 
-	XbrlDockGuiUtilsTree conceptTree = new XbrlDockGuiUtilsTree("", false, TreeSelectionModel.DISCONTIGUOUS_TREE_SELECTION, conceptTreeSelListener);
+//	XbrlDockGuiUtilsTree conceptTree = new XbrlDockGuiUtilsTree("", false, TreeSelectionModel.DISCONTIGUOUS_TREE_SELECTION, conceptTreeSelListener);
+	XbrlDockGuiWidgetTree conceptTree = new XbrlDockGuiWidgetTree("", false, TreeSelectionModel.DISCONTIGUOUS_TREE_SELECTION);
 
 	Map<String, Set> ctxHierarchy = new TreeMap<>();
 	Set ctxFilter;
@@ -246,7 +251,7 @@ public class XbrlDockGuiReportPanel extends JPanel implements XbrlDockGuiConsts,
 	public XbrlDockGuiReportPanel() throws Exception {
 		super(new BorderLayout());
 
-		factGrid.setShowRowNum(true);
+//		factGrid.setShowRowNum(true);
 		JPanel pnlLeft = new JPanel(new BorderLayout());
 
 		pnlLeft.add(XbrlDockUtilsGui.createSplit(false, conceptTree.getComp(), ctxTree.getComp(), 0.4), BorderLayout.CENTER);

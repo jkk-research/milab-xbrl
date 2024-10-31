@@ -148,6 +148,7 @@ public interface XbrlDockUtilsConsts extends XbrlDockConsts {
 
 	class LabeledAccess {
 		public final String label;
+		public final Class valClass;
 		private final Object[] path;
 
 		private final Object defVal;
@@ -158,6 +159,7 @@ public interface XbrlDockUtilsConsts extends XbrlDockConsts {
 			this.path = p;
 			this.defVal = d;
 			this.fmt = null;
+			this.valClass = (null == d) ? Object.class : d.getClass();
 		}
 
 		public LabeledAccess(String l, ObjectFormatter f, Object... p) {
@@ -165,6 +167,7 @@ public interface XbrlDockUtilsConsts extends XbrlDockConsts {
 			this.path = p;
 			this.defVal = null;
 			this.fmt = f;
+			this.valClass = String.class;
 		}
 
 		public <RetType> RetType get(Object from) {

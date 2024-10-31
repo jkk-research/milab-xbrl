@@ -105,6 +105,7 @@ public interface XbrlDockConsts {
 
 	String XDC_EXT_TOKEN_id = "id";
 	String XDC_EXT_TOKEN_name = "name";
+	String XDC_EXT_TOKEN_order = "order";
 	String XDC_EXT_TOKEN_identifier = "identifier";
 
 	String XDC_ENTITY_TOKEN_idType = "idType";

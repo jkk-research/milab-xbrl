@@ -37,7 +37,7 @@ public class XbrlDockMetaContainer implements XbrlDockMetaConsts {
 	Map<String, Map<String, Object>> labels = new TreeMap<>();
 	Map<String, Object> itemsByNS = new TreeMap<>();
 
-	Map<String, Set<String>> fileLinks = new TreeMap<>();
+	Map<String, Map<String, RoleTree>> roleTreeMap;
 
 	boolean updated;
 
@@ -84,6 +84,104 @@ public class XbrlDockMetaContainer implements XbrlDockMetaConsts {
 
 	public Map getMetaInfo() {
 		return metaInfo;
+	}
+
+	public Iterable<String> getRoleTypes() {
+		getRoleTreeMap("");
+		return roleTreeMap.keySet();
+	}
+
+	public synchronized Map<String, RoleTree> getRoleTreeMap(String type) {
+		if (null == roleTreeMap) {
+			roleTreeMap = new TreeMap<>();
+			Map<String, Map> roles = new TreeMap<String, Map>();
+			
+			visit(XDC_METATOKEN_items, new GenProcessor() {
+
+				@Override
+				public boolean process(ProcessorAction action, Object item) throws Exception {
+					switch (action) {
+					case Process:
+						Map<String, String> l = ((Map.Entry<String, Map>) item).getValue();
+						
+						String roleUri = l.get("roleURI");
+						
+						if ( !XbrlDockUtils.isEmpty(roleUri)) {
+							roles.put(XbrlDockUtils.getPostfix(roleUri, XDC_URL_PSEP), l);
+						}
+						
+						break;
+					default:
+						break;
+					}
+					return true;
+				}
+			});
+
+			visit(XDC_METATOKEN_links, new GenProcessor() {
+				String url;
+				Set<RoleTree> localTrees = new HashSet<>();
+				
+				ItemCreator<RoleTreeNode> crtNode = new ItemCreator<RoleTreeNode>() {
+					@Override
+					public RoleTreeNode create(Object key, Object... hints) {
+						Map item = peekItem((String) key);
+						return new RoleTreeNode(url, item);
+					}
+				};
+
+				ItemCreator<RoleTree> crtTree = new ItemCreator<RoleTree>() {
+					@Override
+					public RoleTree create(Object key, Object... hints) {
+						Map item = roles.get((String) key);
+						return new RoleTree(url, item);
+					}
+				};
+
+				@Override
+				public boolean process(ProcessorAction action, Object item) throws Exception {
+					switch (action) {
+					case Begin:
+						url = (String) item;
+						localTrees.clear();
+						break;
+					case Process:
+						Map<String, String> l = (Map) item;
+						
+						String roleType = l.get("type");
+						Map<String, RoleTree> typeMap = XbrlDockUtils.safeGet(roleTreeMap, roleType, SORTEDMAP_CREATOR);
+						
+						String roleName = l.get("xlink:role");
+						RoleTree rt = XbrlDockUtils.safeGet(typeMap, roleName, crtTree);
+						
+						localTrees.add(rt);
+						
+						RoleTreeNode rtnFrom = XbrlDockUtils.safeGet(rt.allNodes, l.get("xlink:from"), crtNode);
+						RoleTreeNode rtnTo = XbrlDockUtils.safeGet(rt.allNodes, l.get("xlink:to"), crtNode);
+						
+						rtnTo.setUpLink(l);
+						
+						rtnFrom.addChild(rtnTo);
+						break;
+					case End:
+						for ( RoleTree lt : localTrees ) {
+							for ( Map.Entry<String, RoleTreeNode> lne : lt.allNodes.entrySet() ) {
+								RoleTreeNode ne = lne.getValue();
+								if ( null == ne.getUpLink() ) {
+									lt.addChild(ne);
+								}
+							}
+						}
+						break;
+					default:
+						break;
+					}
+					return true;
+				}
+			});
+		}
+		
+		return roleTreeMap.get(type);
 	}
 
 	void setUrlContent(Map content) throws Exception {
@@ -179,9 +277,9 @@ public class XbrlDockMetaContainer implements XbrlDockMetaConsts {
 			incl.put(url, targetNs);
 		}
 
-		if ((null != currentUrl) && !XbrlDockUtils.isEqual(url, currentUrl)) {
-			XbrlDockUtils.safeGet(fileLinks, XbrlDockUtils.getPostfix(currentUrl, XDC_URL_PSEP), SORTEDSET_CREATOR).add(XbrlDockUtils.getPostfix(url, XDC_URL_PSEP));
-		}
+//		if ((null != currentUrl) && !XbrlDockUtils.isEqual(url, currentUrl)) {
+//			XbrlDockUtils.safeGet(fileLinks, XbrlDockUtils.getPostfix(currentUrl, XDC_URL_PSEP), SORTEDSET_CREATOR).add(XbrlDockUtils.getPostfix(url, XDC_URL_PSEP));
+//		}
 
 		if (loaded.contains(url) || queue.contains(url)) {
 			return false;
@@ -272,11 +370,11 @@ public class XbrlDockMetaContainer implements XbrlDockMetaConsts {
 
 			metaInfo.put(XDC_METAINFO_ownedUrls, new ArrayList(ownedUrls));
 			metaInfo.put(XDC_FACT_TOKEN_language, new ArrayList(labels.keySet()));
-			
-			Map<String, ArrayList<String>> mfl = XbrlDockUtils.safeGet(metaInfo, XDC_METATOKEN_fileLinks, SORTEDMAP_CREATOR);
-			for ( Map.Entry<String, Set<String>> efl : fileLinks.entrySet() ) {
-				mfl.put(efl.getKey(), new ArrayList(efl.getValue()));
-			}
+
+//			Map<String, ArrayList<String>> mfl = XbrlDockUtils.safeGet(metaInfo, XDC_METATOKEN_fileLinks, SORTEDMAP_CREATOR);
+//			for ( Map.Entry<String, Set<String>> efl : fileLinks.entrySet() ) {
+//				mfl.put(efl.getKey(), new ArrayList(efl.getValue()));
+//			}
 
 			CounterProcessor cnt = new CounterProcessor();
 
@@ -320,12 +418,12 @@ public class XbrlDockMetaContainer implements XbrlDockMetaConsts {
 			loadSet(ownedUrls, XDC_METAINFO_ownedUrls);
 			loadSet(loaded, XDC_METATOKEN_includes);
 //			requires.addAll(XbrlDockUtils.simpleGet(metaInfo, XDC_GEN_TOKEN_requires));
-			
-			Map<String, ArrayList<String>> fl = (Map<String, ArrayList<String>>) metaInfo.getOrDefault(XDC_METATOKEN_fileLinks, Collections.EMPTY_MAP);
-			fileLinks.clear();
-			for (Map.Entry<String, ArrayList<String>> fle : fl.entrySet()) {
-				fileLinks.put(fle.getKey(), new TreeSet<String>(fle.getValue()));
-			}
+
+//			Map<String, ArrayList<String>> fl = (Map<String, ArrayList<String>>) metaInfo.getOrDefault(XDC_METATOKEN_fileLinks, Collections.EMPTY_MAP);
+//			fileLinks.clear();
+//			for (Map.Entry<String, ArrayList<String>> fle : fl.entrySet()) {
+//				fileLinks.put(fle.getKey(), new TreeSet<String>(fle.getValue()));
+//			}
 
 			updated = false;
 
@@ -371,20 +469,24 @@ public class XbrlDockMetaContainer implements XbrlDockMetaConsts {
 	}
 
 	public int collectLinks(Set<String> target, String url) {
-		if ( target.add(url) ) {
-			Set<String> links = fileLinks.get(url);
-			
-			if ( null != links ) {
-				for ( String l : links ) {
+		if (target.add(url)) {
+			Map<String, String> incl = XbrlDockUtils.simpleGet(contentByURL, url, XDC_METATOKEN_includes);
+
+//			Set<String> links = fileLinks.get(url);
+
+			if (null != incl) {
+				for (String l : incl.keySet()) {
 					collectLinks(target, l);
 				}
 			} else {
-				for ( XbrlDockMetaContainer mc : requires ) {
-					mc.collectLinks(target, url);
+				for (XbrlDockMetaContainer mc : requires) {
+					if (null != mc) {
+						mc.collectLinks(target, url);
+					}
 				}
 			}
 		}
-		
+
 		return target.size();
 	}
 
@@ -408,14 +510,15 @@ public class XbrlDockMetaContainer implements XbrlDockMetaConsts {
 				}
 				break;
 			case XDC_METATOKEN_links:
-				for (Map ce : contentByURL.values()) {
-					c = (Collection) ce.getOrDefault(itemType, Collections.EMPTY_LIST);
+				for (Map.Entry<String, Map<String, Object>> ce : contentByURL.entrySet()) {
+					c = (Collection) ce.getValue().getOrDefault(itemType, Collections.EMPTY_LIST);
 					if ((null != c) && !c.isEmpty()) {
-						lp.process(ProcessorAction.Begin, null);
+						String key = ce.getKey();
+						lp.process(ProcessorAction.Begin, key);
 						for (Object e : c) {
 							lp.process(ProcessorAction.Process, e);
 						}
-						lp.process(ProcessorAction.End, null);
+						lp.process(ProcessorAction.End, key);
 					}
 				}
 				break;

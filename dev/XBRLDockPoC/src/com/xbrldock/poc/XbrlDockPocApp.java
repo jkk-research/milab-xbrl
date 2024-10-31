@@ -35,6 +35,12 @@ public class XbrlDockPocApp extends XbrlDock implements XbrlDockPocConsts {
 
 	@Override
 	protected void run() throws Exception {
+		
+//		File srcRoot = new File("work/input");
+//		File targetRoot = new File("/Volumes/Backup01/lkedves/XBRLDock");
+//		
+//		XbrlDockUtilsFile.backup(srcRoot, targetRoot);
+		
 		String urlCacheRoot = XbrlDockUtils.simpleGet(APP_CONFIG, XDC_CFGTOKEN_app, XDC_CFGTOKEN_dirUrlCache);
 		XbrlDockUtilsNet.setCacheRoot(urlCacheRoot);
 		

@@ -259,20 +259,20 @@ public class XbrlDockMetaManager implements XbrlDockMetaConsts, XbrlDockConsts.G
 				metaContainer.contentByURL.remove(ak);
 			}
 			
-			alienKeys = new TreeSet<>(metaContainer.fileLinks.keySet());
-
-			for (String prefix : metaContainer.ownedUrls) {
-				for (Iterator<String> iak = alienKeys.iterator(); iak.hasNext();) {
-					String ak = iak.next();
-					if (ak.startsWith(prefix)) {
-						iak.remove();
-					}
-				}
-			}
-
-			for (String ak : alienKeys) {
-				metaContainer.fileLinks.remove(ak);
-			}
+//			alienKeys = new TreeSet<>(metaContainer.fileLinks.keySet());
+//
+//			for (String prefix : metaContainer.ownedUrls) {
+//				for (Iterator<String> iak = alienKeys.iterator(); iak.hasNext();) {
+//					String ak = iak.next();
+//					if (ak.startsWith(prefix)) {
+//						iak.remove();
+//					}
+//				}
+//			}
+//
+//			for (String ak : alienKeys) {
+//				metaContainer.fileLinks.remove(ak);
+//			}
 			
 
 			mcById.put(metaContainer.getId(), metaContainer);

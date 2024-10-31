@@ -47,7 +47,7 @@
         } ],
         "childPanels" : {
           "metaManager" : {
-            "javaClass" : "com.xbrldock.poc.gui.XbrlDockGuiMetaTaxonomyPanel",
+            "javaClass" : "com.xbrldock.poc.gui.XbrlDockGuiMetaContainerPanel",
             "name" : "XBRLDock PoC Taxonomy Viewer - "
           },
           "esefConn" : {

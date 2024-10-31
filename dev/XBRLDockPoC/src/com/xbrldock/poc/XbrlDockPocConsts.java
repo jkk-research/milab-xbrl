@@ -45,7 +45,7 @@ public interface XbrlDockPocConsts extends XbrlDockConsts, XbrlDockUtilsConsts {
 	String XDC_METATOKEN_includes = "includes";
 	String XDC_METATOKEN_url = "xdc_url";
 	String XDC_METATOKEN_tagName = "xdc_tagName";
-	String XDC_METATOKEN_fileLinks = "xdc_fileLinks";
+//	String XDC_METATOKEN_fileLinks = "xdc_fileLinks";
 	
 
 	String XDC_CFGTOKEN_dirStore = "dirStore";
@@ -66,6 +66,11 @@ public interface XbrlDockPocConsts extends XbrlDockConsts, XbrlDockUtilsConsts {
 	String XDC_FNAME_FILINGTAXPACK = "taxonomyPackage.xml";
 
 	String XDC_RETVAL_STOP = "xbrl_Stop";
+
+	
+	String XDC_APP_SETROLETYPE = "setRoleType";
+	String XDC_APP_SETLANG = "setLanguage";
+	String XDC_APP_SETENTRYPOINT = "setEntryPoint";
 
 	
 	public interface XDModSourceConnector extends GenAgent {
