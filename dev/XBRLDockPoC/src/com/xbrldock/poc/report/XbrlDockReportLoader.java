@@ -3,6 +3,7 @@ package com.xbrldock.poc.report;
 import java.io.BufferedReader;
 import java.io.File;
 import java.io.FileReader;
+import java.math.BigDecimal;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashMap;
@@ -223,9 +224,16 @@ public class XbrlDockReportLoader implements XbrlDockReportConsts, XbrlDockPocCo
 					}
 
 					key = fact.get(XDC_FACT_TOKEN_unit);
-					if (unit.add(key)) {
+					if (!XbrlDockUtils.isEmpty((String) key) && unit.add(key)) {
 						XbrlDockUtils.optCopyFields(fact, segment, UNIT_FIELDS);
 						dataHandler.processSegment(XDC_REP_SEG_Unit, segment);
+					}
+					
+					switch ((String) fact.get(XDC_FACT_TOKEN_xbrldockFactType) ) {
+					case XDC_FACT_VALTYPE_number:
+						BigDecimal bd = new BigDecimal((String) fact.get(XDC_GEN_TOKEN_value));
+						fact.put(XDC_GEN_TOKEN_value, bd);
+						break;
 					}
 
 					String ret = dataHandler.processSegment(XDC_REP_SEG_Fact, fact);
@@ -234,6 +242,10 @@ public class XbrlDockReportLoader implements XbrlDockReportConsts, XbrlDockPocCo
 						break;
 					}
 				}
+			}
+			
+			if ( null != colNames) {
+				dataHandler.endReport();
 			}
 		} finally {
 		}

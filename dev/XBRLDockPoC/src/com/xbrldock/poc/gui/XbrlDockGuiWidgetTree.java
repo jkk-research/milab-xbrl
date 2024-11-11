@@ -1,5 +1,6 @@
 package com.xbrldock.poc.gui;
 
+import java.awt.Component;
 import java.awt.event.ActionListener;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
@@ -12,7 +13,9 @@ import javax.swing.JTree;
 import javax.swing.event.TreeSelectionEvent;
 import javax.swing.event.TreeSelectionListener;
 import javax.swing.tree.DefaultMutableTreeNode;
+import javax.swing.tree.DefaultTreeCellRenderer;
 import javax.swing.tree.DefaultTreeModel;
+import javax.swing.tree.TreeCellRenderer;
 import javax.swing.tree.TreePath;
 import javax.swing.tree.TreeSelectionModel;
 
@@ -27,7 +30,7 @@ public class XbrlDockGuiWidgetTree implements XbrlDockGuiConsts.Widget<JComponen
 	private TreeSelectionModel tsm;
 
 	private final Set selection = new HashSet();
-	
+
 	private JComponent comp;
 
 	public XbrlDockGuiWidgetTree(Object rootOb, boolean rootVisible, int selMode) {
@@ -61,8 +64,11 @@ public class XbrlDockGuiWidgetTree implements XbrlDockGuiConsts.Widget<JComponen
 						@Override
 						public void valueChanged(TreeSelectionEvent e) {
 							selection.clear();
-							for ( TreePath tp : tree.getSelectionPaths()) {
-								selection.add(tp.getLastPathComponent());
+							TreePath[] sps = tree.getSelectionPaths();
+							if (null != sps) {
+								for (TreePath tp : sps) {
+									selection.add(tp.getLastPathComponent());
+								}
 							}
 							al.actionPerformed(new WidgetEvent(XbrlDockGuiWidgetTree.this, XDC_GUICMD_PICK, selection));
 						}
@@ -82,6 +88,24 @@ public class XbrlDockGuiWidgetTree implements XbrlDockGuiConsts.Widget<JComponen
 				break;
 			}
 		}
+	}
+
+	public void setItemFormatter(ObjectFormatter<Object> fmt) {
+		TreeCellRenderer tcr = new DefaultTreeCellRenderer() {
+			private static final long serialVersionUID = 1L;
+			@Override
+			public Component getTreeCellRendererComponent(JTree tree, Object value, boolean sel, boolean expanded, boolean leaf, int row, boolean hasFocus) {
+				Object ob = ((DefaultMutableTreeNode)value).getUserObject();
+
+				return super.getTreeCellRendererComponent(tree, fmt.toString(ob, null), sel, expanded, leaf, row, hasFocus);
+			}
+		};
+		
+		setItemRenderer(tcr);
+	}
+
+	public void setItemRenderer(TreeCellRenderer tcr) {
+		tree.setCellRenderer(tcr);
 	}
 
 	public DefaultMutableTreeNode getRootNode() {

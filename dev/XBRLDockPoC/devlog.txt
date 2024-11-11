@@ -1,3 +1,30 @@
+"HU".equals(sourceAtts.country)
+
+*** 20241106 ***
+
+Stats {	
+	File Count - Data	9260	
+	File Count - Input Report	9260	
+	File Count - Input Report - HTML	1151	
+	File Count - Input Report - XBRL	1	
+	File Count - Input Report - XHTML	8108	
+	File Count - Text	8489	
+	File Size  - Data	3895452150	
+	File Size  - Input Report	258912033599	
+	File Size  - Input Report - HTML	35268806342	
+	File Size  - Input Report - XBRL	1745	
+	File Size  - Input Report - XHTML	223643225512	
+	File Size  - Text	3255129059	
+	Segment count - Context	419076	
+	Segment count - Fact	4112654	
+	Segment count - Unit	29259
+ }
+
+ 
+ LOC: 9200
+ GUI: 2700
+
+
 "DK".equals(sourceAtts.country)
 "cmn:TypeOfAuditorAssistance".equals(concept)
 "gsd:EmailOfReportingEntity".equals(concept)

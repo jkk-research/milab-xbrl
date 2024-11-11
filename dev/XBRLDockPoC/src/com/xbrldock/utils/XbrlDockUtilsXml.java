@@ -2,14 +2,21 @@ package com.xbrldock.utils;
 
 import java.io.File;
 import java.io.FileInputStream;
+import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
+import java.io.OutputStream;
 import java.util.Map;
 import java.util.TreeMap;
 
 import javax.xml.parsers.DocumentBuilder;
 import javax.xml.parsers.DocumentBuilderFactory;
 import javax.xml.parsers.ParserConfigurationException;
+import javax.xml.transform.Transformer;
+import javax.xml.transform.TransformerConfigurationException;
+import javax.xml.transform.TransformerFactory;
+import javax.xml.transform.dom.DOMSource;
+import javax.xml.transform.stream.StreamResult;
 
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
@@ -24,8 +31,6 @@ import com.xbrldock.XbrlDockException;
 
 public class XbrlDockUtilsXml implements XbrlDockUtilsConsts {
 
-	private static DocumentBuilderFactory dbf = DocumentBuilderFactory.newInstance();
-
 	private static EntityResolver CACHED_RESOLVER = new EntityResolver() {
 		@Override
 		public InputSource resolveEntity(String publicId, String systemId) throws SAXException, IOException {
@@ -34,7 +39,10 @@ public class XbrlDockUtilsXml implements XbrlDockUtilsConsts {
 		}
 	};
 
-	private static ThreadLocal<DocumentBuilder> tdb = new ThreadLocal<DocumentBuilder>() {
+
+	private static ThreadLocal<DocumentBuilder> TDB = new ThreadLocal<DocumentBuilder>() {
+		private DocumentBuilderFactory dbf = DocumentBuilderFactory.newInstance();
+		
 		protected DocumentBuilder initialValue() {
 			try {
 				dbf.setValidating(false);
@@ -45,18 +53,56 @@ public class XbrlDockUtilsXml implements XbrlDockUtilsConsts {
 		};
 	};
 
-	public static Document parseDoc(InputStream is) throws Exception {
-		DocumentBuilder db = tdb.get();
+	private static ThreadLocal<Transformer> TTF = new ThreadLocal<Transformer>() {
+		private TransformerFactory tf = TransformerFactory.newInstance();
+		protected Transformer initialValue() {
+			try {
+				return tf.newTransformer();
+			} catch (TransformerConfigurationException e) {
+				return XbrlDockException.wrap(e);
+			}
+		};
+	};
+
+	private static DocumentBuilder createDocBuilder() throws Exception {
+		DocumentBuilder db = TDB.get();
 		db.reset();
 
 		db.setEntityResolver(CACHED_RESOLVER);
 
+		return db;
+	};
+
+	public static Document parseDoc(InputStream is) throws Exception {
+		DocumentBuilder db = createDocBuilder();
 		return db.parse(is);
 	}
 
 	public static Document parseDoc(File f) throws Exception {
 		try (FileInputStream fis = new FileInputStream(f)) {
 			return parseDoc(fis);
+		}
+	}
+
+	public static Document createDoc() throws Exception {
+		DocumentBuilder db = createDocBuilder();
+		return db.newDocument();
+	}
+
+	public static void saveDoc(Document doc, OutputStream os, boolean pretty) throws Exception {
+    Transformer transformer = TTF.get();
+    DOMSource source = new DOMSource(doc);
+    StreamResult result = new StreamResult(os);
+
+    transformer.transform(source, result);
+    
+    os.flush();
+	}
+
+	public static void saveDoc(Document doc, File f, boolean pretty) throws Exception {
+		XbrlDockUtilsFile.ensureDir(f.getParentFile());
+		try (FileOutputStream os = new FileOutputStream(f)) {
+			saveDoc(doc, os, pretty);
 		}
 	}
 
@@ -82,8 +128,8 @@ public class XbrlDockUtilsXml implements XbrlDockUtilsConsts {
 				target.put(an, av);
 			}
 		}
-		
-		if ( null != txtAttName ) {
+
+		if (null != txtAttName) {
 			String tx = e.getTextContent();
 			if (!XbrlDockUtils.isEmpty(tx)) {
 				tx = tx.replaceAll("\\s+", " ").trim();
@@ -121,7 +167,9 @@ public class XbrlDockUtilsXml implements XbrlDockUtilsConsts {
 
 	public static abstract class ChildProcessor {
 		public abstract void processChild(String tagName, Element ch);
-		public void finish() {};
+
+		public void finish() {
+		};
 	}
 
 	public static void processChildren(Element eTaxPack, ChildProcessor childProcessor) {
@@ -136,7 +184,7 @@ public class XbrlDockUtilsXml implements XbrlDockUtilsConsts {
 				childProcessor.processChild(tagName, e);
 			}
 		}
-		
+
 		childProcessor.finish();
 	}
 }

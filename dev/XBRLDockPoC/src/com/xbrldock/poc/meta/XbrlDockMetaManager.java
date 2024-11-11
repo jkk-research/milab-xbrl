@@ -209,7 +209,7 @@ public class XbrlDockMetaManager implements XbrlDockMetaConsts, XbrlDockConsts.G
 				try (InputStream is = XbrlDockUtilsNet.resolveEntityStream(url)) {
 					Element eDoc = XbrlDockUtilsXml.parseDoc(is).getDocumentElement();
 
-//					XbrlDock.log(EventLevel.Trace, "loading", url);
+					XbrlDock.log(EventLevel.Trace, "loading", url);
 
 					XbrlDockMetaContainer mcData = null;
 

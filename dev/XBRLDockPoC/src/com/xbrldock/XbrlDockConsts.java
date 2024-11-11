@@ -84,6 +84,7 @@ public interface XbrlDockConsts {
 	String XDC_REP_SEG_Context = "Context";
 	String XDC_REP_SEG_Unit = "Unit";
 	String XDC_REP_SEG_Fact = "Fact";
+	String[] XDC_SEGMENTS = {XDC_REP_SEG_Context, XDC_REP_SEG_Unit, XDC_REP_SEG_Fact};
 
 	String XDC_FACT_VALTYPE_number = "number";
 	String XDC_FACT_VALTYPE_string = "string";
@@ -107,6 +108,7 @@ public interface XbrlDockConsts {
 	String XDC_EXT_TOKEN_name = "name";
 	String XDC_EXT_TOKEN_order = "order";
 	String XDC_EXT_TOKEN_identifier = "identifier";
+	String XDC_EXT_TOKEN_scheme = "scheme";
 
 	String XDC_ENTITY_TOKEN_idType = "idType";
 	String XDC_ENTITY_TOKEN_urlSource = "urlSource";
@@ -119,6 +121,7 @@ public interface XbrlDockConsts {
 	String XDC_REPORT_TOKEN_langCode = "langCode";
 	String XDC_REPORT_TOKEN_schemas = "schemas";
 	String XDC_REPORT_TOKEN_namespaces = "namespaces";
+	String XDC_REPORT_TOKEN_units = "units";
 
 	String XDC_REPORT_TOKEN_urlPackage = "urlPackage";
 	String XDC_REPORT_TOKEN_sourceUrl = "sourceUrl";

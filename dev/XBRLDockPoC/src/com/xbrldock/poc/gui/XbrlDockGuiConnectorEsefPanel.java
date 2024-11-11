@@ -75,15 +75,24 @@ public class XbrlDockGuiConnectorEsefPanel extends JPanel implements XbrlDockGui
 				XbrlDock.callAgent(XDC_CFGTOKEN_AGENT_esefConn, XDC_CMD_GEN_TEST01, stats);
 
 				XbrlDock.log(EventLevel.Info, "Test visit sats", stats);
+
+//				ReportDataHandler dhv = (ReportDataHandler) params[1];
+
+//				for ( Object rep : reportGrid.items ) {
+//					
+//				}
+				break;
+			case XDC_CMD_GEN_TEST02:
+				XbrlDock.callAgent(XDC_CFGTOKEN_AGENT_esefConn, XDC_CMD_GEN_TEST02, reportGrid.items);
 				break;
 			case XDC_GUICMD_PICK:
-				updateDescPanel(((WidgetEvent)e).getUserOb());
+				updateDescPanel(((WidgetEvent) e).getUserOb());
 				break;
 			case XDC_GUICMD_SELCHG:
-				
+
 				break;
 			case XDC_GUICMD_ACTIVATE:
-				String selId = XbrlDockUtils.simpleGet(((WidgetEvent)e).getUserOb(), XDC_EXT_TOKEN_id);
+				String selId = XbrlDockUtils.simpleGet(((WidgetEvent) e).getUserOb(), XDC_EXT_TOKEN_id);
 				XbrlDock.callAgent(XDC_CFGTOKEN_AGENT_gui, XDC_CMD_GEN_SELECT, XDC_CFGTOKEN_AGENT_esefConn, selId);
 				break;
 			default:
@@ -99,6 +108,9 @@ public class XbrlDockGuiConnectorEsefPanel extends JPanel implements XbrlDockGui
 		repInfo = new XbrlDockGuiUtilsHtmlDisplay();
 
 		repFilterTA = new JTextArea();
+		if (XbrlDock.checkFlag(XDC_FLAG_ADMIN)) {
+			repFilterTA.setText("\"HU\".equals(sourceAtts.country)");
+		}
 		btFilter = XbrlDockGuiUtils.createBtn(XDC_CMD_GEN_FILTER, al, JButton.class);
 
 		factFilterTA = new JTextArea();
@@ -110,8 +122,7 @@ public class XbrlDockGuiConnectorEsefPanel extends JPanel implements XbrlDockGui
 //		pnlFactFilter.add(chkByCtx, BorderLayout.SOUTH);
 
 		JPanel pnlFilterInput = new JPanel(new BorderLayout());
-		pnlFilterInput.add(XbrlDockUtilsGui.createSplit(true, 
-				XbrlDockGuiUtils.setTitle(new JScrollPane(repFilterTA), "Filter by report data"),
+		pnlFilterInput.add(XbrlDockUtilsGui.createSplit(true, XbrlDockGuiUtils.setTitle(new JScrollPane(repFilterTA), "Filter by report data"),
 				XbrlDockGuiUtils.setTitle(new JScrollPane(factFilterTA), "Filter by fact data"), 0.5), BorderLayout.CENTER);
 //		XbrlDockGuiUtils.setTitle(pnlFactFilter, "Filter reports by fact content"), 0.5), BorderLayout.CENTER);
 
@@ -120,14 +131,14 @@ public class XbrlDockGuiConnectorEsefPanel extends JPanel implements XbrlDockGui
 		pnlFilter.add(btFilter, BorderLayout.EAST);
 
 		if (XbrlDock.checkFlag(XDC_FLAG_ADMIN)) {
-			pnlFilter.add(XbrlDockGuiUtils.createBtn(XDC_CMD_GEN_TEST01, al, JButton.class), BorderLayout.WEST);
+			pnlFilter.add(XbrlDockGuiUtils.createBtn(XDC_CMD_GEN_TEST02, al, JButton.class), BorderLayout.WEST);
 		}
 
 		JPanel pnlTop = new JPanel(new BorderLayout());
 		pnlTop.add(XbrlDockUtilsGui.createSplit(false, pnlFilter, XbrlDockGuiUtils.setTitle(reportGrid, "Reports"), 0.2), BorderLayout.CENTER);
 
 		add(XbrlDockUtilsGui.createSplit(false, pnlTop, XbrlDockGuiUtils.setTitle(repInfo, "Selected report information"), 0.2), BorderLayout.CENTER);
-		
+
 		reportGrid.setActionListener(al, XDC_GUICMD_ACTIVATE, XDC_GUICMD_PICK);
 	}
 
@@ -156,7 +167,7 @@ public class XbrlDockGuiConnectorEsefPanel extends JPanel implements XbrlDockGui
 				if (factExpr) {
 					factFilterTest.setByContext(chkByCtx.isSelected());
 					factFilterEval.setExpression(txt, factFilterTest);
-					
+
 					XbrlDock.log(EventLevel.Trace, "Fact expr testing", txt);
 				}
 
@@ -170,17 +181,17 @@ public class XbrlDockGuiConnectorEsefPanel extends JPanel implements XbrlDockGui
 					if (factExpr) {
 						String repId = re.getKey();
 						XbrlDock.log(EventLevel.Trace, "   on report", repId);
-						
+
 						XbrlDock.callAgent(XDC_CFGTOKEN_AGENT_esefConn, XDC_CMD_CONN_VISITREPORT, repId, factFilterEval);
-						
-						if ( !factFilterTest.isMatch()) {
+
+						if (!factFilterTest.isMatch()) {
 							continue;
 						}
 					}
 
 					items.add(rep);
 				}
-				
+
 				XbrlDock.log(EventLevel.Trace, "Match", items.size());
 				return true;
 			}

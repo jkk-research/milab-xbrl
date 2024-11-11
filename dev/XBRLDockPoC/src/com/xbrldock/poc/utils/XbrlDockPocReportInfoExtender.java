@@ -54,7 +54,10 @@ public class XbrlDockPocReportInfoExtender implements XbrlDockPocConsts, XbrlDoc
 			if (XbrlDockUtils.isEmpty(ret)) {
 				ret = "unit-" + unitDef.size();
 			}
-			unitDef.put(ret, new TreeMap<String, Object>(data));
+			TreeMap<String, Object> ud = new TreeMap<String, Object>(data);
+			unitDef.put(ret, ud);
+			
+			XbrlDockUtils.safeGet(reportData, XDC_REPORT_TOKEN_units, SORTEDMAP_CREATOR).put(ret, ud);
 			break;
 		case XDC_REP_SEG_Context:
 			ret = (String) data.get(XDC_FACT_TOKEN_context);

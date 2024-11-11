@@ -123,7 +123,8 @@ public class XbrlDockFormatXhtml implements XbrlDockFormatConsts, XbrlDockPocCon
 					} else {
 						NodeList nn = e.getElementsByTagName("xbrli:entity");
 						if (0 < nl.getLength()) {
-							sVal = getInfo((Element) nn.item(0), "xbrli:identifier");
+							Element ee = (Element) nn.item(0);
+							sVal = getInfo(ee, "xbrli:identifier");
 							segmentData.putIfAbsent(XDC_FACT_TOKEN_entity, sVal);
 						}
 					}
@@ -259,7 +260,7 @@ public class XbrlDockFormatXhtml implements XbrlDockFormatConsts, XbrlDockPocCon
 							segmentData.put(XDC_FACT_TOKEN_xbrldockFactType, XDC_FACT_VALTYPE_text);
 							String id = dataHandler.processSegment(XDC_REP_SEG_Fact, segmentData);
 							segmentData.put(XDC_EXT_TOKEN_id, id);
-							segmentData.put(XDC_GEN_TOKEN_value, txtVal.substring( XbrlDockFormatUtils.TXT_CLIP_LENGTH - 3) + "...");
+							segmentData.put(XDC_GEN_TOKEN_value, txtVal.substring(0, XbrlDockFormatUtils.TXT_CLIP_LENGTH - 3) + "...");
 							segmentData.put(XDC_FACT_TOKEN_xbrldockFactType, XDC_FACT_VALTYPE_textClip);
 						} else {
 							segmentData.put(XDC_FACT_TOKEN_xbrldockFactType, XDC_FACT_VALTYPE_string);

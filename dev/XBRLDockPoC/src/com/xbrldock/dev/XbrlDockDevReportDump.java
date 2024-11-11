@@ -32,12 +32,12 @@ public class XbrlDockDevReportDump implements XbrlDockDevConsts, XbrlDockPocCons
 
 	@Override
 	public void addNamespace(String ref, String id) {
-		XbrlDock.log(EventLevel.Info, "Added namespace", ref, id);
+//		XbrlDock.log(EventLevel.Info, "Added namespace", ref, id);
 	}
 
 	@Override
 	public void addTaxonomy(String tx) {
-		XbrlDock.log(EventLevel.Info, "Added taxonomy", tx);
+//		XbrlDock.log(EventLevel.Info, "Added taxonomy", tx);
 	}
 
 	@Override
@@ -55,6 +55,7 @@ public class XbrlDockDevReportDump implements XbrlDockDevConsts, XbrlDockPocCons
 			break;
 		case XDC_REP_SEG_Fact:
 			ret = (String) data.get(XDC_EXT_TOKEN_id);
+			++factCount;
 			break;
 		}
 
@@ -70,5 +71,17 @@ public class XbrlDockDevReportDump implements XbrlDockDevConsts, XbrlDockPocCons
 		if (logAll) {
 			XbrlDock.log(EventLevel.Info, " --- End report", repId, "---\n");
 		}
+	}
+
+	public int getCount(String segment) {
+		switch (segment) {
+		case XDC_REP_SEG_Unit:
+			return unitDef.size();
+		case XDC_REP_SEG_Context:
+			return ctxDef.size();
+		case XDC_REP_SEG_Fact:
+			return factCount;
+		}
+		return 0;
 	}
 }

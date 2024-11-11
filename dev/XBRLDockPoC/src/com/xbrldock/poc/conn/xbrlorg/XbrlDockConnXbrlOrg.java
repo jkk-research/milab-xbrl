@@ -13,13 +13,14 @@ import java.util.TreeMap;
 import java.util.TreeSet;
 
 import com.xbrldock.XbrlDock;
+import com.xbrldock.XbrlDockConsts;
 import com.xbrldock.XbrlDockException;
 import com.xbrldock.dev.XbrlDockDevCounter;
 import com.xbrldock.dev.XbrlDockDevMonitor;
-import com.xbrldock.poc.XbrlDockPocConsts;
 import com.xbrldock.poc.conn.XbrlDockConnUtils;
 import com.xbrldock.poc.format.XbrlDockFormatUtils;
 import com.xbrldock.poc.format.XbrlDockFormatXhtml;
+import com.xbrldock.poc.format.XbrlDockFormatXmlWriter;
 import com.xbrldock.poc.report.XbrlDockReportLoader;
 import com.xbrldock.poc.utils.XbrlDockPocReportInfoExtender;
 import com.xbrldock.utils.XbrlDockUtils;
@@ -28,7 +29,7 @@ import com.xbrldock.utils.XbrlDockUtilsJson;
 import com.xbrldock.utils.XbrlDockUtilsNet;
 
 @SuppressWarnings({ "rawtypes", "unchecked" })
-public class XbrlDockConnXbrlOrg implements XbrlDockConnXbrlOrgConsts, XbrlDockPocConsts.XDModSourceConnector {
+public class XbrlDockConnXbrlOrg implements XbrlDockConnXbrlOrgConsts, XbrlDockConsts.GenAgent /* , XbrlDockPocConsts.XDModSourceConnector */ {
 	String sourceName = "xbrl.org";
 
 	String urlRoot = "https://filings.xbrl.org/";
@@ -77,20 +78,18 @@ public class XbrlDockConnXbrlOrg implements XbrlDockConnXbrlOrgConsts, XbrlDockP
 	@Override
 	public Object process(String command, Object... params) throws Exception {
 		Object ret = null;
+		Map<String, Map> filings = XbrlDockUtils.simpleGet(catalog, XDC_CONN_CAT_TOKEN_filings);
 
 		switch (command) {
 		case XDC_CMD_GEN_GETCATALOG:
 			ret = catalog;
 			break;
 		case XDC_CMD_GEN_TEST01:
-			Map<String, Map> filings = XbrlDockUtils.simpleGet(catalog, XDC_CONN_CAT_TOKEN_filings);
 
-			// XbrlDockConnXbrlOrgTest.exportHun(dirInput, filings);
-			
 			File fRoot = new File(dirInput, XDC_FNAME_CONNFILINGS);
-			Set<String> msgs = new TreeSet<>();
 
 			XbrlDockDevMonitor mon = new XbrlDockDevMonitor("Report count", 100);
+			Set<String> msgs = new TreeSet<>();
 			XbrlDockDevCounter cnt = new XbrlDockDevCounter("Visit errors", true);
 
 			XbrlDockReportLoader dh = new XbrlDockReportLoader(dirStore);
@@ -137,6 +136,27 @@ public class XbrlDockConnXbrlOrg implements XbrlDockConnXbrlOrgConsts, XbrlDockP
 			XbrlDock.log(EventLevel.Trace, "Visit complete", mon.getCount(), cnt);
 
 			break;
+		case XDC_CMD_GEN_TEST02:
+
+			Collection<Map> items = (Collection) params[0];
+
+			File targetDir = new File("temp/xbrlexport");
+//			targetDir = new File(targetDir, XbrlDockUtils.strTime());
+			XbrlDockFormatXmlWriter xw = new XbrlDockFormatXmlWriter(targetDir);
+			for (Map filingInfo : items) {
+				File dataDir = XbrlDockConnUtils.getFilingDir(dirStore, filingInfo, true, false);
+				File fRep = new File(dataDir, XDC_FNAME_REPDATA);
+				if (fRep.isFile()) {
+					XbrlDockReportLoader.readCsv(fRep, filingInfo, xw);
+					break;
+				}
+			}
+
+			// XbrlDockConnXbrlOrgTest.exportHun(dirInput, filings);
+
+			// XbrlDockConnXbrlOrgTest.collectStats(dirStore, dirInput, filings);
+
+			break;
 		case XDC_CMD_CONN_VISITREPORT:
 			String id = (String) params[0];
 			ReportDataHandler dhv = (ReportDataHandler) params[1];
@@ -161,10 +181,9 @@ public class XbrlDockConnXbrlOrg implements XbrlDockConnXbrlOrgConsts, XbrlDockP
 		}
 
 		return ret;
-
 	}
 
-	@Override
+//	@Override
 	public Map getReportData(String id, Map target) throws Exception {
 		Map filingData = XbrlDockUtils.simpleGet(catalog, XDC_CONN_CAT_TOKEN_filings, id);
 
@@ -196,7 +215,7 @@ public class XbrlDockConnXbrlOrg implements XbrlDockConnXbrlOrgConsts, XbrlDockP
 //		getAllFilings();
 	}
 
-	@Override
+//	@Override
 	public void visitReports(GenProcessor<Map> visitor, GenProcessor<Map> filter) throws Exception {
 		XbrlDockDevMonitor pm = new XbrlDockDevMonitor("visitReports", 100);
 
@@ -227,7 +246,7 @@ public class XbrlDockConnXbrlOrg implements XbrlDockConnXbrlOrgConsts, XbrlDockP
 		visitor.process(ProcessorAction.End, null);
 	}
 
-	@Override
+//	@Override
 	public File getReportFile(String id, Object... keyPath) {
 		File ret = null;
 
@@ -454,7 +473,7 @@ public class XbrlDockConnXbrlOrg implements XbrlDockConnXbrlOrgConsts, XbrlDockP
 		return ret;
 	}
 
-	@Override
+//	@Override
 	public int refresh(Collection<String> updated) throws Exception {
 		int newCount = 0;
 

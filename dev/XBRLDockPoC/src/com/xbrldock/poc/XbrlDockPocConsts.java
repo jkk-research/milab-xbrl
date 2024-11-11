@@ -1,14 +1,11 @@
 package com.xbrldock.poc;
 
-import java.io.File;
 import java.io.InputStream;
-import java.util.Collection;
 import java.util.Map;
 
 import com.xbrldock.XbrlDockConsts;
 import com.xbrldock.utils.XbrlDockUtilsConsts;
 
-@SuppressWarnings("rawtypes")
 public interface XbrlDockPocConsts extends XbrlDockConsts, XbrlDockUtilsConsts {	
 	String XDC_CFGTOKEN_AGENT_metaManager = "metaManager";
 	String XDC_CFGTOKEN_AGENT_esefConn = "esefConn";
@@ -21,6 +18,7 @@ public interface XbrlDockPocConsts extends XbrlDockConsts, XbrlDockUtilsConsts {
 	String XDC_CMD_GEN_ACTIVATE = "activate";
 	String XDC_CMD_GEN_FILTER = "filter";
 	String XDC_CMD_GEN_TEST01 = "test01";
+	String XDC_CMD_GEN_TEST02 = "test02";
 
 	String XDC_CMD_CONN_VISITREPORT = "visitReport";
 
@@ -73,12 +71,12 @@ public interface XbrlDockPocConsts extends XbrlDockConsts, XbrlDockUtilsConsts {
 	String XDC_APP_SETENTRYPOINT = "setEntryPoint";
 
 	
-	public interface XDModSourceConnector extends GenAgent {
-		int refresh(Collection<String> updated) throws Exception;
-		Map getReportData(String id, Map target) throws Exception;
-		void visitReports(GenProcessor<Map> visitor, GenProcessor<Map> filter) throws Exception;
-		File getReportFile(String id, Object...path);
-	}
+//	public interface XDModSourceConnector extends GenAgent {
+//		int refresh(Collection<String> updated) throws Exception;
+//		Map getReportData(String id, Map target) throws Exception;
+//		void visitReports(GenProcessor<Map> visitor, GenProcessor<Map> filter) throws Exception;
+//		File getReportFile(String id, Object...path);
+//	}
 	
 	interface ReportDataHandler {
 		void beginReport(String repId);

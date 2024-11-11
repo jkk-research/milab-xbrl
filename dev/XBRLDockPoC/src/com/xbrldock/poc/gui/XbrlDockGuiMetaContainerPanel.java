@@ -68,6 +68,31 @@ public class XbrlDockGuiMetaContainerPanel extends JPanel implements XbrlDockGui
 
 	XbrlDockGuiWidgetTree roleTree = new XbrlDockGuiWidgetTree("", false, TreeSelectionModel.DISCONTIGUOUS_TREE_SELECTION);
 
+	ObjectFormatter<Object> roleItemFormatter = new ObjectFormatter<Object>() {
+		@Override
+		public String toString(Object value, Object root, Object... hints) {
+			String ret = null;
+
+			if (value instanceof RoleTreeNode) {
+				Map<String, String> item = ((RoleTreeNode) value).item;
+				ret = item.get("roleURI");
+
+				if (XbrlDockUtils.isEmpty(ret)) {
+					if (null == lang ) {
+						ret = item.get("id");
+					} else {
+						ret = item.get("id");
+//						taxonomy.getItemLabel(ret);
+					}
+				}
+			} else {
+				ret = XbrlDockUtils.toString(value);
+			}
+
+			return ret;
+		}
+	};
+
 //@formatter:off  
 	XbrlDockGuiWidgetGrid itemGrid = new XbrlDockGuiWidgetGrid(
 			ListSelectionModel.SINGLE_SELECTION, new String[] {XDC_GRIDCOL_ROWNUM},
@@ -109,6 +134,7 @@ public class XbrlDockGuiMetaContainerPanel extends JPanel implements XbrlDockGui
 		super(new BorderLayout());
 
 		roleTree.setActionListener(al, XDC_GUICMD_SELCHG);
+		roleTree.setItemFormatter(roleItemFormatter);
 
 		JPanel pnlTop = new JPanel(new BorderLayout());
 		pnlTop.add(XbrlDockGuiUtils.setActive(cbLang, XDC_APP_SETLANG, al), BorderLayout.EAST);
@@ -159,14 +185,13 @@ public class XbrlDockGuiMetaContainerPanel extends JPanel implements XbrlDockGui
 			cbLang.addItem(lang);
 		}
 		cbLang.setSelectedItem(CB_LANG_ID);
-		
+
 		cbRoleType.removeAllItems();
 		for (String rt : taxonomy.getRoleTypes()) {
 			cbRoleType.addItem(rt);
 		}
 //		cbRoleType.setSelectedIndex(0);
 //		selRoleType = cbRoleType.getItemAt(0);
-
 
 		cbEntryPoint.removeAllItems();
 		cbEntryPoint.addItem(CB_ALL);
