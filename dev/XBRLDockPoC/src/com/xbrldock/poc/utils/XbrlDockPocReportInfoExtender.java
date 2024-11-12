@@ -39,7 +39,7 @@ public class XbrlDockPocReportInfoExtender implements XbrlDockPocConsts, XbrlDoc
 	}
 
 	@Override
-	public void addTaxonomy(String tx) {
+	public void addTaxonomy(String tx, String type) {
 		XbrlDockUtils.safeGet(reportData, XDC_REPORT_TOKEN_schemas, ARRAY_CREATOR).add(tx);
 	}
 

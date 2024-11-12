@@ -173,7 +173,7 @@ public class XbrlDockGuiReportPanel extends JPanel implements XbrlDockGuiConsts,
 		}
 
 		@Override
-		public void addTaxonomy(String tx) {
+		public void addTaxonomy(String tx, String type) {
 			taxonomies.add(tx);
 		}
 

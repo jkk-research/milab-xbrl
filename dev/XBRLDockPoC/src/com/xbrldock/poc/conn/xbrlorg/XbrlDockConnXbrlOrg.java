@@ -141,15 +141,22 @@ public class XbrlDockConnXbrlOrg implements XbrlDockConnXbrlOrgConsts, XbrlDockC
 			Collection<Map> items = (Collection) params[0];
 
 			File targetDir = new File("temp/xbrlexport");
-//			targetDir = new File(targetDir, XbrlDockUtils.strTime());
+			targetDir = new File(targetDir, XbrlDockUtils.strTime());
+
+			File fRep;
+			ReportFormatHandler xl = new XbrlDockFormatXhtml();
 			XbrlDockFormatXmlWriter xw = new XbrlDockFormatXmlWriter(targetDir);
+
 			for (Map filingInfo : items) {
-				File dataDir = XbrlDockConnUtils.getFilingDir(dirStore, filingInfo, true, false);
-				File fRep = new File(dataDir, XDC_FNAME_REPDATA);
-				if (fRep.isFile()) {
-					XbrlDockReportLoader.readCsv(fRep, filingInfo, xw);
-					break;
-				}
+				String id = (String) filingInfo.get("id");
+				fRep = getFiling(id);
+				loadReport(xl, xw, filingInfo, fRep);
+//				File dataDir = XbrlDockConnUtils.getFilingDir(dirStore, filingInfo, true, false);
+//				 fRep = new File(dataDir, XDC_FNAME_REPDATA);
+//				if (fRep.isFile()) {
+//					XbrlDockReportLoader.readCsv(fRep, filingInfo, xw);
+//					break;
+//				}
 			}
 
 			// XbrlDockConnXbrlOrgTest.exportHun(dirInput, filings);
@@ -164,7 +171,7 @@ public class XbrlDockConnXbrlOrg implements XbrlDockConnXbrlOrgConsts, XbrlDockC
 			Map filingInfo = XbrlDockUtils.simpleGet(catalog, XDC_CONN_CAT_TOKEN_filings, id);
 
 			File dataDir = XbrlDockConnUtils.getFilingDir(dirStore, filingInfo, true, false);
-			File fRep = new File(dataDir, XDC_FNAME_REPDATA);
+			fRep = new File(dataDir, XDC_FNAME_REPDATA);
 			if (fRep.isFile()) {
 				XbrlDockReportLoader.readCsv(fRep, filingInfo, dhv);
 			} else {
@@ -328,7 +335,8 @@ public class XbrlDockConnXbrlOrg implements XbrlDockConnXbrlOrgConsts, XbrlDockC
 
 		if (loadReport) {
 			try (FileInputStream fr = new FileInputStream(f)) {
-				dh.beginReport(f.getCanonicalPath());
+				dh.beginReport((String) filingData.get(XDC_EXT_TOKEN_id));
+//				dh.beginReport(f.getCanonicalPath());
 //				dh.init( prefixes);				
 
 				fh.loadReport(fr, dh);

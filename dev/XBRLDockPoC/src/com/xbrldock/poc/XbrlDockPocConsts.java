@@ -81,7 +81,7 @@ public interface XbrlDockPocConsts extends XbrlDockConsts, XbrlDockUtilsConsts {
 	interface ReportDataHandler {
 		void beginReport(String repId);
 		void addNamespace(String ref, String id);
-		void addTaxonomy(String tx);
+		void addTaxonomy(String tx, String type);
 		String processSegment(String segment, Map<String, Object> data);
 		void endReport();
 	}	

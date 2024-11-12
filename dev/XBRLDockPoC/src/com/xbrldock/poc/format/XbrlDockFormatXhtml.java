@@ -1,7 +1,6 @@
 package com.xbrldock.poc.format;
 
 import java.io.InputStream;
-import java.text.DecimalFormat;
 import java.util.Map;
 import java.util.TreeMap;
 
@@ -43,29 +42,35 @@ public class XbrlDockFormatXhtml implements XbrlDockFormatConsts, XbrlDockPocCon
 		Throwable loadErr = null;
 
 		try {
-			DecimalFormat df = new DecimalFormat("#");
-			df.setMaximumFractionDigits(8);
-
 			String sVal;
 
 			Document doc = XbrlDockUtilsXml.parseDoc(in);
-
 			Element eHtml = doc.getDocumentElement();
+			
+			NamedNodeMap headAtts = eHtml.getAttributes();
+			for (int i = headAtts.getLength(); i-- > 0;) {
+				Node n = headAtts.item(i);
+
+				String attName = n.getNodeName();
+				if (attName.startsWith("xmlns")) {
+					sVal = n.getNodeValue();
+					if (!XbrlDockUtils.isEmpty(sVal)) {
+						int si = attName.indexOf(":");
+						String ref = attName.substring(si + 1);
+						dataHandler.addNamespace(ref, sVal);
+					}
+				}
+			}
 
 			String defLang = XbrlDockUtils.isEmpty(forcedLang) ? eHtml.getAttribute("xml:lang") : forcedLang;
-
-			NodeList nl = eHtml.getElementsByTagName("*");
-			int nodeCount = nl.getLength();
 
 			Map<String, Object> segmentData = new TreeMap<>();
 			Map<String, String> ctxDim = new TreeMap<>();
 
 			Map<String, Element> continuation = new TreeMap<>();
-//			ArrayList<String> schemas = new ArrayList<>();
-//			Map<String, String> namespaces = new TreeMap<>();
 
-//			String repStart = null;
-//			String repEnd = null;
+			NodeList nl = eHtml.getElementsByTagName("*");
+			int nodeCount = nl.getLength();
 
 			for (int idx = 0; idx < nodeCount; ++idx) {
 				Element e = (Element) nl.item(idx);
@@ -77,8 +82,8 @@ public class XbrlDockFormatXhtml implements XbrlDockFormatConsts, XbrlDockPocCon
 				case "link:schemaRef":
 					sVal = e.getAttribute("xlink:href");
 					if (!XbrlDockUtils.isEmpty(sVal)) {
-						dataHandler.addTaxonomy(sVal.trim());
-//						schemas.add(sVal.trim());
+						String lt = e.getAttribute("xlink:type");
+						dataHandler.addTaxonomy(sVal.trim(), lt);
 					}
 					break;
 				case "xbrli:context":
@@ -91,27 +96,10 @@ public class XbrlDockFormatXhtml implements XbrlDockFormatConsts, XbrlDockPocCon
 						String cs = getInfo(e, "xbrli:startDate");
 						segmentData.put(XDC_FACT_TOKEN_startDate, cs);
 
-//						if ( (null == repStart) || (0 > repStart.compareTo(sVal)) ) {
-//							repStart = sVal;
-//						}
-
 						String ce = getInfo(e, "xbrli:endDate");
 						segmentData.put(XDC_FACT_TOKEN_endDate, ce);
-//						if ( (null == repEnd) || (0 < repEnd.compareTo(sVal)) ) {
-//							repEnd = sVal;
-//						}
-
-//						dataHandler.addContextRange(cs, ce);
-
 					} else {
 						segmentData.put(XDC_FACT_TOKEN_instant, sVal);
-//						dataHandler.addContextRange(sVal, sVal);
-//						if ( (null == repStart) || (0 > repStart.compareTo(sVal)) ) {
-//							repStart = sVal;
-//						}
-//						if ( (null == repEnd) || (0 < repEnd.compareTo(sVal)) ) {
-//							repEnd = sVal;
-//						}
 					}
 
 					Element eS = null;
@@ -171,24 +159,6 @@ public class XbrlDockFormatXhtml implements XbrlDockFormatConsts, XbrlDockPocCon
 				case "ix:continuation":
 					continuation.put(e.getAttribute("id"), e);
 					break;
-				}
-			}
-
-			NamedNodeMap headAtts = eHtml.getAttributes();
-			for (int i = headAtts.getLength(); i-- > 0;) {
-				Node n = headAtts.item(i);
-
-				String attName = n.getNodeName();
-				if (attName.startsWith("xmlns")) {
-					sVal = n.getNodeValue();
-					if (!XbrlDockUtils.isEmpty(sVal)) {
-						int si = attName.indexOf(":");
-						String ref = attName.substring(si + 1);
-
-						dataHandler.addNamespace(ref, sVal);
-
-//						namespaces.put(ref, sVal);
-					}
 				}
 			}
 

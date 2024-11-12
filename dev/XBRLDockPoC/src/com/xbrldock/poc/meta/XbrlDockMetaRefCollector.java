@@ -55,7 +55,7 @@ public class XbrlDockMetaRefCollector implements XbrlDockMetaConsts, XbrlDockPoc
 	}
 
 	@Override
-	public void addTaxonomy(String tx) {
+	public void addTaxonomy(String tx, String type) {
 		try {
 			loadTaxonomy("", tx);
 		} catch (Exception e) {

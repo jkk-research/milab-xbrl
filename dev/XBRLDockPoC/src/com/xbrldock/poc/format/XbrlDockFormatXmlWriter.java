@@ -10,6 +10,7 @@ import java.util.TreeMap;
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 
+import com.xbrldock.XbrlDock;
 import com.xbrldock.XbrlDockException;
 import com.xbrldock.poc.XbrlDockPocConsts;
 import com.xbrldock.poc.report.XbrlDockReportUtils;
@@ -32,11 +33,16 @@ public class XbrlDockFormatXmlWriter implements XbrlDockFormatConsts, XbrlDockPo
 		this.targetDir = targetDir;
 		df = new DecimalFormat("#");
 		df.setMaximumFractionDigits(8);
+		
+		XbrlDock.log(EventLevel.Trace, "Exporting reports to folder", targetDir.getPath());
+
 	}
 
 	@Override
 	public void beginReport(String repId) {
 		this.repId = repId;
+		
+		XbrlDock.log(EventLevel.Trace, "   ", repId);
 
 		for (ArrayList sc : segData.values()) {
 			sc.clear();
@@ -63,9 +69,9 @@ public class XbrlDockFormatXmlWriter implements XbrlDockFormatConsts, XbrlDockPo
 	}
 
 	@Override
-	public void addTaxonomy(String tx) {
+	public void addTaxonomy(String tx, String type) {
 		Element e = xmlDoc.createElement("link:schemaRef");
-		e.setAttribute("xlink:type", "simple");
+		e.setAttribute("xlink:type", XbrlDockUtils.isEmpty(type) ? "simple" : type);
 		e.setAttribute("xlink:href", tx);
 		eRoot.appendChild(e);
 	}
@@ -89,23 +95,23 @@ public class XbrlDockFormatXmlWriter implements XbrlDockFormatConsts, XbrlDockPo
 			}
 			e = xmlDoc.createElement("xbrli:unit");
 			e.setAttribute("id", segId);
-			String[] uu = ((String) data.get("unit")).split("/");
-			if (uu.length == 1) {
+			sVal = (String) data.get("measure");
+			if (!XbrlDockUtils.isEmpty(sVal)) {
 				e1 = xmlDoc.createElement("xbrli:measure");
-				e1.setTextContent(uu[0]);
+				e1.setTextContent(sVal);
 				e.appendChild(e1);
 			} else {
 				e1 = xmlDoc.createElement("xbrli:divide");
 
 				e2 = xmlDoc.createElement("xbrli:unitNumerator");
 				e3 = xmlDoc.createElement("xbrli:measure");
-				e3.setTextContent(uu[0]);
+				e3.setTextContent((String) data.get("unitNumerator"));
 				e2.appendChild(e3);
 				e1.appendChild(e2);
 
 				e2 = xmlDoc.createElement("xbrli:unitDenominator");
 				e3 = xmlDoc.createElement("xbrli:measure");
-				e3.setTextContent(uu[1]);
+				e3.setTextContent((String) data.get("unitDenominator"));
 				e2.appendChild(e3);
 				e1.appendChild(e2);
 
@@ -140,7 +146,7 @@ public class XbrlDockFormatXmlWriter implements XbrlDockFormatConsts, XbrlDockPo
 			}
 			e.appendChild(e1);
 
-			sVal = (String) data.get(XDC_FACT_TOKEN_dimensions);
+			sVal = XbrlDockUtils.toString(data.get(XDC_FACT_TOKEN_dimensions));
 
 			if (!XbrlDockUtils.isEmpty(sVal)) {
 				sVal = XbrlDockUtils.getPostfix(sVal, "{");

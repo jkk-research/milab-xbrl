@@ -73,7 +73,7 @@ public class XbrlDockReportLoader implements XbrlDockReportConsts, XbrlDockPocCo
 	}
 
 	@Override
-	public void addTaxonomy(String tx) {
+	public void addTaxonomy(String tx, String type) {
 		XbrlDockUtils.safeGet(reportData, XDC_REPORT_TOKEN_schemas, ARRAY_CREATOR).add(tx);
 	}
 
@@ -209,7 +209,7 @@ public class XbrlDockReportLoader implements XbrlDockReportConsts, XbrlDockPocCo
 					Collection<String> tx = XbrlDockUtils.simpleGet(filingInfo, XDC_REPORT_TOKEN_schemas);
 					if ( null != tx ) {
 						for (String t : tx ) {
-							dataHandler.addTaxonomy(t);
+							dataHandler.addTaxonomy(t, null);
 						}
 					}
 				} else {

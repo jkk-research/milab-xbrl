@@ -38,7 +38,7 @@ public class XbrlDockDevReportStats implements XbrlDockMetaConsts, XbrlDockPocCo
 	}
 
 	@Override
-	public void addTaxonomy(String tx) {
+	public void addTaxonomy(String tx, String type) {
 		taxonomies.add(tx);
 	}
 

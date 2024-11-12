@@ -42,7 +42,7 @@ public class XbrlDockFormatJson implements XbrlDockFormatConsts, XbrlDockPocCons
 			Collection<String> tx = XbrlDockUtils.simpleGet(root, XDC_FMTJSON_TOKEN_documentInfo, XDC_FMTJSON_TOKEN_taxonomy);
 			if (null != tx) {
 				for (String t : tx) {
-					dataHandler.addTaxonomy(t);
+					dataHandler.addTaxonomy(t, null);
 				}
 			}
 

@@ -43,7 +43,7 @@ public class XbrlDockReportExprEval implements XbrlDockReportConsts, XbrlDockPoc
 	}
 
 	@Override
-	public void addTaxonomy(String tx) {
+	public void addTaxonomy(String tx, String type) {
 	}
 
 	@Override

@@ -36,7 +36,7 @@ public class XbrlDockDevReportDump implements XbrlDockDevConsts, XbrlDockPocCons
 	}
 
 	@Override
-	public void addTaxonomy(String tx) {
+	public void addTaxonomy(String tx, String type) {
 //		XbrlDock.log(EventLevel.Info, "Added taxonomy", tx);
 	}
 
