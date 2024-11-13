@@ -210,6 +210,9 @@ public class XbrlDockGuiWorkbench extends JFrame implements XbrlDockGuiConsts, X
 	public Object process(String command, Object... params) throws Exception {
 		Object ret = null;
 		switch (command) {
+		case XDC_CMD_GEN_Init:
+			initModule((Map) params[0]);
+			break;
 		case XDC_CMD_GEN_SELECT:
 			WBNode wbn = rootNode.getChildById((String) params[0], null);
 
@@ -233,7 +236,6 @@ public class XbrlDockGuiWorkbench extends JFrame implements XbrlDockGuiConsts, X
 		return ret;
 	}
 
-	@Override
 	public void initModule(Map config) throws Exception {
 		pack();
 

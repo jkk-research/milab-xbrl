@@ -15,27 +15,27 @@ import com.xbrldock.XbrlDockException;
 @SuppressWarnings({ "rawtypes", "unchecked" })
 public interface XbrlDockUtilsConsts extends XbrlDockConsts {
 
-	class CounterProcessor<ItemType> implements GenProcessor<ItemType> {
+	class CounterProcessor implements GenAgent {
 		long begin;
 		long process;
 		long end;
 
 		@Override
-		public boolean process(ProcessorAction action, ItemType item) throws Exception {
-			switch (action) {
-			case Begin:
+		public Object process(String cmd, Object... params) throws Exception {
+			switch (cmd) {
+			case XDC_CMD_GEN_Begin:
 				++begin;
 				break;
-			case End:
+			case XDC_CMD_GEN_End:
 				++end;
 				break;
-			case Init:
+			case XDC_CMD_GEN_Init:
 				begin = process = end = 0;
 				break;
-			case Process:
+			case XDC_CMD_GEN_Process:
 				++process;
 				break;
-			case Release:
+			case XDC_CMD_GEN_Release:
 				break;
 			}
 			return true;
@@ -49,13 +49,13 @@ public interface XbrlDockUtilsConsts extends XbrlDockConsts {
 			return begin - end;
 		}
 
-		public long getCount(ProcessorAction action) {
-			switch (action) {
-			case Begin:
+		public long getCount(String cmd) {
+			switch (cmd) {
+			case XDC_CMD_GEN_Begin:
 				return begin;
-			case End:
+			case XDC_CMD_GEN_End:
 				return end;
-			case Process:
+			case XDC_CMD_GEN_Process:
 				return process;
 			default:
 				return 0;

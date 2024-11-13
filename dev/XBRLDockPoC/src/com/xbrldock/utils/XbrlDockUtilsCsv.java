@@ -67,7 +67,7 @@ public class XbrlDockUtilsCsv implements XbrlDockUtilsConsts {
 	}
 
 	@SuppressWarnings({ "rawtypes" /*, "unchecked"*/ })
-	public static class CsvWriter implements GenProcessor<Object>, Closeable {
+	public static class CsvWriter implements GenAgent, Closeable {
 		private final String sep = "\t";
 		private Object[] columns;
 
@@ -79,15 +79,15 @@ public class XbrlDockUtilsCsv implements XbrlDockUtilsConsts {
 		}
 
 		@Override
-		public boolean process(ProcessorAction action, Object item) throws Exception {
-			switch (action) {
-			case Init:
+		public Object process(String cmd, Object... params) throws Exception {
+			switch (cmd) {
+			case XDC_CMD_GEN_Init:
 				break;
-			case Begin:
-				target = item;
+			case XDC_CMD_GEN_Begin:
+				target = params[0];
 				break;
-			case Process:
-				Map m = (Map) item;
+			case XDC_CMD_GEN_Process:
+				Map m = (Map) params[0];
 
 				if (m.isEmpty()) {
 					break;
@@ -110,10 +110,10 @@ public class XbrlDockUtilsCsv implements XbrlDockUtilsConsts {
 
 				write(m);
 				break;
-			case End:
+			case XDC_CMD_GEN_End:
 				close();
 				break;
-			case Release:
+			case XDC_CMD_GEN_Release:
 				close();
 				break;
 			}

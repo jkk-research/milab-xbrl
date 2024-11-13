@@ -56,13 +56,13 @@ public class XbrlDockGuiReportPanel extends JPanel implements XbrlDockGuiConsts,
 	);
 //@formatter:on
 
-	GenProcessor ctxTreeLoader = new GenProcessor() {
+	GenAgent ctxTreeLoader = new GenAgent() {
 		DefaultMutableTreeNode lastHead = null;
 
 		@Override
-		public boolean process(ProcessorAction action, Object item) throws Exception {
-			if (action == ProcessorAction.Process) {
-				DefaultMutableTreeNode root = (DefaultMutableTreeNode) item;
+		public Object process(String cmd, Object... params) throws Exception {
+			if (XDC_CMD_GEN_Process.equals(cmd)) {
+				DefaultMutableTreeNode root = (DefaultMutableTreeNode) params[0];
 				
 				Set<String> emptyKeys = new TreeSet<>();
 
@@ -108,10 +108,11 @@ public class XbrlDockGuiReportPanel extends JPanel implements XbrlDockGuiConsts,
 //XbrlDockGuiUtilsTree ctxTree = new XbrlDockGuiUtilsTree(CTX_ROOT, true, TreeSelectionModel.SINGLE_TREE_SELECTION, ctxTreeSelListener);
 	XbrlDockGuiWidgetTree ctxTree = new XbrlDockGuiWidgetTree(CTX_ROOT, true, TreeSelectionModel.SINGLE_TREE_SELECTION);
 
-	GenProcessor conceptTreeLoader = new GenProcessor<DefaultMutableTreeNode>() {
+	GenAgent conceptTreeLoader = new GenAgent() {
 		@Override
-		public boolean process(ProcessorAction action, DefaultMutableTreeNode item) throws Exception {
-			if (action == ProcessorAction.Process) {
+		public Object process(String cmd, Object... params) throws Exception {
+			DefaultMutableTreeNode item = (DefaultMutableTreeNode) params[0];
+			if (XDC_CMD_GEN_Process.equals(cmd)) {
 				for (Map.Entry<String, Set> ec : conceptHierarchy.entrySet()) {
 					DefaultMutableTreeNode n = new DefaultMutableTreeNode(namespaces.get(ec.getKey()));
 					item.add(n);
@@ -259,11 +260,6 @@ public class XbrlDockGuiReportPanel extends JPanel implements XbrlDockGuiConsts,
 	}
 
 	@Override
-	public void initModule(Map config) throws Exception {
-
-	}
-
-	@Override
 	public Object process(String command, Object... params) throws Exception {
 		Object ret = null;
 
@@ -278,6 +274,8 @@ public class XbrlDockGuiReportPanel extends JPanel implements XbrlDockGuiConsts,
 
 			updateFactGrid();
 
+			break;
+		case XDC_CMD_GEN_Init:
 			break;
 		case XDC_CMD_GEN_SELECT:
 			// fact selected
@@ -295,9 +293,11 @@ public class XbrlDockGuiReportPanel extends JPanel implements XbrlDockGuiConsts,
 	}
 
 	private void updateFactGrid() {
-		factGrid.updateItems(true, new GenProcessor<ArrayList>() {
+		factGrid.updateItems(true, new GenAgent() {
+			
 			@Override
-			public boolean process(ProcessorAction action, ArrayList items) throws Exception {
+			public Object process(String cmd, Object... params) throws Exception {
+				ArrayList items = (ArrayList) params[0];
 				for (Object f : facts) {
 					Object ctx = XbrlDockUtils.simpleGet(f, XDC_FACT_TOKEN_context);
 					if ((null == ctxFilter) || ctxFilter.contains(ctx)) {

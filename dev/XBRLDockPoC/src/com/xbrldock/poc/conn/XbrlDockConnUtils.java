@@ -15,12 +15,13 @@ public class XbrlDockConnUtils implements XbrlDockConnConsts {
 		Map<String, File> specFiles = new TreeMap<String, File>();
 
 		@Override
-		public boolean process(ProcessorAction action, File f) {
-			switch (action) {
-			case Init:
+		public Object process(String cmd, Object... params) throws Exception {
+			File f = (File) params[0];
+			switch (cmd) {
+			case XDC_CMD_GEN_Init:
 				specFiles.clear();
 				break;
-			case Begin:
+			case XDC_CMD_GEN_Begin:
 				switch (f.getName()) {
 				case XDC_FNAME_METAINF:
 					File fCat = new File(f, XDC_FNAME_FILINGCATALOG);
@@ -45,7 +46,7 @@ public class XbrlDockConnUtils implements XbrlDockConnConsts {
 		}
 
 		public boolean check(File fDir) throws Exception {
-			process(ProcessorAction.Init, null);
+			process(XDC_CMD_GEN_Init);
 			XbrlDockUtilsFile.processFiles(fDir, this, null, true, false);
 			return isOK();
 		}
@@ -102,7 +103,7 @@ public class XbrlDockConnUtils implements XbrlDockConnConsts {
 			} else {
 				XbrlDockUtilsFile.FileCollector repColl = new XbrlDockUtilsFile.FileCollector();
 
-				repColl.process(ProcessorAction.Init, null);
+				repColl.process(XDC_CMD_GEN_Init);
 				XbrlDockUtilsFile.processFiles(fReports, repColl, XBRL_FILTER);
 				Collection<File> fc = repColl.getFound();
 				if (!fc.isEmpty()) {

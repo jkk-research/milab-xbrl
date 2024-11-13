@@ -72,7 +72,7 @@ public class XbrlDockGuiConnectorEsefPanel extends JPanel implements XbrlDockGui
 				break;
 			case XDC_CMD_GEN_TEST01:
 				XbrlDockDevReportStats stats = new XbrlDockDevReportStats();
-				XbrlDock.callAgent(XDC_CFGTOKEN_AGENT_esefConn, XDC_CMD_GEN_TEST01, stats);
+				XbrlDock.callAgentNoEx(XDC_CFGTOKEN_AGENT_esefConn, XDC_CMD_GEN_TEST01, stats);
 
 				XbrlDock.log(EventLevel.Info, "Test visit sats", stats);
 
@@ -83,7 +83,7 @@ public class XbrlDockGuiConnectorEsefPanel extends JPanel implements XbrlDockGui
 //				}
 				break;
 			case XDC_CMD_GEN_TEST02:
-				XbrlDock.callAgent(XDC_CFGTOKEN_AGENT_esefConn, XDC_CMD_GEN_TEST02, reportGrid.items);
+				XbrlDock.callAgentNoEx(XDC_CFGTOKEN_AGENT_esefConn, XDC_CMD_GEN_TEST02, reportGrid.items);
 				break;
 			case XDC_GUICMD_PICK:
 				updateDescPanel(((WidgetEvent) e).getUserOb());
@@ -93,7 +93,7 @@ public class XbrlDockGuiConnectorEsefPanel extends JPanel implements XbrlDockGui
 				break;
 			case XDC_GUICMD_ACTIVATE:
 				String selId = XbrlDockUtils.simpleGet(((WidgetEvent) e).getUserOb(), XDC_EXT_TOKEN_id);
-				XbrlDock.callAgent(XDC_CFGTOKEN_AGENT_gui, XDC_CMD_GEN_SELECT, XDC_CFGTOKEN_AGENT_esefConn, selId);
+				XbrlDock.callAgentNoEx(XDC_CFGTOKEN_AGENT_gui, XDC_CMD_GEN_SELECT, XDC_CFGTOKEN_AGENT_esefConn, selId);
 				break;
 			default:
 				XbrlDockException.wrap(null, "Unknown command", cmd);
@@ -146,7 +146,6 @@ public class XbrlDockGuiConnectorEsefPanel extends JPanel implements XbrlDockGui
 		repInfo.setObject(selItem);
 	}
 
-	@Override
 	public void initModule(Map config) throws Exception {
 		metaCatalog = XbrlDock.callAgent(XDC_CFGTOKEN_AGENT_esefConn, XDC_CMD_GEN_GETCATALOG);
 		repInfo.setPlaceholder(XbrlDockUtils.simpleGet(config, XDC_GEN_TOKEN_placeholder));
@@ -157,10 +156,15 @@ public class XbrlDockGuiConnectorEsefPanel extends JPanel implements XbrlDockGui
 	}
 
 	private void updateReportGrid() {
-		reportGrid.updateItems(true, new GenProcessor<ArrayList>() {
+		reportGrid.updateItems(true, new GenAgent() {
+			
 			@Override
-			public boolean process(ProcessorAction action, ArrayList items) throws Exception {
-
+			public Object process(String cmd, Object... params) throws Exception {
+				if ( !XDC_CMD_GEN_Process.equals(cmd)) {
+					return true;
+				}
+				
+				ArrayList items = (ArrayList) params[0];
 				String txt = factFilterTA.getText().trim();
 				boolean factExpr = !XbrlDockUtils.isEmpty(txt);
 
@@ -203,6 +207,9 @@ public class XbrlDockGuiConnectorEsefPanel extends JPanel implements XbrlDockGui
 		Object ret = null;
 
 		switch (command) {
+		case XDC_CMD_GEN_Init:
+			initModule((Map) params[0]);
+			break;
 		case XDC_CMD_GEN_SELECT:
 			updateDescPanel(params[0]);
 			break;

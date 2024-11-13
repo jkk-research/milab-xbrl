@@ -104,15 +104,11 @@ public class XbrlDockGuiMetaTaxonomyPanel extends JPanel implements XbrlDockGuiC
 	}
 
 	@Override
-	public void initModule(Map config) throws Exception {
-		// TODO Auto-generated method stub
-
-	}
-
-	@Override
 	public Object process(String command, Object... params) throws Exception {
 		Object ret = null;
 		switch (command) {
+		case XDC_CMD_GEN_Init:
+			break;
 		case XDC_CMD_GEN_SETMAIN:
 			showTaxonomy((String) params[1]);
 			break;

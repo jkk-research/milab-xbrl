@@ -13,27 +13,18 @@ import com.xbrldock.utils.XbrlDockUtilsNet;
 public class XbrlDockPocApp extends XbrlDock implements XbrlDockPocConsts {
 
 	boolean skip = true;
-	EventLevel logAbove = EventLevel.Context;
-
-	Object[] logContext = null;
 
 	@Override
-	protected void handleLog(EventLevel level, Object... params) {
-		if (EventLevel.Context == level) {
-			logContext = params;
-		} else {
-			if (0 > level.compareTo(logAbove)) {
-				if (null != logContext) {
-					System.out.println();
-					handleLogDefault(EventLevel.Context, logContext);
-					logContext = null;
-				}
-				handleLogDefault(level, params);
-			}
+	public Object process(String cmd, Object... params) throws Exception {
+		switch ( cmd ) {
+		case XDC_CMD_GEN_Begin:
+			run();
+			break;
 		}
+		return null;
 	}
-
-	@Override
+	
+//	@Override
 	protected void run() throws Exception {
 		
 //		File srcRoot = new File("work/input");
@@ -109,8 +100,9 @@ public class XbrlDockPocApp extends XbrlDock implements XbrlDockPocConsts {
 
 		XbrlDockUtilsFile.FileProcessor mif = new XbrlDockUtilsFile.FileProcessor() {
 			@Override
-			public boolean process(ProcessorAction action, File f) {
-				if ((action == ProcessorAction.Begin) && XbrlDockUtils.isEqual(XDC_FNAME_METAINF, f.getName())) {
+			public Object process(String cmd, Object... params) throws Exception {
+				File f = (File) params[0];
+				if (XDC_CMD_GEN_Begin.equals(cmd) && XDC_FNAME_METAINF.equals(f.getName())) {
 					if (new File(f, XDC_FNAME_FILINGCATALOG).isFile()) {
 //						XbrlDock.log(EventLevel.Trace, "MIF found", f.getPath());
 

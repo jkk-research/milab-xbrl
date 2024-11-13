@@ -191,11 +191,14 @@ public class XbrlDockGuiMetaRoleTree extends JTree implements XbrlDockGuiConsts 
 
 		Map<String, ItemNode> roles = new TreeMap<>();
 
-		taxonomy.visit(XDC_METATOKEN_links, new GenProcessor<Map<String, String>>() {
+		taxonomy.visit(XDC_METATOKEN_links, new GenAgent() {
+			
 			@Override
-			public boolean process(ProcessorAction action, Map<String, String> l) throws Exception {
-				switch (action) {
-				case Process:
+			public Object process(String cmd, Object... params) throws Exception {
+				switch (cmd) {
+				case XDC_CMD_GEN_Process:
+					Map<String, String> l = (Map<String, String>) params[0];
+
 					String roleName = l.get("xlink:role");
 					String roleType = l.get(XDC_GEN_TOKEN_type);
 

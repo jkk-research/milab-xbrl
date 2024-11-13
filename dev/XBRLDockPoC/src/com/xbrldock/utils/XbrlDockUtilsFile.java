@@ -36,7 +36,7 @@ public class XbrlDockUtilsFile implements XbrlDockUtilsConsts {
 		}
 	}
 
-	public interface FileProcessor extends GenProcessor<File> {
+	public interface FileProcessor extends GenAgent {
 	}
 
 	public static class FileCollector implements FileProcessor {
@@ -44,14 +44,15 @@ public class XbrlDockUtilsFile implements XbrlDockUtilsConsts {
 		public int limit = Integer.MAX_VALUE;
 
 		@Override
-		public boolean process(ProcessorAction action, File f) {
+		public Object process(String cmd, Object... params) throws Exception {
+			File f = (File) params[0];
 			boolean ret = true;
 
-			switch (action) {
-			case Init:
+			switch (cmd) {
+			case XDC_CMD_GEN_Init:
 				found.clear();
 				break;
-			case Process:
+			case XDC_CMD_GEN_Process:
 				found.add(f);
 				ret = found.size() < limit;
 				break;
@@ -88,17 +89,18 @@ public class XbrlDockUtilsFile implements XbrlDockUtilsConsts {
 		long filesize;
 
 		@Override
-		public boolean process(ProcessorAction action, File f) {
+		public Object process(String cmd, Object... params) throws Exception {
+			File f = (File) params[0];
 			boolean ret = true;
 
-			switch (action) {
-			case Init:
+			switch (cmd) {
+			case XDC_CMD_GEN_Init:
 				folders = filesize = 0;
 				break;
-			case Begin:
+			case XDC_CMD_GEN_Begin:
 				++folders;
 				break;
-			case Process:
+			case XDC_CMD_GEN_Process:
 				if ( f.isHidden() ) {
 					break;
 				}
@@ -133,19 +135,20 @@ public class XbrlDockUtilsFile implements XbrlDockUtilsConsts {
 		}
 
 		@Override
-		public boolean process(ProcessorAction action, File f) {
+		public Object process(String cmd, Object... params) throws Exception {
+			File f = (File) params[0];
 			boolean ret = true;
 
 			try {
-				switch (action) {
-				case Init:
+				switch (cmd) {
+				case XDC_CMD_GEN_Init:
 					fromRoot = f.getCanonicalPath();
 					break;
-				case Begin:
+				case XDC_CMD_GEN_Begin:
 					++folders;
 					ensureDir(getTarget(f));
 					break;
-				case Process:
+				case XDC_CMD_GEN_Process:
 					if ( f.isHidden() ) {
 						break;
 					}
@@ -197,7 +200,7 @@ public class XbrlDockUtilsFile implements XbrlDockUtilsConsts {
 		};
 		FileMonitorFilter fmt = new FileMonitorFilter(monitor);
 		
-		cnt.process(ProcessorAction.Init, from);
+		cnt.process(XDC_CMD_GEN_Init, from);
 		
 		processFiles(from, cnt, fmt, true, false);
 		
@@ -205,7 +208,7 @@ public class XbrlDockUtilsFile implements XbrlDockUtilsConsts {
 		
 		if ( null != to) {
 			FileCopy cpy = new FileCopy(to);
-			cpy.process(ProcessorAction.Init, from);
+			cpy.process(XDC_CMD_GEN_Init, from);
 			
 			XbrlDockDevMonitor cpm = new XbrlDockDevMonitor("Count", 1000) {
 				protected void logState(long ts) {
@@ -233,13 +236,13 @@ public class XbrlDockUtilsFile implements XbrlDockUtilsConsts {
 		if (f.exists()) {
 			if (f.isFile()) {
 				if ((null == fileFilter) || fileFilter.accept(f)) {
-					if (proc.process(ProcessorAction.Process, f)) {
+					if ((boolean) proc.process(XDC_CMD_GEN_Process, f)) {
 						count = 1;
 					}
 				}
 			} else {
 				if (dirCallBefore) {
-					if (!proc.process(ProcessorAction.Begin, f)) {
+					if (!(boolean) proc.process(XDC_CMD_GEN_Begin, f)) {
 						return 0;
 					}
 				}
@@ -249,7 +252,7 @@ public class XbrlDockUtilsFile implements XbrlDockUtilsConsts {
 				}
 
 				if (dirCallAfter) {
-					proc.process(ProcessorAction.End, f);
+					proc.process(XDC_CMD_GEN_End, f);
 				}
 			}
 		}

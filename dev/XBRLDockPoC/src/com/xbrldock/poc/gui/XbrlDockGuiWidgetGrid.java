@@ -182,13 +182,13 @@ public class XbrlDockGuiWidgetGrid implements XbrlDockGuiConsts.Widget<JComponen
 		}
 	}
 
-	public void updateItems(boolean clear, GenProcessor loader) {
+	public void updateItems(boolean clear, GenAgent loader) {
 		if (clear) {
 			items.clear();
 		}
 
 		try {
-			loader.process(ProcessorAction.Process, items);
+			loader.process(XDC_CMD_GEN_Process, items);
 		} catch (Exception e) {
 			XbrlDockException.wrap(e, "Grid updateItems");
 		}

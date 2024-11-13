@@ -112,13 +112,13 @@ public class XbrlDockGuiWidgetTree implements XbrlDockGuiConsts.Widget<JComponen
 		return rootNode;
 	}
 
-	public void updateItems(boolean clear, GenProcessor loader) {
+	public void updateItems(boolean clear, GenAgent loader) {
 		if (clear) {
 			rootNode.removeAllChildren();
 		}
 
 		try {
-			loader.process(ProcessorAction.Process, rootNode);
+			loader.process(XDC_CMD_GEN_Process, rootNode);
 		} catch (Exception e) {
 			XbrlDockException.wrap(e, "Grid updateItems");
 		}

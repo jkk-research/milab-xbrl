@@ -95,21 +95,21 @@ public class XbrlDockMetaContainer implements XbrlDockMetaConsts {
 		if (null == roleTreeMap) {
 			roleTreeMap = new TreeMap<>();
 			Map<String, Map> roles = new TreeMap<String, Map>();
-			
-			visit(XDC_METATOKEN_items, new GenProcessor() {
+
+			visit(XDC_METATOKEN_items, new GenAgent() {
 
 				@Override
-				public boolean process(ProcessorAction action, Object item) throws Exception {
-					switch (action) {
-					case Process:
-						Map<String, String> l = ((Map.Entry<String, Map>) item).getValue();
-						
+				public Object process(String cmd, Object... params) throws Exception {
+					switch (cmd) {
+					case XDC_CMD_GEN_Process:
+						Map<String, String> l = ((Map.Entry<String, Map>) params[0]).getValue();
+
 						String roleUri = l.get("roleURI");
-						
-						if ( !XbrlDockUtils.isEmpty(roleUri)) {
+
+						if (!XbrlDockUtils.isEmpty(roleUri)) {
 							roles.put(XbrlDockUtils.getPostfix(roleUri, XDC_URL_PSEP), l);
 						}
-						
+
 						break;
 					default:
 						break;
@@ -118,10 +118,10 @@ public class XbrlDockMetaContainer implements XbrlDockMetaConsts {
 				}
 			});
 
-			visit(XDC_METATOKEN_links, new GenProcessor() {
+			visit(XDC_METATOKEN_links, new GenAgent() {
 				String url;
 				Set<RoleTree> localTrees = new HashSet<>();
-				
+
 				ItemCreator<RoleTreeNode> crtNode = new ItemCreator<RoleTreeNode>() {
 					@Override
 					public RoleTreeNode create(Object key, Object... hints) {
@@ -139,35 +139,35 @@ public class XbrlDockMetaContainer implements XbrlDockMetaConsts {
 				};
 
 				@Override
-				public boolean process(ProcessorAction action, Object item) throws Exception {
-					switch (action) {
-					case Begin:
-						url = (String) item;
+				public Object process(String cmd, Object... params) throws Exception {
+					switch (cmd) {
+					case XDC_CMD_GEN_Begin:
+						url = (String) params[0];
 						localTrees.clear();
 						break;
-					case Process:
-						Map<String, String> l = (Map) item;
-						
+					case XDC_CMD_GEN_Process:
+						Map<String, String> l = (Map) params[0];
+
 						String roleType = l.get("type");
 						Map<String, RoleTree> typeMap = XbrlDockUtils.safeGet(roleTreeMap, roleType, SORTEDMAP_CREATOR);
-						
+
 						String roleName = l.get("xlink:role");
 						RoleTree rt = XbrlDockUtils.safeGet(typeMap, roleName, crtTree);
-						
+
 						localTrees.add(rt);
-						
+
 						RoleTreeNode rtnFrom = XbrlDockUtils.safeGet(rt.allNodes, l.get("xlink:from"), crtNode);
 						RoleTreeNode rtnTo = XbrlDockUtils.safeGet(rt.allNodes, l.get("xlink:to"), crtNode);
-						
+
 						rtnTo.setUpLink(l);
-						
+
 						rtnFrom.addChild(rtnTo);
 						break;
-					case End:
-						for ( RoleTree lt : localTrees ) {
-							for ( Map.Entry<String, RoleTreeNode> lne : lt.allNodes.entrySet() ) {
+					case XDC_CMD_GEN_End:
+						for (RoleTree lt : localTrees) {
+							for (Map.Entry<String, RoleTreeNode> lne : lt.allNodes.entrySet()) {
 								RoleTreeNode ne = lne.getValue();
-								if ( null == ne.getUpLink() ) {
+								if (null == ne.getUpLink()) {
 									lt.addChild(ne);
 								}
 							}
@@ -180,7 +180,7 @@ public class XbrlDockMetaContainer implements XbrlDockMetaConsts {
 				}
 			});
 		}
-		
+
 		return roleTreeMap.get(type);
 	}
 
@@ -380,15 +380,15 @@ public class XbrlDockMetaContainer implements XbrlDockMetaConsts {
 
 			visit(XDC_METATOKEN_items, cnt);
 			metaInfo.put(XDC_METATOKEN_items, cnt.getCount());
-			cnt.process(ProcessorAction.Init, null);
+			cnt.process(XDC_CMD_GEN_Init);
 
 			visit(XDC_METATOKEN_links, cnt);
 			metaInfo.put(XDC_METATOKEN_links, cnt.getCount());
-			cnt.process(ProcessorAction.Init, null);
+			cnt.process(XDC_CMD_GEN_Init);
 
 			visit(XDC_METATOKEN_references, cnt);
 			metaInfo.put(XDC_METATOKEN_references, cnt.getCount());
-			cnt.process(ProcessorAction.Init, null);
+			cnt.process(XDC_CMD_GEN_Init);
 
 			XbrlDockUtilsJson.writeJson(new File(fDir, XDC_TAXONOMYHEAD_FNAME), metaInfo);
 			XbrlDockUtilsJson.writeJson(new File(fDir, XDC_TAXONOMYDATA_FNAME), contentByURL);
@@ -490,7 +490,7 @@ public class XbrlDockMetaContainer implements XbrlDockMetaConsts {
 		return target.size();
 	}
 
-	public void visit(String itemType, GenProcessor lp, Object... params) {
+	public void visit(String itemType, GenAgent lp, Object... params) {
 		Map m = null;
 		Collection c;
 
@@ -501,11 +501,11 @@ public class XbrlDockMetaContainer implements XbrlDockMetaConsts {
 				for (Map ce : contentByURL.values()) {
 					m = (Map) ce.getOrDefault(itemType, Collections.EMPTY_MAP);
 					if ((null != m) && !m.isEmpty()) {
-						lp.process(ProcessorAction.Begin, null);
+						lp.process(XDC_CMD_GEN_Begin);
 						for (Object e : m.entrySet()) {
-							lp.process(ProcessorAction.Process, e);
+							lp.process(XDC_CMD_GEN_Process, e);
 						}
-						lp.process(ProcessorAction.End, null);
+						lp.process(XDC_CMD_GEN_End);
 					}
 				}
 				break;
@@ -514,22 +514,22 @@ public class XbrlDockMetaContainer implements XbrlDockMetaConsts {
 					c = (Collection) ce.getValue().getOrDefault(itemType, Collections.EMPTY_LIST);
 					if ((null != c) && !c.isEmpty()) {
 						String key = ce.getKey();
-						lp.process(ProcessorAction.Begin, key);
+						lp.process(XDC_CMD_GEN_Begin, key);
 						for (Object e : c) {
-							lp.process(ProcessorAction.Process, e);
+							lp.process(XDC_CMD_GEN_Process, e);
 						}
-						lp.process(ProcessorAction.End, key);
+						lp.process(XDC_CMD_GEN_End, key);
 					}
 				}
 				break;
 			case XDC_METATOKEN_references:
 				c = (Collection) references.getOrDefault(itemType, Collections.EMPTY_LIST);
 				if ((null != c) && !c.isEmpty()) {
-					lp.process(ProcessorAction.Begin, null);
+					lp.process(XDC_CMD_GEN_Begin);
 					for (Object e : c) {
-						lp.process(ProcessorAction.Process, e);
+						lp.process(XDC_CMD_GEN_Process, e);
 					}
-					lp.process(ProcessorAction.End, null);
+					lp.process(XDC_CMD_GEN_End);
 				}
 				break;
 			case XDC_METATOKEN_refLinks:
@@ -537,11 +537,11 @@ public class XbrlDockMetaContainer implements XbrlDockMetaConsts {
 				if ((null != m) && !m.isEmpty()) {
 					for (Object e : m.entrySet()) {
 						Map.Entry me = (Map.Entry) e;
-						lp.process(ProcessorAction.Begin, me.getKey());
+						lp.process(XDC_CMD_GEN_Begin, me.getKey());
 						for (Object v : (Collection) me.getValue()) {
-							lp.process(ProcessorAction.Process, v);
+							lp.process(XDC_CMD_GEN_Process, v);
 						}
-						lp.process(ProcessorAction.End, e);
+						lp.process(XDC_CMD_GEN_End, e);
 					}
 				}
 
@@ -554,11 +554,11 @@ public class XbrlDockMetaContainer implements XbrlDockMetaConsts {
 			}
 
 			if ((null != m) && !m.isEmpty()) {
-				lp.process(ProcessorAction.Begin, null);
+				lp.process(XDC_CMD_GEN_Begin);
 				for (Object e : m.entrySet()) {
-					lp.process(ProcessorAction.Process, e);
+					lp.process(XDC_CMD_GEN_Process, e);
 				}
-				lp.process(ProcessorAction.End, null);
+				lp.process(XDC_CMD_GEN_End);
 			}
 
 		} catch (Throwable e) {

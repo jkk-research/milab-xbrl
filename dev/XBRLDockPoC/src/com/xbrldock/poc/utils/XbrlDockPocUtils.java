@@ -31,8 +31,9 @@ public class XbrlDockPocUtils extends XbrlDockUtils implements XbrlDockPocConsts
 			boolean ret = true;
 
 			@Override
-			public boolean process(ProcessorAction action, File f) {
-				if ((action == ProcessorAction.Begin) && XbrlDockUtils.isEqual(XDC_FNAME_METAINF, f.getName())) {
+			public Object process(String cmd, Object... params) throws Exception {
+				File f = (File) params[0];
+				if (XDC_CMD_GEN_Begin.equals(cmd) && XDC_FNAME_METAINF.equals(f.getName())) {
 					t.put(XDC_METAINFO_dir, f);
 					ret = false;
 				}

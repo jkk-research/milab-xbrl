@@ -38,7 +38,7 @@ public class XbrlDockGuiMetaContainerPanel extends JPanel implements XbrlDockGui
 	String selRoleType;
 	Set<String> urlFilter;
 
-	GenProcessor roleTreeLoader = new GenProcessor<DefaultMutableTreeNode>() {
+	GenAgent roleTreeLoader = new GenAgent() {
 		private DefaultMutableTreeNode toTreeNode(RoleTreeNode n) {
 			DefaultMutableTreeNode ret = new DefaultMutableTreeNode(n);
 
@@ -49,8 +49,9 @@ public class XbrlDockGuiMetaContainerPanel extends JPanel implements XbrlDockGui
 		}
 
 		@Override
-		public boolean process(ProcessorAction action, DefaultMutableTreeNode item) throws Exception {
-			if (action == ProcessorAction.Process) {
+		public Object process(String cmd, Object... params) throws Exception {
+			DefaultMutableTreeNode item = (DefaultMutableTreeNode ) params[0];
+			if (XDC_CMD_GEN_Process.equals(cmd)) {
 				Map<String, RoleTree> rtm = taxonomy.getRoleTreeMap(selRoleType);
 
 				for (RoleTree rt : rtm.values()) {
@@ -153,15 +154,11 @@ public class XbrlDockGuiMetaContainerPanel extends JPanel implements XbrlDockGui
 	}
 
 	@Override
-	public void initModule(Map config) throws Exception {
-		// TODO Auto-generated method stub
-
-	}
-
-	@Override
 	public Object process(String command, Object... params) throws Exception {
 		Object ret = null;
 		switch (command) {
+		case XDC_CMD_GEN_Init:
+			break;
 		case XDC_CMD_GEN_SETMAIN:
 			showTaxonomy((String) params[1]);
 			break;

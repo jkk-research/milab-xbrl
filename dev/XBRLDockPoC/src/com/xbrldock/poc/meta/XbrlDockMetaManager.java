@@ -97,8 +97,7 @@ public class XbrlDockMetaManager implements XbrlDockMetaConsts, XbrlDockConsts.G
 	public XbrlDockMetaManager() {
 	}
 
-	@Override
-	public void initModule(Map config) throws Exception {
+	private void initModule(Map config) throws Exception {
 		String dataRoot = XbrlDockUtils.simpleGet(config, XDC_CFGTOKEN_dirStore);
 		this.metaStoreRoot = new File(dataRoot);
 		XbrlDockUtilsFile.ensureDir(metaStoreRoot);
@@ -119,6 +118,9 @@ public class XbrlDockMetaManager implements XbrlDockMetaConsts, XbrlDockConsts.G
 //		XbrlDockMetaContainer mc;
 
 		switch (command) {
+		case XDC_CMD_GEN_Init:
+			initModule((Map) params[0]);
+			break;
 		case XDC_CMD_GEN_GETCATALOG:
 			ret = metaCatalog;
 			break;

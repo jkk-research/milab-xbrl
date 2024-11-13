@@ -71,7 +71,7 @@ public class XbrlDockReportExprEval implements XbrlDockReportConsts, XbrlDockPoc
 				if (!inited) {
 					inited = true;
 					data.put(XDC_EXPR_result, ret);
-					if (!resultProc.process(ProcessorAction.Init, segData)) {
+					if (!(boolean) resultProc.process(XDC_CMD_GEN_Init, segData)) {
 						return XDC_RETVAL_STOP;
 					}
 				}
@@ -103,14 +103,14 @@ public class XbrlDockReportExprEval implements XbrlDockReportConsts, XbrlDockPoc
 					for (Map.Entry<String, Collection<Map>> cfe : ctxFacts.entrySet()) {
 						String ctxId = cfe.getKey();
 						Map ctx = XbrlDockUtils.simpleGet(segData, XDC_REP_SEG_Context, ctxId);
-						resultProc.process(ProcessorAction.Begin, ctx);
+						resultProc.process(XDC_CMD_GEN_Begin, ctx);
 						for (Map f : cfe.getValue()) {
 							evaluate(f);
 						}
-						resultProc.process(ProcessorAction.End, ctx);
+						resultProc.process(XDC_CMD_GEN_End, ctx);
 					}
 				}
-				resultProc.process(ProcessorAction.Release, segData.get(XDC_REP_SEG_Context));
+				resultProc.process(XDC_CMD_GEN_Release, segData.get(XDC_REP_SEG_Context));
 			}
 		} catch (Throwable e) {
 			XbrlDockException.wrap(e, "evaluating expression", repId, exprStr);
@@ -126,7 +126,7 @@ public class XbrlDockReportExprEval implements XbrlDockReportConsts, XbrlDockPoc
 		evalCtx.put(XDC_EXPR_result, ret);
 
 
-		if (!resultProc.process(ProcessorAction.Process, evalCtx)) {
+		if (!(boolean) resultProc.process(XDC_CMD_GEN_Process, evalCtx)) {
 			ret = XDC_RETVAL_STOP;
 		}
 

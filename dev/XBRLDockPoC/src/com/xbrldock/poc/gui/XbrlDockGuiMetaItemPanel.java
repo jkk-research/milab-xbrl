@@ -85,11 +85,13 @@ public class XbrlDockGuiMetaItemPanel extends JPanel implements XbrlDockGuiConst
 
 		Set<String> s = new TreeSet<>();
 
-		taxonomy.visit(XDC_METATOKEN_items, new GenProcessor<Map.Entry<String, Map>>() {
+		taxonomy.visit(XDC_METATOKEN_items, new GenAgent() {
+			
 			@Override
-			public boolean process(ProcessorAction action, Map.Entry<String, Map> l) throws Exception {
-				switch (action) {
-				case Process:
+			public Object process(String cmd, Object... params) throws Exception {
+				switch (cmd) {
+				case XDC_CMD_GEN_Process:
+					Map.Entry<String, Map> l = (Map.Entry<String, Map> ) params[0];
 					s.addAll(l.getValue().keySet());
 					break;
 				default:
@@ -113,11 +115,13 @@ public class XbrlDockGuiMetaItemPanel extends JPanel implements XbrlDockGuiConst
 
 				StringBuilder sbText = new StringBuilder();
 
-				taxonomy.visit(XDC_METATOKEN_labels, new GenProcessor<Map.Entry<String, Object>>() {
+				taxonomy.visit(XDC_METATOKEN_labels, new GenAgent() {
+					
 					@Override
-					public boolean process(ProcessorAction action, Map.Entry<String, Object> le) throws Exception {
-						switch (action) {
-						case Process:
+					public Object process(String cmd, Object... params) throws Exception {
+						switch (cmd) {
+						case XDC_CMD_GEN_Process:
+							Map.Entry<String, Object> le = (Map.Entry<String, Object>) params[0];
 							sbText.append("\t<tr><td>").append(le.getKey()).append("</td><td>").append(le.getValue()).append("</td></tr>\n");
 							break;
 						default:
@@ -152,22 +156,24 @@ public class XbrlDockGuiMetaItemPanel extends JPanel implements XbrlDockGuiConst
 				StringBuilder sbRefs = new StringBuilder();
 				itemRefs.setText("");
 
-				taxonomy.visit(XDC_METATOKEN_refLinks, new GenProcessor<Map<String, Object>>() {
+				taxonomy.visit(XDC_METATOKEN_refLinks, new GenAgent() {
 					boolean cont = false;
 
 					@Override
-					public boolean process(ProcessorAction action, Map<String, Object> re) throws Exception {
-						switch (action) {
-						case Begin:
+					public Object process(String cmd, Object... params) throws Exception {
+						switch (cmd) {
+						case XDC_CMD_GEN_Begin:
 							sbRefs.append("<html><body><table>\n");
 							break;
-						case Process:
+						case XDC_CMD_GEN_Process:
 
 							if (cont) {
 								sbRefs.append("\t<tr colspan=2><td> --- </td></tr>\n");
 							} else {
 								cont = true;
 							}
+							
+							Map<String, Object> re = ( Map<String, Object>) params[0];
 							for (Map.Entry<String, Object> le : re.entrySet()) {
 								String k = le.getKey();
 								Object v = le.getValue();
@@ -178,7 +184,7 @@ public class XbrlDockGuiMetaItemPanel extends JPanel implements XbrlDockGuiConst
 								sbRefs.append("\t<tr><td>").append(k).append("</td><td>").append(v).append("</td></tr>\n");
 							}
 							break;
-						case End:
+						case XDC_CMD_GEN_End:
 							sbRefs.append("</table></body></html>");
 							itemRefs.setText(sbRefs.toString());
 							break;

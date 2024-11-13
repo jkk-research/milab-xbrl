@@ -58,7 +58,6 @@ public class XbrlDockConnXbrlOrg implements XbrlDockConnXbrlOrgConsts, XbrlDockC
 		// TODO Auto-generated constructor stub
 	}
 
-	@Override
 	public void initModule(Map config) throws Exception {
 
 		dirInput = new File((String) XbrlDockUtils.simpleGet(config, XDC_CFGTOKEN_dirInput));
@@ -81,6 +80,9 @@ public class XbrlDockConnXbrlOrg implements XbrlDockConnXbrlOrgConsts, XbrlDockC
 		Map<String, Map> filings = XbrlDockUtils.simpleGet(catalog, XDC_CONN_CAT_TOKEN_filings);
 
 		switch (command) {
+		case XDC_CMD_GEN_Init:
+			initModule((Map) params[0]);
+			break;
 		case XDC_CMD_GEN_GETCATALOG:
 			ret = catalog;
 			break;
@@ -223,23 +225,23 @@ public class XbrlDockConnXbrlOrg implements XbrlDockConnXbrlOrgConsts, XbrlDockC
 	}
 
 //	@Override
-	public void visitReports(GenProcessor<Map> visitor, GenProcessor<Map> filter) throws Exception {
+	public void visitReports(GenAgent visitor, GenAgent filter) throws Exception {
 		XbrlDockDevMonitor pm = new XbrlDockDevMonitor("visitReports", 100);
 
 		Map<String, Map<String, Object>> filings = XbrlDockUtils.simpleGet(catalog, XDC_CONN_CAT_TOKEN_filings);
 
-		visitor.process(ProcessorAction.Begin, null);
+		visitor.process(XDC_CMD_GEN_Begin);
 
 		for (Map.Entry<String, Map<String, Object>> fe : filings.entrySet()) {
 			String k = fe.getKey();
 			Map<String, Object> fd = fe.getValue();
 
 			try {
-				if ((null == filter) || filter.process(ProcessorAction.Process, fd)) {
+				if (XbrlDockUtils.optCall(filter, XDC_CMD_GEN_Process, true, fd)) {
 					if (pm.step()) {
 //						break;
 					}
-					boolean cont = visitor.process(ProcessorAction.Process, fd);
+					boolean cont = (boolean) visitor.process(XDC_CMD_GEN_Process, fd);
 
 					if (!cont) {
 						break;
@@ -250,7 +252,7 @@ public class XbrlDockConnXbrlOrg implements XbrlDockConnXbrlOrgConsts, XbrlDockC
 			}
 		}
 
-		visitor.process(ProcessorAction.End, null);
+		visitor.process(XDC_CMD_GEN_End);
 	}
 
 //	@Override
@@ -450,7 +452,7 @@ public class XbrlDockConnXbrlOrg implements XbrlDockConnXbrlOrgConsts, XbrlDockC
 					ret = rc[0];
 					packStatus = (1 == rc.length) ? XDC_CONN_PACKAGE_PROC_MSG_reportFoundSingle : XDC_CONN_PACKAGE_PROC_MSG_reportFoundMulti;
 				} else {
-					repColl.process(ProcessorAction.Init, null);
+					repColl.process(XDC_CMD_GEN_Init);
 					XbrlDockUtilsFile.processFiles(fReports, repColl, filingCandidate);
 					Collection<File> fc = repColl.getFound();
 					if (!fc.isEmpty()) {

@@ -2,10 +2,27 @@ package com.xbrldock;
 
 import java.io.File;
 import java.nio.charset.StandardCharsets;
-import java.util.Map;
 
-@SuppressWarnings("rawtypes")
 public interface XbrlDockConsts {
+
+	public enum EventLevel {
+		Exception, Error, Warning, Info, Trace, Debug, Context
+	}
+
+	String XDC_CMD_GEN_Init = "xdc_Init";
+	String XDC_CMD_GEN_Begin = "xdc_Begin";
+	String XDC_CMD_GEN_Process = "xdc_Process";
+	String XDC_CMD_GEN_End = "xdc_End";
+	String XDC_CMD_GEN_Release = "xdc_Release";
+
+	public interface GenAgent {
+		Object process(String cmd, Object... params) throws Exception;
+	}
+
+	interface ItemCreator<Type> {
+		Type create(Object key, Object... hints);
+	}
+
 
 	String XDC_SEP_FILE = "_";
 	String XDC_SEP_PATH = ".";
@@ -48,33 +65,6 @@ public interface XbrlDockConsts {
 
 	int KEY_ADD = -1;
 	int KEY_SIZE = -2;
-
-	public enum EventLevel {
-		Exception, Error, Warning, Info, Trace, Debug, Context
-	}
-
-	public enum ProcessorAction {
-		Init, Begin, Process, End, Release
-	}
-
-//	public interface GenApp {
-//		GenAgent getAgent(String agentId) throws Exception;
-//		<RetType> RetType callAgent(String agentId, String command, Object... params) throws Exception;
-//	}
-//	
-	public interface GenAgent {
-		void initModule(Map config) throws Exception;
-
-		Object process(String command, Object... params) throws Exception;
-	}
-
-	interface ItemCreator<Type> {
-		Type create(Object key, Object... hints);
-	}
-
-	public interface GenProcessor<ItemType> {
-		boolean process(ProcessorAction action, ItemType item) throws Exception;
-	}
 
 	String XDC_FORMAT_XML = "XML";
 	String XDC_FORMAT_XHTML = "XHTML";

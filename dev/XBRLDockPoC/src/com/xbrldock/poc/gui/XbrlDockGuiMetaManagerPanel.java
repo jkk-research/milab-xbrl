@@ -62,18 +62,18 @@ public class XbrlDockGuiMetaManagerPanel extends JPanel implements XbrlDockGuiCo
 
 			switch (cmd) {
 			case XDC_GUICMD_PICK:
-				selItem = ((WidgetEvent)e).getUserOb();
+				selItem = ((WidgetEvent) e).getUserOb();
 				updateDescPanel();
 				break;
 			case XDC_GUICMD_ACTIVATE:
 				String selId = XbrlDockUtils.simpleGet(selItem, XDC_METAINFO_pkgInfo, XDC_EXT_TOKEN_identifier);
-			XbrlDock.callAgent(XDC_CFGTOKEN_AGENT_gui, XDC_CMD_GEN_SELECT, XDC_CFGTOKEN_AGENT_metaManager, selId);
+				XbrlDock.callAgentNoEx(XDC_CFGTOKEN_AGENT_gui, XDC_CMD_GEN_SELECT, XDC_CFGTOKEN_AGENT_metaManager, selId);
 //				String selId = XbrlDockUtils.simpleGet(((WidgetEvent)e).getUserOb(), XDC_METAINFO_pkgInfo, XDC_EXT_TOKEN_identifier);
 //				XbrlDock.callAgent(XDC_CFGTOKEN_AGENT_gui, XDC_CMD_GEN_SELECT, XDC_CFGTOKEN_AGENT_esefConn, selId);
 				break;
 
 			case XDC_CMD_GEN_TEST01:
-				XbrlDock.callAgent(XDC_CFGTOKEN_AGENT_metaManager, XDC_CMD_GEN_TEST01, selItem);
+				XbrlDock.callAgentNoEx(XDC_CFGTOKEN_AGENT_metaManager, XDC_CMD_GEN_TEST01, selItem);
 				break;
 			default:
 //				XbrlDockException.wrap(null, "Unknown command", cmd);
@@ -137,7 +137,7 @@ public class XbrlDockGuiMetaManagerPanel extends JPanel implements XbrlDockGuiCo
 		pnlTop.add(XbrlDockGuiUtils.setTitle(taxGrid, "Taxonomy catalog"), BorderLayout.CENTER);
 		pnlTop.add(right, BorderLayout.EAST);
 		add(XbrlDockUtilsGui.createSplit(false, pnlTop, XbrlDockGuiUtils.setTitle(taxInfo, "Selected taxonomy information"), 0.5), BorderLayout.CENTER);
-		
+
 		taxGrid.setActionListener(al, XDC_GUICMD_PICK, XDC_GUICMD_ACTIVATE);
 	}
 
@@ -152,7 +152,6 @@ public class XbrlDockGuiMetaManagerPanel extends JPanel implements XbrlDockGuiCo
 //		txtInfo.setCaretPosition(cp);
 	}
 
-	@Override
 	public void initModule(Map config) throws Exception {
 		metaCatalog = XbrlDock.callAgent(XDC_CFGTOKEN_AGENT_metaManager, XDC_CMD_GEN_GETCATALOG);
 //		placeholder = XbrlDockUtils.simpleGet(config, XDC_GEN_TOKEN_placeholder);
@@ -170,11 +169,15 @@ public class XbrlDockGuiMetaManagerPanel extends JPanel implements XbrlDockGuiCo
 	}
 
 	private void updateTaxGrid() {
-		taxGrid.updateItems(true, new GenProcessor<ArrayList>() {
+		taxGrid.updateItems(true, new GenAgent() {
+			
 			@Override
-			public boolean process(ProcessorAction action, ArrayList items) throws Exception {
-				for (Object c : metaCatalog.values()) {
-					items.add(c);
+			public Object process(String cmd, Object... params) throws Exception {
+				if (XDC_CMD_GEN_Process.equals(cmd)) {
+					ArrayList items = (ArrayList) params[0];
+					for (Object c : metaCatalog.values()) {
+						items.add(c);
+					}
 				}
 				return true;
 			}
@@ -182,8 +185,14 @@ public class XbrlDockGuiMetaManagerPanel extends JPanel implements XbrlDockGuiCo
 	}
 
 	@Override
-	public Object process(String command, Object... params) {
-		// TODO Auto-generated method stub
+	public Object process(String command, Object... params) throws Exception {
+		switch (command) {
+		case XDC_CMD_GEN_Init:
+			initModule((Map) params[0]);
+			break;
+		default:
+			break;
+		}
 		return null;
 	}
 

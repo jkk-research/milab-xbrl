@@ -8,6 +8,11 @@ import java.util.Map;
 
 @SuppressWarnings({ "unchecked", "rawtypes" })
 public class XbrlDockUtils implements XbrlDockUtilsConsts {
+	
+	public static <RetVal> RetVal optCall(GenAgent agent, String cmd, RetVal defRet, Object... params) throws Exception {
+		return (null == agent) ? defRet : (RetVal) agent.process(cmd, params);
+	}
+
 
 	public static boolean isEmpty(String str) {
 		return (null == str) || str.isEmpty();
@@ -285,7 +290,7 @@ public class XbrlDockUtils implements XbrlDockUtilsConsts {
 		RetType ob = (RetType) Class.forName((String) config.get(XDC_CFGTOKEN_javaClass)).getConstructor().newInstance();
 
 		if (ob instanceof GenAgent) {
-			((GenAgent) ob).initModule(config);
+			((GenAgent) ob).process(XDC_CMD_GEN_Init, config);
 		}
 
 		return ob;

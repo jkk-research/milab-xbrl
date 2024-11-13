@@ -15,10 +15,13 @@ import com.xbrldock.utils.XbrlDockUtilsConsts;
 import com.xbrldock.utils.XbrlDockUtilsJson;
 
 @SuppressWarnings({ "unchecked", "rawtypes" })
-public abstract class XbrlDock implements XbrlDockConsts, XbrlDockUtilsConsts {
+public abstract class XbrlDock implements XbrlDockConsts, XbrlDockUtilsConsts, XbrlDockConsts.GenAgent {
 
 	private static XbrlDock XBRLDOCK;
-	private static PrintStream PS_LOG = System.out;
+	
+	private static PrintStream LOG_STREAM = System.out;
+	private static EventLevel LOG_LIMIT_ABOVE = EventLevel.Context;
+	private static Object[] LOG_CONTEXT_PENDING = null;
 
 	protected final static Map<String, Object> APP_CONFIG = new TreeMap<>();
 	protected final static ArrayList<String> APP_ARGS = new ArrayList<>();
@@ -61,33 +64,33 @@ public abstract class XbrlDock implements XbrlDockConsts, XbrlDockUtilsConsts {
 					APP_ARGS.add(a);
 				}
 			}
-			
+
 			String userName = XbrlDockUtils.simpleGet(APP_CONFIG, XDC_CFGTOKEN_env, "user", "name");
 			Map<String, Collection> ufm = XbrlDockUtils.simpleGet(APP_CONFIG, XDC_CFGTOKEN_app, XDC_CFGTOKEN_userFlags);
 			Map<String, Boolean> fm = XbrlDockUtils.safeGet(APP_CONFIG, XDC_CFGTOKEN_userFlags, SORTEDMAP_CREATOR);
-			
-			if ( null != ufm ) {
-				for ( Map.Entry<String, Collection> ufe: ufm.entrySet()) {
+
+			if (null != ufm) {
+				for (Map.Entry<String, Collection> ufe : ufm.entrySet()) {
 					fm.put(ufe.getKey(), ufe.getValue().contains(userName));
 				}
 			}
 
 			XBRLDOCK = XbrlDockUtils.createObject(XbrlDockUtils.safeGet(APP_CONFIG, XDC_CFGTOKEN_app, MAP_CREATOR));
 
-			XBRLDOCK.run();
+			XBRLDOCK.process(XDC_CMD_GEN_Begin);
 
 		} catch (Throwable t) {
 			XbrlDock.log(EventLevel.Exception, t);
 		}
 
-		PS_LOG.println("**********************");
-		PS_LOG.println("*                    *");
-		PS_LOG.println("*      Complete      *");
-		PS_LOG.println("*                    *");
-		PS_LOG.println("**********************");
+		LOG_STREAM.println("**********************");
+		LOG_STREAM.println("*                    *");
+		LOG_STREAM.println("*   Main Complete    *");
+		LOG_STREAM.println("*                    *");
+		LOG_STREAM.println("**********************");
 	}
 
-	protected abstract void run() throws Exception;
+//	protected abstract void run() throws Exception;
 
 	static void addConfig(String key, Object val) {
 		Object[] path = key.split("\\.");
@@ -97,14 +100,27 @@ public abstract class XbrlDock implements XbrlDockConsts, XbrlDockUtilsConsts {
 		XbrlDockUtils.simpleSet(root, val, path);
 	}
 
-	protected abstract void handleLog(EventLevel level, Object... params);
-
-	protected static void handleLogDefault(EventLevel level, Object... params) {
-		handleLogDefault(PS_LOG, level, params);
+	public static void setLogStream(PrintStream ps) {
+		LOG_STREAM = (null == ps) ? System.out : ps;
 	}
 
-	public static boolean checkFlag(String flag) {
-		return Boolean.TRUE.equals(XbrlDockUtils.simpleGet(APP_CONFIG, XDC_CFGTOKEN_userFlags, flag));
+	public static void log(EventLevel level, Object... params) {
+		if (EventLevel.Context == level) {
+			LOG_CONTEXT_PENDING = params;
+		} else {
+			if (0 > level.compareTo(LOG_LIMIT_ABOVE)) {
+				if (null != LOG_CONTEXT_PENDING) {
+					System.out.println();
+					handleLogDefault(EventLevel.Context, LOG_CONTEXT_PENDING);
+					LOG_CONTEXT_PENDING = null;
+				}
+				handleLogDefault(level, params);
+			}
+		}
+	}
+
+	protected static void handleLogDefault(EventLevel level, Object... params) {
+		handleLogDefault(LOG_STREAM, level, params);
 	}
 
 	public static void handleLogDefault(PrintStream target, EventLevel level, Object... params) {
@@ -112,17 +128,9 @@ public abstract class XbrlDock implements XbrlDockConsts, XbrlDockUtilsConsts {
 		target.println(XbrlDockUtils.strTime() + " " + level + " " + XbrlDockUtils.toString(sb));
 		target.flush();
 	}
-
-	public static void setLogStream(PrintStream ps) {
-		PS_LOG = (null == ps) ? System.out : ps;
-	}
-
-	public static void log(EventLevel level, Object... params) {
-		if (null == XBRLDOCK) {
-			handleLogDefault(level, params);
-		} else {
-			XBRLDOCK.handleLog(level, params);
-		}
+	
+	public static boolean checkFlag(String flag) {
+		return Boolean.TRUE.equals(XbrlDockUtils.simpleGet(APP_CONFIG, XDC_CFGTOKEN_userFlags, flag));
 	}
 
 	public static GenAgent getAgent(String agentId) {
@@ -134,7 +142,7 @@ public abstract class XbrlDock implements XbrlDockConsts, XbrlDockUtilsConsts {
 				try {
 					return XbrlDockUtils.createObject(cfg);
 				} catch (Exception e) {
-					return XbrlDockException.wrap(e, "getModule", agentId, cfg);
+					return XbrlDockException.wrap(e, "getAgent", agentId, cfg);
 				}
 			}
 		});
@@ -142,19 +150,20 @@ public abstract class XbrlDock implements XbrlDockConsts, XbrlDockUtilsConsts {
 		return agent;
 	}
 
-	public static <RetType> RetType callAgent(String agentId, String command, Object... params) {
-		Object ret = null;
-
+	public static <RetType> RetType callAgentNoEx(String agentId, String command, Object... params) {
 		try {
-			GenAgent agent = getAgent(agentId);
-
-			if (!XbrlDockUtils.isEmpty(command)) {
-				ret = agent.process(command, params);
-			}
-
-		} catch (Throwable e) {
+			return callAgent(agentId, command, params);
+		} catch (Exception e) {
 			return XbrlDockException.wrap(e, "callAgent", agentId, command, params);
 		}
+	}
+
+	public static <RetType> RetType callAgent(String agentId, String command, Object... params) throws Exception {
+		Object ret = null;
+
+		GenAgent agent = getAgent(agentId);
+
+		ret = agent.process(command, params);
 
 		return (RetType) ret;
 	}

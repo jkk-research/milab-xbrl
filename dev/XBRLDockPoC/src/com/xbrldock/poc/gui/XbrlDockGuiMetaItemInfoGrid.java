@@ -128,11 +128,12 @@ public class XbrlDockGuiMetaItemInfoGrid extends JPanel implements XbrlDockGuiCo
 
 						StringBuilder sbText = new StringBuilder();
 
-						taxonomy.visit(XDC_METATOKEN_labels, new GenProcessor<Map.Entry<String, Object>>() {
+						taxonomy.visit(XDC_METATOKEN_labels, new GenAgent() {
 							@Override
-							public boolean process(ProcessorAction action, Map.Entry<String, Object> le) throws Exception {
-								switch (action) {
-								case Process:
+							public Object process(String cmd, Object... params) throws Exception {
+								switch (cmd) {
+								case XDC_CMD_GEN_Process:
+									Map.Entry<String, Object> le = (Map.Entry<String, Object>)params[0];
 									sbText.append("\t<tr><td>").append(le.getKey()).append("</td><td>").append(le.getValue()).append("</td></tr>\n");
 									break;
 								default:
@@ -167,16 +168,17 @@ public class XbrlDockGuiMetaItemInfoGrid extends JPanel implements XbrlDockGuiCo
 						StringBuilder sbRefs = new StringBuilder();
 						txtRefs.setText("");
 
-						taxonomy.visit(XDC_METATOKEN_refLinks, new GenProcessor<Map<String, Object>>() {
+						taxonomy.visit(XDC_METATOKEN_refLinks, new GenAgent() {
 							boolean cont = false;
 
 							@Override
-							public boolean process(ProcessorAction action, Map<String, Object> re) throws Exception {
-								switch (action) {
-								case Begin:
+							public Object process(String cmd, Object... params) throws Exception {
+								Map<String, Object> re = (Map<String, Object>) params[0];
+								switch (cmd) {
+								case XDC_CMD_GEN_Begin:
 									sbRefs.append("<html><body><table>\n");
 									break;
-								case Process:
+								case XDC_CMD_GEN_Process:
 
 									if (cont) {
 										sbRefs.append("\t<tr colspan=2><td> --- </td></tr>\n");
@@ -193,7 +195,7 @@ public class XbrlDockGuiMetaItemInfoGrid extends JPanel implements XbrlDockGuiCo
 										sbRefs.append("\t<tr><td>").append(k).append("</td><td>").append(v).append("</td></tr>\n");
 									}
 									break;
-								case End:
+								case XDC_CMD_GEN_End:
 									sbRefs.append("</table></body></html>");
 									txtRefs.setText(sbRefs.toString());
 									break;
@@ -287,11 +289,12 @@ public class XbrlDockGuiMetaItemInfoGrid extends JPanel implements XbrlDockGuiCo
 
 		Set<String> s = new TreeSet<>();
 
-		taxonomy.visit(XDC_METATOKEN_items, new GenProcessor<Map.Entry<String, Map>>() {
+		taxonomy.visit(XDC_METATOKEN_items, new GenAgent() {
 			@Override
-			public boolean process(ProcessorAction action, Map.Entry<String, Map> l) throws Exception {
-				switch (action) {
-				case Process:
+			public Object process(String cmd, Object... params) throws Exception {
+				Map.Entry<String, Map> l = (Map.Entry<String, Map>) params[0];
+				switch (cmd) {
+				case XDC_CMD_GEN_Process:
 					s.addAll(l.getValue().keySet());
 					break;
 				default:

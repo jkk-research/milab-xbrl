@@ -46,13 +46,14 @@ public class XbrlDockReportUtils implements XbrlDockReportConsts {
 		}
 
 		@Override
-		public boolean process(ProcessorAction action, Map item) throws Exception {
-			switch (action) {
-			case Init:
+		public Object process(String cmd, Object... params) throws Exception {
+			Map item = (Map) params[0];
+			switch (cmd) {
+			case XDC_CMD_GEN_Init:
 				match = false;
 				ret = true;
 				break;
-			case Process:
+			case XDC_CMD_GEN_Process:
 				match = XbrlDockUtils.isEqual(targetValue, item.get(XDC_EXPR_result));
 				if ( match ) {
 					ret = false;					

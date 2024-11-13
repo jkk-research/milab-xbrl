@@ -49,8 +49,8 @@ public class XbrlDockReportLoader implements XbrlDockReportConsts, XbrlDockPocCo
 
 		File dir = XbrlDockConnUtils.getFilingDir(dataRoot, reportData, true, true);
 
-		cwData.process(ProcessorAction.Begin, new File(dir, XDC_FNAME_REPDATA));
-		cwText.process(ProcessorAction.Begin, new File(dir, XDC_FNAME_REPTEXT));
+		cwData.process(XDC_CMD_GEN_Begin, new File(dir, XDC_FNAME_REPDATA));
+		cwText.process(XDC_CMD_GEN_Begin, new File(dir, XDC_FNAME_REPTEXT));
 	}
 
 	@Override
@@ -124,9 +124,9 @@ public class XbrlDockReportLoader implements XbrlDockReportConsts, XbrlDockPocCo
 
 			try {
 				if (XbrlDockUtils.isEqual(XDC_FACT_VALTYPE_text, data.get(XDC_FACT_TOKEN_xbrldockFactType))) {
-					cwText.process(ProcessorAction.Process, data);
+					cwText.process(XDC_CMD_GEN_Process, data);
 				} else {
-					cwData.process(ProcessorAction.Process, data);
+					cwData.process(XDC_CMD_GEN_Process, data);
 				}
 			} catch (Throwable e) {
 				XbrlDockException.swallow(e, "Storing report data", repId, data);
