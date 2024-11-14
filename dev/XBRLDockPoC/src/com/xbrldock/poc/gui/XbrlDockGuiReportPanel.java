@@ -46,10 +46,10 @@ public class XbrlDockGuiReportPanel extends JPanel implements XbrlDockGuiConsts,
 			
 			new LabeledAccess("Entity", fmtCtx, XDC_FACT_TOKEN_entity), 
 			new LabeledAccess("Instant", fmtCtx, XDC_FACT_TOKEN_instant),
-			new LabeledAccess("Start", fmtCtx, XDC_FACT_TOKEN_startDate),
-			new LabeledAccess("End", fmtCtx, XDC_FACT_TOKEN_endDate),
+			new LabeledAccess("Start", fmtCtx, XDC_EXT_TOKEN_startDate),
+			new LabeledAccess("End", fmtCtx, XDC_EXT_TOKEN_endDate),
 			new LabeledAccess("Concept", "", XDC_FACT_TOKEN_concept),
-			new LabeledAccess("Value", "", XDC_GEN_TOKEN_value),
+			new LabeledAccess("Value", "", XDC_EXT_TOKEN_value),
 			new LabeledAccess("Sign", "", XDC_FACT_TOKEN_sign),
 			new LabeledAccess("Scale", "", XDC_FACT_TOKEN_scale),
 			new LabeledAccess("Decimals", "", XDC_FACT_TOKEN_decimals)
@@ -206,7 +206,7 @@ public class XbrlDockGuiReportPanel extends JPanel implements XbrlDockGuiConsts,
 
 				String key = (String) cloneData.get(XDC_FACT_TOKEN_instant);
 				if (XbrlDockUtils.isEmpty(key)) {
-					key = XbrlDockUtils.sbAppend(null, "/", true, cloneData.get(XDC_FACT_TOKEN_startDate), cloneData.get(XDC_FACT_TOKEN_endDate)).toString();
+					key = XbrlDockUtils.sbAppend(null, "/", true, cloneData.get(XDC_EXT_TOKEN_startDate), cloneData.get(XDC_EXT_TOKEN_endDate)).toString();
 				}
 
 				String dim = XbrlDockUtils.toString(cloneData.get(XDC_FACT_TOKEN_dimensions));

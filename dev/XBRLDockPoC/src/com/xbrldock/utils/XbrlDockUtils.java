@@ -6,11 +6,21 @@ import java.util.Date;
 import java.util.HashMap;
 import java.util.Map;
 
+import com.xbrldock.XbrlDockException;
+
 @SuppressWarnings({ "unchecked", "rawtypes" })
 public class XbrlDockUtils implements XbrlDockUtilsConsts {
 	
 	public static <RetVal> RetVal optCall(GenAgent agent, String cmd, RetVal defRet, Object... params) throws Exception {
 		return (null == agent) ? defRet : (RetVal) agent.process(cmd, params);
+	}
+
+	public static <RetType> RetType optCallNoEx(GenAgent agent, String cmd, Object... params) {
+		try {
+			return optCall(agent, cmd, null, params);
+		} catch (Exception e) {
+			return XbrlDockException.wrap(e, "callAgent", agent, cmd, params);
+		}
 	}
 
 

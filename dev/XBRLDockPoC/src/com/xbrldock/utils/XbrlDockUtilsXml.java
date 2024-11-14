@@ -12,6 +12,7 @@ import java.util.TreeMap;
 import javax.xml.parsers.DocumentBuilder;
 import javax.xml.parsers.DocumentBuilderFactory;
 import javax.xml.parsers.ParserConfigurationException;
+import javax.xml.transform.OutputKeys;
 import javax.xml.transform.Transformer;
 import javax.xml.transform.TransformerConfigurationException;
 import javax.xml.transform.TransformerFactory;
@@ -89,8 +90,14 @@ public class XbrlDockUtilsXml implements XbrlDockUtilsConsts {
 		return db.newDocument();
 	}
 
-	public static void saveDoc(Document doc, OutputStream os, boolean pretty) throws Exception {
+	public static void saveDoc(Document doc, OutputStream os, int indent) throws Exception {
     Transformer transformer = TTF.get();
+    
+   if ( 0 < indent ) {
+  	 transformer.setOutputProperty(OutputKeys.INDENT, "yes");
+  	 transformer.setOutputProperty("{http://xml.apache.org/xslt}indent-amount", Integer.toString(indent));
+   }
+
     DOMSource source = new DOMSource(doc);
     StreamResult result = new StreamResult(os);
 
@@ -99,12 +106,43 @@ public class XbrlDockUtilsXml implements XbrlDockUtilsConsts {
     os.flush();
 	}
 
-	public static void saveDoc(Document doc, File f, boolean pretty) throws Exception {
+	public static void saveDoc(Document doc, File f, int indent) throws Exception {
 		XbrlDockUtilsFile.ensureDir(f.getParentFile());
 		try (FileOutputStream os = new FileOutputStream(f)) {
-			saveDoc(doc, os, pretty);
+			saveDoc(doc, os, indent);
 		}
 	}
+
+	public static boolean optSet(Element e, String ns, String aName, Object val) {
+		if ( null != val ) {
+			String str = XbrlDockUtils.toString(val);
+			if ( !XbrlDockUtils.isEmpty(str) ) {
+				if ( XbrlDockUtils.isEmpty(aName) ) {
+					e.setTextContent(str.trim());
+				} else {
+					String ai = XbrlDockUtils.isEmpty(ns) ? aName : ns + ":" + aName;
+					e.setAttribute(ai, str.trim());
+				}
+				
+				return true;
+			}
+		}
+		
+		return false;
+	}
+
+	public static Element createElement(Document xmlDoc, String ns, String tagId, Element parent, String id) {
+		String ti = XbrlDockUtils.isEmpty(ns) ? tagId : ns + ":" + tagId;
+		Element e = xmlDoc.createElement(ti);
+		if (null != parent) {
+			parent.appendChild(e);
+		}
+		if ( !XbrlDockUtils.isEmpty(id) ) {
+			e.setAttribute("id", id);
+		}
+		return e;
+	}
+
 
 	public static Map<String, String> readAtts(Element e, Map<String, String> target) throws Exception {
 		return readAtts(e, null, target);

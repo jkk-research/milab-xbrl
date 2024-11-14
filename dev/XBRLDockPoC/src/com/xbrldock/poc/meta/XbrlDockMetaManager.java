@@ -451,7 +451,7 @@ public class XbrlDockMetaManager implements XbrlDockMetaConsts, XbrlDockConsts.G
 			case "arc":
 				Map<String, String> am = XbrlDockUtilsXml.readAtts(e, null, null);
 				am.put("xlink:role", roleID);
-				am.put(XDC_GEN_TOKEN_type, XbrlDockUtils.getPostfix(eParent.getTagName(), ":"));
+				am.put(XDC_EXT_TOKEN_type, XbrlDockUtils.getPostfix(eParent.getTagName(), ":"));
 				arcs.add(am);
 				storeInContent = false;
 				break;

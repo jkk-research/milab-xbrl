@@ -163,7 +163,7 @@ public class XbrlDockGuiMetaRoleTree extends JTree implements XbrlDockGuiConsts 
 	private void rebuildTree() {
 		tnRoot.children.clear();
 		for (ItemNode in : allRoleNodes) {
-			if ((null != selRoleType) && !XbrlDockUtils.isEqual(in.item.get(XDC_GEN_TOKEN_type), selRoleType)) {
+			if ((null != selRoleType) && !XbrlDockUtils.isEqual(in.item.get(XDC_EXT_TOKEN_type), selRoleType)) {
 				continue;
 			}
 			
@@ -200,7 +200,7 @@ public class XbrlDockGuiMetaRoleTree extends JTree implements XbrlDockGuiConsts 
 					Map<String, String> l = (Map<String, String>) params[0];
 
 					String roleName = l.get("xlink:role");
-					String roleType = l.get(XDC_GEN_TOKEN_type);
+					String roleType = l.get(XDC_EXT_TOKEN_type);
 
 					roleTypes.add(roleType);
 
@@ -213,7 +213,7 @@ public class XbrlDockGuiMetaRoleTree extends JTree implements XbrlDockGuiConsts 
 
 					if (null == rn.item) {
 						rn.item = new TreeMap();
-						rn.item.put(XDC_GEN_TOKEN_type, roleType);
+						rn.item.put(XDC_EXT_TOKEN_type, roleType);
 					}
 
 					rn.roleLinks.add(l);

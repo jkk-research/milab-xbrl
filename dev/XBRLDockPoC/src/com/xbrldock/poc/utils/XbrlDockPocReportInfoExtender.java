@@ -69,13 +69,13 @@ public class XbrlDockPocReportInfoExtender implements XbrlDockPocConsts, XbrlDoc
 			
 			sVal = (String) data.get(XDC_FACT_TOKEN_instant);
 			if (XbrlDockUtils.isEmpty(sVal)) {
-				String cs = (String) data.get(XDC_FACT_TOKEN_startDate);
+				String cs = (String) data.get(XDC_EXT_TOKEN_startDate);
 				
 				if ( (null == repStart) || (0 < repStart.compareTo(cs)) ) {
 					repStart = cs;
 				}
 				
-				String ce = (String) data.get(XDC_FACT_TOKEN_endDate);
+				String ce = (String) data.get(XDC_EXT_TOKEN_endDate);
 				if ( (null == repEnd) || (0 > repEnd.compareTo(ce)) ) {
 					repEnd = ce;
 				}
@@ -101,7 +101,7 @@ public class XbrlDockPocReportInfoExtender implements XbrlDockPocConsts, XbrlDoc
 
 	@Override
 	public void endReport() {
-		reportData.put(XDC_REPORT_TOKEN_startDate, repStart);
-		reportData.put(XDC_REPORT_TOKEN_endDate, repEnd);
+		reportData.put(XDC_EXT_TOKEN_startDate, repStart);
+		reportData.put(XDC_EXT_TOKEN_endDate, repEnd);
 	}
 }

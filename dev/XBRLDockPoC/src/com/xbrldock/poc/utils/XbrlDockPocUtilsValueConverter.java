@@ -60,7 +60,7 @@ public class XbrlDockPocUtilsValueConverter implements XbrlDockPocConsts {
 			error = "Conversion exception " + e.toString();
 		}
 
-		data.put(XDC_GEN_TOKEN_value, valObj);
+		data.put(XDC_EXT_TOKEN_value, valObj);
 		data.put(XDC_FACT_TOKEN_xbrldockFactType, ft);
 		if (null != error) {
 			data.put(XDC_FACT_TOKEN_xbrldockParseError, error);

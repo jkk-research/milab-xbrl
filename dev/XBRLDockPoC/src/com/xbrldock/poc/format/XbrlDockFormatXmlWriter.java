@@ -134,10 +134,10 @@ public class XbrlDockFormatXmlWriter implements XbrlDockFormatConsts, XbrlDockPo
 
 			if (XbrlDockUtils.isEmpty(sVal)) {
 				e2 = xmlDoc.createElement("xbrli:startDate");
-				e2.setTextContent((String) data.get(XDC_FACT_TOKEN_startDate));
+				e2.setTextContent((String) data.get(XDC_EXT_TOKEN_startDate));
 				e1.appendChild(e2);
 				e2 = xmlDoc.createElement("xbrli:endDate");
-				e2.setTextContent((String) data.get(XDC_FACT_TOKEN_endDate));
+				e2.setTextContent((String) data.get(XDC_EXT_TOKEN_endDate));
 				e1.appendChild(e2);
 			} else {
 				e2 = xmlDoc.createElement("xbrli:instant");
@@ -165,27 +165,6 @@ public class XbrlDockFormatXmlWriter implements XbrlDockFormatConsts, XbrlDockPo
 				}
 			}
 
-//		   <xbrli:scenario>
-//	      <xbrldi:explicitMember dimension="ifrs-full:ComponentsOfEquityAxis">ifrs-full:RetainedEarningsMember</xbrldi:explicitMember>
-//	    </xbrli:scenario>
-
-			/*
-			 * <context id=
-			 * "As_Of_5_31_2015_us-gaap_ValuationAllowancesAndReservesTypeAxis_us-gaap_AllowanceForDoubtfulAccountsMember">
-			 * <entity> <identifier scheme="http://www.sec.gov/CIK">0000001750</identifier>
-			 * <segment> <xbrldi:explicitMember
-			 * dimension="us-gaap:ValuationAllowancesAndReservesTypeAxis">us-gaap:
-			 * AllowanceForDoubtfulAccountsMember</xbrldi:explicitMember> </segment>
-			 * </entity> <period> <instant>2015-05-31</instant> </period> </context>
-			 * <context id=
-			 * "Duration_6_1_2017_To_5_31_2018_us-gaap_StatementEquityComponentsAxis_us-gaap_CommonStockMember">
-			 * <entity> <identifier scheme="http://www.sec.gov/CIK">0000001750</identifier>
-			 * <segment> <xbrldi:explicitMember
-			 * dimension="us-gaap:StatementEquityComponentsAxis">us-gaap:CommonStockMember</
-			 * xbrldi:explicitMember> </segment> </entity> <period>
-			 * <startDate>2017-06-01</startDate> <endDate>2018-05-31</endDate> </period>
-			 * </context>
-			 */
 			break;
 		case XDC_REP_SEG_Fact:
 			String factType = (String) data.get(XDC_FACT_TOKEN_xbrldockFactType);
@@ -204,7 +183,7 @@ public class XbrlDockFormatXmlWriter implements XbrlDockFormatConsts, XbrlDockPo
 			e.setAttribute("contextRef", sVal);
 
 			if (XDC_FACT_VALTYPE_text.equals(factType) || XDC_FACT_VALTYPE_string.equals(factType)) {
-				sVal = (String) data.get(XDC_GEN_TOKEN_value);
+				sVal = (String) data.get(XDC_EXT_TOKEN_value);
 				e.setTextContent(sVal);
 				sVal = (String) data.get(XDC_FACT_TOKEN_language);
 				e.setAttribute("lang", sVal);
@@ -215,16 +194,13 @@ public class XbrlDockFormatXmlWriter implements XbrlDockFormatConsts, XbrlDockPo
 				sVal = (String) data.get(XDC_FACT_TOKEN_decimals);
 				e.setAttribute(XDC_FACT_TOKEN_decimals, sVal);
 
-				Object val = data.get(XDC_GEN_TOKEN_value);
+				Object val = data.get(XDC_EXT_TOKEN_value);
 				if ( val instanceof BigDecimal ) {
 					val = df.format((BigDecimal)val);
 				}
 
 				e.setTextContent(XbrlDockUtils.toString(val));
-
 			}
-			// <us-gaap:LongTermDebtCurrent contextRef="As_Of_5_31_2017" unitRef="Unit1"
-			// decimals="-5">100000</us-gaap:LongTermDebtCurrent>
 
 			break;
 		}
@@ -241,7 +217,6 @@ public class XbrlDockFormatXmlWriter implements XbrlDockFormatConsts, XbrlDockPo
 	public void endReport() {
 		try {
 			if ((null != eRoot) && eRoot.hasChildNodes()) {
-
 				for (String seg : XDC_SEGMENTS) {
 					ArrayList<Element> sc = segData.get(seg);
 					if (null != sc) {
@@ -250,9 +225,7 @@ public class XbrlDockFormatXmlWriter implements XbrlDockFormatConsts, XbrlDockPo
 						}
 					}
 				}
-
-//				xmlDoc.createProcessingInstruction("xml", "version=\"1.0\" encoding=\"utf-8\"");
-				XbrlDockUtilsXml.saveDoc(xmlDoc, new File(targetDir, repId + XDC_FEXT_XML), true);
+				XbrlDockUtilsXml.saveDoc(xmlDoc, new File(targetDir, repId + XDC_FEXT_XML), 2);
 			}
 		} catch (Throwable e) {
 			XbrlDockException.wrap(e, "Exporting report to XML", repId);

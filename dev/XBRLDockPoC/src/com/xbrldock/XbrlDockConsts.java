@@ -15,6 +15,9 @@ public interface XbrlDockConsts {
 	String XDC_CMD_GEN_End = "xdc_End";
 	String XDC_CMD_GEN_Release = "xdc_Release";
 
+	String XDC_CMD_REP_ADD_NAMESPACE = "xdc_Namespace";
+	String XDC_CMD_REP_ADD_SCHEMA = "xdc_Schema";
+
 	public interface GenAgent {
 		Object process(String cmd, Object... params) throws Exception;
 	}
@@ -87,18 +90,21 @@ public interface XbrlDockConsts {
 	String XDC_ENTITY_ID_TYPE_ = "";
 	String XDC_ENTITY_ID_TYPE_LEI = "lei";
 
-	String XDC_GEN_TOKEN_value = "value";
 	String XDC_GEN_TOKEN_members = "members";
 	String XDC_GEN_TOKEN_requires = "requires";
 	String XDC_GEN_TOKEN_placeholder = "placeholder";
 	String XDC_GEN_TOKEN_childPanels = "childPanels";
-	String XDC_GEN_TOKEN_type = "type";
 
 	String XDC_EXT_TOKEN_id = "id";
+	String XDC_EXT_TOKEN_type = "type";
+	String XDC_EXT_TOKEN_value = "value";
 	String XDC_EXT_TOKEN_name = "name";
 	String XDC_EXT_TOKEN_order = "order";
 	String XDC_EXT_TOKEN_identifier = "identifier";
 	String XDC_EXT_TOKEN_scheme = "scheme";
+	String XDC_EXT_TOKEN_lang = "lang";
+	String XDC_EXT_TOKEN_startDate = "startDate";
+	String XDC_EXT_TOKEN_endDate = "endDate";
 
 	String XDC_ENTITY_TOKEN_idType = "idType";
 	String XDC_ENTITY_TOKEN_urlSource = "urlSource";
@@ -118,8 +124,6 @@ public interface XbrlDockConsts {
 	String XDC_REPORT_TOKEN_sourceAtts = "sourceAtts";
 
 	String XDC_REPORT_TOKEN_packageStatus = "packageStatus";
-	String XDC_REPORT_TOKEN_startDate = "startDate";
-	String XDC_REPORT_TOKEN_endDate = "endDate";
 	String XDC_REPORT_TOKEN_localPath = "localPath";
 	String XDC_REPORT_TOKEN_localFilingPath = "localFilingPath";
 	String XDC_REPORT_TOKEN_localMetaInfPath = "localMetaInfPath";
@@ -128,14 +132,13 @@ public interface XbrlDockConsts {
 	String XDC_FACT_TOKEN_context = "context";
 
 	String XDC_FACT_TOKEN_unit = "unit";
+	String XDC_FACT_TOKEN_divide = "divide";
 	String XDC_FACT_TOKEN_unitNumerator = "unitNumerator";
 	String XDC_FACT_TOKEN_unitDenominator = "unitDenominator";
 	String XDC_FACT_TOKEN_measure = "measure";
 
 	String XDC_FACT_TOKEN_period = "period";
 	String XDC_FACT_TOKEN_instant = "instant";
-	String XDC_FACT_TOKEN_startDate = "startDate";
-	String XDC_FACT_TOKEN_endDate = "endDate";
 
 	String XDC_FACT_TOKEN_concept = "concept";
 	String XDC_FACT_TOKEN_entity = "entity";
@@ -154,11 +157,11 @@ public interface XbrlDockConsts {
 
 //@formatter:off  
 	String[] UNIT_FIELDS = {XDC_FACT_TOKEN_unit, XDC_FACT_TOKEN_unitNumerator, XDC_FACT_TOKEN_unitDenominator, XDC_FACT_TOKEN_measure};
-	String[] CONTEXT_FIELDS = {XDC_FACT_TOKEN_context, XDC_FACT_TOKEN_entity, XDC_FACT_TOKEN_instant, XDC_FACT_TOKEN_startDate, XDC_FACT_TOKEN_endDate, XDC_FACT_TOKEN_dimensions};
+	String[] CONTEXT_FIELDS = {XDC_FACT_TOKEN_context, XDC_FACT_TOKEN_entity, XDC_FACT_TOKEN_instant, XDC_EXT_TOKEN_startDate, XDC_EXT_TOKEN_endDate, XDC_FACT_TOKEN_dimensions};
 	String[] FACT_DATA_FIELDS = {
-			XDC_FACT_TOKEN_entity, XDC_FACT_TOKEN_context, XDC_FACT_TOKEN_concept, XDC_GEN_TOKEN_value, XDC_FACT_TOKEN_unit,
+			XDC_FACT_TOKEN_entity, XDC_FACT_TOKEN_context, XDC_FACT_TOKEN_concept, XDC_EXT_TOKEN_value, XDC_FACT_TOKEN_unit,
 			
-			XDC_FACT_TOKEN_instant, XDC_FACT_TOKEN_startDate, XDC_FACT_TOKEN_endDate, XDC_FACT_TOKEN_dimensions,
+			XDC_FACT_TOKEN_instant, XDC_EXT_TOKEN_startDate, XDC_EXT_TOKEN_endDate, XDC_FACT_TOKEN_dimensions,
 			XDC_FACT_TOKEN_unitNumerator, XDC_FACT_TOKEN_unitDenominator, XDC_FACT_TOKEN_measure,
 			XDC_FACT_TOKEN_format, XDC_FACT_TOKEN_decimals, XDC_FACT_TOKEN_scale, XDC_FACT_TOKEN_sign,
 			XDC_FACT_TOKEN_language, 
@@ -166,9 +169,9 @@ public interface XbrlDockConsts {
 			XDC_FACT_TOKEN_xbrldockFactType, XDC_FACT_TOKEN_xbrldockOrigValue, XDC_FACT_TOKEN_xbrldockParseError
 	};
 	String[] FACT_TEXT_FIELDS = {
-			XDC_FACT_TOKEN_entity, XDC_FACT_TOKEN_context, XDC_FACT_TOKEN_concept, XDC_GEN_TOKEN_value, 
+			XDC_FACT_TOKEN_entity, XDC_FACT_TOKEN_context, XDC_FACT_TOKEN_concept, XDC_EXT_TOKEN_value, 
 			
-			XDC_FACT_TOKEN_instant, XDC_FACT_TOKEN_startDate, XDC_FACT_TOKEN_endDate, XDC_FACT_TOKEN_dimensions,
+			XDC_FACT_TOKEN_instant, XDC_EXT_TOKEN_startDate, XDC_EXT_TOKEN_endDate, XDC_FACT_TOKEN_dimensions,
 			XDC_FACT_TOKEN_language, 
 			
 			XDC_FACT_TOKEN_xbrldockFactType, XDC_FACT_TOKEN_xbrldockOrigValue, XDC_FACT_TOKEN_xbrldockParseError

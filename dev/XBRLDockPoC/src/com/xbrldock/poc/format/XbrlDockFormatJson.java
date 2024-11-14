@@ -91,8 +91,8 @@ public class XbrlDockFormatJson implements XbrlDockFormatConsts, XbrlDockPocCons
 					if (!XbrlDockUtils.isEmpty(period)) {
 						String[] info = period.split("/");
 						if (1 < info.length) {
-							ctxData.put(XDC_FACT_TOKEN_startDate, info[0]);
-							ctxData.put(XDC_FACT_TOKEN_endDate, info[1]);
+							ctxData.put(XDC_EXT_TOKEN_startDate, info[0]);
+							ctxData.put(XDC_EXT_TOKEN_endDate, info[1]);
 						} else {
 							ctxData.put(XDC_FACT_TOKEN_instant, info[0]);
 						}
@@ -116,7 +116,7 @@ public class XbrlDockFormatJson implements XbrlDockFormatConsts, XbrlDockPocCons
 				Map<String, Object> dim = (Map<String, Object>) fd.remove(XDC_FACT_TOKEN_dimensions);
 
 				factData.put(XDC_EXT_TOKEN_id, fe.getKey());
-				factData.put(XDC_GEN_TOKEN_value, fd.remove(XDC_GEN_TOKEN_value));
+				factData.put(XDC_EXT_TOKEN_value, fd.remove(XDC_EXT_TOKEN_value));
 				factData.put(XDC_FACT_TOKEN_concept, dim.remove(XDC_FACT_TOKEN_concept));
 
 				String unit = (String) dim.remove(XDC_FACT_TOKEN_unit);

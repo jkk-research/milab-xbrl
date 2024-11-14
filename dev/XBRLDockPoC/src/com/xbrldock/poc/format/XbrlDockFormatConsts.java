@@ -11,13 +11,13 @@ public interface XbrlDockFormatConsts extends XbrlDockPocConsts {
 	String XDC_FMTJSON_TOKEN_namespaces = "namespaces";
 	String XDC_FMTJSON_TOKEN_taxonomy = "taxonomy";
 	String XDC_FMTJSON_TOKEN_facts = "facts";
-	String XDC_FMTJSON_TOKEN_value = "value";
-	String XDC_FMTJSON_TOKEN_decimals = "decimals";
-	String XDC_FMTJSON_TOKEN_dimensions = "dimensions";
-	String XDC_FMTJSON_TOKEN_concept = "concept";
-	String XDC_FMTJSON_TOKEN_entity = "entity";
-	String XDC_FMTJSON_TOKEN_period = "period";
-	String XDC_FMTJSON_TOKEN_unit = "unit";
-
+	
+	String XDC_FMTXML_TOKEN_xbrl = "xbrl";
+	String XDC_FMTXML_TOKEN_xmlns = "xmlns";
+	String XDC_FMTXML_TOKEN_dimension = "dimension";
+	
+	String XDC_FMTXML_TOKEN_explicitMember = "explicitMember";
+	String XDC_FMTXML_TOKEN_contextRef = "contextRef";
+	String XDC_FMTXML_TOKEN_unitRef = "unitRef";
 
 }

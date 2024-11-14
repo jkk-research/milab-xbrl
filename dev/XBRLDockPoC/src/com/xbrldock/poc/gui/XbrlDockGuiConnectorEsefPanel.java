@@ -34,8 +34,8 @@ public class XbrlDockGuiConnectorEsefPanel extends JPanel implements XbrlDockGui
 			
 			new LabeledAccess("Entity", "", XDC_REPORT_TOKEN_entityName), 
 			new LabeledAccess("Identifier", "", XDC_REPORT_TOKEN_sourceAtts, XDC_XBRLORG_TOKEN_fxo_id),
-			new LabeledAccess("Start", "", XDC_REPORT_TOKEN_startDate), 
-			new LabeledAccess("End", "", XDC_REPORT_TOKEN_endDate),
+			new LabeledAccess("Start", "", XDC_EXT_TOKEN_startDate), 
+			new LabeledAccess("End", "", XDC_EXT_TOKEN_endDate),
 			new LabeledAccess("Namespaces", FMT_MAP, XDC_REPORT_TOKEN_namespaces)
 	);
 //@formatter:on

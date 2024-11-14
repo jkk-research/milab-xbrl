@@ -16,12 +16,12 @@ public class XbrlDockConnUtils implements XbrlDockConnConsts {
 
 		@Override
 		public Object process(String cmd, Object... params) throws Exception {
-			File f = (File) params[0];
 			switch (cmd) {
 			case XDC_CMD_GEN_Init:
 				specFiles.clear();
 				break;
 			case XDC_CMD_GEN_Begin:
+				File f = (File) params[0];
 				switch (f.getName()) {
 				case XDC_FNAME_METAINF:
 					File fCat = new File(f, XDC_FNAME_FILINGCATALOG);

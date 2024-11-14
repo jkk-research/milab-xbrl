@@ -94,10 +94,10 @@ public class XbrlDockFormatXhtml implements XbrlDockFormatConsts, XbrlDockPocCon
 					sVal = getInfo(e, "xbrli:instant");
 					if (XbrlDockUtils.isEmpty(sVal)) {
 						String cs = getInfo(e, "xbrli:startDate");
-						segmentData.put(XDC_FACT_TOKEN_startDate, cs);
+						segmentData.put(XDC_EXT_TOKEN_startDate, cs);
 
 						String ce = getInfo(e, "xbrli:endDate");
-						segmentData.put(XDC_FACT_TOKEN_endDate, ce);
+						segmentData.put(XDC_EXT_TOKEN_endDate, ce);
 					} else {
 						segmentData.put(XDC_FACT_TOKEN_instant, sVal);
 					}
@@ -186,7 +186,7 @@ public class XbrlDockFormatXhtml implements XbrlDockFormatConsts, XbrlDockPocCon
 
 					if (!XbrlDockUtils.isEmpty(fmtCode)) {
 						segmentData.put(XDC_FACT_TOKEN_xbrldockOrigValue, valOrig);
-						segmentData.put(XDC_GEN_TOKEN_value, valOrig);
+						segmentData.put(XDC_EXT_TOKEN_value, valOrig);
 						segmentData.put(XDC_FACT_TOKEN_format, fmtCode);
 						for (String xt : cvtKeys) {
 							Object v = e.getAttribute(xt);
@@ -225,12 +225,12 @@ public class XbrlDockFormatXhtml implements XbrlDockFormatConsts, XbrlDockPocCon
 						} while (!last);
 
 						String txtVal = XbrlDockUtils.toString(merge);
-						segmentData.put(XDC_GEN_TOKEN_value, txtVal);
+						segmentData.put(XDC_EXT_TOKEN_value, txtVal);
 						if (txtVal.length() > XbrlDockFormatUtils.TXT_CLIP_LENGTH) {
 							segmentData.put(XDC_FACT_TOKEN_xbrldockFactType, XDC_FACT_VALTYPE_text);
 							String id = dataHandler.processSegment(XDC_REP_SEG_Fact, segmentData);
 							segmentData.put(XDC_EXT_TOKEN_id, id);
-							segmentData.put(XDC_GEN_TOKEN_value, txtVal.substring(0, XbrlDockFormatUtils.TXT_CLIP_LENGTH - 3) + "...");
+							segmentData.put(XDC_EXT_TOKEN_value, txtVal.substring(0, XbrlDockFormatUtils.TXT_CLIP_LENGTH - 3) + "...");
 							segmentData.put(XDC_FACT_TOKEN_xbrldockFactType, XDC_FACT_VALTYPE_textClip);
 						} else {
 							segmentData.put(XDC_FACT_TOKEN_xbrldockFactType, XDC_FACT_VALTYPE_string);

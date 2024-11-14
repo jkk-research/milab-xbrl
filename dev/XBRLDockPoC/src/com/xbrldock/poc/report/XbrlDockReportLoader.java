@@ -231,8 +231,8 @@ public class XbrlDockReportLoader implements XbrlDockReportConsts, XbrlDockPocCo
 					
 					switch ((String) fact.get(XDC_FACT_TOKEN_xbrldockFactType) ) {
 					case XDC_FACT_VALTYPE_number:
-						BigDecimal bd = new BigDecimal((String) fact.get(XDC_GEN_TOKEN_value));
-						fact.put(XDC_GEN_TOKEN_value, bd);
+						BigDecimal bd = new BigDecimal((String) fact.get(XDC_EXT_TOKEN_value));
+						fact.put(XDC_EXT_TOKEN_value, bd);
 						break;
 					}
 
