@@ -17,6 +17,7 @@ import com.xbrldock.poc.XbrlDockPocConsts;
 import com.xbrldock.poc.conn.XbrlDockConnUtils;
 import com.xbrldock.utils.XbrlDockUtils;
 import com.xbrldock.utils.XbrlDockUtilsCsv;
+import com.xbrldock.utils.XbrlDockUtilsCsvWriterAgent;
 
 @SuppressWarnings({ "rawtypes", "unchecked" })
 public class XbrlDockReportLoader implements XbrlDockReportConsts, XbrlDockPocConsts.ReportDataHandler {
@@ -37,8 +38,8 @@ public class XbrlDockReportLoader implements XbrlDockReportConsts, XbrlDockPocCo
 
 	ArrayList<String> errors = new ArrayList<>();
 
-	XbrlDockUtilsCsv.CsvWriter cwData = new XbrlDockUtilsCsv.CsvWriter(FACT_DATA_FIELDS);
-	XbrlDockUtilsCsv.CsvWriter cwText = new XbrlDockUtilsCsv.CsvWriter(FACT_TEXT_FIELDS);
+	XbrlDockUtilsCsvWriterAgent cwData = new XbrlDockUtilsCsvWriterAgent();
+	XbrlDockUtilsCsvWriterAgent cwText = new XbrlDockUtilsCsvWriterAgent();
 
 	public XbrlDockReportLoader(File dataRoot) {
 		this.dataRoot = dataRoot;
@@ -49,7 +50,10 @@ public class XbrlDockReportLoader implements XbrlDockReportConsts, XbrlDockPocCo
 
 		File dir = XbrlDockConnUtils.getFilingDir(dataRoot, reportData, true, true);
 
+		cwData.process(XDC_CMD_GEN_Init, FACT_DATA_FIELDS);
 		cwData.process(XDC_CMD_GEN_Begin, new File(dir, XDC_FNAME_REPDATA));
+		
+		cwText.process(XDC_CMD_GEN_Init, FACT_TEXT_FIELDS);
 		cwText.process(XDC_CMD_GEN_Begin, new File(dir, XDC_FNAME_REPTEXT));
 	}
 

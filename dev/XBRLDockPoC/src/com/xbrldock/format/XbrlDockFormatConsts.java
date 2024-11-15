@@ -1,4 +1,4 @@
-package com.xbrldock.poc.format;
+package com.xbrldock.format;
 
 import com.xbrldock.poc.XbrlDockPocConsts;
 

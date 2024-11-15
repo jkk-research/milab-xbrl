@@ -143,6 +143,18 @@ public class XbrlDockUtilsXml implements XbrlDockUtilsConsts {
 		return e;
 	}
 
+	public static String getInfo(Element e, String ns, String tagId) {
+		String ti = XbrlDockUtils.isEmpty(ns) ? tagId : ns + ":" + tagId;
+
+		NodeList nl = e.getElementsByTagName(ti);
+		if (0 < nl.getLength()) {
+			String val = nl.item(0).getTextContent();
+			if (!XbrlDockUtils.isEmpty(val)) {
+				return val.trim();
+			}
+		}
+		return null;
+	}
 
 	public static Map<String, String> readAtts(Element e, Map<String, String> target) throws Exception {
 		return readAtts(e, null, target);

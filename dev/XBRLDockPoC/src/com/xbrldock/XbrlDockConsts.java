@@ -158,7 +158,7 @@ public interface XbrlDockConsts {
 //@formatter:off  
 	String[] UNIT_FIELDS = {XDC_FACT_TOKEN_unit, XDC_FACT_TOKEN_unitNumerator, XDC_FACT_TOKEN_unitDenominator, XDC_FACT_TOKEN_measure};
 	String[] CONTEXT_FIELDS = {XDC_FACT_TOKEN_context, XDC_FACT_TOKEN_entity, XDC_FACT_TOKEN_instant, XDC_EXT_TOKEN_startDate, XDC_EXT_TOKEN_endDate, XDC_FACT_TOKEN_dimensions};
-	String[] FACT_DATA_FIELDS = {
+	Object[] FACT_DATA_FIELDS = {
 			XDC_FACT_TOKEN_entity, XDC_FACT_TOKEN_context, XDC_FACT_TOKEN_concept, XDC_EXT_TOKEN_value, XDC_FACT_TOKEN_unit,
 			
 			XDC_FACT_TOKEN_instant, XDC_EXT_TOKEN_startDate, XDC_EXT_TOKEN_endDate, XDC_FACT_TOKEN_dimensions,
@@ -168,7 +168,7 @@ public interface XbrlDockConsts {
 			
 			XDC_FACT_TOKEN_xbrldockFactType, XDC_FACT_TOKEN_xbrldockOrigValue, XDC_FACT_TOKEN_xbrldockParseError
 	};
-	String[] FACT_TEXT_FIELDS = {
+	Object[] FACT_TEXT_FIELDS = {
 			XDC_FACT_TOKEN_entity, XDC_FACT_TOKEN_context, XDC_FACT_TOKEN_concept, XDC_EXT_TOKEN_value, 
 			
 			XDC_FACT_TOKEN_instant, XDC_EXT_TOKEN_startDate, XDC_EXT_TOKEN_endDate, XDC_FACT_TOKEN_dimensions,

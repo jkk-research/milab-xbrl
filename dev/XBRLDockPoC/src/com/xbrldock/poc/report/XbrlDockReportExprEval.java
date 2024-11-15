@@ -5,6 +5,7 @@ import java.util.Map;
 import java.util.TreeMap;
 
 import com.xbrldock.XbrlDockException;
+import com.xbrldock.format.XbrlDockFormatUtils;
 import com.xbrldock.poc.XbrlDockPocConsts;
 import com.xbrldock.utils.XbrlDockUtils;
 import com.xbrldock.utils.XbrlDockUtilsMvel;
@@ -50,7 +51,7 @@ public class XbrlDockReportExprEval implements XbrlDockReportConsts, XbrlDockPoc
 	public String processSegment(String segment, Map<String, Object> data) {
 		Map segContent = XbrlDockUtils.safeGet(segData, segment, SORTEDMAP_CREATOR);
 
-		String segIdKey = XbrlDockReportUtils.getSegmentIdKey(segment);
+		String segIdKey = XbrlDockFormatUtils.getSegmentIdKey(segment);
 		String segId = (String) data.get(segIdKey);
 		if (XbrlDockUtils.isEmpty(segId)) {
 			segId = segment + "-" + (segContent.size() + 1);

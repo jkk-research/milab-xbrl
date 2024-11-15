@@ -17,10 +17,10 @@ import com.xbrldock.XbrlDockConsts;
 import com.xbrldock.XbrlDockException;
 import com.xbrldock.dev.XbrlDockDevCounter;
 import com.xbrldock.dev.XbrlDockDevMonitor;
+import com.xbrldock.format.XbrlDockFormatUtils;
 import com.xbrldock.poc.conn.XbrlDockConnUtils;
-import com.xbrldock.poc.format.XbrlDockFormatAgentXmlWriter;
-import com.xbrldock.poc.format.XbrlDockFormatUtils;
 import com.xbrldock.poc.format.XbrlDockFormatXhtml;
+import com.xbrldock.poc.format.XbrlDockFormatXmlWriterShell;
 import com.xbrldock.poc.report.XbrlDockReportLoader;
 import com.xbrldock.poc.utils.XbrlDockPocReportInfoExtender;
 import com.xbrldock.utils.XbrlDockUtils;
@@ -147,7 +147,7 @@ public class XbrlDockConnXbrlOrg implements XbrlDockConnXbrlOrgConsts, XbrlDockC
 
 			File fRep;
 			ReportFormatHandler xl = new XbrlDockFormatXhtml();
-			ReportDataHandler xw = new XbrlDockFormatAgentXmlWriter.DataHandler(targetDir);
+			ReportDataHandler xw = new XbrlDockFormatXmlWriterShell(targetDir);
 
 			for (Map filingInfo : items) {
 				String id = (String) filingInfo.get("id");

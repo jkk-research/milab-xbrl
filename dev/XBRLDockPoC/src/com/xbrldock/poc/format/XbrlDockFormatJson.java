@@ -11,6 +11,7 @@ import java.util.TreeMap;
 
 import org.json.simple.parser.JSONParser;
 
+import com.xbrldock.format.XbrlDockFormatConsts;
 import com.xbrldock.poc.XbrlDockPocConsts;
 import com.xbrldock.utils.XbrlDockUtils;
 
