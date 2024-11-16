@@ -17,6 +17,7 @@ public interface XbrlDockPocConsts extends XbrlDockConsts, XbrlDockUtilsConsts {
 	String XDC_CMD_GEN_SELECT = "select";
 	String XDC_CMD_GEN_ACTIVATE = "activate";
 	String XDC_CMD_GEN_FILTER = "filter";
+	String XDC_CMD_GEN_SETLANG = "setLanguage";
 	String XDC_CMD_GEN_TEST01 = "test01";
 	String XDC_CMD_GEN_TEST02 = "test02";
 
@@ -43,7 +44,6 @@ public interface XbrlDockPocConsts extends XbrlDockConsts, XbrlDockUtilsConsts {
 	String XDC_METATOKEN_includes = "includes";
 	String XDC_METATOKEN_url = "xdc_url";
 	String XDC_METATOKEN_tagName = "xdc_tagName";
-//	String XDC_METATOKEN_fileLinks = "xdc_fileLinks";
 	
 
 	String XDC_CFGTOKEN_dirStore = "dirStore";
@@ -67,16 +67,7 @@ public interface XbrlDockPocConsts extends XbrlDockConsts, XbrlDockUtilsConsts {
 
 	
 	String XDC_APP_SETROLETYPE = "setRoleType";
-	String XDC_APP_SETLANG = "setLanguage";
 	String XDC_APP_SETENTRYPOINT = "setEntryPoint";
-
-	
-//	public interface XDModSourceConnector extends GenAgent {
-//		int refresh(Collection<String> updated) throws Exception;
-//		Map getReportData(String id, Map target) throws Exception;
-//		void visitReports(GenProcessor<Map> visitor, GenProcessor<Map> filter) throws Exception;
-//		File getReportFile(String id, Object...path);
-//	}
 	
 	interface ReportDataHandler {
 		void beginReport(String repId);

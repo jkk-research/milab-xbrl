@@ -112,7 +112,7 @@ public class XbrlDockGuiMetaContainerPanel extends JPanel implements XbrlDockGui
 		@Override
 		public void actionPerformed(ActionEvent e) {
 			switch (e.getActionCommand()) {
-			case XDC_APP_SETLANG:
+			case XDC_CMD_GEN_SETLANG:
 				lang = (String) cbLang.getSelectedItem();
 				if (CB_LANG_ID.equals(lang)) {
 					lang = null;
@@ -138,7 +138,7 @@ public class XbrlDockGuiMetaContainerPanel extends JPanel implements XbrlDockGui
 		roleTree.setItemFormatter(roleItemFormatter);
 
 		JPanel pnlTop = new JPanel(new BorderLayout());
-		pnlTop.add(XbrlDockGuiUtils.setActive(cbLang, XDC_APP_SETLANG, al), BorderLayout.EAST);
+		pnlTop.add(XbrlDockGuiUtils.setActive(cbLang, XDC_CMD_GEN_SETLANG, al), BorderLayout.EAST);
 		pnlTop.add(XbrlDockGuiUtils.setActive(cbEntryPoint, XDC_APP_SETENTRYPOINT, al), BorderLayout.CENTER);
 
 		JPanel pnlTree = new JPanel(new BorderLayout());

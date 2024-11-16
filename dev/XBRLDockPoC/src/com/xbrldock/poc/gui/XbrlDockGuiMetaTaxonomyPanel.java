@@ -50,7 +50,7 @@ public class XbrlDockGuiMetaTaxonomyPanel extends JPanel implements XbrlDockGuiC
 			case XDC_APP_SHOWITEMS:
 				itemGrid.displayItems(roleTree.getRelatedItems());
 				break;
-			case XDC_APP_SETLANG:
+			case XDC_CMD_GEN_SETLANG:
 //			int li = cbLang.getSelectedIndex();
 //			taxonomy.setLang( (0 == li) ? null : cbLang.getItemAt(li));
 				roleTree.invalidate();
@@ -91,7 +91,7 @@ public class XbrlDockGuiMetaTaxonomyPanel extends JPanel implements XbrlDockGuiC
 
 		JPanel pnlTop = new JPanel(new BorderLayout());
 
-		cbLang.setActionCommand(XDC_APP_SETLANG);
+		cbLang.setActionCommand(XDC_CMD_GEN_SETLANG);
 		cbLang.addActionListener(al);
 		pnlTop.add(cbLang, BorderLayout.EAST);
 

@@ -17,10 +17,12 @@ import com.xbrldock.XbrlDockConsts;
 import com.xbrldock.XbrlDockException;
 import com.xbrldock.dev.XbrlDockDevCounter;
 import com.xbrldock.dev.XbrlDockDevMonitor;
+import com.xbrldock.format.XbrlDockFormatAgentXmlWriter;
 import com.xbrldock.format.XbrlDockFormatUtils;
+import com.xbrldock.poc.XbrlDockPocRefactorUtils;
 import com.xbrldock.poc.conn.XbrlDockConnUtils;
+import com.xbrldock.poc.format.XbrlDockFormatAgentXhtmlReader;
 import com.xbrldock.poc.format.XbrlDockFormatXhtml;
-import com.xbrldock.poc.format.XbrlDockFormatXmlWriterShell;
 import com.xbrldock.poc.report.XbrlDockReportLoader;
 import com.xbrldock.poc.utils.XbrlDockPocReportInfoExtender;
 import com.xbrldock.utils.XbrlDockUtils;
@@ -29,7 +31,8 @@ import com.xbrldock.utils.XbrlDockUtilsJson;
 import com.xbrldock.utils.XbrlDockUtilsNet;
 
 @SuppressWarnings({ "rawtypes", "unchecked" })
-public class XbrlDockConnXbrlOrg implements XbrlDockConnXbrlOrgConsts, XbrlDockConsts.GenAgent /* , XbrlDockPocConsts.XDModSourceConnector */ {
+public class XbrlDockConnXbrlOrg
+		implements XbrlDockConnXbrlOrgConsts, XbrlDockPocRefactorUtils, XbrlDockConsts.GenAgent /* , XbrlDockPocConsts.XDModSourceConnector */ {
 	String sourceName = "xbrl.org";
 
 	String urlRoot = "https://filings.xbrl.org/";
@@ -145,20 +148,23 @@ public class XbrlDockConnXbrlOrg implements XbrlDockConnXbrlOrgConsts, XbrlDockC
 			File targetDir = new File("work/xbrlexport");
 			targetDir = new File(targetDir, XbrlDockUtils.strTime());
 
-			File fRep;
-			ReportFormatHandler xl = new XbrlDockFormatXhtml();
-			ReportDataHandler xw = new XbrlDockFormatXmlWriterShell(targetDir);
+			GenAgent agtXhtmlReader = new XbrlDockFormatAgentXhtmlReader();
+			GenAgent agtXmlWriter = null;
 
 			for (Map filingInfo : items) {
 				String id = (String) filingInfo.get("id");
-				fRep = getFiling(id);
-				loadReport(xl, xw, filingInfo, fRep);
-//				File dataDir = XbrlDockConnUtils.getFilingDir(dirStore, filingInfo, true, false);
-//				 fRep = new File(dataDir, XDC_FNAME_REPDATA);
-//				if (fRep.isFile()) {
-//					XbrlDockReportLoader.readCsv(fRep, filingInfo, xw);
-//					break;
-//				}
+				File fRep = getFiling(id);
+
+				try (FileInputStream fr = new FileInputStream(fRep)) {
+					if (null == agtXmlWriter) {
+						agtXmlWriter = new XbrlDockFormatAgentXmlWriter();
+						agtXmlWriter.process(XDC_CMD_GEN_Init, targetDir);
+					}
+
+					agtXmlWriter.process(XDC_CMD_GEN_Begin, id);
+					agtXhtmlReader.process(XDC_CMD_GEN_Process, fr, agtXmlWriter);
+					agtXmlWriter.process(XDC_CMD_GEN_End);
+				}
 			}
 
 			// XbrlDockConnXbrlOrgTest.exportHun(dirInput, filings);
@@ -173,7 +179,7 @@ public class XbrlDockConnXbrlOrg implements XbrlDockConnXbrlOrgConsts, XbrlDockC
 			Map filingInfo = XbrlDockUtils.simpleGet(catalog, XDC_CONN_CAT_TOKEN_filings, id);
 
 			File dataDir = XbrlDockConnUtils.getFilingDir(dirStore, filingInfo, true, false);
-			fRep = new File(dataDir, XDC_FNAME_REPDATA);
+			File fRep = new File(dataDir, XDC_FNAME_REPDATA);
 			if (fRep.isFile()) {
 				XbrlDockReportLoader.readCsv(fRep, filingInfo, dhv);
 			} else {
