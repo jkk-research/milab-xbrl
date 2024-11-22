@@ -2,6 +2,9 @@
   "app" : {
     "javaClass" : "com.xbrldock.poc.XbrlDockPocApp",
     "dirUrlCache" : "work/urlcache",
+    "taxImportESRS2024" : ["EFRAG-Article8-Taxonomy", "EFRAG-ESRS-Set1-Taxonomy"],
+    "taxImportFAC" : ["fac-ifrs-master"],
+    "taxImportEsgIndia" : ["Taxonomy_BRSR"],
     "gui" : true,
     "userFlags" : {
       "admin" : [ "lkedves" ]

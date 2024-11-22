@@ -39,7 +39,7 @@ public class XbrlDockMetaManager implements XbrlDockMetaConsts, XbrlDockConsts.G
 	XbrlDockDevCounter importIssues = new XbrlDockDevCounter("Import issues", true);
 
 	public static boolean LOAD_CACHE = false;
-	
+
 	ArrayList<String> cacheQueue = new ArrayList<>();
 	ItemCreator<XbrlDockMetaContainer> cacheLoader = new ItemCreator<XbrlDockMetaContainer>() {
 		@Override
@@ -56,8 +56,8 @@ public class XbrlDockMetaManager implements XbrlDockMetaConsts, XbrlDockConsts.G
 					for (String prefix : mc.ownedUrls) {
 						mcByUrl.put(prefix, mc);
 					}
-					for (String r : (Collection<String>) mi.getOrDefault( XDC_GEN_TOKEN_requires, Collections.EMPTY_LIST)) {
-						if( !mcById.keySet().contains(r) && !cacheQueue.contains(r)) {
+					for (String r : (Collection<String>) mi.getOrDefault(XDC_GEN_TOKEN_requires, Collections.EMPTY_LIST)) {
+						if (!mcById.keySet().contains(r) && !cacheQueue.contains(r)) {
 							cacheQueue.add(r);
 						}
 					}
@@ -69,28 +69,28 @@ public class XbrlDockMetaManager implements XbrlDockMetaConsts, XbrlDockConsts.G
 			return mc;
 		}
 	};
-	
+
 	XbrlDockMetaContainer loadFromCache(String id) {
 		XbrlDockMetaContainer ret = mcById.get(id);
-		if ( null != ret ) {
+		if (null != ret) {
 			return ret;
 		}
-		
+
 		Map<String, XbrlDockMetaContainer> loaded = new TreeMap<>();
 		cacheQueue.add(id);
-		
-		while ( !cacheQueue.isEmpty() ) {
+
+		while (!cacheQueue.isEmpty()) {
 			String mcid = cacheQueue.get(0);
-			loaded.put(mcid, XbrlDockUtils.safeGet( mcById, mcid, cacheLoader));
+			loaded.put(mcid, XbrlDockUtils.safeGet(mcById, mcid, cacheLoader));
 			cacheQueue.remove(0);
 		}
-		
-		for ( XbrlDockMetaContainer mc : loaded.values() ) {
-			for (String r : (Collection<String>) mc.metaInfo.getOrDefault( XDC_GEN_TOKEN_requires, Collections.EMPTY_LIST)) {
+
+		for (XbrlDockMetaContainer mc : loaded.values()) {
+			for (String r : (Collection<String>) mc.metaInfo.getOrDefault(XDC_GEN_TOKEN_requires, Collections.EMPTY_LIST)) {
 				mc.requires.add(loaded.get(r));
 			}
 		}
-		
+
 		return loaded.get(id);
 	}
 
@@ -147,21 +147,21 @@ public class XbrlDockMetaManager implements XbrlDockMetaConsts, XbrlDockConsts.G
 
 	private XbrlDockMetaContainer importTaxonomy(File taxSource) throws Exception {
 		XbrlDockMetaContainer mc = null;
-		
-		File fTempDir = null;
 
-		if (taxSource.isFile() && taxSource.getName().endsWith(XDC_FEXT_ZIP)) {
-			fTempDir = new File(dirInput, XbrlDockUtils.strTime());
-			XbrlDockUtilsFile.extractWithApacheZipFile(fTempDir, taxSource, null);
+		String fName = taxSource.getName();
 
-			taxSource = fTempDir;
+		if (!taxSource.exists()) {
+			File fTaxZip = new File(taxSource.getParentFile(), fName + XDC_FEXT_ZIP);
+			if (fTaxZip.isFile()) {
+				XbrlDockUtilsFile.extractWithApacheZipFile(taxSource, fTaxZip, null);
+			}
 		}
 
 		if (taxSource.isDirectory()) {
 			importIssues.reset();
 
-			 mc = buildMetaContainer(taxSource, true);
-			
+			mc = buildMetaContainer(taxSource, true);
+
 			saveChanges();
 
 //			mc.optSave();
@@ -171,7 +171,7 @@ public class XbrlDockMetaManager implements XbrlDockMetaConsts, XbrlDockConsts.G
 //			XbrlDock.log(EventLevel.Trace, "Schema stats", mc.cntLinkTypes, mc.cntArcRoles);
 
 		}
-		
+
 		return mc;
 	}
 

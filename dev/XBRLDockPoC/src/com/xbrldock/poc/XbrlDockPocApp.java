@@ -1,6 +1,7 @@
 package com.xbrldock.poc;
 
 import java.io.File;
+import java.util.Collection;
 
 import com.xbrldock.XbrlDock;
 import com.xbrldock.poc.meta.XbrlDockMetaContainer;
@@ -16,26 +17,36 @@ public class XbrlDockPocApp extends XbrlDock implements XbrlDockPocConsts {
 
 	@Override
 	public Object process(String cmd, Object... params) throws Exception {
-		switch ( cmd ) {
+		switch (cmd) {
 		case XDC_CMD_GEN_Begin:
 			run();
 			break;
 		}
 		return null;
 	}
-	
+
 //	@Override
 	protected void run() throws Exception {
-		
+
+		String urlCacheRoot = XbrlDockUtils.simpleGet(APP_CONFIG, XDC_CFGTOKEN_app, XDC_CFGTOKEN_dirUrlCache);
+		XbrlDockUtilsNet.setCacheRoot(urlCacheRoot);
+
 //		File srcRoot = new File("work/input");
 //		File targetRoot = new File("/Volumes/Backup01/lkedves/XBRLDock");
 //		
 //		XbrlDockUtilsFile.backup(srcRoot, targetRoot);
-		
-		String urlCacheRoot = XbrlDockUtils.simpleGet(APP_CONFIG, XDC_CFGTOKEN_app, XDC_CFGTOKEN_dirUrlCache);
-		XbrlDockUtilsNet.setCacheRoot(urlCacheRoot);
-		
-		boolean gui = Boolean.TRUE.equals( XbrlDockUtils.simpleGet(APP_CONFIG, XDC_CFGTOKEN_app, XDC_CFGTOKEN_gui));
+
+		Collection<String> taxImport = XbrlDockUtils.simpleGet(APP_CONFIG, XDC_CFGTOKEN_app, "taxImport");
+
+		if (null != taxImport) {
+			String fRoot = XbrlDockUtils.simpleGet(APP_CONFIG, XDC_CFGTOKEN_app, XDC_CFGTOKEN_agents, XDC_CFGTOKEN_AGENT_metaManager, XDC_CFGTOKEN_dirInput);
+			File taxDir = new File(fRoot);
+			for (String t : taxImport) {
+				callAgent(XDC_CFGTOKEN_AGENT_metaManager, XDC_CMD_METAMGR_IMPORT, new File(taxDir, t));
+			}
+		}
+
+		boolean gui = Boolean.TRUE.equals(XbrlDockUtils.simpleGet(APP_CONFIG, XDC_CFGTOKEN_app, XDC_CFGTOKEN_gui));
 
 		if (gui || Boolean.TRUE.equals(XbrlDockUtils.simpleGet(APP_CONFIG, XDC_CFGTOKEN_env, XDC_CFGTOKEN_AGENT_gui))) {
 			XbrlDockMetaManager.LOAD_CACHE = true;
