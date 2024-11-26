@@ -76,6 +76,9 @@ public class XbrlDockGuiMetaContainerPanel extends JPanel implements XbrlDockGui
 
 			if (value instanceof RoleTreeNode) {
 				Map<String, String> item = ((RoleTreeNode) value).item;
+				if ( null == item ) {
+					return "???";
+				}
 				ret = item.get("roleURI");
 
 				if (XbrlDockUtils.isEmpty(ret)) {

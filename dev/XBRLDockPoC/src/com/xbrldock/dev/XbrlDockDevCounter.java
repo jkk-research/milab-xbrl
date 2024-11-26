@@ -1,5 +1,6 @@
 package com.xbrldock.dev;
 
+import java.util.Collection;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.Map;
@@ -38,6 +39,10 @@ public class XbrlDockDevCounter implements XbrlDockDevConsts, Iterable<Map.Entry
 	@Override
 	public Iterator<Entry<Object, Long>> iterator() {
 		return counts.entrySet().iterator();
+	}
+
+	public Collection<Object> keys() {
+		return counts.keySet();
 	}
 
 	@Override

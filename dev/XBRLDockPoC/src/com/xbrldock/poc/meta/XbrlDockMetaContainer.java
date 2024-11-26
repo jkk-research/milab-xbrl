@@ -371,6 +371,9 @@ public class XbrlDockMetaContainer implements XbrlDockMetaConsts {
 			metaInfo.put(XDC_METAINFO_ownedUrls, new ArrayList(ownedUrls));
 			metaInfo.put(XDC_FACT_TOKEN_language, new ArrayList(labels.keySet()));
 
+			metaInfo.put(XDC_METAINFO_arcRoles, new ArrayList(cntArcRoles.keys()));
+			metaInfo.put(XDC_METAINFO_linkTypes, new ArrayList(cntLinkTypes.keys()));
+
 //			Map<String, ArrayList<String>> mfl = XbrlDockUtils.safeGet(metaInfo, XDC_METATOKEN_fileLinks, SORTEDMAP_CREATOR);
 //			for ( Map.Entry<String, Set<String>> efl : fileLinks.entrySet() ) {
 //				mfl.put(efl.getKey(), new ArrayList(efl.getValue()));

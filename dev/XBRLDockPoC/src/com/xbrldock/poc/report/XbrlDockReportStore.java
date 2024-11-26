@@ -1,4 +1,4 @@
-package com.xbrldock.poc.conn.xbrlorg;
+package com.xbrldock.poc.report;
 
 import java.io.File;
 import java.io.FileFilter;
@@ -9,7 +9,6 @@ import java.util.Collection;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Set;
-import java.util.TreeMap;
 import java.util.TreeSet;
 
 import com.xbrldock.XbrlDock;
@@ -23,20 +22,13 @@ import com.xbrldock.poc.XbrlDockPocRefactorUtils;
 import com.xbrldock.poc.conn.XbrlDockConnUtils;
 import com.xbrldock.poc.format.XbrlDockFormatAgentXhtmlReader;
 import com.xbrldock.poc.format.XbrlDockFormatXhtml;
-import com.xbrldock.poc.report.XbrlDockReportLoader;
 import com.xbrldock.poc.utils.XbrlDockPocReportInfoExtender;
 import com.xbrldock.utils.XbrlDockUtils;
 import com.xbrldock.utils.XbrlDockUtilsFile;
 import com.xbrldock.utils.XbrlDockUtilsJson;
-import com.xbrldock.utils.XbrlDockUtilsNet;
 
 @SuppressWarnings({ "rawtypes", "unchecked" })
-public class XbrlDockConnXbrlOrg
-		implements XbrlDockConnXbrlOrgConsts, XbrlDockPocRefactorUtils, XbrlDockConsts.GenAgent /* , XbrlDockPocConsts.XDModSourceConnector */ {
-	String sourceName = "xbrl.org";
-
-	String urlRoot = "https://filings.xbrl.org/";
-
+public class XbrlDockReportStore implements XbrlDockReportConsts, XbrlDockPocRefactorUtils, XbrlDockConsts.GenAgent {
 	File dirStore;
 	File dirInput;
 
@@ -57,21 +49,20 @@ public class XbrlDockConnXbrlOrg
 //	public boolean loadReport;
 	public boolean loadReport = true;
 
-	public XbrlDockConnXbrlOrg() {
+	public XbrlDockReportStore() {
 		// TODO Auto-generated constructor stub
 	}
 
 	public void initModule(Map config) throws Exception {
 
-		dirInput = new File((String) XbrlDockUtils.simpleGet(config, XDC_CFGTOKEN_dirInput));
-		XbrlDockUtilsFile.ensureDir(dirInput);
-
-		dirStore = new File((String) XbrlDockUtils.simpleGet(config, XDC_CFGTOKEN_dirStore));
-		XbrlDockUtilsFile.ensureDir(dirStore);
+		dirInput = XbrlDockUtilsFile.ensureDir((String) XbrlDockUtils.simpleGet(config, XDC_CFGTOKEN_dirInput));
+		dirStore = XbrlDockUtilsFile.ensureDir((String) XbrlDockUtils.simpleGet(config, XDC_CFGTOKEN_dirStore));
 
 		File fc = new File(dirStore, XDC_FNAME_CONNCATALOG);
 		if (fc.isFile()) {
 			catalog = XbrlDockUtilsJson.readJson(fc);
+		} else {
+			catalog = new HashMap();
 		}
 
 		testMode = true;
@@ -391,14 +382,6 @@ public class XbrlDockConnXbrlOrg
 		File fZipDir = new File(fDir, zipDir);
 		File fZip = new File(fDir, zipFile);
 
-		if (!fZip.isFile()) {
-			XbrlDock.log(EventLevel.Trace, "Downloading filing package", fZip.getCanonicalPath());
-
-			if (!testMode) {
-				XbrlDockUtilsNet.download(urlRoot + zipUrl.replace(" ", "%20"), fZip);
-			}
-		}
-
 		if (!fZipDir.isDirectory() && fZip.isFile()) {
 			XbrlDock.log(EventLevel.Trace, "Unzipping package", fZip.getCanonicalPath());
 			try {
@@ -409,24 +392,8 @@ public class XbrlDockConnXbrlOrg
 			}
 		}
 
-		str = XbrlDockUtils.simpleGet(filingData, XDC_REPORT_TOKEN_sourceAtts, XDC_XBRLORG_TOKEN_json_url);
-		if (!XbrlDockUtils.isEmpty(str)) {
-			String prefix = XbrlDockUtils.cutPostfix(zipUrl, "/");
-			String jsonFileName = str.substring(prefix.length() + 1);
-			File fJson = new File(fDir, jsonFileName);
-
-			if (!fJson.isFile()) {
-				if (!testMode) {
-					XbrlDock.log(EventLevel.Trace, "Downloading JSON", fJson.getCanonicalPath());
-					XbrlDockUtilsNet.download(urlRoot + str.replace(" ", "%20"), fJson);
-				}
-//			} else {
-//				XbrlDock.log(EventLevel.Trace, "Json file found", fJson.getCanonicalPath());				
-			}
-		}
-
 		String packStatus = XDC_CONN_PACKAGE_PROC_MSG_reportNotFound;
-		str = XbrlDockUtils.simpleGet(filingData, XDC_REPORT_TOKEN_sourceAtts, XDC_XBRLORG_TOKEN_report_url);
+		str = XbrlDockUtils.simpleGet(filingData, XDC_REPORT_TOKEN_urlReport);
 
 		boolean metaOK = rf.check(fDir);
 
@@ -496,97 +463,6 @@ public class XbrlDockConnXbrlOrg
 		if (null != updated) {
 			updated.clear();
 		}
-
-//		Map resp = XbrlDockUtilsJson.readJson(new File(dataRoot, PATH_SRVRESP));
-		Map resp = XbrlDockUtilsJson.readJson(new File("temp/ESEFTest/20240907_ESEF_All.json"));
-
-		Map entities = XbrlDockUtils.safeGet(catalog, XDC_CONN_CAT_TOKEN_entities, MAP_CREATOR);
-		Map langs = XbrlDockUtils.safeGet(catalog, XDC_CONN_CAT_TOKEN_languages, MAP_CREATOR);
-
-		Map atts;
-		String id;
-		Map<String, String> locLang = new HashMap<>();
-		Map<String, Object> locEnt = new TreeMap<>();
-		Map entityData;
-
-		Collection<Map<String, Object>> c;
-
-		c = XbrlDockUtils.simpleGet(resp, XDC_JSONAPI_TOKEN_included);
-		for (Map<String, Object> i : c) {
-			id = XbrlDockUtils.simpleGet(i, XDC_JSONAPI_TOKEN_id);
-			atts = XbrlDockUtils.simpleGet(i, XDC_JSONAPI_TOKEN_attributes);
-			String rt = (String) i.get(XDC_JSONAPI_TOKEN_type);
-
-			switch (rt) {
-			case XDC_XBRLORG_TOKEN_entity:
-				String eid = XDC_ENTITY_ID_TYPE_LEI + XDC_SEP_ID + XbrlDockUtils.simpleGet(atts, XDC_XBRLORG_TOKEN_identifier);
-				entityData = XbrlDockUtils.safeGet(entities, eid, MAP_CREATOR);
-
-				entityData.put(XDC_EXT_TOKEN_id, eid);
-				entityData.put(XDC_EXT_TOKEN_name, atts.get(XDC_XBRLORG_TOKEN_name));
-				entityData.put(XDC_ENTITY_TOKEN_urlSource, XbrlDockUtils.simpleGet(i, XDC_JSONAPI_TOKEN_links, XDC_JSONAPI_TOKEN_self));
-
-				locEnt.put(id, entityData);
-
-				break;
-			case XDC_XBRLORG_TOKEN_language:
-				String code = XbrlDockUtils.simpleGet(atts, XDC_XBRLORG_TOKEN_code);
-				langs.put(code, XbrlDockUtils.simpleGet(atts, XDC_XBRLORG_TOKEN_name));
-				locLang.put(id, code);
-				break;
-			default:
-				XbrlDockException.wrap(null, "Should not be here");
-				break;
-			}
-		}
-
-		Map filings = XbrlDockUtils.safeGet(catalog, XDC_CONN_CAT_TOKEN_filings, MAP_CREATOR);
-
-		c = XbrlDockUtils.simpleGet(resp, XDC_JSONAPI_TOKEN_data);
-		XbrlDock.log(EventLevel.Trace, "Data count", c.size());
-		for (Map<String, Object> i : c) {
-			atts = XbrlDockUtils.simpleGet(i, XDC_JSONAPI_TOKEN_attributes);
-			String rt = (String) i.get(XDC_JSONAPI_TOKEN_type);
-
-			switch (rt) {
-			case XDC_XBRLORG_TOKEN_filing:
-				id = XbrlDockUtils.simpleGet(atts, XDC_XBRLORG_TOKEN_fxo_id);
-				Map filingData = XbrlDockUtils.safeGet(filings, id, MAP_CREATOR);
-
-				filingData.put(XDC_REPORT_TOKEN_source, sourceName);
-				filingData.put(XDC_EXT_TOKEN_id, id);
-				filingData.put(XDC_REPORT_TOKEN_sourceAtts, atts);
-
-				filingData.put(XDC_REPORT_TOKEN_periodEnd, atts.get(XDC_XBRLORG_TOKEN_period_end));
-				filingData.put(XDC_REPORT_TOKEN_published, atts.get(XDC_XBRLORG_TOKEN_date_added));
-				filingData.put(XDC_REPORT_TOKEN_urlPackage, atts.get(XDC_XBRLORG_TOKEN_package_url));
-				filingData.put(XDC_REPORT_TOKEN_urlJson, atts.get(XDC_XBRLORG_TOKEN_json_url));
-				filingData.put(XDC_REPORT_TOKEN_urlReport, atts.get(XDC_XBRLORG_TOKEN_report_url));
-				filingData.put(XDC_REPORT_TOKEN_sourceUrl, XbrlDockUtils.simpleGet(i, XDC_JSONAPI_TOKEN_links, XDC_JSONAPI_TOKEN_self));
-
-				String linkId = XbrlDockUtils.simpleGet(i, XDC_JSONAPI_TOKEN_relationships, XDC_XBRLORG_TOKEN_language, XDC_JSONAPI_TOKEN_data, XDC_JSONAPI_TOKEN_id);
-				filingData.put(XDC_REPORT_TOKEN_langCode, locLang.get(linkId));
-
-				linkId = XbrlDockUtils.simpleGet(i, XDC_JSONAPI_TOKEN_relationships, XDC_XBRLORG_TOKEN_entity, XDC_JSONAPI_TOKEN_data, XDC_JSONAPI_TOKEN_id);
-				entityData = (Map) locEnt.get(linkId);
-				filingData.put(XDC_REPORT_TOKEN_entityId, entityData.get(XDC_EXT_TOKEN_id));
-				filingData.put(XDC_REPORT_TOKEN_entityName, entityData.get(XDC_EXT_TOKEN_name));
-
-				++newCount;
-				if (null != updated) {
-					updated.add(id);
-				}
-
-				break;
-			default:
-				XbrlDockException.wrap(null, "Should not be here");
-				break;
-			}
-		}
-
-		XbrlDock.log(EventLevel.Trace, "Read filing count", filings.size(), "Entity count", entities.size(), "Language count", langs.size());
-
-//		XbrlDockUtilsJson.writeJson(new File(dataRoot, PATH_CATALOG), catalog);
 
 		return (null == updated) ? newCount : updated.size();
 	}

@@ -120,6 +120,8 @@ public interface XbrlDockConsts {
 	String XDC_REPORT_TOKEN_units = "units";
 
 	String XDC_REPORT_TOKEN_urlPackage = "urlPackage";
+	String XDC_REPORT_TOKEN_urlJson = "urlJson";
+	String XDC_REPORT_TOKEN_urlReport = "urlReport";
 	String XDC_REPORT_TOKEN_sourceUrl = "sourceUrl";
 	String XDC_REPORT_TOKEN_sourceAtts = "sourceAtts";
 

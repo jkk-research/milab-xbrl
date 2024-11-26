@@ -260,7 +260,7 @@ public class XbrlDockMetaManager implements XbrlDockMetaConsts, XbrlDockConsts.G
 			for (String ak : alienKeys) {
 				metaContainer.contentByURL.remove(ak);
 			}
-			
+
 //			alienKeys = new TreeSet<>(metaContainer.fileLinks.keySet());
 //
 //			for (String prefix : metaContainer.ownedUrls) {
@@ -275,7 +275,6 @@ public class XbrlDockMetaManager implements XbrlDockMetaConsts, XbrlDockConsts.G
 //			for (String ak : alienKeys) {
 //				metaContainer.fileLinks.remove(ak);
 //			}
-			
 
 			mcById.put(metaContainer.getId(), metaContainer);
 		}
@@ -291,7 +290,7 @@ public class XbrlDockMetaManager implements XbrlDockMetaConsts, XbrlDockConsts.G
 
 	private void saveChanges() throws Exception {
 		boolean updateCatalog = false;
-		
+
 		for (Map.Entry<String, XbrlDockMetaContainer> mce : mcById.entrySet()) {
 			XbrlDockMetaContainer mc = mce.getValue();
 			if (mc.optSave()) {
@@ -299,7 +298,7 @@ public class XbrlDockMetaManager implements XbrlDockMetaConsts, XbrlDockConsts.G
 				metaCatalog.put(mce.getKey(), mc.metaInfo);
 			}
 		}
-		
+
 		if (updateCatalog) {
 			XbrlDockUtilsJson.writeJson(new File(metaStoreRoot, XDC_FNAME_METACATALOG), metaCatalog);
 		}

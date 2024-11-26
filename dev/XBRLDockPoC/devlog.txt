@@ -20,6 +20,13 @@ Stats {
 	Segment count - Unit	29259
  }
 
+
+Search->File
+"Containing text" -> ^.*$    OR    \n[\s]*
+"Regular Expression" check
+"File name patterns" -> *.java
+"Search"
+Check the number of matches in the "Search" Tab.
  
  LOC: 9200
  GUI: 2700

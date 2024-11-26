@@ -2,9 +2,9 @@
   "app" : {
     "javaClass" : "com.xbrldock.poc.XbrlDockPocApp",
     "dirUrlCache" : "work/urlcache",
-    "taxImportESRS2024" : ["EFRAG-Article8-Taxonomy", "EFRAG-ESRS-Set1-Taxonomy"],
-    "taxImportFAC" : ["fac-ifrs-master"],
-    "taxImportEsgIndia" : ["Taxonomy_BRSR"],
+    "taxImportESRS2024" : [ "EFRAG-Article8-Taxonomy", "EFRAG-ESRS-Set1-Taxonomy" ],
+    "taxImportFAC" : [ "IFRST_2017-03-09", "fac-ifrs-master" ],
+    "taxImportEsgIndia" : [ "Taxonomy_BRSR" ],
     "gui" : true,
     "userFlags" : {
       "admin" : [ "lkedves" ]
@@ -21,10 +21,16 @@
         "dirStore" : "work/knowledge/connectors/filings.xbrl.org",
         "dirInput" : "work/input/connectors/filings.xbrl.org"
       },
-      "manualReports" : {
-        "javaClass" : "",
-        "dirStore" : "",
-        "dirInput" : ""
+      "facStore" : {
+        "javaClass" : "com.xbrldock.poc.report.XbrlDockReportStore",
+        "name" : "fac",
+        "connector" : {
+          "javaClass" : "com.xbrldock.poc.conn.concordance.XbrlDockConnConcordance",
+          "store" : "esefConn",
+          "requires" : [ "fac-ifrs-master" ],
+          "loadRules" : "work/input/connectors/fac/ImputeRules.txt"
+        },
+        "dirStore" : "work/knowledge/connectors/fac"
       },
       "gui" : {
         "javaClass" : "com.xbrldock.poc.gui.XbrlDockGuiWorkbench",
@@ -44,8 +50,17 @@
           "placeholder" : "Select a taxonomy in the list above to see its properties."
         }, {
           "id" : "esefConn",
-          "javaClass" : "com.xbrldock.poc.gui.XbrlDockGuiConnectorEsefPanel",
+          "javaClass" : "com.xbrldock.poc.gui.XbrlDockGuiStorePanel",
+          "guiCommands" : [ "test01", "test02" ],
           "name" : "ESEF Connector",
+          "store" : "esefConn",
+          "placeholder" : "Select a report in the list above to see its properties."
+        }, {
+          "id" : "facConn",
+          "javaClass" : "com.xbrldock.poc.gui.XbrlDockGuiStorePanel",
+          "guiCommands" : [ "refresh" ],
+          "name" : "FAC Concordance",
+          "store" : "facStore",
           "placeholder" : "Select a report in the list above to see its properties."
         } ],
         "childPanels" : {
@@ -54,6 +69,10 @@
             "name" : "XBRLDock PoC Taxonomy Viewer - "
           },
           "esefConn" : {
+            "javaClass" : "com.xbrldock.poc.gui.XbrlDockGuiReportPanel",
+            "name" : "XBRLDock PoC Report Viewer - "
+          },
+          "facConn" : {
             "javaClass" : "com.xbrldock.poc.gui.XbrlDockGuiReportPanel",
             "name" : "XBRLDock PoC Report Viewer - "
           }

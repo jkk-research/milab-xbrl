@@ -8,6 +8,10 @@ import javax.swing.JComponent;
 import com.xbrldock.poc.XbrlDockPocConsts;
 
 public interface XbrlDockGuiConsts extends XbrlDockPocConsts {	
+	
+	String XDC_GUI_STORE = "store";
+	String XDC_GUI_COMMANDS = "guiCommands";
+	
 	String XDC_GUICMD_PICK = "xdc_guiPick";
 	String XDC_GUICMD_ACTIVATE = "xdc_guiActivate";
 	String XDC_GUICMD_SELCHG = "xdc_guiSelChg";

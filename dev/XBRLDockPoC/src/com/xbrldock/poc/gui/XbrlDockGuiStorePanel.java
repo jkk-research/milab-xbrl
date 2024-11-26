@@ -1,9 +1,11 @@
 package com.xbrldock.poc.gui;
 
 import java.awt.BorderLayout;
+import java.awt.GridLayout;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.Map;
 
 import javax.swing.JButton;
@@ -25,7 +27,7 @@ import com.xbrldock.utils.XbrlDockUtilsGui;
 import com.xbrldock.utils.XbrlDockUtilsMvel;
 
 @SuppressWarnings({ "rawtypes", "unchecked" })
-public class XbrlDockGuiConnectorEsefPanel extends JPanel implements XbrlDockGuiConsts, XbrlDockConnXbrlOrgConsts, GenAgent {
+public class XbrlDockGuiStorePanel extends JPanel implements XbrlDockGuiConsts, XbrlDockConnXbrlOrgConsts, GenAgent {
 	private static final long serialVersionUID = 1L;
 
 //@formatter:off  
@@ -40,7 +42,8 @@ public class XbrlDockGuiConnectorEsefPanel extends JPanel implements XbrlDockGui
 	);
 //@formatter:on
 
-	Map metaCatalog;
+	Map catalog;
+	String store;
 
 	JTextArea repFilterTA;
 	String repFilterStr;
@@ -52,6 +55,9 @@ public class XbrlDockGuiConnectorEsefPanel extends JPanel implements XbrlDockGui
 	XbrlDockReportUtils.SimpleMatchTester factFilterTest = new XbrlDockReportUtils.SimpleMatchTester();
 
 	JButton btFilter;
+
+	Collection<String> cmds;
+	JPanel pnlCmds;
 
 	XbrlDockGuiUtilsHtmlDisplay repInfo;
 
@@ -72,7 +78,7 @@ public class XbrlDockGuiConnectorEsefPanel extends JPanel implements XbrlDockGui
 				break;
 			case XDC_CMD_GEN_TEST01:
 				XbrlDockDevReportStats stats = new XbrlDockDevReportStats();
-				XbrlDock.callAgentNoEx(XDC_CFGTOKEN_AGENT_esefConn, XDC_CMD_GEN_TEST01, stats);
+				XbrlDock.callAgentNoEx(store, XDC_CMD_GEN_TEST01, stats);
 
 				XbrlDock.log(EventLevel.Info, "Test visit sats", stats);
 
@@ -83,7 +89,7 @@ public class XbrlDockGuiConnectorEsefPanel extends JPanel implements XbrlDockGui
 //				}
 				break;
 			case XDC_CMD_GEN_TEST02:
-				XbrlDock.callAgentNoEx(XDC_CFGTOKEN_AGENT_esefConn, XDC_CMD_GEN_TEST02, reportGrid.items);
+				XbrlDock.callAgentNoEx(store, XDC_CMD_GEN_TEST02, reportGrid.items);
 				break;
 			case XDC_GUICMD_PICK:
 				updateDescPanel(((WidgetEvent) e).getUserOb());
@@ -93,16 +99,20 @@ public class XbrlDockGuiConnectorEsefPanel extends JPanel implements XbrlDockGui
 				break;
 			case XDC_GUICMD_ACTIVATE:
 				String selId = XbrlDockUtils.simpleGet(((WidgetEvent) e).getUserOb(), XDC_EXT_TOKEN_id);
-				XbrlDock.callAgentNoEx(XDC_CFGTOKEN_AGENT_gui, XDC_CMD_GEN_SELECT, XDC_CFGTOKEN_AGENT_esefConn, selId);
+				XbrlDock.callAgentNoEx(XDC_CFGTOKEN_AGENT_gui, XDC_CMD_GEN_SELECT, store, selId);
 				break;
 			default:
-				XbrlDockException.wrap(null, "Unknown command", cmd);
+				if (cmds.contains(cmd)) {
+					XbrlDock.callAgentNoEx(store, cmd);
+				} else {
+					XbrlDockException.wrap(null, "Unknown command", cmd);
+				}
 				break;
 			}
 		}
 	};
 
-	public XbrlDockGuiConnectorEsefPanel() throws Exception {
+	public XbrlDockGuiStorePanel() throws Exception {
 		super(new BorderLayout());
 
 		repInfo = new XbrlDockGuiUtilsHtmlDisplay();
@@ -130,9 +140,12 @@ public class XbrlDockGuiConnectorEsefPanel extends JPanel implements XbrlDockGui
 		pnlFilter.add(pnlFilterInput, BorderLayout.CENTER);
 		pnlFilter.add(btFilter, BorderLayout.EAST);
 
-		if (XbrlDock.checkFlag(XDC_FLAG_ADMIN)) {
-			pnlFilter.add(XbrlDockGuiUtils.createBtn(XDC_CMD_GEN_TEST02, al, JButton.class), BorderLayout.WEST);
-		}
+		pnlCmds = new JPanel();
+		pnlFilter.add(pnlCmds, BorderLayout.WEST);
+
+//		if (XbrlDock.checkFlag(XDC_FLAG_ADMIN)) {
+//			pnlFilter.add(XbrlDockGuiUtils.createBtn(XDC_CMD_GEN_TEST02, al, JButton.class), BorderLayout.WEST);
+//		}
 
 		JPanel pnlTop = new JPanel(new BorderLayout());
 		pnlTop.add(XbrlDockUtilsGui.createSplit(false, pnlFilter, XbrlDockGuiUtils.setTitle(reportGrid, "Reports"), 0.2), BorderLayout.CENTER);
@@ -147,8 +160,21 @@ public class XbrlDockGuiConnectorEsefPanel extends JPanel implements XbrlDockGui
 	}
 
 	public void initModule(Map config) throws Exception {
-		metaCatalog = XbrlDock.callAgent(XDC_CFGTOKEN_AGENT_esefConn, XDC_CMD_GEN_GETCATALOG);
+		store = XbrlDockUtils.simpleGet(config, XDC_GUI_STORE);
+		catalog = XbrlDock.callAgent(store, XDC_CMD_GEN_GETCATALOG);
 		repInfo.setPlaceholder(XbrlDockUtils.simpleGet(config, XDC_GEN_TOKEN_placeholder));
+
+		cmds = XbrlDockUtils.simpleGet(config, XDC_GUI_COMMANDS);
+
+		if (null != cmds) {
+			pnlCmds.setLayout(new GridLayout(cmds.size(), 1));
+
+			for (String cmd : cmds) {
+				pnlCmds.add(XbrlDockGuiUtils.createBtn(cmd, al, JButton.class));
+			}
+		} else {
+			pnlCmds.getParent().remove(pnlCmds);
+		}
 
 		updateReportGrid();
 
@@ -157,13 +183,13 @@ public class XbrlDockGuiConnectorEsefPanel extends JPanel implements XbrlDockGui
 
 	private void updateReportGrid() {
 		reportGrid.updateItems(true, new GenAgent() {
-			
+
 			@Override
 			public Object process(String cmd, Object... params) throws Exception {
-				if ( !XDC_CMD_GEN_Process.equals(cmd)) {
+				if (!XDC_CMD_GEN_Process.equals(cmd) || catalog.isEmpty()) {
 					return true;
 				}
-				
+
 				ArrayList items = (ArrayList) params[0];
 				String txt = factFilterTA.getText().trim();
 				boolean factExpr = !XbrlDockUtils.isEmpty(txt);
@@ -175,7 +201,7 @@ public class XbrlDockGuiConnectorEsefPanel extends JPanel implements XbrlDockGui
 					XbrlDock.log(EventLevel.Trace, "Fact expr testing", txt);
 				}
 
-				for (Map.Entry<String, Object> re : ((Map<String, Object>) XbrlDockUtils.simpleGet(metaCatalog, XDC_CONN_CAT_TOKEN_filings)).entrySet()) {
+				for (Map.Entry<String, Object> re : ((Map<String, Object>) XbrlDockUtils.simpleGet(catalog, XDC_CONN_CAT_TOKEN_filings)).entrySet()) {
 					Object rep = re.getValue();
 
 					if ((null != repFilterOb) && !(Boolean) XbrlDockUtilsMvel.evalCompiled(repFilterOb, rep)) {
@@ -186,7 +212,7 @@ public class XbrlDockGuiConnectorEsefPanel extends JPanel implements XbrlDockGui
 						String repId = re.getKey();
 						XbrlDock.log(EventLevel.Trace, "   on report", repId);
 
-						XbrlDock.callAgent(XDC_CFGTOKEN_AGENT_esefConn, XDC_CMD_CONN_VISITREPORT, repId, factFilterEval);
+						XbrlDock.callAgent(store, XDC_CMD_CONN_VISITREPORT, repId, factFilterEval);
 
 						if (!factFilterTest.isMatch()) {
 							continue;
@@ -215,7 +241,7 @@ public class XbrlDockGuiConnectorEsefPanel extends JPanel implements XbrlDockGui
 			break;
 		case XDC_CMD_GEN_ACTIVATE:
 			String selId = XbrlDockUtils.simpleGet(params[0], XDC_EXT_TOKEN_id);
-			XbrlDock.callAgent(XDC_CFGTOKEN_AGENT_gui, XDC_CMD_GEN_SELECT, XDC_CFGTOKEN_AGENT_esefConn, selId);
+			XbrlDock.callAgent(XDC_CFGTOKEN_AGENT_gui, XDC_CMD_GEN_SELECT, store, selId);
 			break;
 		default:
 			XbrlDockException.wrap(null, "Unhandled agent command", command, params);

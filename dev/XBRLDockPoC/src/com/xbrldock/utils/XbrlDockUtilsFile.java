@@ -260,6 +260,15 @@ public class XbrlDockUtilsFile implements XbrlDockUtilsConsts {
 		return count;
 	}
 
+	public static File ensureDir(String fName) throws IOException {
+		if ( XbrlDockUtils.isEmpty(fName)) {
+			return null;
+		}
+		File f = new File(fName);
+		ensureDir(f);
+		return f;
+	}
+
 	public static void ensureDir(File f) throws IOException {
 		if (!f.isDirectory() && !f.mkdirs()) {
 			throw new IOException("failed to create directory " + f);
