@@ -409,6 +409,32 @@ public class XbrlDockMetaContainer implements XbrlDockMetaConsts {
 		return false;
 	}
 
+	public Map<String, String> getRes(String lang, Map item) throws Exception {
+		Map<String, Object> res = XbrlDockUtils.safeGet(labels, lang, new ItemCreator<Map>() {
+			@Override
+			public Map create(Object key, Object... hints) {
+				String id = getId();
+				File fDir = new File(metaManager.metaStoreRoot, id);
+				File fRes = new File(fDir, XDC_TAXONOMYRES_FNAME_PREFIX + key + XDC_FEXT_JSON);
+				
+				Map m =  Collections.EMPTY_MAP;
+				
+				if ( fRes.isFile()) {
+					try {
+						m =  XbrlDockUtilsJson.readJson(fRes);
+					} catch (Exception e) {
+					}
+				}
+				
+				return m;
+			}
+		});
+		
+		String id = XbrlDockUtils.sbAppend(null, "#", false, XbrlDockUtils.getPostfix((String) item.get(XDC_METATOKEN_url), XDC_URL_PSEP), item.get(XDC_EXT_TOKEN_id)).toString();
+		
+		return (Map<String, String>) res.getOrDefault(id, Collections.EMPTY_MAP);
+	}
+
 	public boolean load() throws Exception {
 		String id = getId();
 		File fDir = new File(metaManager.metaStoreRoot, id);

@@ -10,6 +10,7 @@ import java.util.Set;
 import java.util.TreeMap;
 import java.util.TreeSet;
 
+import javax.swing.JButton;
 import javax.swing.JComboBox;
 import javax.swing.JPanel;
 import javax.swing.ListSelectionModel;
@@ -21,6 +22,7 @@ import com.xbrldock.XbrlDockConsts.GenAgent;
 import com.xbrldock.XbrlDockException;
 import com.xbrldock.poc.meta.XbrlDockMetaConsts;
 import com.xbrldock.poc.meta.XbrlDockMetaContainer;
+import com.xbrldock.poc.sandbox.XbrlDockESRSTest;
 import com.xbrldock.utils.XbrlDockUtils;
 import com.xbrldock.utils.XbrlDockUtilsGui;
 
@@ -130,6 +132,9 @@ public class XbrlDockGuiMetaContainerPanel extends JPanel implements XbrlDockGui
 				urlFilter = entryPointUrls.get(ep);
 				updateRoleTree();
 				break;
+			case XDC_CMD_GEN_TEST01:
+				XbrlDockESRSTest.exportMetaContainer(taxonomy);
+				break;
 			}
 		}
 	};
@@ -147,6 +152,7 @@ public class XbrlDockGuiMetaContainerPanel extends JPanel implements XbrlDockGui
 		JPanel pnlTree = new JPanel(new BorderLayout());
 		pnlTree.add(XbrlDockGuiUtils.setActive(cbRoleType, XDC_APP_SETROLETYPE, al), BorderLayout.NORTH);
 		pnlTree.add(XbrlDockUtilsGui.setTitle(roleTree.getComp(), "Taxonomy tree"), BorderLayout.CENTER);
+		pnlTree.add(XbrlDockGuiUtils.createBtn(XDC_CMD_GEN_TEST01, al, JButton.class), BorderLayout.SOUTH);
 
 		JPanel pnlRight = new JPanel(new BorderLayout());
 		pnlRight.add(XbrlDockUtilsGui.createSplit(false, itemGrid.getComp(), XbrlDockUtilsGui.setTitle(itemPanel, "Selected item info"), 0.5), BorderLayout.CENTER);

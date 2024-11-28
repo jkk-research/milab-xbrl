@@ -1,4 +1,4 @@
-package com.xbrldock.poc.conn.xbrlorg;
+package com.xbrldock.poc.sandbox;
 
 import java.io.File;
 import java.io.FilenameFilter;
@@ -15,6 +15,7 @@ import com.xbrldock.dev.XbrlDockDevCounter;
 import com.xbrldock.dev.XbrlDockDevMonitor;
 import com.xbrldock.dev.XbrlDockDevReportDump;
 import com.xbrldock.poc.conn.XbrlDockConnUtils;
+import com.xbrldock.poc.conn.xbrlorg.XbrlDockConnXbrlOrgConsts;
 import com.xbrldock.poc.report.XbrlDockReportLoader;
 import com.xbrldock.utils.XbrlDockUtils;
 import com.xbrldock.utils.XbrlDockUtilsFile;
