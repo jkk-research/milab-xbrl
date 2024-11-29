@@ -27,7 +27,7 @@
         "connector" : {
           "javaClass" : "com.xbrldock.poc.conn.concordance.XbrlDockConnConcordance",
           "store" : "esefConn",
-          "requires" : [ "fac-ifrs-master" ],
+          "requires" : [ "www.xbrlsite.com/2018/Protototype/fac/ifrs" ],
           "loadRules" : "work/input/connectors/fac/ImputeRules.txt"
         },
         "dirStore" : "work/knowledge/connectors/fac"

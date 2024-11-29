@@ -1,7 +1,10 @@
 package com.xbrldock.utils;
 
+import java.util.Map;
+
 import org.mvel2.MVEL;
 
+@SuppressWarnings({ "unchecked", "rawtypes" })
 public class XbrlDockUtilsMvel implements XbrlDockUtilsConsts {
 	
 	public interface MvelDataWrapper {
@@ -12,9 +15,8 @@ public class XbrlDockUtilsMvel implements XbrlDockUtilsConsts {
 		return MVEL.compileExpression(expr);
 	}
 	
-	@SuppressWarnings("unchecked")
-	public static <RetType> RetType evalCompiled(Object o , Object ctx) {
-		return (RetType) MVEL.executeExpression(o, ctx);
+	public static <RetType> RetType evalCompiled(Object o, Object ctx) {				
+		return (RetType) ((ctx instanceof Map) ?  MVEL.executeExpression(o, null, (Map) ctx) : MVEL.executeExpression(o, ctx));
 	}
 
 }

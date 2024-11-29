@@ -34,6 +34,8 @@ public class XbrlDockReportStore implements XbrlDockReportConsts, XbrlDockPocRef
 
 	Map catalog;
 
+	GenAgent agtConn;
+
 	XbrlDockConnUtils.DirMapper rf = new XbrlDockConnUtils.DirMapper();
 
 	FileFilter filingCandidate = new FileFilter() {
@@ -66,6 +68,12 @@ public class XbrlDockReportStore implements XbrlDockReportConsts, XbrlDockPocRef
 		}
 
 		testMode = true;
+
+		Map connInfo = XbrlDockUtils.simpleGet(config, XDC_STORE_CONNECTOR);
+
+		if (null != connInfo) {
+			agtConn = XbrlDockUtils.createObject(connInfo);
+		}
 	}
 
 	@Override
@@ -180,9 +188,12 @@ public class XbrlDockReportStore implements XbrlDockReportConsts, XbrlDockPocRef
 				loadReport(fh, dhv, filingInfo, fRep);
 			}
 			break;
-
 		default:
-			XbrlDockException.wrap(null, "Unhandled agent command", command, params);
+			if (null != agtConn) {
+				agtConn.process(command, params);
+			} else {
+				XbrlDockException.wrap(null, "Unhandled agent command", command, params);
+			}
 			break;
 		}
 
@@ -456,14 +467,4 @@ public class XbrlDockReportStore implements XbrlDockReportConsts, XbrlDockPocRef
 		return ret;
 	}
 
-//	@Override
-	public int refresh(Collection<String> updated) throws Exception {
-		int newCount = 0;
-
-		if (null != updated) {
-			updated.clear();
-		}
-
-		return (null == updated) ? newCount : updated.size();
-	}
 }
