@@ -18,14 +18,15 @@ public class XbrlDockReportExprEval implements XbrlDockReportConsts, XbrlDockPoc
 	private Object exprComp;
 
 	private String repId;
-	private Map<String, Map> segData = new TreeMap<>();
+	protected Map<String, Map> segData = new TreeMap<>();
 	private Map evalCtx = new TreeMap<>();
 	private boolean inited;
 
 	public void setExpression(String expr, ExprResultProcessor resultProc) {
 		this.resultProc = resultProc;
 		this.exprStr = expr;
-		exprComp = XbrlDockUtilsMvel.compile(expr);
+
+		exprComp = XbrlDockUtils.isEmpty(expr) ? null : XbrlDockUtilsMvel.compile(expr);
 	}
 
 	@Override
@@ -118,14 +119,15 @@ public class XbrlDockReportExprEval implements XbrlDockReportConsts, XbrlDockPoc
 		}
 	}
 
-	private Object evaluate(Map data) throws Exception {
+	protected Object evaluate(Map data) throws Exception {
 		evalCtx.clear();
 		evalCtx.putAll(data);
 
-		Object ret = XbrlDockUtilsMvel.evalCompiled(exprComp, evalCtx);
-
-		evalCtx.put(XDC_EXPR_result, ret);
-
+		Object ret = null;
+		if (null != exprComp) {
+			ret = XbrlDockUtilsMvel.evalCompiled(exprComp, evalCtx);
+			evalCtx.put(XDC_EXPR_result, ret);
+		}
 
 		if (!(boolean) resultProc.process(XDC_CMD_GEN_Process, evalCtx)) {
 			ret = XDC_RETVAL_STOP;

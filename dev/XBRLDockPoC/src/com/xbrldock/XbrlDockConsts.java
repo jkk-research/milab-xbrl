@@ -95,6 +95,7 @@ public interface XbrlDockConsts {
 	String XDC_GEN_TOKEN_placeholder = "placeholder";
 	String XDC_GEN_TOKEN_childPanels = "childPanels";
 	String XDC_GEN_TOKEN_description = "description";
+	String XDC_GEN_TOKEN_store = "store";
 
 	String XDC_UTILS_MVEL_mvelObj = "xdc_mvelObj";
 

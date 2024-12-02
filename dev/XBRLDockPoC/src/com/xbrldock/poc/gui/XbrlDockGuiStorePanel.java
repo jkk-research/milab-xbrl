@@ -160,7 +160,7 @@ public class XbrlDockGuiStorePanel extends JPanel implements XbrlDockGuiConsts, 
 	}
 
 	public void initModule(Map config) throws Exception {
-		store = XbrlDockUtils.simpleGet(config, XDC_GUI_STORE);
+		store = XbrlDockUtils.simpleGet(config, XDC_GEN_TOKEN_store);
 		catalog = XbrlDock.callAgent(store, XDC_CMD_GEN_GETCATALOG);
 		repInfo.setPlaceholder(XbrlDockUtils.simpleGet(config, XDC_GEN_TOKEN_placeholder));
 
