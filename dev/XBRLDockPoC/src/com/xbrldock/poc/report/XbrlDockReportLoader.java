@@ -6,6 +6,7 @@ import java.io.FileReader;
 import java.math.BigDecimal;
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Map;
@@ -23,6 +24,7 @@ import com.xbrldock.utils.XbrlDockUtilsCsvWriterAgent;
 public class XbrlDockReportLoader implements XbrlDockReportConsts, XbrlDockPocConsts.ReportDataHandler {
 
 	final File dataRoot;
+	public boolean flat = false;
 
 	String repId;
 
@@ -48,13 +50,15 @@ public class XbrlDockReportLoader implements XbrlDockReportConsts, XbrlDockPocCo
 	public void setReportData(Map reportData) throws Exception {
 		this.reportData = reportData;
 
-		File dir = XbrlDockConnUtils.getFilingDir(dataRoot, reportData, true, true);
+//		File dir = flat ? new File(dataRoot, XbrlDockUtils.strTime()) : XbrlDockConnUtils.getFilingDir(dataRoot, reportData, true, true);
+		File dir = flat ? dataRoot : XbrlDockConnUtils.getFilingDir(dataRoot, reportData, true, true);
+		String prefix = flat ? ((String) reportData.get(XDC_EXT_TOKEN_id) + "_") : "";
 
 		cwData.process(XDC_CMD_GEN_Init, FACT_DATA_FIELDS);
-		cwData.process(XDC_CMD_GEN_Begin, new File(dir, XDC_FNAME_REPDATA));
+		cwData.process(XDC_CMD_GEN_Begin, new File(dir, prefix + XDC_FNAME_REPDATA));
 		
 		cwText.process(XDC_CMD_GEN_Init, FACT_TEXT_FIELDS);
-		cwText.process(XDC_CMD_GEN_Begin, new File(dir, XDC_FNAME_REPTEXT));
+		cwText.process(XDC_CMD_GEN_Begin, new File(dir, prefix + XDC_FNAME_REPTEXT));
 	}
 
 	@Override
@@ -122,7 +126,7 @@ public class XbrlDockReportLoader implements XbrlDockReportConsts, XbrlDockPocCo
 			str = XbrlDockUtils.simpleGet(data, XDC_FACT_TOKEN_unit);
 
 			if (!XbrlDockUtils.isEmpty(str)) {
-				Map<String, Object> unit = unitDef.get(str);
+				Map<String, Object> unit = unitDef.getOrDefault(str, Collections.EMPTY_MAP);
 				data.putAll(unit);
 			}
 
@@ -235,7 +239,8 @@ public class XbrlDockReportLoader implements XbrlDockReportConsts, XbrlDockPocCo
 					
 					switch ((String) fact.get(XDC_FACT_TOKEN_xbrldockFactType) ) {
 					case XDC_FACT_VALTYPE_number:
-						BigDecimal bd = new BigDecimal((String) fact.get(XDC_EXT_TOKEN_value));
+						String sv = (String) fact.get(XDC_EXT_TOKEN_value);
+						BigDecimal bd = XbrlDockUtils.isEmpty(sv) ? BigDecimal.ZERO : new BigDecimal(sv);
 						fact.put(XDC_EXT_TOKEN_value, bd);
 						break;
 					}

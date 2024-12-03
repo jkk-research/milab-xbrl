@@ -28,7 +28,8 @@
           "javaClass" : "com.xbrldock.poc.conn.concordance.XbrlDockConnConcordance",
           "store" : "esefConn",
           "requires" : [ "http://www.xbrlsite.com/2018/Protototype/fac/ifrs/" ],
-          "loadRules" : "work/input/connectors/fac/ImputeRules.txt"
+          "loadRules" : "work/input/connectors/fac/ImputeRules.txt",
+					"dirStore" : "work/knowledge/connectors/fac"
         },
         "dirStore" : "work/knowledge/connectors/fac"
       },

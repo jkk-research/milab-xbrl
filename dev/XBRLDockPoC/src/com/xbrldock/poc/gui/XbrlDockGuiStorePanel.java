@@ -103,7 +103,7 @@ public class XbrlDockGuiStorePanel extends JPanel implements XbrlDockGuiConsts, 
 				break;
 			default:
 				if (cmds.contains(cmd)) {
-					XbrlDock.callAgentNoEx(store, cmd);
+					XbrlDock.callAgentNoEx(store, cmd, repFilterTA.getText());
 				} else {
 					XbrlDockException.wrap(null, "Unknown command", cmd);
 				}

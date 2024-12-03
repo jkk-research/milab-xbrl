@@ -95,6 +95,7 @@ public interface XbrlDockConsts {
 	String XDC_GEN_TOKEN_placeholder = "placeholder";
 	String XDC_GEN_TOKEN_childPanels = "childPanels";
 	String XDC_GEN_TOKEN_description = "description";
+	String XDC_GEN_TOKEN_comment = "comment";
 	String XDC_GEN_TOKEN_store = "store";
 
 	String XDC_UTILS_MVEL_mvelObj = "xdc_mvelObj";
@@ -172,7 +173,7 @@ public interface XbrlDockConsts {
 			XDC_FACT_TOKEN_format, XDC_FACT_TOKEN_decimals, XDC_FACT_TOKEN_scale, XDC_FACT_TOKEN_sign,
 			XDC_FACT_TOKEN_language, 
 			
-			XDC_FACT_TOKEN_xbrldockFactType, XDC_FACT_TOKEN_xbrldockOrigValue, XDC_FACT_TOKEN_xbrldockParseError
+			XDC_FACT_TOKEN_xbrldockFactType, XDC_FACT_TOKEN_xbrldockOrigValue, XDC_FACT_TOKEN_xbrldockParseError, XDC_GEN_TOKEN_comment
 	};
 	Object[] FACT_TEXT_FIELDS = {
 			XDC_FACT_TOKEN_entity, XDC_FACT_TOKEN_context, XDC_FACT_TOKEN_concept, XDC_EXT_TOKEN_value, 
@@ -180,7 +181,7 @@ public interface XbrlDockConsts {
 			XDC_FACT_TOKEN_instant, XDC_EXT_TOKEN_startDate, XDC_EXT_TOKEN_endDate, XDC_FACT_TOKEN_dimensions,
 			XDC_FACT_TOKEN_language, 
 			
-			XDC_FACT_TOKEN_xbrldockFactType, XDC_FACT_TOKEN_xbrldockOrigValue, XDC_FACT_TOKEN_xbrldockParseError
+			XDC_FACT_TOKEN_xbrldockFactType, XDC_FACT_TOKEN_xbrldockOrigValue, XDC_FACT_TOKEN_xbrldockParseError, XDC_GEN_TOKEN_comment
 	};
 //@formatter:on 
 
