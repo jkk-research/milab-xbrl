@@ -177,7 +177,7 @@ public class XbrlDockFormatAgentXmlWriter implements XbrlDockFormatConsts, XbrlD
 			}
 
 			sVal = (String) data.get(XDC_FACT_TOKEN_concept);
-			e = XbrlDockUtilsXml.createElement(xmlDoc, nsXbrli, sVal, null, segId);
+			e = XbrlDockUtilsXml.createElement(xmlDoc, null, sVal, null, segId);
 
 			XbrlDockUtilsXml.optSet(e, null, XDC_FMTXML_TOKEN_contextRef, data.get(XDC_FACT_TOKEN_context));
 

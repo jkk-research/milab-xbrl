@@ -2,9 +2,7 @@ package com.xbrldock.poc.conn.concordance;
 
 import java.io.BufferedReader;
 import java.io.File;
-import java.io.FileNotFoundException;
 import java.io.FileReader;
-import java.io.IOException;
 import java.math.BigDecimal;
 import java.util.AbstractMap;
 import java.util.ArrayList;
@@ -25,10 +23,17 @@ import com.xbrldock.poc.report.XbrlDockReportExprEval;
 import com.xbrldock.poc.report.XbrlDockReportLoader;
 import com.xbrldock.utils.XbrlDockUtils;
 import com.xbrldock.utils.XbrlDockUtilsFile;
+import com.xbrldock.utils.XbrlDockUtilsJson;
 import com.xbrldock.utils.XbrlDockUtilsMvel;
 
 @SuppressWarnings({ "rawtypes", "unchecked" })
 public class XbrlDockConnConcordance implements XbrlDockConnConcordanceConsts, XbrlDockPocRefactorUtils, XbrlDockConsts.GenAgent {
+
+	private static final String IMPUTE_END_IF = "End If";
+
+	private static final String IMPUTE_IF = "If ";
+
+	private static final String IMPUTE_THEN = " Then ";
 
 	Pattern ptVerifyRule = Pattern.compile("[A-Z]+\\d+");
 
@@ -58,12 +63,13 @@ public class XbrlDockConnConcordance implements XbrlDockConnConcordanceConsts, X
 				Map fact = (Map) params[0];
 				String concept = (String) fact.get(XDC_FACT_TOKEN_concept);
 
-				concept = concept.replaceFirst(":", "_");
+//				concept = concept.replaceFirst(":", "_");
 
 				Map m = conceptMapping.get(concept);
 
 				if (null != m) {
 					String targetConcept = XbrlDockUtils.getPostfix((String) m.get("xlink:from"), "#");
+					targetConcept = targetConcept.replaceFirst("_", ":");
 					Map<String, Object> target = ctxFacts.get(targetConcept);
 					String strOrder = (String) m.get(XDC_EXT_TOKEN_order);
 					BigDecimal order = XbrlDockUtils.isEmpty(strOrder) ? null : new BigDecimal(strOrder);
@@ -74,13 +80,14 @@ public class XbrlDockConnConcordance implements XbrlDockConnConcordanceConsts, X
 						target.put(XDC_FACT_TOKEN_concept, targetConcept);
 					} else {
 						BigDecimal oo = (BigDecimal) target.get(XDC_EXT_TOKEN_order);
-						
-						if ( 0 <= oo.compareTo(order) ) {
+
+						if (0 >= oo.compareTo(order)) {
 							break;
 						}
 						target.put(XDC_EXT_TOKEN_value, fact.get(XDC_EXT_TOKEN_value));
-						
-						XbrlDock.log(EventLevel.Trace, target.get(XDC_FACT_TOKEN_context), "Override", targetConcept, XbrlDockUtils.getPostfix((String)target.get(XDC_GEN_TOKEN_comment), " "), "with", concept);
+
+//						XbrlDock.log(EventLevel.Trace, target.get(XDC_FACT_TOKEN_context), "Override", targetConcept,
+//								XbrlDockUtils.getPostfix((String) target.get(XDC_GEN_TOKEN_comment), " "), "with", concept);
 					}
 
 					target.put(XDC_GEN_TOKEN_comment, "Direct mapping from " + concept);
@@ -89,10 +96,9 @@ public class XbrlDockConnConcordance implements XbrlDockConnConcordanceConsts, X
 			case XDC_CMD_GEN_End:
 
 				if (!ctxFacts.isEmpty()) {
-					final StringBuilder ruleName = new StringBuilder();
+					final Map<String, Object> lastGet = new HashMap<>();
 
 					Map<String, Object> val = new AbstractMap<String, Object>() {
-						Map<String, Object> lastGet;
 
 						@Override
 						public boolean containsKey(Object key) {
@@ -103,11 +109,12 @@ public class XbrlDockConnConcordance implements XbrlDockConnConcordanceConsts, X
 						public Object get(Object key) {
 							Map<String, Object> ret = ctxFacts.get(key);
 							if (null == ret) {
-								ret = ctxFacts.get("fac_" + key);
+								ret = ctxFacts.get("fac:" + key);
 							}
 
 							if (null != ret) {
-								lastGet = ret;
+								lastGet.clear();
+								lastGet.putAll(ret);
 								return ret.getOrDefault(XDC_EXT_TOKEN_value, 0L);
 							}
 
@@ -116,22 +123,7 @@ public class XbrlDockConnConcordance implements XbrlDockConnConcordanceConsts, X
 
 						@Override
 						public Object put(String key, Object value) {
-							if (!key.startsWith("fac_")) {
-								if (!ptVerifyRule.matcher(key).matches()) {
-									key = "fac_" + key;
-								}
-							}
-
-							Map<String, Object> target = ctxFacts.get(key);
-							if (null == target) {
-								target = new TreeMap((null == lastGet) ? ctxInfo : lastGet);
-								target.put(XDC_FACT_TOKEN_concept, key);
-								ctxFacts.put(key, target);
-							}
-
-							target.put(XDC_GEN_TOKEN_comment, "Applied rule: " + ruleName.toString());
-
-							return target.put(XDC_EXT_TOKEN_value, value);
+							return XbrlDockException.wrap(null, "Expression should not have side effect on data here", key, value);
 						}
 
 						@Override
@@ -141,21 +133,29 @@ public class XbrlDockConnConcordance implements XbrlDockConnConcordanceConsts, X
 					};
 
 					for (Map<String, Object> r : ruleArr) {
+						String key = (String) r.get(XDC_FACT_TOKEN_concept);
 						String rn = (String) r.get(XDC_EXT_TOKEN_name);
 
-						if (!XbrlDockUtils.isEmpty(rn) && rn.contains("VERIFICATION")) {
-//							continue;
+						Object mo = r.get(XDC_UTILS_MVEL_mvelCompCond);
+						if ((null != mo) && !(boolean) XbrlDockUtilsMvel.evalCompiled(mo, val)) {
+							continue;
 						}
 
-						ruleName.replace(0, ruleName.length(), rn);
-						String expr = (String) r.get(XDC_EXT_TOKEN_value);
-						Object mvelObj = XbrlDockUtilsMvel.compile(expr);
-						r.put(XDC_UTILS_MVEL_mvelObj, mvelObj);
+						mo = r.get(XDC_UTILS_MVEL_mvelCompObj);
+						lastGet.clear();
+						Object value = XbrlDockUtilsMvel.evalCompiled(mo, val);
 
-						XbrlDockUtilsMvel.evalCompiled(mvelObj, val);
+						Map<String, Object> target = ctxFacts.get(key);
+						if (null == target) {
+							target = new TreeMap(lastGet.isEmpty() ? ctxInfo : lastGet);
+							target.put(XDC_FACT_TOKEN_concept, key);
+							ctxFacts.put(key, target);
+						}
+
+						target.put(XDC_EXT_TOKEN_value, value);
+						target.put(XDC_GEN_TOKEN_comment, "Applied rule: " + rn);
+
 					}
-
-//					XbrlDock.log(EventLevel.Info, "Context facts", ctxFacts);
 
 					loader.processSegment(XDC_REP_SEG_Context, ctxInfo);
 
@@ -197,7 +197,7 @@ public class XbrlDockConnConcordance implements XbrlDockConnConcordanceConsts, X
 
 		if (!XbrlDockUtils.isEmpty(ruleFileName)) {
 			readRuleFile(ruleFileName);
-			testRules();
+			compileRules();
 		}
 
 		Collection<String> taxIds = XbrlDockUtils.simpleGet(config, XDC_GEN_TOKEN_requires);
@@ -207,13 +207,13 @@ public class XbrlDockConnConcordance implements XbrlDockConnConcordanceConsts, X
 			}
 		}
 
-		dumpConcordanceSettings();
-
 		dirStore = XbrlDockUtilsFile.ensureDir((String) XbrlDockUtils.simpleGet(config, XDC_CFGTOKEN_dirStore));
 		loader = new XbrlDockReportLoader(dirStore);
+
+		dumpConcordanceSettings();
 	}
 
-	public void dumpConcordanceSettings() {
+	public void dumpConcordanceSettings() throws Exception {
 		for (Map<String, Object> r : ruleArr) {
 			System.out.println(r.get(XDC_EXT_TOKEN_name) + "\t" + r.get(XDC_EXT_TOKEN_value));
 		}
@@ -221,10 +221,40 @@ public class XbrlDockConnConcordance implements XbrlDockConnConcordanceConsts, X
 		System.out.println("-------");
 
 		for (Map.Entry<String, Map> me : conceptMapping.entrySet()) {
-			System.out.println(me.getKey() + "\t" + me.getValue());
+			Map m = me.getValue();
+			String line = XbrlDockUtils
+					.sbAppend(null, "\t", true, me.getKey(), XbrlDockUtils.getPostfix((String) m.get("xlink:from"), "#"), m.get(XDC_EXT_TOKEN_order)).toString();
+			System.out.println(line);
 		}
 
 		System.out.println("-------");
+
+		saveConcordanceSettings();
+	}
+
+	public void saveConcordanceSettings() throws Exception {
+
+		Map conCfg = new TreeMap();
+
+		ArrayList expRules = XbrlDockUtils.safeGet(conCfg, XDC_CONN_CONCORDANCE_CFG_expressions, ARRAY_CREATOR);
+		for (Map<String, Object> r : ruleArr) {
+			Map rm = new TreeMap(r);
+			rm.remove(XDC_UTILS_MVEL_mvelCompObj);
+			rm.remove(XDC_UTILS_MVEL_mvelCompCond);
+			expRules.add(rm);
+		}
+
+		Map mapExp = XbrlDockUtils.safeGet(conCfg, XDC_CONN_CONCORDANCE_CFG_mappings, SORTEDMAP_CREATOR);
+		mapExp = XbrlDockUtils.safeGet(mapExp, "ESEF", SORTEDMAP_CREATOR);
+		for (Map.Entry<String, Map> me : conceptMapping.entrySet()) {
+			Map m = me.getValue();
+			String from = XbrlDockUtils.getPostfix((String) m.get("xlink:from"), "#");
+			from = from.replaceFirst("_", ":");
+			XbrlDockUtils.safeGet(mapExp, from, ARRAY_CREATOR).add(me.getKey());
+		}
+
+		XbrlDockUtilsJson.writeJson(new File(dirStore, "concordance.json"), conCfg);
+
 	}
 
 	public void readConceptMapping(String tid) throws Exception {
@@ -240,6 +270,7 @@ public class XbrlDockConnConcordance implements XbrlDockConnConcordanceConsts, X
 
 					if ("class-equivalentClass".equals(re.get("xlink:arcrole"))) {
 						String to = XbrlDockUtils.getPostfix((String) re.get("xlink:to"), "#");
+						to = to.replaceFirst("_", ":");
 						conceptMapping.put(to, re);
 					}
 
@@ -254,9 +285,10 @@ public class XbrlDockConnConcordance implements XbrlDockConnConcordanceConsts, X
 		});
 
 		XbrlDock.log(EventLevel.Info, "Concept mapping", conceptMapping);
+
 	}
 
-	public void readRuleFile(String ruleFileName) throws IOException, FileNotFoundException {
+	public void readRuleFile(String ruleFileName) throws Exception {
 		try (FileReader fr = new FileReader(ruleFileName); BufferedReader br = new BufferedReader(fr)) {
 			String lastComment = null;
 			StringBuilder sbExpr = null;
@@ -271,37 +303,39 @@ public class XbrlDockConnConcordance implements XbrlDockConnConcordanceConsts, X
 							lastComment = c;
 						}
 					} else {
+						String cond = null;
+
 						if (null != sbExpr) {
 							sbExpr = XbrlDockUtils.sbAppend(sbExpr, " ", false, line);
-							if (line.endsWith("End If")) {
+
+							if (line.endsWith(IMPUTE_END_IF)) {
 								line = sbExpr.toString();
 
-								int csep = line.indexOf(" Then ");
+								int csep = line.indexOf(IMPUTE_THEN);
 
-								String cond = line.substring(0, csep);
+								cond = line.substring(0, csep);
 
-								cond = cond.replaceAll("If ", "if ((");
+								cond = cond.replaceAll(IMPUTE_IF, "(");
 								cond = cond.replaceAll("=", "==");
 								cond = cond.replaceAll("<>", "!=");
 								cond = cond.replaceAll(" and ", ") && (");
 								cond = cond.replaceAll(" or ", ") || (");
+								cond = cond + ")";
 
-								line = cond + line.substring(csep);
+								line = line.substring(csep + IMPUTE_THEN.length());
 
-								line = line.replaceAll(" Then", ")) { ");
-								line = line.replaceAll("End If", "; }");
+								line = line.replaceAll(IMPUTE_END_IF, "");
 
 								sbExpr = null;
 							} else {
 								continue;
 							}
-						} else if (line.startsWith("If ")) {
+						} else if (line.startsWith(IMPUTE_IF)) {
 							sbExpr = new StringBuilder(line);
 							continue;
 						}
 
 						Map<String, Object> rule = new TreeMap<>();
-						rule.put(XDC_EXT_TOKEN_value, line);
 
 						int sep = lastComment.indexOf(':');
 						if (-1 == sep) {
@@ -311,6 +345,19 @@ public class XbrlDockConnConcordance implements XbrlDockConnConcordanceConsts, X
 							rule.put(XDC_GEN_TOKEN_description, lastComment.substring(sep + 1));
 						}
 
+						sep = line.indexOf("=");
+
+						String target = line.substring(0, sep).trim();
+						rule.put(XDC_FACT_TOKEN_concept, "fac:" + target);
+
+						line = line.substring(sep + 1).trim();
+						rule.put(XDC_UTILS_MVEL_mvelText, line);
+
+						if (null != cond) {
+							rule.put(XDC_UTILS_MVEL_mvelCondition, cond);
+							cond = null;
+						}
+
 						ruleArr.add(rule);
 					}
 				}
@@ -318,47 +365,19 @@ public class XbrlDockConnConcordance implements XbrlDockConnConcordanceConsts, X
 		}
 	}
 
-	public void testRules() {
-		Map<String, Object> chg = new HashMap<String, Object>();
-
-		Map<String, Object> val = new HashMap<String, Object>() {
-			private static final long serialVersionUID = 1L;
-
-			@Override
-			public boolean containsKey(Object key) {
-				return true;
-			}
-
-			@Override
-			public Object get(Object key) {
-				// TODO Auto-generated method stub
-				return getOrDefault(key, 0L);
-			}
-
-			@Override
-			public Object put(String key, Object value) {
-				chg.put(key, value);
-				return super.put(key, value);
-			}
-		};
-
-		val.put("CurrentAssetsExcludingHeldForSale", 10L);
-		val.put("AssetsHeldForSale", 10L);
+	public void compileRules() {
+		String str;
 
 		for (Map<String, Object> r : ruleArr) {
-			chg.clear();
+			str = (String) r.get(XDC_UTILS_MVEL_mvelText);
+			r.put(XDC_UTILS_MVEL_mvelCompObj, XbrlDockUtilsMvel.compile(str));
 
-			String expr = (String) r.get(XDC_EXT_TOKEN_value);
-			Object mvelObj = XbrlDockUtilsMvel.compile(expr);
-			r.put(XDC_UTILS_MVEL_mvelObj, mvelObj);
-
-			XbrlDockUtilsMvel.evalCompiled(mvelObj, val);
-
-			XbrlDock.log(EventLevel.Info, r.get(XDC_EXT_TOKEN_name), expr);
-			if (!chg.isEmpty()) {
-				XbrlDock.log(EventLevel.Info, "Updated", chg);
+			str = (String) r.get(XDC_UTILS_MVEL_mvelCondition);
+			if (null != str) {
+				r.put(XDC_UTILS_MVEL_mvelCompCond, XbrlDockUtilsMvel.compile(str));
 			}
 		}
+
 	}
 
 	@Override
@@ -376,7 +395,7 @@ public class XbrlDockConnConcordance implements XbrlDockConnConcordanceConsts, X
 			String strFilter = ((params.length > 0) && (params[0] instanceof String)) ? (String) params[0] : null;
 
 			Object filter = (null == strFilter) ? null : XbrlDockUtilsMvel.compile(strFilter);
-			
+
 			loader.flat = (null != filter);
 
 			XbrlDockDevMonitor mon = new XbrlDockDevMonitor("Concordance", 100);
@@ -393,7 +412,7 @@ public class XbrlDockConnConcordance implements XbrlDockConnConcordanceConsts, X
 //				break;
 			}
 			XbrlDock.log(EventLevel.Info, mon);
-			
+
 			break;
 
 		default:
