@@ -48,6 +48,13 @@ public interface XbrlDockPocConsts extends XbrlDockConsts, XbrlDockUtilsConsts {
 	String XDC_METATOKEN_url = "xdc_url";
 	String XDC_METATOKEN_tagName = "xdc_tagName";
 	
+	String XDC_METATOKEN_formula = "formula";
+	
+	String XDC_FORMULA_expressions = "expressions";
+	String XDC_FORMULA_assertions = "assertions";
+	String XDC_FORMULA_formula = "formula";
+	String XDC_FORMULA_condition= "condition";
+
 
 	String XDC_CFGTOKEN_dirStore = "dirStore";
 	String XDC_CFGTOKEN_dirInput = "dirInput";

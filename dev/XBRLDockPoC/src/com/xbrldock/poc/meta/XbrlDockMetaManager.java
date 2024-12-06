@@ -211,7 +211,7 @@ public class XbrlDockMetaManager implements XbrlDockMetaConsts, XbrlDockConsts.G
 				try (InputStream is = XbrlDockUtilsNet.resolveEntityStream(url)) {
 					Element eDoc = XbrlDockUtilsXml.parseDoc(is).getDocumentElement();
 
-					XbrlDock.log(EventLevel.Trace, "loading", url);
+					XbrlDock.log(EventLevel.Trace, "loading ", url);
 
 					XbrlDockMetaContainer mcData = null;
 
@@ -388,6 +388,15 @@ public class XbrlDockMetaManager implements XbrlDockMetaConsts, XbrlDockConsts.G
 		}
 	}
 
+	private Map addFormulaOb(XbrlDockMetaContainer mcData, String type) throws Exception {
+		Map formula = XbrlDockUtils.safeGet(mcData.metaInfo, XDC_METATOKEN_formula, SORTEDMAP_CREATOR);
+		ArrayList fa = XbrlDockUtils.safeGet(formula, type, ARRAY_CREATOR);
+		Map fOb = new TreeMap();
+		fa.add(fOb);
+
+		return fOb;
+	}
+
 	private void readLinkbase(Element eDoc, XbrlDockMetaContainer mcData) throws Exception {
 
 		NodeList nl;
@@ -400,6 +409,8 @@ public class XbrlDockMetaManager implements XbrlDockMetaConsts, XbrlDockConsts.G
 		List<Map<String, String>> arcs = new ArrayList<>();
 
 		String url = mcData.getCurrentUrl();
+		
+		Map formOb = null;
 
 		for (int idx = 0; idx < nc; ++idx) {
 			Element e = (Element) nl.item(idx);
@@ -434,6 +445,26 @@ public class XbrlDockMetaManager implements XbrlDockMetaConsts, XbrlDockConsts.G
 					int refIdx = mcData.storeDocumentRef(rm);
 					content.put(roleID + XDC_SEP_ID + label, refIdx);
 					storeInContent = false;
+					break;
+				case "valueAssertion":
+					
+					Map fOb = addFormulaOb(mcData, XDC_FORMULA_assertions);
+					fOb.put(XDC_EXT_TOKEN_id, e.getAttribute("id"));
+					fOb.put(XDC_FORMULA_formula, e.getAttribute("test"));
+					
+					break;
+				case "formula":
+					formOb = addFormulaOb(mcData, XDC_FORMULA_expressions);
+					formOb.put(XDC_EXT_TOKEN_id, e.getAttribute("id"));
+					formOb.put(XDC_FACT_TOKEN_concept, XbrlDockUtilsXml.getInfo(e, "formula", "qname"));
+					formOb.put(XDC_FORMULA_formula, e.getAttribute("value"));
+
+//					XbrlDock.log(EventLevel.Trace, "Calculation", e.getAttribute("id"), XbrlDockUtilsXml.getInfo(e, "formula", "qname"), e.getAttribute("value"));
+					break;
+				case "precondition":
+					formOb.put(XDC_FORMULA_condition, e.getAttribute("test"));
+					formOb = null;
+//					XbrlDock.log(EventLevel.Trace, "Precondition", e.getAttribute("test"));
 					break;
 				default:
 					String iid = e.getAttribute("id");

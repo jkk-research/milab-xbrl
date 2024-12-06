@@ -236,7 +236,7 @@ public class XbrlDockConnConcordance implements XbrlDockConnConcordanceConsts, X
 
 		Map conCfg = new TreeMap();
 
-		ArrayList expRules = XbrlDockUtils.safeGet(conCfg, XDC_CONN_CONCORDANCE_CFG_expressions, ARRAY_CREATOR);
+		ArrayList expRules = XbrlDockUtils.safeGet(conCfg, XDC_FORMULA_expressions, ARRAY_CREATOR);
 		for (Map<String, Object> r : ruleArr) {
 			Map rm = new TreeMap(r);
 			rm.remove(XDC_UTILS_MVEL_mvelCompObj);
@@ -245,12 +245,15 @@ public class XbrlDockConnConcordance implements XbrlDockConnConcordanceConsts, X
 		}
 
 		Map mapExp = XbrlDockUtils.safeGet(conCfg, XDC_CONN_CONCORDANCE_CFG_mappings, SORTEDMAP_CREATOR);
-		mapExp = XbrlDockUtils.safeGet(mapExp, "ESEF", SORTEDMAP_CREATOR);
 		for (Map.Entry<String, Map> me : conceptMapping.entrySet()) {
 			Map m = me.getValue();
 			String from = XbrlDockUtils.getPostfix((String) m.get("xlink:from"), "#");
 			from = from.replaceFirst("_", ":");
-			XbrlDockUtils.safeGet(mapExp, from, ARRAY_CREATOR).add(me.getKey());
+			
+			String k = me.getKey();
+			int s = k.indexOf(":");
+			Map mm = XbrlDockUtils.safeGet(mapExp, k.substring(0, s), SORTEDMAP_CREATOR);
+			XbrlDockUtils.safeGet(mm, from, ARRAY_CREATOR).add(k);
 		}
 
 		XbrlDockUtilsJson.writeJson(new File(dirStore, "concordance.json"), conCfg);
@@ -394,7 +397,7 @@ public class XbrlDockConnConcordance implements XbrlDockConnConcordanceConsts, X
 
 			String strFilter = ((params.length > 0) && (params[0] instanceof String)) ? (String) params[0] : null;
 
-			Object filter = (null == strFilter) ? null : XbrlDockUtilsMvel.compile(strFilter);
+			Object filter = XbrlDockUtils.isEmpty(strFilter) ? null : XbrlDockUtilsMvel.compile(strFilter);
 
 			loader.flat = (null != filter);
 
