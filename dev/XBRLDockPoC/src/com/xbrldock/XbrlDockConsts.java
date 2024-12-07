@@ -101,7 +101,8 @@ public interface XbrlDockConsts {
 	String XDC_UTILS_MVEL_mvelCondition = "xdc_mvelCondition";
 	String XDC_UTILS_MVEL_mvelText = "xdc_mvelText";
 	String XDC_UTILS_MVEL_mvelType = "xdc_mvelType";
-	String XDC_UTILS_MVEL_mvelTypeExpression = "Expression";
+	String XDC_UTILS_MVEL_mvelTypeValidation = "Validation";
+	String XDC_UTILS_MVEL_mvelTypeCalculation = "Calculation";
 	String XDC_UTILS_MVEL_mvelTypeScript = "Script";
 	String XDC_UTILS_MVEL_mvelTypeTemplate = "Template";
 	String XDC_UTILS_MVEL_mvelCompObj = "xdc_mvelCompObj";

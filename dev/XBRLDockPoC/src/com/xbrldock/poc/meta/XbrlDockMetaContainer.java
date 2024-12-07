@@ -416,22 +416,23 @@ public class XbrlDockMetaContainer implements XbrlDockMetaConsts {
 				String id = getId();
 				File fDir = new File(metaManager.metaStoreRoot, id);
 				File fRes = new File(fDir, XDC_TAXONOMYRES_FNAME_PREFIX + key + XDC_FEXT_JSON);
-				
-				Map m =  Collections.EMPTY_MAP;
-				
-				if ( fRes.isFile()) {
+
+				Map m = Collections.EMPTY_MAP;
+
+				if (fRes.isFile()) {
 					try {
-						m =  XbrlDockUtilsJson.readJson(fRes);
+						m = XbrlDockUtilsJson.readJson(fRes);
 					} catch (Exception e) {
 					}
 				}
-				
+
 				return m;
 			}
 		});
-		
-		String id = XbrlDockUtils.sbAppend(null, "#", false, XbrlDockUtils.getPostfix((String) item.get(XDC_METATOKEN_url), XDC_URL_PSEP), item.get(XDC_EXT_TOKEN_id)).toString();
-		
+
+		String id = XbrlDockUtils
+				.sbAppend(null, "#", false, XbrlDockUtils.getPostfix((String) item.get(XDC_METATOKEN_url), XDC_URL_PSEP), item.get(XDC_EXT_TOKEN_id)).toString();
+
 		return (Map<String, String>) res.getOrDefault(id, Collections.EMPTY_MAP);
 	}
 
@@ -594,5 +595,60 @@ public class XbrlDockMetaContainer implements XbrlDockMetaConsts {
 			XbrlDockException.wrap(e, "MetaContainer visit processor exception", getId(), itemType, params);
 		}
 
+	}
+
+	public void optConvertRules(ArrayList<Map<String, Object>> ruleArr) {
+
+		Map formula = (Map) metaInfo.get(XDC_METATOKEN_formula);
+
+		if (null != formula) {
+			ArrayList<Map<String, Object>> fArr = new ArrayList<>(((Collection<Map>) formula.getOrDefault(XDC_FORMULA_assertions, Collections.EMPTY_LIST)));
+			fArr.addAll(((Collection<Map<String, Object>>) formula.getOrDefault(XDC_FORMULA_expressions, Collections.EMPTY_LIST)));
+
+			for (Map fObj : fArr) {
+				String str;
+
+				str = (String) fObj.get(XDC_FORMULA_formula);
+				boolean validation = XbrlDockUtils.isEmpty(str);
+				if (!validation) {
+					str = str.replaceAll("\\$", "");
+					str = str.replaceAll(" div ", " / ");
+					fObj.put(XDC_UTILS_MVEL_mvelText, str);
+					
+					XbrlDock.log(EventLevel.Trace, "Expression", str);
+				}
+
+				str = (String) fObj.get(XDC_FORMULA_condition);
+				if (!XbrlDockUtils.isEmpty(str)) {
+					str = str.replace("$", "");
+					str = str.replace("=", "==");
+					str = str.replaceAll("<\\s*>", "!=");
+					str = str.replace(" and ", " && ");
+					str = str.replace(" or ", " || ");
+					
+					if ( str.contains("\"null\"")) {
+						str = str.replaceAll("\\(\\s*(\\w+)\\s+eq\\s+\"null\"\\s*\\)", "!exists\\($1\\)");
+					}
+
+					if ( str.contains("exists(")) {
+						str = str.replaceAll("exists\\s*\\(\\s*(\\w+)\\s*\\)", "xdgen.exists\\(\"$1\"\\)");
+					}
+
+					fObj.put(validation ? XDC_UTILS_MVEL_mvelText : XDC_UTILS_MVEL_mvelCondition, str);
+					
+					XbrlDock.log(EventLevel.Trace, "Condition", str);
+				}
+
+				fObj.put(XDC_UTILS_MVEL_mvelType, validation ? XDC_UTILS_MVEL_mvelTypeValidation : XDC_UTILS_MVEL_mvelTypeCalculation);
+
+
+				str = (String) fObj.get(XDC_FACT_TOKEN_concept);
+				if (XbrlDockUtils.isEmpty(str)) {
+					fObj.put(XDC_FACT_TOKEN_concept, fObj.get(XDC_EXT_TOKEN_id));
+				}
+			}
+			ruleArr.addAll(fArr);
+			
+		}
 	}
 }

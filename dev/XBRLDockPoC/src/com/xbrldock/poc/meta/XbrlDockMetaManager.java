@@ -388,10 +388,12 @@ public class XbrlDockMetaManager implements XbrlDockMetaConsts, XbrlDockConsts.G
 		}
 	}
 
-	private Map addFormulaOb(XbrlDockMetaContainer mcData, String type) throws Exception {
+	private Map addFormulaOb(XbrlDockMetaContainer mcData, String type, Element e) throws Exception {
 		Map formula = XbrlDockUtils.safeGet(mcData.metaInfo, XDC_METATOKEN_formula, SORTEDMAP_CREATOR);
 		ArrayList fa = XbrlDockUtils.safeGet(formula, type, ARRAY_CREATOR);
 		Map fOb = new TreeMap();
+		fOb.put(XDC_EXT_TOKEN_id, e.getAttribute("id"));
+		
 		fa.add(fOb);
 
 		return fOb;
@@ -448,14 +450,12 @@ public class XbrlDockMetaManager implements XbrlDockMetaConsts, XbrlDockConsts.G
 					break;
 				case "valueAssertion":
 					
-					Map fOb = addFormulaOb(mcData, XDC_FORMULA_assertions);
-					fOb.put(XDC_EXT_TOKEN_id, e.getAttribute("id"));
-					fOb.put(XDC_FORMULA_formula, e.getAttribute("test"));
+					Map fOb = addFormulaOb(mcData, XDC_FORMULA_assertions, e);
+					fOb.put(XDC_FORMULA_condition, e.getAttribute("test"));
 					
 					break;
 				case "formula":
-					formOb = addFormulaOb(mcData, XDC_FORMULA_expressions);
-					formOb.put(XDC_EXT_TOKEN_id, e.getAttribute("id"));
+					formOb = addFormulaOb(mcData, XDC_FORMULA_expressions, e);
 					formOb.put(XDC_FACT_TOKEN_concept, XbrlDockUtilsXml.getInfo(e, "formula", "qname"));
 					formOb.put(XDC_FORMULA_formula, e.getAttribute("value"));
 

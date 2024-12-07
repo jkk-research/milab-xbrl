@@ -1,3 +1,29 @@
+
+
+*** 2024-12-07 ***
+
+fac-Rule-KeyRatios-Code-KR_SGR-formula.xml	missing )))))) added
+fac-Rule-Derivation-Code-CF-Impute-11-formula.xml	value setting part deleted
+fac-Rule-Derivation-Code-BS-Impute-09-formula.xml	value setting part deleted
+
+2024-12-07T10_37_07 Error DERIVE_KR_SGR, [Error: unbalanced braces in expression: (6):]
+[Near : {... uity) / Equity))) / ((1 / (Revenues / Assets)) - ( ....}]
+2024-12-07T10_37_07 Error DERIVE_CF_Impute_11, [Error: [Error: was expecting type: java.lang.Boolean; but found type: java.lang.Integer]
+[Near : {... tiesContinuing) && (NetCashFlowContinuing - (NetCa ....}]
+2024-12-07T10_37_07 Error DERIVE_CF_Impute_12, [Error: [Error: was expecting type: java.lang.Boolean; but found type: java.lang.Integer]
+[Near : {... tiesContinuing) && (NetCashFlowContinuing - (NetCa ....}]
+2024-12-07T10_37_07 Error DERIVE_CF_Impute_13, [Error: [Error: was expecting type: java.lang.Boolean; but found type: java.lang.Integer]
+[Near : {... tingActivities) && (NetCashFlow - (NetCashFlowFrom ....}]
+2024-12-07T10_37_07 Error DERIVE_CF_Impute_13B, [Error: [Error: was expecting type: java.lang.Boolean; but found type: java.lang.Integer]
+[Near : {... cingActivities) && (NetCashFlow - (NetCashFlowFrom ....}]
+2024-12-07T10_37_07 Error DERIVE_CF_Impute_14, [Error: [Error: was expecting type: java.lang.Boolean; but found type: java.lang.Integer]
+[Near : {... tingActivities) && (NetCashFlow - (NetCashFlowFrom ....}]
+2024-12-07T10_37_07 Error DERIVE_CF_Impute_14B, [Error: [Error: was expecting type: java.lang.Boolean; but found type: java.lang.Integer]
+[Near : {... tingActivities) && (NetCashFlow - (NetCashFlowFrom ....}]
+
+*** 20241116 ***
+
+
 "HU".equals(sourceAtts.country)
 
 *** 20241106 ***
