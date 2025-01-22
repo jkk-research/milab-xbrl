@@ -1,4 +1,16 @@
 
+*** 2024-12-18 ***
+
+importing esma_taxonomy_set_prototype_2024-12-31
+
+2024-12-18T08_35_51 Info Downloading url, https://xbrl.efrag.org/taxonomy/esrs/2023-12-22/common/esrs_cor.xsd, to file, /Volumes/Giskard_ext/work/XBRL/XBRLDock/work/urlcache/xbrl.efrag.org/taxonomy/esrs/2023-12-22/common/esrs_cor.xsd
+2024-12-18T08_37_56 Info Downloading url, https://xbrl.efrag.org/taxonomy/article8/2023-06-27/common/art8_cor.xsd, to file, /Volumes/Giskard_ext/work/XBRL/XBRLDock/work/urlcache/xbrl.efrag.org/taxonomy/article8/2023-06-27/common/art8_cor.xsd
+2024-12-18T08_38_19 Info Downloading url, https://xbrl.ifrs.org/taxonomy/2022-03-24/full_ifrs/labels/in_full_ifrs-en_2022-03-24.xml, to file, /Volumes/Giskard_ext/work/XBRL/XBRLDock/work/urlcache/xbrl.ifrs.org/taxonomy/2022-03-24/full_ifrs/labels/in_full_ifrs-en_2022-03-24.xml
+2024-12-18T08_38_37 Info Downloading url, https://xbrl.ifrs.org/taxonomy/2022-03-24/full_ifrs/labels/lab_full_ifrs-en_2022-03-24.xml, to file, /Volumes/Giskard_ext/work/XBRL/XBRLDock/work/urlcache/xbrl.ifrs.org/taxonomy/2022-03-24/full_ifrs/labels/lab_full_ifrs-en_2022-03-24.xml
+2024-12-18T08_38_43 Info Downloading url, https://xbrl.ifrs.org/taxonomy/2022-03-24/full_ifrs/labels/doc_full_ifrs-en_2022-03-24.xml, to file, /Volumes/Giskard_ext/work/XBRL/XBRLDock/work/urlcache/xbrl.ifrs.org/taxonomy/2022-03-24/full_ifrs/labels/doc_full_ifrs-en_2022-03-24.xml
+2024-12-18T08_38_55 Info Downloading url, https://xbrl.ifrs.org/taxonomy/2022-03-24/full_ifrs/linkbases/ias_1/ref_ias_1_2022-03-24.xml, to file, /Volumes/Giskard_ext/work/XBRL/XBRLDock/work/urlcache/xbrl.ifrs.org/taxonomy/2022-03-24/full_ifrs/linkbases/ias_1/ref_ias_1_2022-03-24.xml
+2024-12-18T08_39_01 Info Downloading url, https://xbrl.ifrs.org/taxonomy/2022-03-24/full_ifrs/linkbases/ias_10/ref_ias_10_2022-03-24.xml, to file, /Volumes/Giskard_ext/work/XBRL/XBRLDock/work/urlcache/xbrl.ifrs.org/taxonomy/2022-03-24/full_ifrs/linkbases/ias_10/ref_ias_10_2022-03-24.xml
+
 
 *** 2024-12-07 ***
 

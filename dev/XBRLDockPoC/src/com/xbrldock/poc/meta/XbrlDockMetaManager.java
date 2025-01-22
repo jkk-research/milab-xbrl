@@ -393,7 +393,7 @@ public class XbrlDockMetaManager implements XbrlDockMetaConsts, XbrlDockConsts.G
 		ArrayList fa = XbrlDockUtils.safeGet(formula, type, ARRAY_CREATOR);
 		Map fOb = new TreeMap();
 		fOb.put(XDC_EXT_TOKEN_id, e.getAttribute("id"));
-		
+
 		fa.add(fOb);
 
 		return fOb;
@@ -411,7 +411,7 @@ public class XbrlDockMetaManager implements XbrlDockMetaConsts, XbrlDockConsts.G
 		List<Map<String, String>> arcs = new ArrayList<>();
 
 		String url = mcData.getCurrentUrl();
-		
+
 		Map formOb = null;
 
 		for (int idx = 0; idx < nc; ++idx) {
@@ -449,10 +449,10 @@ public class XbrlDockMetaManager implements XbrlDockMetaConsts, XbrlDockConsts.G
 					storeInContent = false;
 					break;
 				case "valueAssertion":
-					
+
 					Map fOb = addFormulaOb(mcData, XDC_FORMULA_assertions, e);
 					fOb.put(XDC_FORMULA_condition, e.getAttribute("test"));
-					
+
 					break;
 				case "formula":
 					formOb = addFormulaOb(mcData, XDC_FORMULA_expressions, e);
@@ -462,8 +462,12 @@ public class XbrlDockMetaManager implements XbrlDockMetaConsts, XbrlDockConsts.G
 //					XbrlDock.log(EventLevel.Trace, "Calculation", e.getAttribute("id"), XbrlDockUtilsXml.getInfo(e, "formula", "qname"), e.getAttribute("value"));
 					break;
 				case "precondition":
-					formOb.put(XDC_FORMULA_condition, e.getAttribute("test"));
-					formOb = null;
+					if (null == formOb) {
+						XbrlDock.log(EventLevel.Error, "Precondition without active formula object", e.getAttribute("test"));
+					} else {
+						formOb.put(XDC_FORMULA_condition, e.getAttribute("test"));
+						formOb = null;
+					}
 //					XbrlDock.log(EventLevel.Trace, "Precondition", e.getAttribute("test"));
 					break;
 				default:

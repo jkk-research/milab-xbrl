@@ -44,11 +44,11 @@ public class XbrlDockConnConcordance implements XbrlDockConnConcordanceConsts, X
 
 	File dirStore;
 	XbrlDockReportLoader loader;
-	
+
 	public abstract class ValueMap extends AbstractMap<String, Object> {
 		public abstract boolean exists(Object key);
 	}
-	
+
 	ExprResultProcessor conProc = new ExprResultProcessor() {
 		Map ctxInfo = new TreeMap();
 		Map<String, Map> ctxFacts = new TreeMap();
@@ -102,14 +102,14 @@ public class XbrlDockConnConcordance implements XbrlDockConnConcordanceConsts, X
 
 				if (!ctxFacts.isEmpty()) {
 					final Map<String, Object> lastGet = new HashMap<>();
-					
+
 					MvelUtilsGen ctx = new MvelUtilsGen() {
 						@Override
 						public boolean exists(Object key) {
 							return ctxFacts.containsKey("fac:" + key);
 						}
 					};
-					
+
 					Map<String, Object> val = new ValueMap() {
 						@Override
 						public boolean containsKey(Object key) {
@@ -118,7 +118,7 @@ public class XbrlDockConnConcordance implements XbrlDockConnConcordanceConsts, X
 
 						@Override
 						public Object get(Object key) {
-							if ( "xdgen".equals(key)) {
+							if ("xdgen".equals(key)) {
 								return ctx;
 							}
 							Map<String, Object> ret = ctxFacts.get(key);
@@ -146,20 +146,20 @@ public class XbrlDockConnConcordance implements XbrlDockConnConcordanceConsts, X
 						public Set<Entry<String, Object>> entrySet() {
 							return XbrlDockException.wrap(null, "Should not call this");
 						}
-						
+
 						@Override
 						public boolean exists(Object key) {
 							return ctxFacts.containsKey("fac:" + key);
 						}
 
 					};
-					
+
 					for (Map<String, Object> r : ruleArr) {
 						String key = (String) r.get(XDC_FACT_TOKEN_concept);
 						String rn = (String) r.get(XDC_EXT_TOKEN_id);
 
 						Object mo;
-						
+
 						mo = r.get(XDC_UTILS_MVEL_mvelCompCond);
 						if ((null != mo) && !(boolean) XbrlDockUtilsMvel.evalCompiled(mo, val)) {
 							continue;
@@ -230,7 +230,7 @@ public class XbrlDockConnConcordance implements XbrlDockConnConcordanceConsts, X
 			}
 		}
 		compileRules();
-		
+
 //		int a = ((NetIncomeLoss / Revenues) * (1 + ((Assets - Equity) / Equity))) / ((1 / (Revenues / Assets)) - (((NetIncomeLoss / Revenues) * (1 + (((Assets - Equity)  )))))))
 
 		dirStore = XbrlDockUtilsFile.ensureDir((String) XbrlDockUtils.simpleGet(config, XDC_CFGTOKEN_dirStore));
@@ -297,10 +297,17 @@ public class XbrlDockConnConcordance implements XbrlDockConnConcordanceConsts, X
 				case XDC_CMD_GEN_Process:
 					Map<String, Object> re = (Map<String, Object>) params[0];
 
-					if ("class-equivalentClass".equals(re.get("xlink:arcrole"))) {
-						String to = XbrlDockUtils.getPostfix((String) re.get("xlink:to"), "#");
+					String to;
+					String ar = (String) re.get("xlink:arcrole");
+					switch (ar) {
+					case "class-equivalentClass":
+						to = XbrlDockUtils.getPostfix((String) re.get("xlink:to"), "#");
 						to = to.replaceFirst("_", ":");
 						conceptMapping.put(to, re);
+						break;
+					default:
+						to = XbrlDockUtils.getPostfix((String) re.get("xlink:to"), "#");
+						break;
 					}
 
 					break;
@@ -405,13 +412,13 @@ public class XbrlDockConnConcordance implements XbrlDockConnConcordanceConsts, X
 		for (Map<String, Object> r : ruleArr) {
 			StringBuilder sbErr = null;
 			str = (String) r.get(XDC_UTILS_MVEL_mvelText);
-			
+
 			try {
 				r.put(XDC_UTILS_MVEL_mvelCompObj, XbrlDockUtilsMvel.compile(str));
 			} catch (Throwable t) {
 				sbErr = XbrlDockUtils.sbAppend(sbErr, ", ", true, t.getMessage());
 			}
-			
+
 			str = (String) r.get(XDC_UTILS_MVEL_mvelCondition);
 			if (null != str) {
 				try {
@@ -421,10 +428,10 @@ public class XbrlDockConnConcordance implements XbrlDockConnConcordanceConsts, X
 				}
 
 			}
-			
-			if ( null != sbErr ) {
+
+			if (null != sbErr) {
 				r.put(XDC_JSONAPI_TOKEN_errors, sbErr.toString());
-				
+
 				XbrlDock.log(EventLevel.Error, r.get(XDC_EXT_TOKEN_id), sbErr);
 			}
 		}

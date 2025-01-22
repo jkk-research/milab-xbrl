@@ -2,13 +2,14 @@
   "app" : {
     "javaClass" : "com.xbrldock.poc.XbrlDockPocApp",
     "dirUrlCache" : "work/urlcache",
-		"taxImport" : [ "EFRAG-Article8-Taxonomy", "EFRAG-ESRS-Set1-Taxonomy" ],
+		"taxImportESEF2021" : [ "esef_taxonomy_2021" ],
 		"taxImportESRS2024" : [ "EFRAG-Article8-Taxonomy", "EFRAG-ESRS-Set1-Taxonomy" ],
     "taxImportFAC" : [ "IFRST_2017-03-09", "fac-ifrs-master" ],
 		"taxImportEsgIndia" : [ "Taxonomy_BRSR" ],
 		"taxImportDei" : [ "dei-2018","dei-2019" ],
 		"taxImportGAAP" : [ "dei-2019", "srt-2020-01-31" ],
 		"taxImportFAC2020" : [ "fac-2020" ],
+		"taxImportPrototype" : [ "IFRSAT-2022-03-24", "EFRAG-Article8-Taxonomy", "EFRAG-ESRS-Set1-Taxonomy", "esma_taxonomy_set_prototype_2024-12-31" ],
     "gui" : true,
     "userFlags" : {
       "admin" : [ "lkedves" ]
