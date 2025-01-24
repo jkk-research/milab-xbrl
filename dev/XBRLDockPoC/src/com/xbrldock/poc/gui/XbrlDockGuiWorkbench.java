@@ -166,7 +166,7 @@ public class XbrlDockGuiWorkbench extends JFrame implements XbrlDockGuiConsts, X
 				JComponent mainPanel = n.getComp(cfg);
 
 				if (mainPanel instanceof GenAgent) {
-					((GenAgent) mainPanel).process(XDC_CMD_GEN_SETMAIN, hints);
+					((GenAgent) mainPanel).process(XDC_CMD_GEN_SETMAIN, "");
 				}
 				n.frm = new ChildFrame((String) cfg.get(XDC_EXT_TOKEN_name), n, mainPanel);
 				return n;
@@ -207,21 +207,21 @@ public class XbrlDockGuiWorkbench extends JFrame implements XbrlDockGuiConsts, X
 	}
 
 	@Override
-	public Object process(String command, Object... params) throws Exception {
+	public Object process(String command, Map params) throws Exception {
 		Object ret = null;
 		switch (command) {
 		case XDC_CMD_GEN_Init:
-			initModule((Map) params[0]);
+			initModule(params);
 			break;
 		case XDC_CMD_GEN_SELECT:
-			WBNode wbn = rootNode.getChildById((String) params[0], null);
+			WBNode wbn = rootNode.getChildById((String) params.get(XDC_GUICMD_WBAGENT), null);
 
-			if (params.length == 1) {
+			if (old.length == 1) {
 				TreePath tp = new TreePath(wbn);
 				panelTree.setSelectionPath(tp);
 				selectRightPanel(wbn);
 			} else {
-				wbn = wbn.getChildById((String) params[1], childCreator, params);
+				wbn = wbn.getChildById((String) old[1], childCreator, params);
 
 				wbn.focusFrame();
 

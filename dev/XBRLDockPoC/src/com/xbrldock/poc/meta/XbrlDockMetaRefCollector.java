@@ -8,13 +8,14 @@ import org.w3c.dom.Element;
 import org.w3c.dom.NodeList;
 
 import com.xbrldock.XbrlDock;
+import com.xbrldock.XbrlDockConsts;
 import com.xbrldock.XbrlDockException;
 import com.xbrldock.dev.XbrlDockDevCounter;
-import com.xbrldock.poc.XbrlDockPocConsts;
 import com.xbrldock.utils.XbrlDockUtils;
 import com.xbrldock.utils.XbrlDockUtilsXml;
 
-public class XbrlDockMetaRefCollector implements XbrlDockMetaConsts, XbrlDockPocConsts.ReportDataHandler {
+@SuppressWarnings({ "unchecked" })
+public class XbrlDockMetaRefCollector implements XbrlDockMetaConsts, XbrlDockConsts.GenAgent {
 
 	String repId;
 	Map<String, String> imports = new TreeMap<>();
@@ -24,11 +25,34 @@ public class XbrlDockMetaRefCollector implements XbrlDockMetaConsts, XbrlDockPoc
 	XbrlDockDevCounter unresolvedCount = new XbrlDockDevCounter("Unresolved namespaces", true);
 
 	@Override
+	public Object process(String cmd, Map<String, Object> params) throws Exception {
+		switch (cmd) {
+		case XDC_CMD_GEN_Init:
+			break;
+		case XDC_CMD_GEN_Begin:
+			beginReport((String) params.get(XDC_EXT_TOKEN_id));
+			break;
+		case XDC_CMD_REP_ADD_NAMESPACE:
+			addNamespace((String) params.get(XDC_EXT_TOKEN_id), (String) params.get(XDC_EXT_TOKEN_value));
+			break;
+		case XDC_CMD_REP_ADD_SCHEMA:
+			addTaxonomy((String) params.get(XDC_EXT_TOKEN_id), (String) params.get(XDC_EXT_TOKEN_value));
+			break;
+		case XDC_REP_SEG_Unit:
+		case XDC_REP_SEG_Context:
+		case XDC_REP_SEG_Fact:
+			return processSegment(cmd, (Map<String, Object>) params.get(XDC_GEN_TOKEN_source));
+		case XDC_CMD_GEN_End:
+			endReport();
+			break;
+		}
+		return null;
+	}
+
 	public void beginReport(String repId) {
 		this.repId = repId;
 	}
 
-	@Override
 	public void addNamespace(String ref, String id) {		
 		String url = imports.get(id);
 
@@ -54,7 +78,6 @@ public class XbrlDockMetaRefCollector implements XbrlDockMetaConsts, XbrlDockPoc
 		}
 	}
 
-	@Override
 	public void addTaxonomy(String tx, String type) {
 		try {
 			loadTaxonomy("", tx);
@@ -72,13 +95,11 @@ public class XbrlDockMetaRefCollector implements XbrlDockMetaConsts, XbrlDockPoc
 //		}
 	}
 
-	@Override
 	public String processSegment(String segment, Map<String, Object> data) {
 		// TODO Auto-generated method stub
 		return null;
 	}
 
-	@Override
 	public void endReport() {
 	}
 

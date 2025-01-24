@@ -4,9 +4,10 @@ import java.util.Map;
 import java.util.TreeMap;
 
 import com.xbrldock.XbrlDock;
-import com.xbrldock.poc.XbrlDockPocConsts;
+import com.xbrldock.XbrlDockConsts;
 
-public class XbrlDockDevReportDump implements XbrlDockDevConsts, XbrlDockPocConsts.ReportDataHandler {
+@SuppressWarnings({ "unchecked" })
+public class XbrlDockDevReportDump implements XbrlDockDevConsts, XbrlDockConsts.GenAgent {
 
 	public boolean logAll = true;
 
@@ -22,25 +23,46 @@ public class XbrlDockDevReportDump implements XbrlDockDevConsts, XbrlDockPocCons
 		ctxDef.clear();
 		factCount = 0;
 	}
-
+	
 	@Override
+	public Object process(String cmd, Map<String, Object> params) throws Exception {
+		switch (cmd) {
+		case XDC_CMD_GEN_Init:
+			break;
+		case XDC_CMD_GEN_Begin:
+			beginReport((String) params.get(XDC_EXT_TOKEN_id));
+			break;
+		case XDC_CMD_REP_ADD_NAMESPACE:
+			addNamespace((String) params.get(XDC_EXT_TOKEN_id), (String) params.get(XDC_EXT_TOKEN_value));
+			break;
+		case XDC_CMD_REP_ADD_SCHEMA:
+			addTaxonomy((String) params.get(XDC_EXT_TOKEN_id), (String) params.get(XDC_EXT_TOKEN_value));
+			break;
+		case XDC_REP_SEG_Unit:
+		case XDC_REP_SEG_Context:
+		case XDC_REP_SEG_Fact:
+			return processSegment(cmd, (Map<String, Object>) params.get(XDC_GEN_TOKEN_source));
+		case XDC_CMD_GEN_End:
+			endReport();
+			break;
+		}
+		return null;
+	}
+
 	public void beginReport(String repId) {
 		XbrlDock.log(EventLevel.Info, "\n\n --- Begin report", repId, "---");
 		reset();
 		this.repId = repId;
 	}
 
-	@Override
 	public void addNamespace(String ref, String id) {
 //		XbrlDock.log(EventLevel.Info, "Added namespace", ref, id);
 	}
 
-	@Override
 	public void addTaxonomy(String tx, String type) {
 //		XbrlDock.log(EventLevel.Info, "Added taxonomy", tx);
 	}
 
-	@Override
 	public String processSegment(String segment, Map<String, Object> data) {
 		String ret = "";
 
@@ -66,7 +88,6 @@ public class XbrlDockDevReportDump implements XbrlDockDevConsts, XbrlDockPocCons
 		return ret;
 	}
 
-	@Override
 	public void endReport() {
 		if (logAll) {
 			XbrlDock.log(EventLevel.Info, " --- End report", repId, "---\n");

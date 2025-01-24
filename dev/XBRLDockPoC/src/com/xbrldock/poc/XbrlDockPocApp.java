@@ -2,6 +2,8 @@ package com.xbrldock.poc;
 
 import java.io.File;
 import java.util.Collection;
+import java.util.Map;
+import java.util.TreeMap;
 
 import com.xbrldock.XbrlDock;
 import com.xbrldock.poc.meta.XbrlDockMetaContainer;
@@ -14,9 +16,10 @@ import com.xbrldock.utils.XbrlDockUtilsNet;
 public class XbrlDockPocApp extends XbrlDock implements XbrlDockPocConsts {
 
 	boolean skip = true;
+	Map<String, Object> cp = new TreeMap<String, Object>();
 
 	@Override
-	public Object process(String cmd, Object... params) throws Exception {
+	public Object process(String cmd, Map<String, Object> params) throws Exception {
 		switch (cmd) {
 		case XDC_CMD_GEN_Begin:
 			run();
@@ -42,7 +45,7 @@ public class XbrlDockPocApp extends XbrlDock implements XbrlDockPocConsts {
 			String fRoot = XbrlDockUtils.simpleGet(APP_CONFIG, XDC_CFGTOKEN_app, XDC_CFGTOKEN_agents, XDC_CFGTOKEN_AGENT_metaManager, XDC_CFGTOKEN_dirInput);
 			File taxDir = new File(fRoot);
 			for (String t : taxImport) {
-				callAgent(XDC_CFGTOKEN_AGENT_metaManager, XDC_CMD_METAMGR_IMPORT, new File(taxDir, t));
+				callAgent(XDC_CFGTOKEN_AGENT_metaManager, XDC_CMD_METAMGR_IMPORT, XbrlDockUtils.setParamMap(cp, XDC_GEN_TOKEN_source, new File(taxDir, t)));
 			}
 		}
 
@@ -50,7 +53,7 @@ public class XbrlDockPocApp extends XbrlDock implements XbrlDockPocConsts {
 
 		if (gui || Boolean.TRUE.equals(XbrlDockUtils.simpleGet(APP_CONFIG, XDC_CFGTOKEN_env, XDC_CFGTOKEN_AGENT_gui))) {
 			XbrlDockMetaManager.LOAD_CACHE = true;
-			callAgent(XDC_CFGTOKEN_AGENT_gui, XDC_CMD_GEN_SELECT, XDC_CFGTOKEN_AGENT_metaManager);
+			callAgent(XDC_CFGTOKEN_AGENT_gui, XDC_CMD_GEN_SELECT, XbrlDockUtils.setParamMap(cp, XDC_GEN_TOKEN_target, XDC_CFGTOKEN_AGENT_metaManager));
 			return;
 		}
 
@@ -66,20 +69,20 @@ public class XbrlDockPocApp extends XbrlDock implements XbrlDockPocConsts {
 		for (String year : years) {
 			switch (year) {
 			case "2019":
-				callAgent(XDC_CFGTOKEN_AGENT_metaManager, XDC_CMD_METAMGR_IMPORT, new File("work/input/taxonomies/IFRST_2019-03-27"));
-				callAgent(XDC_CFGTOKEN_AGENT_metaManager, XDC_CMD_METAMGR_IMPORT, new File("work/input/taxonomies/esef_taxonomy_2019"));
+				callAgent(XDC_CFGTOKEN_AGENT_metaManager, XDC_CMD_METAMGR_IMPORT, XbrlDockUtils.setParamMap(cp, XDC_GEN_TOKEN_source, new File("work/input/taxonomies/IFRST_2019-03-27")));
+				callAgent(XDC_CFGTOKEN_AGENT_metaManager, XDC_CMD_METAMGR_IMPORT, XbrlDockUtils.setParamMap(cp, XDC_GEN_TOKEN_source, new File("work/input/taxonomies/esef_taxonomy_2019")));
 				break;
 			case "2020":
-				callAgent(XDC_CFGTOKEN_AGENT_metaManager, XDC_CMD_METAMGR_IMPORT, new File("work/input/taxonomies/IFRST_2020-03-16"));
-				callAgent(XDC_CFGTOKEN_AGENT_metaManager, XDC_CMD_METAMGR_IMPORT, new File("work/input/taxonomies/esef_taxonomy_2020"));
+				callAgent(XDC_CFGTOKEN_AGENT_metaManager, XDC_CMD_METAMGR_IMPORT, XbrlDockUtils.setParamMap(cp, XDC_GEN_TOKEN_source, new File("work/input/taxonomies/IFRST_2020-03-16")));
+				callAgent(XDC_CFGTOKEN_AGENT_metaManager, XDC_CMD_METAMGR_IMPORT, XbrlDockUtils.setParamMap(cp, XDC_GEN_TOKEN_source, new File("work/input/taxonomies/esef_taxonomy_2020")));
 				break;
 			case "2021":
-				callAgent(XDC_CFGTOKEN_AGENT_metaManager, XDC_CMD_METAMGR_IMPORT, new File("work/input/taxonomies/IFRST_2021-03-24"));
-				callAgent(XDC_CFGTOKEN_AGENT_metaManager, XDC_CMD_METAMGR_IMPORT, new File("work/input/taxonomies/esef_taxonomy_2021"));
+				callAgent(XDC_CFGTOKEN_AGENT_metaManager, XDC_CMD_METAMGR_IMPORT, XbrlDockUtils.setParamMap(cp, XDC_GEN_TOKEN_source, new File("work/input/taxonomies/IFRST_2021-03-24")));
+				callAgent(XDC_CFGTOKEN_AGENT_metaManager, XDC_CMD_METAMGR_IMPORT, XbrlDockUtils.setParamMap(cp, XDC_GEN_TOKEN_source, new File("work/input/taxonomies/esef_taxonomy_2021")));
 				break;
 			case "2022":
-				callAgent(XDC_CFGTOKEN_AGENT_metaManager, XDC_CMD_METAMGR_IMPORT, new File("work/input/taxonomies/IFRSAT-2022-03-24"));
-				callAgent(XDC_CFGTOKEN_AGENT_metaManager, XDC_CMD_METAMGR_IMPORT, new File("work/input/taxonomies/esef_taxonomy_2022_v1.1"));
+				callAgent(XDC_CFGTOKEN_AGENT_metaManager, XDC_CMD_METAMGR_IMPORT, XbrlDockUtils.setParamMap(cp, XDC_GEN_TOKEN_source, new File("work/input/taxonomies/IFRSAT-2022-03-24")));
+				callAgent(XDC_CFGTOKEN_AGENT_metaManager, XDC_CMD_METAMGR_IMPORT, XbrlDockUtils.setParamMap(cp, XDC_GEN_TOKEN_source, new File("work/input/taxonomies/esef_taxonomy_2022_v1.1")));
 				break;
 			}
 		}
@@ -102,24 +105,24 @@ public class XbrlDockPocApp extends XbrlDock implements XbrlDockPocConsts {
 	void checkReport(String repRoot) throws Exception {
 		File f = new File(repRoot);
 
-		callAgent(XDC_CFGTOKEN_AGENT_metaManager, XDC_CMD_METAMGR_LOADMC, f);
+		callAgent(XDC_CFGTOKEN_AGENT_metaManager, XDC_CMD_METAMGR_LOADMC, XbrlDockUtils.setParamMap(cp, XDC_GEN_TOKEN_source, f));
 	}
 
 	void checkReports() throws Exception {
 		String srcRoot = XbrlDockUtils.simpleGet(APP_CONFIG, XDC_CFGTOKEN_app, XDC_CFGTOKEN_agents, XDC_CFGTOKEN_AGENT_esefConn, XDC_CFGTOKEN_dirInput);
 		File root = new File(srcRoot);
 
-		XbrlDockUtilsFile.FileProcessor mif = new XbrlDockUtilsFile.FileProcessor() {
+		GenAgent mif = new GenAgent() {
 			@Override
-			public Object process(String cmd, Object... params) throws Exception {
-				File f = (File) params[0];
+			public Object process(String cmd, Map<String, Object> params) throws Exception {
+				File f = (File) params.get(XDC_GEN_TOKEN_target);
 				if (XDC_CMD_GEN_Begin.equals(cmd) && XDC_FNAME_METAINF.equals(f.getName())) {
 					if (new File(f, XDC_FNAME_FILINGCATALOG).isFile()) {
 //						XbrlDock.log(EventLevel.Trace, "MIF found", f.getPath());
 
 						try {
 //							XbrlDockPocUtils.readMeta(f);
-							XbrlDockMetaContainer mc = callAgent(XDC_CFGTOKEN_AGENT_metaManager, XDC_CMD_METAMGR_LOADMC, f);
+							XbrlDockMetaContainer mc = callAgent(XDC_CFGTOKEN_AGENT_metaManager, XDC_CMD_METAMGR_LOADMC, XbrlDockUtils.setParamMap(cp, XDC_GEN_TOKEN_source, f));
 							XbrlDock.log(EventLevel.Info, mc.getId());
 						} catch (Throwable e) {
 							XbrlDock.log(EventLevel.Trace, "load exception", e);

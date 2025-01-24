@@ -104,13 +104,13 @@ public class XbrlDockGuiMetaTaxonomyPanel extends JPanel implements XbrlDockGuiC
 	}
 
 	@Override
-	public Object process(String command, Object... params) throws Exception {
+	public Object process(String command, Map<String, Object> params) throws Exception {
 		Object ret = null;
 		switch (command) {
 		case XDC_CMD_GEN_Init:
 			break;
 		case XDC_CMD_GEN_SETMAIN:
-			showTaxonomy((String) params[1]);
+			showTaxonomy((String) params.get(XDC_EXT_TOKEN_id));
 			break;
 		default:
 			XbrlDockException.wrap(null, "Unhandled agent command", command, params);
@@ -123,7 +123,7 @@ public class XbrlDockGuiMetaTaxonomyPanel extends JPanel implements XbrlDockGuiC
 	public void showTaxonomy(String taxonomyId) throws Exception {
 //		JOptionPane.showMessageDialog(this, "Display taxonomy " + taxonomyId);
 
-		taxonomy = XbrlDock.callAgent(XDC_CFGTOKEN_AGENT_metaManager, XDC_CMD_METAMGR_GETMC, taxonomyId);
+		taxonomy = XbrlDock.callAgent(XDC_CFGTOKEN_AGENT_metaManager, XDC_CMD_METAMGR_GETMC, XbrlDockUtils.setParams(XDC_EXT_TOKEN_id, taxonomyId));
 
 		Map mi = taxonomy.getMetaInfo();
 

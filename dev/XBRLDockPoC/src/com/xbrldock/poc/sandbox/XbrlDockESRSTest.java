@@ -23,10 +23,10 @@ public class XbrlDockESRSTest implements XbrlDockMetaConsts {
 
 		mc.visit(XDC_METATOKEN_items, new GenAgent() {
 			@Override
-			public Object process(String cmd, Object... params) throws Exception {
+			public Object process(String cmd, Map<String, Object> params) throws Exception {
 				switch (cmd) {
 				case XDC_CMD_GEN_Process:
-					Map.Entry<String, Map<String, String>> ie = (Map.Entry<String, Map<String, String>>) params[0];
+					Map.Entry<String, Map<String, String>> ie = (Map.Entry<String, Map<String, String>>) params.get(XDC_EXT_TOKEN_value);
 					Map<String, String> origItem = ie.getValue();
 
 					String sg = origItem.get("substitutionGroup");

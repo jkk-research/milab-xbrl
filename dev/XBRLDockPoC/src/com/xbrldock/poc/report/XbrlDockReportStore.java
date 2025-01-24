@@ -9,6 +9,7 @@ import java.util.Collection;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Set;
+import java.util.TreeMap;
 import java.util.TreeSet;
 
 import com.xbrldock.XbrlDock;
@@ -21,7 +22,6 @@ import com.xbrldock.format.XbrlDockFormatUtils;
 import com.xbrldock.poc.XbrlDockPocRefactorUtils;
 import com.xbrldock.poc.conn.XbrlDockConnUtils;
 import com.xbrldock.poc.format.XbrlDockFormatAgentXhtmlReader;
-import com.xbrldock.poc.format.XbrlDockFormatXhtml;
 import com.xbrldock.poc.utils.XbrlDockPocReportInfoExtender;
 import com.xbrldock.utils.XbrlDockUtils;
 import com.xbrldock.utils.XbrlDockUtilsFile;
@@ -77,13 +77,14 @@ public class XbrlDockReportStore implements XbrlDockReportConsts, XbrlDockPocRef
 	}
 
 	@Override
-	public Object process(String command, Object... params) throws Exception {
+	public Object process(String command, Map params) throws Exception {
 		Object ret = null;
 		Map<String, Map> filings = XbrlDockUtils.simpleGet(catalog, XDC_CONN_CAT_TOKEN_filings);
-
+		Map<String, Object> cp = new TreeMap<String, Object>();
+		
 		switch (command) {
 		case XDC_CMD_GEN_Init:
-			initModule((Map) params[0]);
+			initModule(params);
 			break;
 		case XDC_CMD_GEN_GETCATALOG:
 			ret = catalog;
@@ -121,9 +122,9 @@ public class XbrlDockReportStore implements XbrlDockReportConsts, XbrlDockPocRef
 							cnt.add("Warning " + msgs);
 						}
 
-						dh.setReportData(filingData);
+						dh.process(XDC_CMD_GEN_Init, XbrlDockUtils.setParams(XDC_GEN_TOKEN_source, filingData));
 
-						ReportFormatHandler fh = new XbrlDockFormatXhtml();
+						GenAgent fh = new XbrlDockFormatAgentXhtmlReader();
 //						ReportDataHandler dh = (ReportDataHandler) params[0];
 						loadReport(fh, dh, filingData, rep);
 
@@ -142,7 +143,7 @@ public class XbrlDockReportStore implements XbrlDockReportConsts, XbrlDockPocRef
 			break;
 		case XDC_CMD_GEN_TEST02:
 
-			Collection<Map> items = (Collection) params[0];
+			Collection<Map> items = (Collection) params.get(XDC_GEN_TOKEN_members);
 
 			File targetDir = new File("work/xbrlexport");
 			targetDir = new File(targetDir, XbrlDockUtils.strTime());
@@ -157,11 +158,11 @@ public class XbrlDockReportStore implements XbrlDockReportConsts, XbrlDockPocRef
 				try (FileInputStream fr = new FileInputStream(fRep)) {
 					if (null == agtXmlWriter) {
 						agtXmlWriter = new XbrlDockFormatAgentXmlWriter();
-						agtXmlWriter.process(XDC_CMD_GEN_Init, targetDir);
+						agtXmlWriter.process(XDC_CMD_GEN_Init, XbrlDockUtils.setParamMap(cp, XDC_GEN_TOKEN_target, targetDir));
 					}
 
-					agtXmlWriter.process(XDC_CMD_GEN_Begin, id);
-					agtXhtmlReader.process(XDC_CMD_GEN_Process, fr, agtXmlWriter);
+					agtXmlWriter.process(XDC_CMD_GEN_Begin, XbrlDockUtils.setParamMap(cp, XDC_EXT_TOKEN_id, id));
+					agtXhtmlReader.process(XDC_CMD_GEN_Process, XbrlDockUtils.setParamMap(cp, XDC_GEN_TOKEN_source, fr, XDC_GEN_TOKEN_target, agtXmlWriter));
 					agtXmlWriter.process(XDC_CMD_GEN_End);
 				}
 			}
@@ -172,8 +173,8 @@ public class XbrlDockReportStore implements XbrlDockReportConsts, XbrlDockPocRef
 
 			break;
 		case XDC_CMD_CONN_VISITREPORT:
-			String id = (String) params[0];
-			ReportDataHandler dhv = (ReportDataHandler) params[1];
+			String id = (String) params.get(XDC_EXT_TOKEN_id);
+			GenAgent dhv = (GenAgent) params.get(XDC_GEN_TOKEN_processor);
 
 			Map filingInfo = XbrlDockUtils.simpleGet(catalog, XDC_CONN_CAT_TOKEN_filings, id);
 
@@ -184,7 +185,7 @@ public class XbrlDockReportStore implements XbrlDockReportConsts, XbrlDockPocRef
 			} else {
 				fRep = getFiling(id);
 
-				ReportFormatHandler fh = new XbrlDockFormatXhtml();
+				GenAgent fh = new XbrlDockFormatAgentXhtmlReader();
 				loadReport(fh, dhv, filingInfo, fRep);
 			}
 			break;
@@ -238,7 +239,7 @@ public class XbrlDockReportStore implements XbrlDockReportConsts, XbrlDockPocRef
 
 		Map<String, Map<String, Object>> filings = XbrlDockUtils.simpleGet(catalog, XDC_CONN_CAT_TOKEN_filings);
 
-		visitor.process(XDC_CMD_GEN_Begin);
+		visitor.process(XDC_CMD_GEN_Begin, null);
 
 		for (Map.Entry<String, Map<String, Object>> fe : filings.entrySet()) {
 			String k = fe.getKey();
@@ -249,7 +250,7 @@ public class XbrlDockReportStore implements XbrlDockReportConsts, XbrlDockPocRef
 					if (pm.step()) {
 //						break;
 					}
-					boolean cont = (boolean) visitor.process(XDC_CMD_GEN_Process, fd);
+					boolean cont = (boolean) visitor.process(XDC_CMD_GEN_Process, XbrlDockUtils.setParams(XDC_EXT_TOKEN_value, fd));
 
 					if (!cont) {
 						break;
@@ -260,7 +261,7 @@ public class XbrlDockReportStore implements XbrlDockReportConsts, XbrlDockPocRef
 			}
 		}
 
-		visitor.process(XDC_CMD_GEN_End);
+		visitor.process(XDC_CMD_GEN_End, null);
 	}
 
 //	@Override
@@ -297,7 +298,7 @@ public class XbrlDockReportStore implements XbrlDockReportConsts, XbrlDockPocRef
 
 //		XbrlDockTaxonomyRefCollector dh = new XbrlDockTaxonomyRefCollector();
 		XbrlDockPocReportInfoExtender dh = new XbrlDockPocReportInfoExtender();
-		ReportFormatHandler fh = new XbrlDockFormatXhtml();
+		GenAgent fh = new XbrlDockFormatAgentXhtmlReader();
 
 //		long ts = System.currentTimeMillis();
 
@@ -340,17 +341,14 @@ public class XbrlDockReportStore implements XbrlDockReportConsts, XbrlDockPocRef
 
 	int missingMetaInf = 0;
 
-	private void loadReport(ReportFormatHandler fh, ReportDataHandler dh, Map<String, Object> filingData, File f)
+	private void loadReport(GenAgent fh, GenAgent dh, Map<String, Object> filingData, File f)
 			throws IOException, Exception, FileNotFoundException {
 
 		if (loadReport) {
 			try (FileInputStream fr = new FileInputStream(f)) {
-				dh.beginReport((String) filingData.get(XDC_EXT_TOKEN_id));
-//				dh.beginReport(f.getCanonicalPath());
-//				dh.init( prefixes);				
-
-				fh.loadReport(fr, dh);
-				dh.endReport();
+				dh.process(XDC_CMD_GEN_Begin, XbrlDockUtils.setParams(XDC_EXT_TOKEN_id, filingData.get(XDC_EXT_TOKEN_id)));
+				fh.process(XDC_CMD_GEN_Process, XbrlDockUtils.setParams(XDC_GEN_TOKEN_source, fr, XDC_GEN_TOKEN_target, dh));
+				dh.process(XDC_CMD_GEN_End, null);
 			}
 		}
 	}
@@ -436,7 +434,7 @@ public class XbrlDockReportStore implements XbrlDockReportConsts, XbrlDockPocRef
 					ret = rc[0];
 					packStatus = (1 == rc.length) ? XDC_CONN_PACKAGE_PROC_MSG_reportFoundSingle : XDC_CONN_PACKAGE_PROC_MSG_reportFoundMulti;
 				} else {
-					repColl.process(XDC_CMD_GEN_Init);
+					repColl.process(XDC_CMD_GEN_Init, null);
 					XbrlDockUtilsFile.processFiles(fReports, repColl, filingCandidate);
 					Collection<File> fc = repColl.getFound();
 					if (!fc.isEmpty()) {

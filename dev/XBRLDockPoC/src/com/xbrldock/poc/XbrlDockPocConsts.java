@@ -1,8 +1,5 @@
 package com.xbrldock.poc;
 
-import java.io.InputStream;
-import java.util.Map;
-
 import com.xbrldock.XbrlDockConsts;
 import com.xbrldock.utils.XbrlDockUtilsConsts;
 
@@ -79,15 +76,15 @@ public interface XbrlDockPocConsts extends XbrlDockConsts, XbrlDockUtilsConsts {
 	String XDC_APP_SETROLETYPE = "setRoleType";
 	String XDC_APP_SETENTRYPOINT = "setEntryPoint";
 	
-	interface ReportDataHandler {
-		void beginReport(String repId);
-		void addNamespace(String ref, String id);
-		void addTaxonomy(String tx, String type);
-		String processSegment(String segment, Map<String, Object> data);
-		void endReport();
-	}	
-	
-	interface ReportFormatHandler {
-		void loadReport(InputStream in, ReportDataHandler dataHandler) throws Exception;
-	}
+//	interface ReportDataHandler {
+//		void beginReport(String repId);
+//		void addNamespace(String ref, String id);
+//		void addTaxonomy(String tx, String type);
+//		String processSegment(String segment, Map<String, Object> data);
+//		void endReport();
+//	}	
+//	
+//	interface ReportFormatHandler {
+//		void loadReport(InputStream in, ReportDataHandler dataHandler) throws Exception;
+//	}
 }

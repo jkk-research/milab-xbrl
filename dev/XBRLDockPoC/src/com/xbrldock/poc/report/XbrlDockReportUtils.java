@@ -34,8 +34,8 @@ public class XbrlDockReportUtils implements XbrlDockReportConsts {
 		}
 
 		@Override
-		public Object process(String cmd, Object... params) throws Exception {
-			Map item = (Map) params[0];
+		public Object process(String cmd, Map params) throws Exception {
+			Map item = (Map) params.get(XDC_EXT_TOKEN_value);
 			switch (cmd) {
 			case XDC_CMD_GEN_Init:
 				match = false;

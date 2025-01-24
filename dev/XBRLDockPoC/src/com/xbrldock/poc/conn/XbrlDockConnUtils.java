@@ -11,17 +11,17 @@ import com.xbrldock.utils.XbrlDockUtilsFile;
 @SuppressWarnings({ "unchecked", "rawtypes" })
 public class XbrlDockConnUtils implements XbrlDockConnConsts {
 
-	public static class DirMapper implements XbrlDockUtilsFile.FileProcessor {
+	public static class DirMapper implements GenAgent {
 		Map<String, File> specFiles = new TreeMap<String, File>();
 
 		@Override
-		public Object process(String cmd, Object... params) throws Exception {
+		public Object process(String cmd, Map params) throws Exception {
 			switch (cmd) {
 			case XDC_CMD_GEN_Init:
 				specFiles.clear();
 				break;
 			case XDC_CMD_GEN_Begin:
-				File f = (File) params[0];
+				File f = (File) params.get(XDC_GEN_TOKEN_target);
 				switch (f.getName()) {
 				case XDC_FNAME_METAINF:
 					File fCat = new File(f, XDC_FNAME_FILINGCATALOG);
@@ -46,7 +46,7 @@ public class XbrlDockConnUtils implements XbrlDockConnConsts {
 		}
 
 		public boolean check(File fDir) throws Exception {
-			process(XDC_CMD_GEN_Init);
+			process(XDC_CMD_GEN_Init, null);
 			XbrlDockUtilsFile.processFiles(fDir, this, null, true, false);
 			return isOK();
 		}

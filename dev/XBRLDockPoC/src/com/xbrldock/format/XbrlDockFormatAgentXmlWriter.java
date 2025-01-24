@@ -34,28 +34,28 @@ public class XbrlDockFormatAgentXmlWriter implements XbrlDockFormatConsts, XbrlD
 	private Map<String, ArrayList<Element>> segData = new TreeMap<>();
 
 	@Override
-	public Object process(String cmd, Object... params) throws Exception {
+	public Object process(String cmd, Map params) throws Exception {
 		switch (cmd) {
 		case XDC_CMD_GEN_Init:
-			this.targetDir = (File) params[0];
+			this.targetDir = (File) params.get(XDC_GEN_TOKEN_target);
 			df = new DecimalFormat("#");
 			df.setMaximumFractionDigits(8);
 
 			XbrlDock.log(EventLevel.Trace, "Exporting reports to folder", targetDir.getPath());
 			break;
 		case XDC_CMD_GEN_Begin:
-			beginReport((String) params[0]);
+			beginReport((String) params.get(XDC_EXT_TOKEN_id));
 			break;
 		case XDC_CMD_REP_ADD_NAMESPACE:
-			addNamespace((String) params[0], (String) params[1]);
+			addNamespace((String) params.get(XDC_EXT_TOKEN_id), (String) params.get(XDC_EXT_TOKEN_value));
 			break;
 		case XDC_CMD_REP_ADD_SCHEMA:
-			addTaxonomy((String) params[0], (String) params[1]);
+			addTaxonomy((String) params.get(XDC_EXT_TOKEN_id), (String) params.get(XDC_EXT_TOKEN_value));
 			break;
 		case XDC_REP_SEG_Unit:
 		case XDC_REP_SEG_Context:
 		case XDC_REP_SEG_Fact:
-			return processSegment(cmd, (Map<String, Object>) params[0]);
+			return processSegment(cmd, (Map<String, Object>) params.get(XDC_GEN_TOKEN_source));
 		case XDC_CMD_GEN_End:
 			endReport();
 			break;

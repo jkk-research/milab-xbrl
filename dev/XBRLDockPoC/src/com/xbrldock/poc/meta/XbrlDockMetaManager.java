@@ -113,25 +113,25 @@ public class XbrlDockMetaManager implements XbrlDockMetaConsts, XbrlDockConsts.G
 	}
 
 	@Override
-	public Object process(String command, Object... params) throws Exception {
+	public Object process(String command, Map params) throws Exception {
 		Object ret = null;
 //		XbrlDockMetaContainer mc;
 
 		switch (command) {
 		case XDC_CMD_GEN_Init:
-			initModule((Map) params[0]);
+			initModule(params);
 			break;
 		case XDC_CMD_GEN_GETCATALOG:
 			ret = metaCatalog;
 			break;
 		case XDC_CMD_METAMGR_IMPORT:
-			importTaxonomy((File) params[0]);
+			importTaxonomy((File) params.get(XDC_GEN_TOKEN_source));
 			break;
 		case XDC_CMD_METAMGR_GETMC:
-			ret = loadFromCache((String) params[0]);
+			ret = loadFromCache((String) params.get(XDC_EXT_TOKEN_id));
 			break;
 		case XDC_CMD_METAMGR_LOADMC:
-			ret = buildMetaContainer((File) params[0], false);
+			ret = buildMetaContainer((File) params.get(XDC_GEN_TOKEN_source), false);
 			break;
 		case XDC_CMD_GEN_TEST01:
 			File f = new File(dirInput, "esef_taxonomy_2022_v1.1");

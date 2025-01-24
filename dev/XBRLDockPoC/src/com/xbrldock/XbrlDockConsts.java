@@ -2,6 +2,8 @@ package com.xbrldock;
 
 import java.io.File;
 import java.nio.charset.StandardCharsets;
+import java.util.Collections;
+import java.util.Map;
 
 public interface XbrlDockConsts {
 
@@ -15,11 +17,13 @@ public interface XbrlDockConsts {
 	String XDC_CMD_GEN_End = "xdc_End";
 	String XDC_CMD_GEN_Release = "xdc_Release";
 
-	String XDC_CMD_REP_ADD_NAMESPACE = "xdc_Namespace";
-	String XDC_CMD_REP_ADD_SCHEMA = "xdc_Schema";
-
 	public interface GenAgent {
-		Object process(String cmd, Object... params) throws Exception;
+		Object process(String cmd, Map<String, Object> params) throws Exception;
+
+		@SuppressWarnings("unchecked")
+		default Object process(String cmd) throws Exception {
+			return process(cmd, Collections.EMPTY_MAP);
+		}
 	}
 
 	interface ItemCreator<Type> {
@@ -73,6 +77,9 @@ public interface XbrlDockConsts {
 	String XDC_FORMAT_XHTML = "XHTML";
 	String XDC_FORMAT_JSON = "JSON";
 	String XDC_FORMAT_CSV = "CSV";
+	
+	String XDC_CMD_REP_ADD_NAMESPACE = "xdc_Namespace";
+	String XDC_CMD_REP_ADD_SCHEMA = "xdc_Schema";
 
 	String XDC_REP_SEG_Context = "Context";
 	String XDC_REP_SEG_Unit = "Unit";
@@ -97,6 +104,9 @@ public interface XbrlDockConsts {
 	String XDC_GEN_TOKEN_description = "description";
 	String XDC_GEN_TOKEN_comment = "comment";
 	String XDC_GEN_TOKEN_store = "store";
+	String XDC_GEN_TOKEN_source = "source";
+	String XDC_GEN_TOKEN_target = "target";
+	String XDC_GEN_TOKEN_processor = "processor";
 
 	String XDC_UTILS_MVEL_mvelCondition = "xdc_mvelCondition";
 	String XDC_UTILS_MVEL_mvelText = "xdc_mvelText";

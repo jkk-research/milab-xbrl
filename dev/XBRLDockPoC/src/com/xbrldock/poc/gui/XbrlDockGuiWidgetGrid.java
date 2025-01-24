@@ -18,6 +18,7 @@ import javax.swing.event.ListSelectionListener;
 import javax.swing.table.AbstractTableModel;
 
 import com.xbrldock.XbrlDockException;
+import com.xbrldock.utils.XbrlDockUtils;
 
 @SuppressWarnings({ "rawtypes", "unchecked" })
 public class XbrlDockGuiWidgetGrid implements XbrlDockGuiConsts.Widget<JComponent>, XbrlDockGuiConsts {
@@ -188,7 +189,7 @@ public class XbrlDockGuiWidgetGrid implements XbrlDockGuiConsts.Widget<JComponen
 		}
 
 		try {
-			loader.process(XDC_CMD_GEN_Process, items);
+			loader.process(XDC_CMD_GEN_Process, XbrlDockUtils.setParams(XDC_GEN_TOKEN_members, items));
 		} catch (Exception e) {
 			XbrlDockException.wrap(e, "Grid updateItems");
 		}

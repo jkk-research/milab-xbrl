@@ -5,24 +5,24 @@ import java.util.ArrayList;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.TreeMap;
 
 import com.xbrldock.XbrlDockException;
 
 @SuppressWarnings({ "unchecked", "rawtypes" })
 public class XbrlDockUtils implements XbrlDockUtilsConsts {
-	
-	public static <RetVal> RetVal optCall(GenAgent agent, String cmd, RetVal defRet, Object... params) throws Exception {
+
+	public static <RetVal> RetVal optCall(GenAgent agent, String cmd, RetVal defRet, Map params) throws Exception {
 		return (null == agent) ? defRet : (RetVal) agent.process(cmd, params);
 	}
 
-	public static <RetType> RetType optCallNoEx(GenAgent agent, String cmd, Object... params) {
+	public static <RetType> RetType optCallNoEx(GenAgent agent, String cmd, Map params) {
 		try {
 			return optCall(agent, cmd, null, params);
 		} catch (Exception e) {
 			return XbrlDockException.wrap(e, "callAgent", agent, cmd, params);
 		}
 	}
-
 
 	public static boolean isEmpty(String str) {
 		return (null == str) || str.isEmpty();
@@ -94,7 +94,7 @@ public class XbrlDockUtils implements XbrlDockUtilsConsts {
 		} else {
 			to.clear();
 		}
-		
+
 		for (KeyType k : keys) {
 			Object val = from.get(k);
 			if (null != val) {
@@ -311,6 +311,26 @@ public class XbrlDockUtils implements XbrlDockUtilsConsts {
 			target = new HashMap<String, Object>();
 		} else if (clear) {
 			target.clear();
+		}
+
+		return target;
+	}
+	
+	private static ThreadLocal<Map<String, Object>> TL_PMAP = new ThreadLocal<Map<String,Object>>() {
+		protected java.util.Map<String,Object> initialValue() {
+			return new TreeMap<String, Object>();
+		};
+	};
+
+	public static Map<String, Object> setParams(Object... params) {
+		return setParamMap(TL_PMAP.get(), params);
+	}
+
+	public static Map<String, Object> setParamMap(Map target, Object... params) {
+		target = ensureMap(target, true);
+
+		for (int i = 0; i < params.length;) {
+			target.put((String) params[i++], params[i++]);
 		}
 
 		return target;

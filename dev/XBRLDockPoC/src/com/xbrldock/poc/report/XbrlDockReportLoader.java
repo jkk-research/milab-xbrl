@@ -13,15 +13,15 @@ import java.util.Map;
 import java.util.Set;
 import java.util.TreeMap;
 
+import com.xbrldock.XbrlDockConsts;
 import com.xbrldock.XbrlDockException;
-import com.xbrldock.poc.XbrlDockPocConsts;
 import com.xbrldock.poc.conn.XbrlDockConnUtils;
 import com.xbrldock.utils.XbrlDockUtils;
 import com.xbrldock.utils.XbrlDockUtilsCsv;
 import com.xbrldock.utils.XbrlDockUtilsCsvWriterAgent;
 
 @SuppressWarnings({ "rawtypes", "unchecked" })
-public class XbrlDockReportLoader implements XbrlDockReportConsts, XbrlDockPocConsts.ReportDataHandler {
+public class XbrlDockReportLoader implements XbrlDockReportConsts, XbrlDockConsts.GenAgent {
 
 	final File dataRoot;
 	public boolean flat = false;
@@ -47,21 +47,46 @@ public class XbrlDockReportLoader implements XbrlDockReportConsts, XbrlDockPocCo
 		this.dataRoot = dataRoot;
 	}
 
-	public void setReportData(Map reportData) throws Exception {
+	private void setReportData(Map reportData) throws Exception {
 		this.reportData = reportData;
 
 //		File dir = flat ? new File(dataRoot, XbrlDockUtils.strTime()) : XbrlDockConnUtils.getFilingDir(dataRoot, reportData, true, true);
 		File dir = flat ? dataRoot : XbrlDockConnUtils.getFilingDir(dataRoot, reportData, true, true);
 		String prefix = flat ? ((String) reportData.get(XDC_EXT_TOKEN_id) + "_") : "";
 
-		cwData.process(XDC_CMD_GEN_Init, FACT_DATA_FIELDS);
-		cwData.process(XDC_CMD_GEN_Begin, new File(dir, prefix + XDC_FNAME_REPDATA));
+		cwData.process(XDC_CMD_GEN_Init, XbrlDockUtils.setParams(XDC_GEN_TOKEN_members, FACT_DATA_FIELDS));
+		cwData.process(XDC_CMD_GEN_Begin, XbrlDockUtils.setParams(XDC_GEN_TOKEN_target, new File(dir, prefix + XDC_FNAME_REPDATA)));
 		
-		cwText.process(XDC_CMD_GEN_Init, FACT_TEXT_FIELDS);
-		cwText.process(XDC_CMD_GEN_Begin, new File(dir, prefix + XDC_FNAME_REPTEXT));
+		cwText.process(XDC_CMD_GEN_Init, XbrlDockUtils.setParams(XDC_GEN_TOKEN_members, FACT_TEXT_FIELDS));
+		cwText.process(XDC_CMD_GEN_Begin, XbrlDockUtils.setParams(XDC_GEN_TOKEN_target, new File(dir, prefix + XDC_FNAME_REPTEXT)));
 	}
 
 	@Override
+	public Object process(String cmd, Map<String, Object> params) throws Exception {
+		switch (cmd) {
+		case XDC_CMD_GEN_Init:
+			setReportData((Map) params.get(XDC_GEN_TOKEN_source));
+			break;
+		case XDC_CMD_GEN_Begin:
+			beginReport((String) params.get(XDC_EXT_TOKEN_id));
+			break;
+		case XDC_CMD_REP_ADD_NAMESPACE:
+			addNamespace((String) params.get(XDC_EXT_TOKEN_id), (String) params.get(XDC_EXT_TOKEN_value));
+			break;
+		case XDC_CMD_REP_ADD_SCHEMA:
+			addTaxonomy((String) params.get(XDC_EXT_TOKEN_id), (String) params.get(XDC_EXT_TOKEN_value));
+			break;
+		case XDC_REP_SEG_Unit:
+		case XDC_REP_SEG_Context:
+		case XDC_REP_SEG_Fact:
+			return processSegment(cmd, (Map<String, Object>) params.get(XDC_GEN_TOKEN_source));
+		case XDC_CMD_GEN_End:
+			endReport();
+			break;
+		}
+		return null;
+	}
+
 	public void beginReport(String repId) {
 		this.repId = repId;
 
@@ -74,18 +99,15 @@ public class XbrlDockReportLoader implements XbrlDockReportConsts, XbrlDockPocCo
 		repStart = repEnd = null;
 	}
 
-	@Override
 	public void addNamespace(String ref, String id) {
 		nsRefs.put(ref, id);
 		XbrlDockUtils.safeGet(reportData, XDC_REPORT_TOKEN_namespaces, MAP_CREATOR).put(ref, id);
 	}
 
-	@Override
 	public void addTaxonomy(String tx, String type) {
 		XbrlDockUtils.safeGet(reportData, XDC_REPORT_TOKEN_schemas, ARRAY_CREATOR).add(tx);
 	}
 
-	@Override
 	public String processSegment(String segment, Map<String, Object> data) {
 		String ret = "";
 
@@ -132,9 +154,9 @@ public class XbrlDockReportLoader implements XbrlDockReportConsts, XbrlDockPocCo
 
 			try {
 				if (XbrlDockUtils.isEqual(XDC_FACT_VALTYPE_text, data.get(XDC_FACT_TOKEN_xbrldockFactType))) {
-					cwText.process(XDC_CMD_GEN_Process, data);
+					cwText.process(XDC_CMD_GEN_Process, XbrlDockUtils.setParams(XDC_EXT_TOKEN_value, data));
 				} else {
-					cwData.process(XDC_CMD_GEN_Process, data);
+					cwData.process(XDC_CMD_GEN_Process, XbrlDockUtils.setParams(XDC_EXT_TOKEN_value, data));
 				}
 			} catch (Throwable e) {
 				XbrlDockException.swallow(e, "Storing report data", repId, data);
@@ -164,7 +186,6 @@ public class XbrlDockReportLoader implements XbrlDockReportConsts, XbrlDockPocCo
 		return segId;
 	}
 
-	@Override
 	public void endReport() {
 		try {
 			cwData.close();
@@ -179,7 +200,7 @@ public class XbrlDockReportLoader implements XbrlDockReportConsts, XbrlDockPocCo
 		return repId + "\n  Namespaces: " + nsRefs + "\n  Contexts:" + ctxDef + "\n  Units:" + unitDef;
 	}
 
-	public static void readCsv(File f, Map filingInfo, ReportDataHandler dataHandler) throws Exception {
+	public static void readCsv(File f, Map filingInfo, GenAgent dataHandler) throws Exception {
 
 		int colCount = 0;
 		ArrayList<String> colNames = null;
@@ -205,19 +226,19 @@ public class XbrlDockReportLoader implements XbrlDockReportConsts, XbrlDockPocCo
 					colNames = new ArrayList<>(values);
 					colCount = colNames.size();
 					
-					dataHandler.beginReport(XbrlDockUtils.simpleGet(filingInfo, XDC_EXT_TOKEN_id));
+					dataHandler.process(XDC_CMD_GEN_Begin, XbrlDockUtils.setParams(XDC_EXT_TOKEN_id, filingInfo.get(XDC_EXT_TOKEN_id)));
 					
 					Map<String, String> ns = XbrlDockUtils.simpleGet(filingInfo, XDC_REPORT_TOKEN_namespaces);
 					if ( null != ns ) {
 						for ( Map.Entry<String, String> ne : ns.entrySet() ) {
-							dataHandler.addNamespace(ne.getKey(), ne.getValue());
+							dataHandler.process(XDC_CMD_REP_ADD_NAMESPACE, XbrlDockUtils.setParams(XDC_EXT_TOKEN_id, ne.getKey(), XDC_EXT_TOKEN_value , ne.getValue()));
 						}
 					}
 					
 					Collection<String> tx = XbrlDockUtils.simpleGet(filingInfo, XDC_REPORT_TOKEN_schemas);
 					if ( null != tx ) {
 						for (String t : tx ) {
-							dataHandler.addTaxonomy(t, null);
+							dataHandler.process(XDC_CMD_REP_ADD_SCHEMA, XbrlDockUtils.setParams(XDC_EXT_TOKEN_id, t));
 						}
 					}
 				} else {
@@ -228,13 +249,14 @@ public class XbrlDockReportLoader implements XbrlDockReportConsts, XbrlDockPocCo
 					Object key = fact.get(XDC_FACT_TOKEN_context);
 					if (ctx.add(key)) {
 						XbrlDockUtils.optCopyFields(fact, segment, CONTEXT_FIELDS);
-						dataHandler.processSegment(XDC_REP_SEG_Context, segment);
+						dataHandler.process(XDC_REP_SEG_Context, XbrlDockUtils.setParams(XDC_GEN_TOKEN_source, segment));
+
 					}
 
 					key = fact.get(XDC_FACT_TOKEN_unit);
 					if (!XbrlDockUtils.isEmpty((String) key) && unit.add(key)) {
 						XbrlDockUtils.optCopyFields(fact, segment, UNIT_FIELDS);
-						dataHandler.processSegment(XDC_REP_SEG_Unit, segment);
+						dataHandler.process(XDC_REP_SEG_Unit, XbrlDockUtils.setParams(XDC_GEN_TOKEN_source, segment));
 					}
 					
 					switch ((String) fact.get(XDC_FACT_TOKEN_xbrldockFactType) ) {
@@ -245,7 +267,7 @@ public class XbrlDockReportLoader implements XbrlDockReportConsts, XbrlDockPocCo
 						break;
 					}
 
-					String ret = dataHandler.processSegment(XDC_REP_SEG_Fact, fact);
+					String ret = (String) dataHandler.process(XDC_REP_SEG_Fact, XbrlDockUtils.setParams(XDC_GEN_TOKEN_source, XDC_REP_SEG_Fact));
 					
 					if ( XDC_RETVAL_STOP.equals(ret)) {
 						break;
@@ -254,7 +276,7 @@ public class XbrlDockReportLoader implements XbrlDockReportConsts, XbrlDockPocCo
 			}
 			
 			if ( null != colNames) {
-				dataHandler.endReport();
+				dataHandler.process(XDC_CMD_GEN_End, null);
 			}
 		} finally {
 		}

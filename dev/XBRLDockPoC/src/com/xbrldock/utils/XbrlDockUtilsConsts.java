@@ -21,7 +21,7 @@ public interface XbrlDockUtilsConsts extends XbrlDockConsts {
 		long end;
 
 		@Override
-		public Object process(String cmd, Object... params) throws Exception {
+		public Object process(String cmd, Map params) throws Exception {
 			switch (cmd) {
 			case XDC_CMD_GEN_Begin:
 				++begin;

@@ -51,8 +51,8 @@ public class XbrlDockGuiMetaContainerPanel extends JPanel implements XbrlDockGui
 		}
 
 		@Override
-		public Object process(String cmd, Object... params) throws Exception {
-			DefaultMutableTreeNode item = (DefaultMutableTreeNode ) params[0];
+		public Object process(String cmd, Map params) throws Exception {
+			DefaultMutableTreeNode item = (DefaultMutableTreeNode ) params.get(XDC_EXT_TOKEN_value);
 			if (XDC_CMD_GEN_Process.equals(cmd)) {
 				Map<String, RoleTree> rtm = taxonomy.getRoleTreeMap(selRoleType);
 
@@ -163,13 +163,13 @@ public class XbrlDockGuiMetaContainerPanel extends JPanel implements XbrlDockGui
 	}
 
 	@Override
-	public Object process(String command, Object... params) throws Exception {
+	public Object process(String command, Map params) throws Exception {
 		Object ret = null;
 		switch (command) {
 		case XDC_CMD_GEN_Init:
 			break;
 		case XDC_CMD_GEN_SETMAIN:
-			showTaxonomy((String) params[1]);
+			showTaxonomy((String) params.get(XDC_EXT_TOKEN_id));
 			break;
 		default:
 			XbrlDockException.wrap(null, "Unhandled agent command", command, params);
@@ -180,7 +180,7 @@ public class XbrlDockGuiMetaContainerPanel extends JPanel implements XbrlDockGui
 	}
 
 	private void showTaxonomy(String taxonomyId) throws Exception {
-		taxonomy = XbrlDock.callAgent(XDC_CFGTOKEN_AGENT_metaManager, XDC_CMD_METAMGR_GETMC, taxonomyId);
+		taxonomy = XbrlDock.callAgent(XDC_CFGTOKEN_AGENT_metaManager, XDC_CMD_METAMGR_GETMC, XbrlDockUtils.setParamMap(null, XDC_EXT_TOKEN_id, taxonomyId));
 
 		Map mi = taxonomy.getMetaInfo();
 

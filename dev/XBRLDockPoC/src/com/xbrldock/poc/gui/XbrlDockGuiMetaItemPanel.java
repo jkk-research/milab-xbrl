@@ -88,10 +88,10 @@ public class XbrlDockGuiMetaItemPanel extends JPanel implements XbrlDockGuiConst
 		taxonomy.visit(XDC_METATOKEN_items, new GenAgent() {
 			
 			@Override
-			public Object process(String cmd, Object... params) throws Exception {
+			public Object process(String cmd, Map params) throws Exception {
 				switch (cmd) {
 				case XDC_CMD_GEN_Process:
-					Map.Entry<String, Map> l = (Map.Entry<String, Map> ) params[0];
+					Map.Entry<String, Map> l = (Map.Entry<String, Map> ) params.get(XDC_EXT_TOKEN_value);
 					s.addAll(l.getValue().keySet());
 					break;
 				default:
@@ -118,10 +118,10 @@ public class XbrlDockGuiMetaItemPanel extends JPanel implements XbrlDockGuiConst
 				taxonomy.visit(XDC_METATOKEN_labels, new GenAgent() {
 					
 					@Override
-					public Object process(String cmd, Object... params) throws Exception {
+					public Object process(String cmd, Map params) throws Exception {
 						switch (cmd) {
 						case XDC_CMD_GEN_Process:
-							Map.Entry<String, Object> le = (Map.Entry<String, Object>) params[0];
+							Map.Entry<String, Object> le = (Map.Entry<String, Object>) params.get(XDC_EXT_TOKEN_value);
 							sbText.append("\t<tr><td>").append(le.getKey()).append("</td><td>").append(le.getValue()).append("</td></tr>\n");
 							break;
 						default:
@@ -160,7 +160,7 @@ public class XbrlDockGuiMetaItemPanel extends JPanel implements XbrlDockGuiConst
 					boolean cont = false;
 
 					@Override
-					public Object process(String cmd, Object... params) throws Exception {
+					public Object process(String cmd, Map params) throws Exception {
 						switch (cmd) {
 						case XDC_CMD_GEN_Begin:
 							sbRefs.append("<html><body><table>\n");
@@ -173,7 +173,7 @@ public class XbrlDockGuiMetaItemPanel extends JPanel implements XbrlDockGuiConst
 								cont = true;
 							}
 							
-							Map<String, Object> re = ( Map<String, Object>) params[0];
+							Map<String, Object> re = ( Map<String, Object>) params.get(XDC_EXT_TOKEN_value);
 							for (Map.Entry<String, Object> le : re.entrySet()) {
 								String k = le.getKey();
 								Object v = le.getValue();

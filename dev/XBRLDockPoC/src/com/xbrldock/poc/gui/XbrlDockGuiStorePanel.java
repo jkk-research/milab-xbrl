@@ -185,12 +185,12 @@ public class XbrlDockGuiStorePanel extends JPanel implements XbrlDockGuiConsts, 
 		reportGrid.updateItems(true, new GenAgent() {
 
 			@Override
-			public Object process(String cmd, Object... params) throws Exception {
+			public Object process(String cmd, Map params) throws Exception {
 				if (!XDC_CMD_GEN_Process.equals(cmd) || catalog.isEmpty()) {
 					return true;
 				}
 
-				ArrayList items = (ArrayList) params[0];
+				ArrayList items = (ArrayList) params.get(XDC_GEN_TOKEN_members);
 				String txt = factFilterTA.getText().trim();
 				boolean factExpr = !XbrlDockUtils.isEmpty(txt);
 
@@ -229,22 +229,22 @@ public class XbrlDockGuiStorePanel extends JPanel implements XbrlDockGuiConsts, 
 	}
 
 	@Override
-	public Object process(String command, Object... params) throws Exception {
+	public Object process(String command, Map params) throws Exception {
 		Object ret = null;
 
 		switch (command) {
 		case XDC_CMD_GEN_Init:
-			initModule((Map) params[0]);
+			initModule(params);
 			break;
 		case XDC_CMD_GEN_SELECT:
-			updateDescPanel(params[0]);
+			updateDescPanel(old[0]);
 			break;
 		case XDC_CMD_GEN_ACTIVATE:
-			String selId = XbrlDockUtils.simpleGet(params[0], XDC_EXT_TOKEN_id);
+			String selId = XbrlDockUtils.simpleGet(old[0], XDC_EXT_TOKEN_id);
 			XbrlDock.callAgent(XDC_CFGTOKEN_AGENT_gui, XDC_CMD_GEN_SELECT, store, selId);
 			break;
 		default:
-			XbrlDockException.wrap(null, "Unhandled agent command", command, params);
+			XbrlDockException.wrap(null, "Unhandled agent command", command, old);
 			break;
 		}
 

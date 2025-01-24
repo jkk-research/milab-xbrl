@@ -4,11 +4,12 @@ import java.io.File;
 import java.util.Map;
 import java.util.TreeMap;
 
-import com.xbrldock.poc.XbrlDockPocConsts;
+import com.xbrldock.XbrlDockConsts;
 import com.xbrldock.poc.meta.XbrlDockMetaConsts;
 import com.xbrldock.utils.XbrlDockUtils;
 
-public class XbrlDockDevReportStats implements XbrlDockMetaConsts, XbrlDockPocConsts.ReportDataHandler {
+@SuppressWarnings({ "unchecked" })
+public class XbrlDockDevReportStats implements XbrlDockMetaConsts, XbrlDockConsts.GenAgent {
 
 	String repId;
 
@@ -25,24 +26,46 @@ public class XbrlDockDevReportStats implements XbrlDockMetaConsts, XbrlDockPocCo
 
 	XbrlDockDevCounter segCnt = new XbrlDockDevCounter("Segments", true);
 	long factCount;
-
+	
 	@Override
+	public Object process(String cmd, Map<String, Object> params) throws Exception {
+		switch (cmd) {
+		case XDC_CMD_GEN_Init:
+			break;
+		case XDC_CMD_GEN_Begin:
+			beginReport((String) params.get(XDC_EXT_TOKEN_id));
+			break;
+		case XDC_CMD_REP_ADD_NAMESPACE:
+			addNamespace((String) params.get(XDC_EXT_TOKEN_id), (String) params.get(XDC_EXT_TOKEN_value));
+			break;
+		case XDC_CMD_REP_ADD_SCHEMA:
+			addTaxonomy((String) params.get(XDC_EXT_TOKEN_id), (String) params.get(XDC_EXT_TOKEN_value));
+			break;
+		case XDC_REP_SEG_Unit:
+		case XDC_REP_SEG_Context:
+		case XDC_REP_SEG_Fact:
+			return processSegment(cmd, (Map<String, Object>) params.get(XDC_GEN_TOKEN_source));
+		case XDC_CMD_GEN_End:
+			endReport();
+			break;
+		}
+		return null;
+	}
+
+
 	public void beginReport(String repId) {
 		this.repId = repId;
 		segCnt.reset();
 	}
 
-	@Override
 	public void addNamespace(String ref, String id) {
 		XbrlDockUtils.safeGet(nsRefs, ref, rc).add(id);
 	}
 
-	@Override
 	public void addTaxonomy(String tx, String type) {
 		taxonomies.add(tx);
 	}
 
-	@Override
 	public String processSegment(String segment, Map<String, Object> data) {
 		String ret = "";
 		Long sc = segCnt.add(segment);
@@ -86,7 +109,6 @@ public class XbrlDockDevReportStats implements XbrlDockMetaConsts, XbrlDockPocCo
 		return ret;
 	}
 
-	@Override
 	public void endReport() {
 	}
 

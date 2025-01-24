@@ -67,13 +67,13 @@ public class XbrlDockGuiMetaManagerPanel extends JPanel implements XbrlDockGuiCo
 				break;
 			case XDC_GUICMD_ACTIVATE:
 				String selId = XbrlDockUtils.simpleGet(selItem, XDC_METAINFO_pkgInfo, XDC_EXT_TOKEN_identifier);
-				XbrlDock.callAgentNoEx(XDC_CFGTOKEN_AGENT_gui, XDC_CMD_GEN_SELECT, XDC_CFGTOKEN_AGENT_metaManager, selId);
+				XbrlDock.callAgentNoEx(XDC_CFGTOKEN_AGENT_gui, XDC_CMD_GEN_SELECT, XbrlDockUtils.setParams(XDC_GUICMD_WBAGENT, XDC_CFGTOKEN_AGENT_metaManager, XDC_EXT_TOKEN_id, selId));
 //				String selId = XbrlDockUtils.simpleGet(((WidgetEvent)e).getUserOb(), XDC_METAINFO_pkgInfo, XDC_EXT_TOKEN_identifier);
 //				XbrlDock.callAgent(XDC_CFGTOKEN_AGENT_gui, XDC_CMD_GEN_SELECT, XDC_CFGTOKEN_AGENT_esefConn, selId);
 				break;
 
 			case XDC_CMD_GEN_TEST01:
-				XbrlDock.callAgentNoEx(XDC_CFGTOKEN_AGENT_metaManager, XDC_CMD_GEN_TEST01, selItem);
+				XbrlDock.callAgentNoEx(XDC_CFGTOKEN_AGENT_metaManager, XDC_CMD_GEN_TEST01, XbrlDockUtils.setParams(XDC_EXT_TOKEN_value, selItem));
 				break;
 			default:
 //				XbrlDockException.wrap(null, "Unknown command", cmd);
@@ -172,9 +172,9 @@ public class XbrlDockGuiMetaManagerPanel extends JPanel implements XbrlDockGuiCo
 		taxGrid.updateItems(true, new GenAgent() {
 			
 			@Override
-			public Object process(String cmd, Object... params) throws Exception {
+			public Object process(String cmd, Map params) throws Exception {
 				if (XDC_CMD_GEN_Process.equals(cmd)) {
-					ArrayList items = (ArrayList) params[0];
+					ArrayList items = (ArrayList) params.get(XDC_GEN_TOKEN_members);
 					for (Object c : metaCatalog.values()) {
 						items.add(c);
 					}
@@ -185,10 +185,10 @@ public class XbrlDockGuiMetaManagerPanel extends JPanel implements XbrlDockGuiCo
 	}
 
 	@Override
-	public Object process(String command, Object... params) throws Exception {
+	public Object process(String command, Map params) throws Exception {
 		switch (command) {
 		case XDC_CMD_GEN_Init:
-			initModule((Map) params[0]);
+			initModule(params);
 			break;
 		default:
 			break;

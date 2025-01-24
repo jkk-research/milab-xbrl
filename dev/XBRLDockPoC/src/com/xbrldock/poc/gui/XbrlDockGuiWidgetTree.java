@@ -20,6 +20,7 @@ import javax.swing.tree.TreePath;
 import javax.swing.tree.TreeSelectionModel;
 
 import com.xbrldock.XbrlDockException;
+import com.xbrldock.utils.XbrlDockUtils;
 
 @SuppressWarnings({ "rawtypes", "unchecked" })
 public class XbrlDockGuiWidgetTree implements XbrlDockGuiConsts.Widget<JComponent>, XbrlDockGuiConsts {
@@ -118,7 +119,7 @@ public class XbrlDockGuiWidgetTree implements XbrlDockGuiConsts.Widget<JComponen
 		}
 
 		try {
-			loader.process(XDC_CMD_GEN_Process, rootNode);
+			loader.process(XDC_CMD_GEN_Process, XbrlDockUtils.setParams(XDC_EXT_TOKEN_value, rootNode));
 		} catch (Exception e) {
 			XbrlDockException.wrap(e, "Grid updateItems");
 		}

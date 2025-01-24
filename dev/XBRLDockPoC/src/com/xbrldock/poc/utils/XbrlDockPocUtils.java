@@ -27,12 +27,12 @@ public class XbrlDockPocUtils extends XbrlDockUtils implements XbrlDockPocConsts
 	public static Map<String, Object> readMeta(File root) throws Exception {
 		Map<String, Object> t = new TreeMap<>();
 
-		XbrlDockUtilsFile.FileProcessor mif = new XbrlDockUtilsFile.FileProcessor() {
+		GenAgent mif = new GenAgent() {
 			boolean ret = true;
 
 			@Override
-			public Object process(String cmd, Object... params) throws Exception {
-				File f = (File) params[0];
+			public Object process(String cmd, Map<String, Object> params) throws Exception {
+				File f = (File) params.get(XDC_GEN_TOKEN_target);
 				if (XDC_CMD_GEN_Begin.equals(cmd) && XDC_FNAME_METAINF.equals(f.getName())) {
 					t.put(XDC_METAINFO_dir, f);
 					ret = false;

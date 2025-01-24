@@ -60,9 +60,9 @@ public class XbrlDockGuiReportPanel extends JPanel implements XbrlDockGuiConsts,
 		DefaultMutableTreeNode lastHead = null;
 
 		@Override
-		public Object process(String cmd, Object... params) throws Exception {
+		public Object process(String cmd, Map params) throws Exception {
 			if (XDC_CMD_GEN_Process.equals(cmd)) {
-				DefaultMutableTreeNode root = (DefaultMutableTreeNode) params[0];
+				DefaultMutableTreeNode root = (DefaultMutableTreeNode) params.get(XDC_EXT_TOKEN_value);
 				
 				Set<String> emptyKeys = new TreeSet<>();
 
@@ -110,8 +110,8 @@ public class XbrlDockGuiReportPanel extends JPanel implements XbrlDockGuiConsts,
 
 	GenAgent conceptTreeLoader = new GenAgent() {
 		@Override
-		public Object process(String cmd, Object... params) throws Exception {
-			DefaultMutableTreeNode item = (DefaultMutableTreeNode) params[0];
+		public Object process(String cmd, Map params) throws Exception {
+			DefaultMutableTreeNode item = (DefaultMutableTreeNode) params.get(XDC_EXT_TOKEN_value);
 			if (XDC_CMD_GEN_Process.equals(cmd)) {
 				for (Map.Entry<String, Set> ec : conceptHierarchy.entrySet()) {
 					DefaultMutableTreeNode n = new DefaultMutableTreeNode(namespaces.get(ec.getKey()));
@@ -165,25 +165,25 @@ public class XbrlDockGuiReportPanel extends JPanel implements XbrlDockGuiConsts,
 	Set<String> taxonomies = new TreeSet<>();
 	Map<String, String> namespaces = new TreeMap<>();
 
-	ReportDataHandler dh = new ReportDataHandler() {
-
+	GenAgent dh = new GenAgent() {
+		
 		@Override
-		public void beginReport(String repId) {
-			// TODO Auto-generated method stub
-
+		public Object process(String cmd, Map<String, Object> params) throws Exception {
+			switch (cmd) {
+			case XDC_CMD_REP_ADD_NAMESPACE:
+				namespaces.put((String) params.get(XDC_EXT_TOKEN_id), (String) params.get(XDC_EXT_TOKEN_value));				
+				break;
+			case XDC_CMD_REP_ADD_SCHEMA:
+				taxonomies.add((String) params.get(XDC_EXT_TOKEN_id));
+				break;
+			case XDC_REP_SEG_Unit:
+			case XDC_REP_SEG_Context:
+			case XDC_REP_SEG_Fact:
+				return processSegment(cmd, (Map<String, Object>) params.get(XDC_GEN_TOKEN_source));
+			}
+			return null;
 		}
 
-		@Override
-		public void addTaxonomy(String tx, String type) {
-			taxonomies.add(tx);
-		}
-
-		@Override
-		public void addNamespace(String ref, String id) {
-			namespaces.put(ref, id);
-		}
-
-		@Override
 		public String processSegment(String segment, Map<String, Object> data) {
 			String ret = "";
 
@@ -241,12 +241,6 @@ public class XbrlDockGuiReportPanel extends JPanel implements XbrlDockGuiConsts,
 
 			return ret;
 		}
-
-		@Override
-		public void endReport() {
-			// TODO Auto-generated method stub
-
-		}
 	};
 
 	public XbrlDockGuiReportPanel() throws Exception {
@@ -260,14 +254,14 @@ public class XbrlDockGuiReportPanel extends JPanel implements XbrlDockGuiConsts,
 	}
 
 	@Override
-	public Object process(String command, Object... params) throws Exception {
+	public Object process(String command, Map params) throws Exception {
 		Object ret = null;
 
 		switch (command) {
 		case XDC_CMD_GEN_SETMAIN:
 			ctxHierarchy.clear();
 
-			XbrlDock.callAgent(XDC_CFGTOKEN_AGENT_esefConn, XDC_CMD_CONN_VISITREPORT, params[1], dh);
+			XbrlDock.callAgent(XDC_CFGTOKEN_AGENT_esefConn, XDC_CMD_CONN_VISITREPORT, XbrlDockUtils.setParams(XDC_EXT_TOKEN_id, params.get(XDC_EXT_TOKEN_id), XDC_GEN_TOKEN_processor, dh));
 
 			ctxTree.updateItems(true, ctxTreeLoader);
 			conceptTree.updateItems(true, conceptTreeLoader);
@@ -296,8 +290,8 @@ public class XbrlDockGuiReportPanel extends JPanel implements XbrlDockGuiConsts,
 		factGrid.updateItems(true, new GenAgent() {
 			
 			@Override
-			public Object process(String cmd, Object... params) throws Exception {
-				ArrayList items = (ArrayList) params[0];
+			public Object process(String cmd, Map params) throws Exception {
+				ArrayList items = (ArrayList) params.get(XDC_GEN_TOKEN_members);
 				for (Object f : facts) {
 					Object ctx = XbrlDockUtils.simpleGet(f, XDC_FACT_TOKEN_context);
 					if ((null == ctxFilter) || ctxFilter.contains(ctx)) {

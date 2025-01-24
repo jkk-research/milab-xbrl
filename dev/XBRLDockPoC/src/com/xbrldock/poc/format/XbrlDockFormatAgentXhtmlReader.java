@@ -25,13 +25,13 @@ public class XbrlDockFormatAgentXhtmlReader implements XbrlDockFormatConsts, Xbr
 	String forcedLang;
 	
 	@Override
-	public Object process(String cmd, Object... params) throws Exception {
+	public Object process(String cmd, Map<String, Object> params) throws Exception {
 		switch ( cmd ) {
 		case XDC_CMD_GEN_SETLANG:
-			forceLang((String) params[0]);
+			forceLang((String) params.get(XDC_EXT_TOKEN_id));
 			break;
 		case XDC_CMD_GEN_Process:
-			loadReport((InputStream) params[0], (GenAgent) params[1]);
+			loadReport((InputStream) params.get(XDC_GEN_TOKEN_source), (GenAgent) params.get(XDC_GEN_TOKEN_target));
 			break;
 		}
 		return null;
@@ -61,7 +61,7 @@ public class XbrlDockFormatAgentXhtmlReader implements XbrlDockFormatConsts, Xbr
 					if (!XbrlDockUtils.isEmpty(sVal)) {
 						int si = attName.indexOf(":");
 						String ref = attName.substring(si + 1);
-						dataHandler.process(XDC_CMD_REP_ADD_NAMESPACE, ref, sVal);
+						dataHandler.process(XDC_CMD_REP_ADD_NAMESPACE, XbrlDockUtils.setParams(XDC_EXT_TOKEN_id, ref, XDC_EXT_TOKEN_value , sVal));
 					}
 				}
 			}
@@ -90,7 +90,7 @@ public class XbrlDockFormatAgentXhtmlReader implements XbrlDockFormatConsts, Xbr
 					sVal = e.getAttribute("xlink:href");
 					if (!XbrlDockUtils.isEmpty(sVal)) {
 						String lt = e.getAttribute("xlink:type");
-						dataHandler.process(XDC_CMD_REP_ADD_SCHEMA, sVal.trim(), lt);
+						dataHandler.process(XDC_CMD_REP_ADD_SCHEMA, XbrlDockUtils.setParams(XDC_EXT_TOKEN_id, sVal.trim(), XDC_EXT_TOKEN_value, lt));
 					}
 					break;
 				case "xbrli:context":
@@ -145,7 +145,7 @@ public class XbrlDockFormatAgentXhtmlReader implements XbrlDockFormatConsts, Xbr
 						}
 					}
 
-					dataHandler.process(XDC_REP_SEG_Context, segmentData);
+					dataHandler.process(XDC_REP_SEG_Context, XbrlDockUtils.setParams(XDC_GEN_TOKEN_source, segmentData));
 
 					break;
 				case "xbrli:unit":
@@ -161,7 +161,7 @@ public class XbrlDockFormatAgentXhtmlReader implements XbrlDockFormatConsts, Xbr
 						segmentData.put(XDC_FACT_TOKEN_unitDenominator, XbrlDockUtilsXml.getInfo(e, nsXbrli, "unitDenominator"));
 					}
 
-					dataHandler.process(XDC_REP_SEG_Unit, segmentData);
+					dataHandler.process(XDC_REP_SEG_Unit, XbrlDockUtils.setParams(XDC_GEN_TOKEN_source, segmentData));
 					break;
 				}
 			}
@@ -232,7 +232,7 @@ public class XbrlDockFormatAgentXhtmlReader implements XbrlDockFormatConsts, Xbr
 						segmentData.put(XDC_EXT_TOKEN_value, txtVal);
 						if (txtVal.length() > XbrlDockFormatUtils.TXT_CLIP_LENGTH) {
 							segmentData.put(XDC_FACT_TOKEN_xbrldockFactType, XDC_FACT_VALTYPE_text);
-							String id = (String) dataHandler.process(XDC_REP_SEG_Fact, segmentData);
+							String id = (String) dataHandler.process(XDC_REP_SEG_Fact, XbrlDockUtils.setParams(XDC_GEN_TOKEN_source, segmentData));
 							segmentData.put(XDC_EXT_TOKEN_id, id);
 							segmentData.put(XDC_EXT_TOKEN_value, txtVal.substring(0, XbrlDockFormatUtils.TXT_CLIP_LENGTH - 3) + "...");
 							segmentData.put(XDC_FACT_TOKEN_xbrldockFactType, XDC_FACT_VALTYPE_textClip);
@@ -241,7 +241,7 @@ public class XbrlDockFormatAgentXhtmlReader implements XbrlDockFormatConsts, Xbr
 						}
 					}
 
-					dataHandler.process(XDC_REP_SEG_Fact, segmentData);
+					dataHandler.process(XDC_REP_SEG_Fact, XbrlDockUtils.setParams(XDC_GEN_TOKEN_source, segmentData));
 				}
 			}
 		} catch (Throwable tl) {

@@ -3,11 +3,12 @@ package com.xbrldock.poc.utils;
 import java.util.Map;
 import java.util.TreeMap;
 
+import com.xbrldock.XbrlDockConsts;
 import com.xbrldock.poc.XbrlDockPocConsts;
 import com.xbrldock.utils.XbrlDockUtils;
 
 @SuppressWarnings({ "unchecked", "rawtypes" })
-public class XbrlDockPocReportInfoExtender implements XbrlDockPocConsts, XbrlDockPocConsts.ReportDataHandler {
+public class XbrlDockPocReportInfoExtender implements XbrlDockPocConsts, XbrlDockConsts.GenAgent {
 
 	Map reportData;
 
@@ -25,6 +26,30 @@ public class XbrlDockPocReportInfoExtender implements XbrlDockPocConsts, XbrlDoc
 	}
 
 	@Override
+	public Object process(String cmd, Map<String, Object> params) throws Exception {
+		switch (cmd) {
+		case XDC_CMD_GEN_Init:
+			break;
+		case XDC_CMD_GEN_Begin:
+			beginReport((String) params.get(XDC_EXT_TOKEN_id));
+			break;
+		case XDC_CMD_REP_ADD_NAMESPACE:
+			addNamespace((String) params.get(XDC_EXT_TOKEN_id), (String) params.get(XDC_EXT_TOKEN_value));
+			break;
+		case XDC_CMD_REP_ADD_SCHEMA:
+			addTaxonomy((String) params.get(XDC_EXT_TOKEN_id), (String) params.get(XDC_EXT_TOKEN_value));
+			break;
+		case XDC_REP_SEG_Unit:
+		case XDC_REP_SEG_Context:
+		case XDC_REP_SEG_Fact:
+			return processSegment(cmd, (Map<String, Object>) params.get(XDC_GEN_TOKEN_source));
+		case XDC_CMD_GEN_End:
+			endReport();
+			break;
+		}
+		return null;
+	}
+
 	public void beginReport(String repId) {
 		unitDef.clear();
 		ctxDef.clear();
@@ -33,17 +58,14 @@ public class XbrlDockPocReportInfoExtender implements XbrlDockPocConsts, XbrlDoc
 		repStart = repEnd = null;
 	}
 
-	@Override
 	public void addNamespace(String ref, String id) {
 		XbrlDockUtils.safeGet(reportData, XDC_REPORT_TOKEN_namespaces, MAP_CREATOR).put(ref, id);
 	}
 
-	@Override
 	public void addTaxonomy(String tx, String type) {
 		XbrlDockUtils.safeGet(reportData, XDC_REPORT_TOKEN_schemas, ARRAY_CREATOR).add(tx);
 	}
 
-	@Override
 	public String processSegment(String segment, Map<String, Object> data) {
 		String ret = "";
 		String sVal;
@@ -99,7 +121,6 @@ public class XbrlDockPocReportInfoExtender implements XbrlDockPocConsts, XbrlDoc
 		return ret;
 	}
 
-	@Override
 	public void endReport() {
 		reportData.put(XDC_EXT_TOKEN_startDate, repStart);
 		reportData.put(XDC_EXT_TOKEN_endDate, repEnd);

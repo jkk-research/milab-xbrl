@@ -8,10 +8,11 @@ import java.io.Writer;
 import java.util.Arrays;
 import java.util.Map;
 
+import com.xbrldock.XbrlDockConsts;
 import com.xbrldock.XbrlDockConsts.GenAgent;
 
 @SuppressWarnings({ "rawtypes" /*, "unchecked"*/ })
-public class XbrlDockUtilsCsvWriterAgent implements GenAgent, Closeable {
+public class XbrlDockUtilsCsvWriterAgent implements XbrlDockConsts, GenAgent, Closeable {
 	private final String sep = "\t";
 	private Object[] columns;
 
@@ -19,16 +20,17 @@ public class XbrlDockUtilsCsvWriterAgent implements GenAgent, Closeable {
 	private Writer writer;
 
 	@Override
-	public Object process(String cmd, Object... params) throws Exception {
+	public Object process(String cmd, Map params) throws Exception {
 		switch (cmd) {
 		case XbrlDockUtilsCsv.XDC_CMD_GEN_Init:
-			columns = (0 < params.length) ? Arrays.copyOf(params, params.length) : null;
+			Object[] old = (Object[]) params.get(XDC_GEN_TOKEN_members);
+			columns = (0 < old.length) ? Arrays.copyOf(old, old.length) : null;
 			break;
 		case XbrlDockUtilsCsv.XDC_CMD_GEN_Begin:
-			target = params[0];
+			target = params.get(XDC_GEN_TOKEN_target);
 			break;
 		case XbrlDockUtilsCsv.XDC_CMD_GEN_Process:
-			Map m = (Map) params[0];
+			Map m = (Map) params.get(XDC_EXT_TOKEN_value);
 
 			if (m.isEmpty()) {
 				break;

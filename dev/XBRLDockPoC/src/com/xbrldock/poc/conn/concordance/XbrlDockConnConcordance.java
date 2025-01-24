@@ -54,18 +54,18 @@ public class XbrlDockConnConcordance implements XbrlDockConnConcordanceConsts, X
 		Map<String, Map> ctxFacts = new TreeMap();
 
 		@Override
-		public Object process(String cmd, Object... params) throws Exception {
+		public Object process(String cmd, Map params) throws Exception {
 
 			switch (cmd) {
 			case XDC_CMD_GEN_Init:
 				break;
 			case XDC_CMD_GEN_Begin:
 				ctxInfo.clear();
-				ctxInfo.putAll((Map) params[0]);
+				ctxInfo.putAll((Map) params.get(XDC_GEN_TOKEN_source));
 				ctxFacts.clear();
 				break;
 			case XDC_CMD_GEN_Process:
-				Map fact = (Map) params[0];
+				Map fact = (Map) params.get(XDC_EXT_TOKEN_value);
 				String concept = (String) fact.get(XDC_FACT_TOKEN_concept);
 
 //				concept = concept.replaceFirst(":", "_");
@@ -287,15 +287,15 @@ public class XbrlDockConnConcordance implements XbrlDockConnConcordanceConsts, X
 	}
 
 	public void readConceptMapping(String tid) throws Exception {
-		XbrlDockMetaContainer tx2nd = XbrlDock.callAgent(XDC_CFGTOKEN_AGENT_metaManager, XDC_CMD_METAMGR_GETMC, tid);
+		XbrlDockMetaContainer tx2nd = XbrlDock.callAgent(XDC_CFGTOKEN_AGENT_metaManager, XDC_CMD_METAMGR_GETMC, XbrlDockUtils.setParamMap(null, XDC_EXT_TOKEN_id, tid));
 		tx2nd.visit(XDC_METATOKEN_links, new GenAgent() {
 			@Override
-			public Object process(String cmd, Object... params) throws Exception {
+			public Object process(String cmd, Map params) throws Exception {
 				switch (cmd) {
 				case XDC_CMD_GEN_Begin:
 					break;
 				case XDC_CMD_GEN_Process:
-					Map<String, Object> re = (Map<String, Object>) params[0];
+					Map<String, Object> re = (Map<String, Object>) params.get(XDC_EXT_TOKEN_value);
 
 					String to;
 					String ar = (String) re.get("xlink:arcrole");
@@ -439,18 +439,18 @@ public class XbrlDockConnConcordance implements XbrlDockConnConcordanceConsts, X
 	}
 
 	@Override
-	public Object process(String command, Object... params) throws Exception {
+	public Object process(String command, Map params) throws Exception {
 		Object ret = null;
 
 		switch (command) {
 		case XDC_CMD_GEN_Init:
-			initModule((Map) params[0]);
+			initModule(params);
 			break;
 		case XDC_CMD_GEN_REFRESH:
 			Map<String, Object> catalog = XbrlDock.callAgent(store, XDC_CMD_GEN_GETCATALOG);
 			Map<String, Map> filings = (Map<String, Map>) catalog.get(XDC_CONN_CAT_TOKEN_filings);
 
-			String strFilter = ((params.length > 0) && (params[0] instanceof String)) ? (String) params[0] : null;
+			String strFilter = (String) params.get(XDC_UTILS_MVEL_mvelCondition);
 
 			Object filter = XbrlDockUtils.isEmpty(strFilter) ? null : XbrlDockUtilsMvel.compile(strFilter);
 
@@ -463,8 +463,8 @@ public class XbrlDockConnConcordance implements XbrlDockConnConcordanceConsts, X
 					mon.step();
 					String repId = ef.getKey();
 					XbrlDock.log(EventLevel.Context, repId);
-					loader.setReportData(repInfo);
-					XbrlDock.callAgent(store, XDC_CMD_CONN_VISITREPORT, repId, repEval);
+					loader.process(XDC_CMD_GEN_Init, XbrlDockUtils.setParams(XDC_GEN_TOKEN_source, repInfo));
+					XbrlDock.callAgent(store, XDC_CMD_CONN_VISITREPORT, XbrlDockUtils.setParams(XDC_EXT_TOKEN_id, repId, XDC_GEN_TOKEN_processor, repEval));
 					loader.endReport();
 				}
 //				break;

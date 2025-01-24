@@ -11,12 +11,13 @@ import java.util.TreeMap;
 
 import org.json.simple.parser.JSONParser;
 
+import com.xbrldock.XbrlDockConsts;
+import com.xbrldock.XbrlDockException;
 import com.xbrldock.format.XbrlDockFormatConsts;
-import com.xbrldock.poc.XbrlDockPocConsts;
 import com.xbrldock.utils.XbrlDockUtils;
 
 @SuppressWarnings("unchecked")
-public class XbrlDockFormatJson implements XbrlDockFormatConsts, XbrlDockPocConsts.ReportFormatHandler {
+public class XbrlDockFormatJson implements XbrlDockFormatConsts, XbrlDockConsts.GenAgent {
 
 	Comparator<Map.Entry<String, Object>> dimComp = new Comparator<Map.Entry<String, Object>>() {
 		@Override
@@ -25,10 +26,19 @@ public class XbrlDockFormatJson implements XbrlDockFormatConsts, XbrlDockPocCons
 			return (0 != d) ? d : XbrlDockUtils.safeCompare(o1.getValue(), o2.getValue());
 		}
 	};
+	
+	@Override
+	public Object process(String cmd, Map<String, Object> params) throws Exception {
+		switch ( cmd ) {
+		case XDC_CMD_GEN_Process:
+			loadReport((InputStream) params.get(XDC_GEN_TOKEN_source), (GenAgent) params.get(XDC_GEN_TOKEN_target));
+			break;
+		}
+		return null;
+	}
 
 	@SuppressWarnings("unused")
-	@Override
-	public void loadReport(InputStream in, ReportDataHandler dataHandler) throws Exception {
+	public void loadReport(InputStream in, GenAgent dataHandler) throws Exception {
 		JSONParser p = new JSONParser();
 
 		try (InputStreamReader ir = new InputStreamReader(in)) {
@@ -43,14 +53,14 @@ public class XbrlDockFormatJson implements XbrlDockFormatConsts, XbrlDockPocCons
 			Collection<String> tx = XbrlDockUtils.simpleGet(root, XDC_FMTJSON_TOKEN_documentInfo, XDC_FMTJSON_TOKEN_taxonomy);
 			if (null != tx) {
 				for (String t : tx) {
-					dataHandler.addTaxonomy(t, null);
+					dataHandler.process(XDC_CMD_REP_ADD_SCHEMA, XbrlDockUtils.setParams(XDC_EXT_TOKEN_id, t));
 				}
 			}
 
 			Map<String, String> ns = XbrlDockUtils.simpleGet(root, XDC_FMTJSON_TOKEN_documentInfo, XDC_FMTJSON_TOKEN_namespaces);
 			if (null != ns) {
 				for (Map.Entry<String, String> ne : ns.entrySet()) {
-					dataHandler.addNamespace(ne.getKey(), ne.getValue());
+					dataHandler.process(XDC_CMD_REP_ADD_NAMESPACE, XbrlDockUtils.setParams(XDC_EXT_TOKEN_id, ne.getKey(), XDC_EXT_TOKEN_value , ne.getValue()));
 				}
 			}
 
@@ -70,8 +80,12 @@ public class XbrlDockFormatJson implements XbrlDockFormatConsts, XbrlDockPocCons
 						unitData.put(XDC_FACT_TOKEN_measure, info[0]);
 					}
 					unitData.put(XDC_FACT_TOKEN_unit, key);
-
-					return dataHandler.processSegment(XDC_REP_SEG_Unit, unitData);
+					
+					try {
+						return (String) dataHandler.process(XDC_REP_SEG_Unit, XbrlDockUtils.setParams(XDC_GEN_TOKEN_source, unitData));
+					} catch (Exception e) {
+						return XbrlDockException.wrap(e, "Creating unit", key);
+					}
 				}
 			};
 
@@ -103,7 +117,11 @@ public class XbrlDockFormatJson implements XbrlDockFormatConsts, XbrlDockPocCons
 						ctxData.put(XDC_FACT_TOKEN_dimensions, d);
 					}
 
-					return dataHandler.processSegment(XDC_REP_SEG_Context, ctxData);
+					try {
+						return (String) dataHandler.process(XDC_REP_SEG_Context, XbrlDockUtils.setParams(XDC_GEN_TOKEN_source, ctxData));
+					} catch (Exception e) {
+						return XbrlDockException.wrap(e, "Creating context", key);
+					}
 				}
 			};
 
@@ -138,7 +156,7 @@ public class XbrlDockFormatJson implements XbrlDockFormatConsts, XbrlDockPocCons
 
 				factData.put(XDC_FACT_TOKEN_context, ctxId);
 
-				dataHandler.processSegment(XDC_REP_SEG_Fact, factData);
+				dataHandler.process(XDC_REP_SEG_Fact, XbrlDockUtils.setParams(XDC_GEN_TOKEN_source, factData));
 			}
 		}
 	}

@@ -150,7 +150,11 @@ public abstract class XbrlDock implements XbrlDockConsts, XbrlDockUtilsConsts, X
 		return agent;
 	}
 
-	public static <RetType> RetType callAgentNoEx(String agentId, String command, Object... params) {
+	public static <RetType> RetType callAgentNoEx(String agentId, String command) {
+		return (RetType) callAgentNoEx( agentId, command, Collections.EMPTY_MAP);
+	}
+
+	public static <RetType> RetType callAgentNoEx(String agentId, String command, Map<String, Object> params) {
 		try {
 			return callAgent(agentId, command, params);
 		} catch (Exception e) {
@@ -158,7 +162,11 @@ public abstract class XbrlDock implements XbrlDockConsts, XbrlDockUtilsConsts, X
 		}
 	}
 
-	public static <RetType> RetType callAgent(String agentId, String command, Object... params) throws Exception {
+	public static <RetType> RetType callAgent(String agentId, String command) throws Exception {
+		return (RetType) callAgent( agentId, command, Collections.EMPTY_MAP);
+	}
+
+	public static <RetType> RetType callAgent(String agentId, String command, Map<String, Object> params) throws Exception {
 		Object ret = null;
 
 		GenAgent agent = getAgent(agentId);
