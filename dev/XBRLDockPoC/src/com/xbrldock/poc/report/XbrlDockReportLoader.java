@@ -267,7 +267,7 @@ public class XbrlDockReportLoader implements XbrlDockReportConsts, XbrlDockConst
 						break;
 					}
 
-					String ret = (String) dataHandler.process(XDC_REP_SEG_Fact, XbrlDockUtils.setParams(XDC_GEN_TOKEN_source, XDC_REP_SEG_Fact));
+					String ret = (String) dataHandler.process(XDC_REP_SEG_Fact, XbrlDockUtils.setParams(XDC_GEN_TOKEN_source, fact));
 					
 					if ( XDC_RETVAL_STOP.equals(ret)) {
 						break;

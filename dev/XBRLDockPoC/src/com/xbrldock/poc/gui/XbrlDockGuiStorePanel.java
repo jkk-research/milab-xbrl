@@ -78,7 +78,7 @@ public class XbrlDockGuiStorePanel extends JPanel implements XbrlDockGuiConsts, 
 				break;
 			case XDC_CMD_GEN_TEST01:
 				XbrlDockDevReportStats stats = new XbrlDockDevReportStats();
-				XbrlDock.callAgentNoEx(store, XDC_CMD_GEN_TEST01, stats);
+				XbrlDock.callAgentNoEx(store, XDC_CMD_GEN_TEST01, XbrlDockUtils.setParams(XDC_GEN_TOKEN_processor, stats));
 
 				XbrlDock.log(EventLevel.Info, "Test visit sats", stats);
 
@@ -89,7 +89,7 @@ public class XbrlDockGuiStorePanel extends JPanel implements XbrlDockGuiConsts, 
 //				}
 				break;
 			case XDC_CMD_GEN_TEST02:
-				XbrlDock.callAgentNoEx(store, XDC_CMD_GEN_TEST02, reportGrid.items);
+				XbrlDock.callAgentNoEx(store, XDC_CMD_GEN_TEST02, XbrlDockUtils.setParams(XDC_GEN_TOKEN_members, reportGrid.items));
 				break;
 			case XDC_GUICMD_PICK:
 				updateDescPanel(((WidgetEvent) e).getUserOb());
@@ -99,11 +99,11 @@ public class XbrlDockGuiStorePanel extends JPanel implements XbrlDockGuiConsts, 
 				break;
 			case XDC_GUICMD_ACTIVATE:
 				String selId = XbrlDockUtils.simpleGet(((WidgetEvent) e).getUserOb(), XDC_EXT_TOKEN_id);
-				XbrlDock.callAgentNoEx(XDC_CFGTOKEN_AGENT_gui, XDC_CMD_GEN_SELECT, store, selId);
+				XbrlDock.callAgentNoEx(XDC_CFGTOKEN_AGENT_gui, XDC_CMD_GEN_SELECT, XbrlDockUtils.setParams(XDC_GUICMD_WBAGENT, store, XDC_EXT_TOKEN_id, selId));
 				break;
 			default:
 				if (cmds.contains(cmd)) {
-					XbrlDock.callAgentNoEx(store, cmd, repFilterTA.getText());
+					XbrlDock.callAgentNoEx(store, cmd, XbrlDockUtils.setParams(XDC_UTILS_MVEL_mvelCondition, repFilterTA.getText()));
 				} else {
 					XbrlDockException.wrap(null, "Unknown command", cmd);
 				}
@@ -212,7 +212,7 @@ public class XbrlDockGuiStorePanel extends JPanel implements XbrlDockGuiConsts, 
 						String repId = re.getKey();
 						XbrlDock.log(EventLevel.Trace, "   on report", repId);
 
-						XbrlDock.callAgent(store, XDC_CMD_CONN_VISITREPORT, repId, factFilterEval);
+						XbrlDock.callAgent(store, XDC_CMD_CONN_VISITREPORT,  XbrlDockUtils.setParams(XDC_EXT_TOKEN_id, repId, XDC_GEN_TOKEN_processor, factFilterEval));
 
 						if (!factFilterTest.isMatch()) {
 							continue;
@@ -237,14 +237,14 @@ public class XbrlDockGuiStorePanel extends JPanel implements XbrlDockGuiConsts, 
 			initModule(params);
 			break;
 		case XDC_CMD_GEN_SELECT:
-			updateDescPanel(old[0]);
+			updateDescPanel(params.get(XDC_EXT_TOKEN_id));
 			break;
 		case XDC_CMD_GEN_ACTIVATE:
-			String selId = XbrlDockUtils.simpleGet(old[0], XDC_EXT_TOKEN_id);
-			XbrlDock.callAgent(XDC_CFGTOKEN_AGENT_gui, XDC_CMD_GEN_SELECT, store, selId);
+			String selId = XbrlDockUtils.simpleGet(params.get(XDC_EXT_TOKEN_value), XDC_EXT_TOKEN_id);
+			XbrlDock.callAgent(XDC_CFGTOKEN_AGENT_gui, XDC_CMD_GEN_SELECT, XbrlDockUtils.setParams(XDC_GUICMD_WBAGENT, store, XDC_EXT_TOKEN_id, selId));
 			break;
 		default:
-			XbrlDockException.wrap(null, "Unhandled agent command", command, old);
+			XbrlDockException.wrap(null, "Unhandled agent command", command, params);
 			break;
 		}
 

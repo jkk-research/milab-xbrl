@@ -5,7 +5,6 @@ import java.util.ArrayList;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.Map;
-import java.util.TreeMap;
 
 import com.xbrldock.XbrlDockException;
 
@@ -316,14 +315,18 @@ public class XbrlDockUtils implements XbrlDockUtilsConsts {
 		return target;
 	}
 	
-	private static ThreadLocal<Map<String, Object>> TL_PMAP = new ThreadLocal<Map<String,Object>>() {
-		protected java.util.Map<String,Object> initialValue() {
-			return new TreeMap<String, Object>();
-		};
-	};
+//	private static ThreadLocal<Map<String, Object>> TL_PMAP = new ThreadLocal<Map<String,Object>>() {
+//		protected java.util.Map<String,Object> initialValue() {
+//			return new TreeMap<String, Object>();
+//		};
+//	};
+//
+//	public static Map<String, Object> setParams(Object... params) {
+//		return setParamMap(TL_PMAP.get(), params);
+//	}
 
 	public static Map<String, Object> setParams(Object... params) {
-		return setParamMap(TL_PMAP.get(), params);
+		return setParamMap(null, params);
 	}
 
 	public static Map<String, Object> setParamMap(Map target, Object... params) {

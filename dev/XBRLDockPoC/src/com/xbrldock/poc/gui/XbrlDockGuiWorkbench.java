@@ -154,10 +154,13 @@ public class XbrlDockGuiWorkbench extends JFrame implements XbrlDockGuiConsts, X
 	};
 
 	ItemCreator<WBNode> childCreator = new ItemCreator<XbrlDockGuiWorkbench.WBNode>() {
+		@SuppressWarnings("unchecked")
 		@Override
 		public WBNode create(Object key, Object... hints) {
 			try {
-				Map cfg = childConfigs.get(hints[0]);
+				Map params = (Map) hints[0];
+				String agent = (String) params.get(XDC_GUICMD_WBAGENT);
+				Map cfg = childConfigs.get(agent);
 
 				Map<String, Object> childData = new TreeMap<String, Object>();
 				childData.put(XDC_EXT_TOKEN_name, key);
@@ -166,7 +169,7 @@ public class XbrlDockGuiWorkbench extends JFrame implements XbrlDockGuiConsts, X
 				JComponent mainPanel = n.getComp(cfg);
 
 				if (mainPanel instanceof GenAgent) {
-					((GenAgent) mainPanel).process(XDC_CMD_GEN_SETMAIN, "");
+					((GenAgent) mainPanel).process(XDC_CMD_GEN_SETMAIN, params);
 				}
 				n.frm = new ChildFrame((String) cfg.get(XDC_EXT_TOKEN_name), n, mainPanel);
 				return n;
@@ -214,14 +217,16 @@ public class XbrlDockGuiWorkbench extends JFrame implements XbrlDockGuiConsts, X
 			initModule(params);
 			break;
 		case XDC_CMD_GEN_SELECT:
-			WBNode wbn = rootNode.getChildById((String) params.get(XDC_GUICMD_WBAGENT), null);
+			String agent = (String) params.get(XDC_GUICMD_WBAGENT);
+			WBNode wbn = rootNode.getChildById(agent, null);
+			String id = (String) params.get(XDC_EXT_TOKEN_id);
 
-			if (old.length == 1) {
+			if (XbrlDockUtils.isEmpty(id)) {
 				TreePath tp = new TreePath(wbn);
 				panelTree.setSelectionPath(tp);
 				selectRightPanel(wbn);
 			} else {
-				wbn = wbn.getChildById((String) old[1], childCreator, params);
+				wbn = wbn.getChildById(id, childCreator, params);
 
 				wbn.focusFrame();
 

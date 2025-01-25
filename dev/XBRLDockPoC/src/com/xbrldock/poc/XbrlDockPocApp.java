@@ -6,6 +6,7 @@ import java.util.Map;
 import java.util.TreeMap;
 
 import com.xbrldock.XbrlDock;
+import com.xbrldock.poc.gui.XbrlDockGuiConsts;
 import com.xbrldock.poc.meta.XbrlDockMetaContainer;
 import com.xbrldock.poc.meta.XbrlDockMetaManager;
 import com.xbrldock.utils.XbrlDockUtils;
@@ -53,7 +54,7 @@ public class XbrlDockPocApp extends XbrlDock implements XbrlDockPocConsts {
 
 		if (gui || Boolean.TRUE.equals(XbrlDockUtils.simpleGet(APP_CONFIG, XDC_CFGTOKEN_env, XDC_CFGTOKEN_AGENT_gui))) {
 			XbrlDockMetaManager.LOAD_CACHE = true;
-			callAgent(XDC_CFGTOKEN_AGENT_gui, XDC_CMD_GEN_SELECT, XbrlDockUtils.setParamMap(cp, XDC_GEN_TOKEN_target, XDC_CFGTOKEN_AGENT_metaManager));
+			callAgent(XDC_CFGTOKEN_AGENT_gui, XDC_CMD_GEN_SELECT, XbrlDockUtils.setParamMap(cp, XbrlDockGuiConsts.XDC_GUICMD_WBAGENT, XDC_CFGTOKEN_AGENT_metaManager));
 			return;
 		}
 
