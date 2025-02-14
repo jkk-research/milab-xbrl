@@ -1,4 +1,6 @@
 
+https://filings.xbrl.org/api/filings?include=entity,language&filter=%5B%7B%22name%22%3A%22input_filing.filing_source.program%22%2C%22op%22%3A%22ne%22%2C%22val%22%3A%22UAIFRS%22%7D%5D&sort=-date_added&page%5Bsize%5D=20&page%5Bnumber%5D=1&_=1739367064711
+
 *** 2024-12-18 ***
 
 importing esma_taxonomy_set_prototype_2024-12-31

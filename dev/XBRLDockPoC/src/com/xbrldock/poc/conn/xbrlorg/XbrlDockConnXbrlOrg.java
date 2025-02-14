@@ -73,7 +73,7 @@ public class XbrlDockConnXbrlOrg
 			catalog = XbrlDockUtilsJson.readJson(fc);
 		}
 
-		testMode = true;
+		testMode = false;
 	}
 
 	@Override
@@ -89,6 +89,9 @@ public class XbrlDockConnXbrlOrg
 			ret = catalog;
 			break;
 		case XDC_CMD_GEN_TEST01:
+
+//			refresh(null);
+			getAllFilings();
 
 			File fRoot = new File(dirInput, XDC_FNAME_CONNFILINGS);
 
@@ -492,7 +495,8 @@ public class XbrlDockConnXbrlOrg
 		}
 
 //		Map resp = XbrlDockUtilsJson.readJson(new File(dataRoot, PATH_SRVRESP));
-		Map resp = XbrlDockUtilsJson.readJson(new File("temp/ESEFTest/20240907_ESEF_All.json"));
+//		Map resp = XbrlDockUtilsJson.readJson(new File("temp/ESEFTest/20240907_ESEF_All.json"));
+		Map resp = XbrlDockUtilsJson.readJson(new File(dirInput, "update/ESEF_All.json"));
 
 		Map entities = XbrlDockUtils.safeGet(catalog, XDC_CONN_CAT_TOKEN_entities, MAP_CREATOR);
 		Map langs = XbrlDockUtils.safeGet(catalog, XDC_CONN_CAT_TOKEN_languages, MAP_CREATOR);
@@ -580,8 +584,13 @@ public class XbrlDockConnXbrlOrg
 
 		XbrlDock.log(EventLevel.Trace, "Read filing count", filings.size(), "Entity count", entities.size(), "Language count", langs.size());
 
-//		XbrlDockUtilsJson.writeJson(new File(dataRoot, PATH_CATALOG), catalog);
+		int ret = (null == updated) ? newCount : updated.size();
 
-		return (null == updated) ? newCount : updated.size();
+		if (0 < ret) {
+			File fc = new File(dirStore, XDC_FNAME_CONNCATALOG);
+			XbrlDockUtilsJson.writeJson(fc, catalog);
+		}
+
+		return ret;
 	}
 }
