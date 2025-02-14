@@ -1,0 +1,70 @@
+{
+	"namespace": {
+		"iso4217": {
+			"url": "http://www.xbrl.org/2003/iso4217"
+		},
+		"esrs": {
+			"url": "https://xbrl.efrag.org/taxonomy/esrs/2023-12-22/common/esrs_cor.xsd"
+		},
+		"testComp": {
+			"url": "http://www.xbrl.org/2003/iso4217"
+		}
+	},
+	"measurement": {
+		"mass": {
+			"units": {
+				"g": {},
+				"kg": {}
+			}
+		},
+		"time": {
+			"units": {
+				"s": {}
+			}
+		},
+		"distance": {
+			"units": {
+				"m": {}
+			}
+		},
+		"volume": {
+			"derive": {
+				"op": "pow",
+				"arg": [
+					"distance",
+					3
+				]
+			},
+			"units": {
+				"l": {}
+			}
+		},
+		"speed": {
+			"derive": {
+				"op": "div",
+				"arg": [
+					"distance",
+					"time"
+				]
+			}
+		}
+	},
+	"options": {
+		"fuelType": {
+			"Diesel": {},
+			"Gasoline": {}
+		}
+	},
+	"attributes": {
+		"esrs": {
+			"CO2Footprint": {
+				"measurement": "mass"
+			}
+		},
+		"testComp": {
+			"CO2Footprint": {
+				"measurement": "mass"
+			}
+		}
+	}
+}
