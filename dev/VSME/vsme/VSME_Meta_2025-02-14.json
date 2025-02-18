@@ -1,0 +1,226 @@
+{
+	"meta": {
+		"standard": "vsme/VSME_Standard_2025-02-14.html",
+		"url": "https://www.efrag.org/sites/default/files/sites/webpublishing/SiteAssets/VSME%20Standard.pdf",
+		"time": "2025-02-14"
+	},
+	"imports": {
+		"NACE": "data/NACE_2025-02-14.json",
+		"Country": "data/Countries_2025-02-14.json"
+	},
+	"tables": {
+		"vsme_Locations": {
+			"type": "Table",
+			"attributes": [
+				{
+					"id": "vsme_LocationName",
+					"type": "String"
+				},
+				{
+					"id": "vsme_LocationAddress",
+					"type": "String"
+				},
+				{
+					"id": "vsme_LocationPostalCode",
+					"type": "String"
+				},
+				{
+					"id": "vsme_LocationCity",
+					"type": "String"
+				},
+				{
+					"id": "vsme_LocationCountry",
+					"type": "Identifier",
+					"source": "Country"
+				},
+				{
+					"id": "vsme_LocationCoordinates",
+					"type": "String",
+					"flags": [
+						"Set"
+					]
+				}
+			]
+		}
+	},
+	"attributes": {
+		"vsme_ReportModules": {
+			"type": "Identifier",
+			"options": [
+				{
+					"id": "vsme_ReportModules_Basic"
+				},
+				{
+					"id": "vsme_ReportModules_Comprehensive"
+				}
+			]
+		},
+		"vsme_ReportOmittedDisclosures": {
+			"type": "Identifier",
+			"flags": [
+				"Calculated",
+				"Set"
+			]
+		},
+		"vsme_ReportEntity": {
+			"type": "Identifier",
+			"options": [
+				{
+					"id": "vsme_ReportEntity_Individual"
+				},
+				{
+					"id": "vsme_ReportEntity_Consolidated"
+				}
+			]
+		},
+		"vsme_UndertakingSubsidiaries": {
+			"type": "Table",
+			"source": "vsme_Locations"
+		},
+		"vsme_UndertakingLegalForm": {
+			"type": "Identifier",
+			"flags": [
+				"Mandatory",
+				"AllowsText"
+			]
+		},
+		"vsme_UndertakingNACE": {
+			"type": "Identifier",
+			"source": "NACE",
+			"flags": [
+				"Mandatory",
+				"Set"
+			]
+		},
+		"vsme_UndertakingBalanceSheet": {
+			"type": "Real"
+		},
+		"vsme_UndertakingTurnover": {
+			"type": "Real"
+		},
+		"vsme_UndertakingEmployees": {
+			"type": "Real"
+		},
+		"vsme_UndertakingCategory": {
+			"type": "Identifier",
+			"flags": [
+				"Calculated"
+			],
+			"options": [
+				{
+					"id": "vsme_UndertakingCategory_Micro",
+					"limits": {
+						"vsme_UndertakingBalanceSheet": 450000,
+						"vsme_UndertakingTurnover": 900000,
+						"vsme_UndertakingEmployees": 10
+					}
+				},
+				{
+					"id": "vsme_UndertakingCategory_Small",
+					"limits": {
+						"vsme_UndertakingBalanceSheet": 5000000,
+						"vsme_UndertakingTurnover": 10000000,
+						"vsme_UndertakingEmployees": 50
+					}
+				},
+				{
+					"id": "vsme_UndertakingCategory_Medium",
+					"limits": {
+						"vsme_UndertakingBalanceSheet": 25000000,
+						"vsme_UndertakingTurnover": 50000000,
+						"vsme_UndertakingEmployees": 250
+					}
+				}
+			]
+		},
+		"vsme_UndertakingCountry": {
+			"type": "Identifier",
+			"source": "Country"
+		},
+		"vsme_UndertakingAssets": {
+			"type": "Table",
+			"source": "vsme_Locations"
+		},
+		"vsme_UndertakingSites": {
+			"type": "Table",
+			"source": "vsme_Locations"
+		},
+		"vsme_Certifications": {
+			"type": "Table",
+			"attributes": [
+				{
+					"id": "vsme_CertificationName",
+					"type": "String"
+				},
+				{
+					"id": "vsme_CertificationProvider",
+					"type": "String"
+				},
+				{
+					"id": "vsme_CertificationScore",
+					"type": "Real"
+				},
+				{
+					"id": "vsme_CertificationDate",
+					"type": "Date"
+				},
+				{
+					"id": "vsme_CertificationDescription",
+					"type": "Text"
+				}
+			]
+		}
+	},
+	"expressions": [
+		{
+			"target": "vsme_UndertakingCategory",
+			"type": "Value",
+			"items": [
+				"vsme_UndertakingBalanceSheet",
+				"vsme_UndertakingTurnover",
+				"vsme_UndertakingEmployees"
+			],
+			"formula": ""
+		},
+		{
+			"target": "vsme_UndertakingSubsidiaries",
+			"type": "State",
+			"items": [
+				"vsme_ReportEntity"
+			],
+			"formula": ""
+		}
+	],
+	"panels": {
+		"h3_B1": {
+			"path": [
+				"h2_Basic_General",
+				"h3_B1"
+			],
+			"items": [
+				"vsme_ReportModules",
+				"vsme_ReportOmittedDisclosures",
+				"vsme_ReportEntity",
+				"vsme_UndertakingSubsidiaries",
+				"vsme_UndertakingLegalForm",
+				"vsme_UndertakingNACE",
+				"vsme_UndertakingBalanceSheet",
+				"vsme_UndertakingTurnover",
+				"vsme_UndertakingEmployees",
+				"vsme_UndertakingCategory",
+				"vsme_UndertakingCountry",
+				"vsme_UndertakingAssets",
+				"vsme_UndertakingSites",
+				"vsme_Certifications"
+			]
+		}
+	},
+	"app": {
+		"start": "h3_B1"
+	},
+	"messages": {
+		"vsme_Err_UndertakingCategoryInvalid": {
+			"level": "Error"
+		}
+	}
+}

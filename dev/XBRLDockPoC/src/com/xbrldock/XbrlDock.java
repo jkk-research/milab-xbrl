@@ -30,12 +30,6 @@ public abstract class XbrlDock implements XbrlDockConsts, XbrlDockUtilsConsts, X
 
 	public static void main(String[] args) {
 		try {
-			Map cfgData = XbrlDockUtilsJson.readJson(XDC_FNAME_CONFIG);
-
-			if (null != cfgData) {
-				APP_CONFIG.putAll(cfgData);
-			}
-
 			for (Map.Entry<String, String> e : System.getenv().entrySet()) {
 				addConfig(e.getKey(), e.getValue());
 			}
@@ -63,6 +57,14 @@ public abstract class XbrlDock implements XbrlDockConsts, XbrlDockUtilsConsts, X
 				} else {
 					APP_ARGS.add(a);
 				}
+			}
+			
+			String cfgFile = XbrlDockUtils.simpleGet(APP_CONFIG, XDC_CFGTOKEN_env, "cfg");
+
+			Map cfgData = XbrlDockUtilsJson.readJson(XbrlDockUtils.isEmpty(cfgFile) ? XDC_FNAME_CONFIG : cfgFile );
+
+			if (null != cfgData) {
+				APP_CONFIG.putAll(cfgData);
 			}
 
 			String userName = XbrlDockUtils.simpleGet(APP_CONFIG, XDC_CFGTOKEN_env, "user", "name");
@@ -108,6 +110,9 @@ public abstract class XbrlDock implements XbrlDockConsts, XbrlDockUtilsConsts, X
 		if (EventLevel.Context == level) {
 			LOG_CONTEXT_PENDING = params;
 		} else {
+			if ( null == level ) {
+				level = EventLevel.Trace;
+			}
 			if (0 > level.compareTo(LOG_LIMIT_ABOVE)) {
 				if (null != LOG_CONTEXT_PENDING) {
 					System.out.println();

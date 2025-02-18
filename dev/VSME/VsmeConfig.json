@@ -1,0 +1,12 @@
+{
+  "app" : {
+    "javaClass" : "org.xbrldock.vsme.poc.VsmeMain",
+		"standard" : "vsme/VSME_Standard_2025-02-14.html",
+		"meta" : "vsme/VSME_Meta_2025-02-14.json",
+    "userFlags" : {
+      "admin" : [ "lkedves" ]
+    },
+    "agents" : {
+    }
+  }
+}
