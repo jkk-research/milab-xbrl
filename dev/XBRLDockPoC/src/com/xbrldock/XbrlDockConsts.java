@@ -119,6 +119,7 @@ public interface XbrlDockConsts {
 	String XDC_UTILS_MVEL_mvelCompCond = "xdc_mvelCompCond";
 
 	String XDC_EXT_TOKEN_id = "id";
+	String XDC_EXT_TOKEN_class = "class";
 	String XDC_EXT_TOKEN_type = "type";
 	String XDC_EXT_TOKEN_value = "value";
 	String XDC_EXT_TOKEN_name = "name";

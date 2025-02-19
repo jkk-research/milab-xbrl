@@ -41,9 +41,42 @@
 					]
 				}
 			]
+		},
+		"vsme_Identifiers": {
+			"type": "Table",
+			"attributes": [
+				{
+					"id": "vsme_IdType",
+					"type": "String"
+				},
+				{
+					"id": "vsme_IdValue",
+					"type": "String"
+				}
+			]
 		}
 	},
 	"attributes": {
+		"vsme_UndertakingName": {
+			"type": "String"
+		},
+		"vsme_UndertakingLegalForm": {
+			"type": "Identifier",
+			"flags": [
+				"Mandatory",
+				"AllowsText"
+			]
+		},
+		"vsme_UndertakingContact": {
+			"type": "String",
+			"flags": [
+				"Set"
+			]
+		},
+		"vsme_UndertakingIdentifiers": {
+			"type": "Table",
+			"source": "vsme_Identifiers"
+		},
 		"vsme_ReportModules": {
 			"type": "Identifier",
 			"options": [
@@ -76,13 +109,6 @@
 		"vsme_UndertakingSubsidiaries": {
 			"type": "Table",
 			"source": "vsme_Locations"
-		},
-		"vsme_UndertakingLegalForm": {
-			"type": "Identifier",
-			"flags": [
-				"Mandatory",
-				"AllowsText"
-			]
 		},
 		"vsme_UndertakingNACE": {
 			"type": "Identifier",
@@ -191,33 +217,35 @@
 			"formula": ""
 		}
 	],
-	"panels": {
-		"h3_B1": {
+	"panels": [
+		{
+			"id": "h3_B1",
 			"path": [
 				"h2_Basic_General",
 				"h3_B1"
 			],
 			"items": [
+				"vsme_UndertakingName",
+				"vsme_UndertakingLegalForm",
+				"vsme_UndertakingCountry",
+				"vsme_UndertakingContact",
+				"vsme_UndertakingIdentifiers",
 				"vsme_ReportModules",
 				"vsme_ReportOmittedDisclosures",
 				"vsme_ReportEntity",
 				"vsme_UndertakingSubsidiaries",
-				"vsme_UndertakingLegalForm",
 				"vsme_UndertakingNACE",
 				"vsme_UndertakingBalanceSheet",
 				"vsme_UndertakingTurnover",
 				"vsme_UndertakingEmployees",
 				"vsme_UndertakingCategory",
-				"vsme_UndertakingCountry",
 				"vsme_UndertakingAssets",
 				"vsme_UndertakingSites",
 				"vsme_Certifications"
 			]
 		}
-	},
-	"app": {
-		"start": "h3_B1"
-	},
+	],
+	"start": "h3_B1",
 	"messages": {
 		"vsme_Err_UndertakingCategoryInvalid": {
 			"level": "Error"

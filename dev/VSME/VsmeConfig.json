@@ -7,6 +7,10 @@
       "admin" : [ "lkedves" ]
     },
     "agents" : {
+			"reportFrame" : {
+			  "javaClass" : "org.xbrldock.vsme.poc.VsmeFrame",
+				"name" : "VSME Report frame"
+			},
     }
   }
 }
