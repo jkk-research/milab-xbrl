@@ -3,17 +3,23 @@ package org.xbrldock.vsme.poc;
 import java.awt.BorderLayout;
 import java.awt.Container;
 import java.awt.GridLayout;
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
 import java.awt.event.FocusAdapter;
 import java.awt.event.FocusEvent;
+import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Map;
 import java.util.TreeMap;
 
+import javax.swing.AbstractButton;
+import javax.swing.ButtonGroup;
 import javax.swing.JComboBox;
 import javax.swing.JComponent;
 import javax.swing.JFrame;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
+import javax.swing.JRadioButton;
 import javax.swing.JScrollPane;
 import javax.swing.JTabbedPane;
 import javax.swing.JTextField;
@@ -39,6 +45,7 @@ public class VsmeFrame implements VsmePocConsts, XbrlDockConsts.GenAgent {
 	Map<String, Element> standardElements;
 
 	Map<String, Object> report;
+	ArrayList<Map<String, String>> messages;
 
 	JFrame frame;
 	XbrlDockGuiUtilsHtmlDisplay htmlStandard;
@@ -49,7 +56,7 @@ public class VsmeFrame implements VsmePocConsts, XbrlDockConsts.GenAgent {
 	JPanel pnlReportPage;
 	GridLayout glReportPage;
 
-	XbrlDockGuiWidgetGrid messages;
+	XbrlDockGuiWidgetGrid gridMsg;
 
 	@Override
 	public Object process(String cmd, Map<String, Object> params) throws Exception {
@@ -84,9 +91,11 @@ public class VsmeFrame implements VsmePocConsts, XbrlDockConsts.GenAgent {
 			pnlReport.add(cbPageSelector, BorderLayout.NORTH);
 			pnlReport.add(new JScrollPane(pnlReportPage), BorderLayout.CENTER);
 
-			messages = new XbrlDockGuiWidgetGrid();
+			messages = new ArrayList<>();
+			gridMsg = new XbrlDockGuiWidgetGrid(new LabeledAccess("Level", VSME_msgLevel), new LabeledAccess("Location", VSME_msgRef),
+					new LabeledAccess("Source", VSME_msgExpr), new LabeledAccess("Message", XDC_EXT_TOKEN_value));
 
-			JComponent cpLeft = XbrlDockUtilsGui.createSplit(false, pnlReport, messages.getComp(), 0.2);
+			JComponent cpLeft = XbrlDockUtilsGui.createSplit(false, pnlReport, gridMsg.getComp(), 0.8);
 			cp.add(XbrlDockUtilsGui.createSplit(true, cpLeft, cpRight, 0.8), BorderLayout.CENTER);
 
 			break;
@@ -187,6 +196,20 @@ public class VsmeFrame implements VsmePocConsts, XbrlDockConsts.GenAgent {
 		}
 	};
 
+	ActionListener al = new ActionListener() {
+		@Override
+		public void actionPerformed(ActionEvent e) {
+			JComponent comp = (JComponent) e.getSource();
+
+			if (comp instanceof AbstractButton) {
+				AbstractButton abtn = (AbstractButton) comp;
+				if (abtn.isSelected()) {
+					report.put((String) abtn.getClientProperty(XDC_EXT_TOKEN_id), abtn.getActionCommand());
+				}
+			}
+		}
+	};
+
 	private void setReportPage(String pageId) {
 		Map<String, Object> page = XbrlDockUtils.simpleGet(panelMap, pageId);
 
@@ -197,7 +220,13 @@ public class VsmeFrame implements VsmePocConsts, XbrlDockConsts.GenAgent {
 		glReportPage.setRows(items.size());
 
 		for (String i : items) {
-			pnlReportPage.add(new JLabel(i));
+			JLabel label = new JLabel(i);
+			pnlReportPage.add(label);
+			Element se = standardElements.get(i);
+
+			if (null != se) {
+				label.setToolTipText(se.getTextContent());
+			}
 
 			Map<String, Object> attDef = XbrlDockUtils.simpleGet(meta, VSME_attributes, i);
 			String attType = XbrlDockUtils.simpleGet(attDef, XDC_EXT_TOKEN_type);
@@ -208,19 +237,43 @@ public class VsmeFrame implements VsmePocConsts, XbrlDockConsts.GenAgent {
 			case "Real":
 				comp = createTextField(i, attDef);
 				break;
-			default:
-				comp = new JLabel(attType);
+			case "Identifier":
+				comp = createRadio(i, attDef);
 				break;
 			}
 
-			pnlReportPage.add(comp);
+			pnlReportPage.add((null == comp) ? new JLabel(attType) : comp);
 		}
 
 		pnlReportPage.invalidate();
 		pnlReportPage.getParent().revalidate();
 	}
 
-	public JTextField createTextField(String i, Map<String, Object> attDef) {
+	public JComponent createRadio(String i, Map<String, Object> attDef) {
+		Collection<Object> options = XbrlDockUtils.simpleGet(attDef, VSME_options);
+
+		if (null != options) {
+			JPanel ret = new JPanel(new GridLayout(options.size(), 1));
+
+			ButtonGroup bgr = new ButtonGroup();
+
+			for (Object o : options) {
+				String id = XbrlDockUtils.simpleGet(o, XDC_EXT_TOKEN_id);
+				JRadioButton bt = new JRadioButton(id);
+				bt.putClientProperty(XDC_EXT_TOKEN_id, i);
+				bt.setActionCommand(id);
+				bt.addActionListener(al);
+				bgr.add(bt);
+				ret.add(bt);
+			}
+
+			return ret;
+		}
+
+		return null;
+	}
+
+	public JComponent createTextField(String i, Map<String, Object> attDef) {
 		JTextField tf = new JTextField();
 
 		tf.putClientProperty(XDC_EXT_TOKEN_id, i);
