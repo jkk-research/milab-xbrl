@@ -4,12 +4,12 @@ import java.io.File;
 import java.util.Map;
 import java.util.TreeMap;
 
-import org.w3c.dom.Document;
+import org.jsoup.nodes.Document;
 
 import com.xbrldock.XbrlDock;
 import com.xbrldock.utils.XbrlDockUtils;
+import com.xbrldock.utils.XbrlDockUtilsHtml;
 import com.xbrldock.utils.XbrlDockUtilsJson;
-import com.xbrldock.utils.XbrlDockUtilsXml;
 
 public class VsmeMain extends XbrlDock implements VsmePocConsts {
 
@@ -27,9 +27,10 @@ public class VsmeMain extends XbrlDock implements VsmePocConsts {
 			meta = XbrlDockUtilsJson.readJson(new File(fName));
 
 			fName = XbrlDockUtils.simpleGet(params, VSME_standard);
-			standard = XbrlDockUtilsXml.parseDoc(new File(fName));
-
-			VsmeTest.testStandard(standard);
+			standard = XbrlDockUtilsHtml.readHtml(fName);
+//			standard = XbrlDockUtilsXml.parseDoc(new File(fName));
+//
+//			VsmeTest.testStandard(standard);
 
 			break;
 		case XDC_CMD_GEN_Begin:

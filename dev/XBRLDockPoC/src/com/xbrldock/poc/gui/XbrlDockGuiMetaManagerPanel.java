@@ -123,7 +123,7 @@ public class XbrlDockGuiMetaManagerPanel extends JPanel implements XbrlDockGuiCo
 		dropZone.setMaximumSize(new Dimension(50, 500));
 		right = dropZone;
 
-		if (XbrlDock.checkFlag(XDC_FLAG_ADMIN)) {
+		if (XbrlDock.checkUserFlag(XDC_FLAG_ADMIN)) {
 			JPanel pnlRight = new JPanel(new BorderLayout());
 
 			pnlRight.add(dropZone, BorderLayout.CENTER);

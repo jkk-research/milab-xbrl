@@ -107,6 +107,7 @@ public interface XbrlDockConsts {
 	String XDC_GEN_TOKEN_source = "source";
 	String XDC_GEN_TOKEN_target = "target";
 	String XDC_GEN_TOKEN_processor = "processor";
+	String XDC_GEN_TOKEN_flags = "flags";
 
 	String XDC_UTILS_MVEL_mvelCondition = "xdc_mvelCondition";
 	String XDC_UTILS_MVEL_mvelText = "xdc_mvelText";

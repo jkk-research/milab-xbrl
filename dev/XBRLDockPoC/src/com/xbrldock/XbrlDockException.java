@@ -10,7 +10,7 @@ public final class XbrlDockException extends RuntimeException implements XbrlDoc
 	public static PrintStream DUMP_STACK_TRACE = System.err;
 
 	private XbrlDockException(Throwable src, Object... params) {
-		super(XbrlDockUtils.sbAppend(null, ",", false, params).toString(), src);
+		super(XbrlDockUtils.toString(XbrlDockUtils.sbAppend(null, ",", false, params)), src);
 
 		log(true, src, getMessage());
 	}
@@ -20,7 +20,7 @@ public final class XbrlDockException extends RuntimeException implements XbrlDoc
 	}
 
 	public static <FakeRet> FakeRet wrap(Throwable src, Object... params) {
-		if ( src instanceof XbrlDockException ) {
+		if (src instanceof XbrlDockException) {
 			throw (XbrlDockException) src;
 		}
 
@@ -30,7 +30,7 @@ public final class XbrlDockException extends RuntimeException implements XbrlDoc
 	private static void log(boolean thrown, Throwable src, String msg) {
 		XbrlDock.log(EventLevel.Exception, src, msg);
 
-		if ( (null != DUMP_STACK_TRACE) && (null != src) ) {
+		if ((null != DUMP_STACK_TRACE) && (null != src)) {
 			src.printStackTrace(DUMP_STACK_TRACE);
 		}
 	}

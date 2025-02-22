@@ -1,5 +1,6 @@
 package com.xbrldock.utils;
 
+import java.awt.GridBagConstraints;
 import java.awt.event.ActionListener;
 
 import javax.swing.AbstractButton;
@@ -12,6 +13,30 @@ import com.xbrldock.XbrlDockException;
 
 public class XbrlDockUtilsGui implements XbrlDockUtilsConsts {
 	
+	public static JComponent setTitle(JComponent comp, String title) {
+		comp.setBorder(new TitledBorder(title));
+		return comp;
+	}
+
+	public static void nextGBRow(GridBagConstraints gbc, boolean reset) {
+		++ gbc.gridy;
+		gbc.gridx = -1;
+		nextGBCell(gbc, reset);
+	}
+
+	public static void nextGBCell(GridBagConstraints gbc, boolean reset) {
+		++ gbc.gridx;
+		
+		if ( reset ) {
+			gbc.gridwidth = gbc.gridheight = 1;
+			gbc.ipadx = gbc.ipady = 0;
+			gbc.weightx = gbc.weighty = 0.0;			
+			gbc.fill = GridBagConstraints.HORIZONTAL;
+//			gbc.insets = null;
+			gbc.anchor = GridBagConstraints.CENTER;
+		}
+	}
+
 	public static JSplitPane createSplit(boolean horizontal, JComponent c1, JComponent c2, double weight) {
 		JSplitPane spp = new JSplitPane(horizontal ? JSplitPane.HORIZONTAL_SPLIT : JSplitPane.VERTICAL_SPLIT, c1, c2);
 		spp.setResizeWeight(weight);
@@ -19,11 +44,6 @@ public class XbrlDockUtilsGui implements XbrlDockUtilsConsts {
 		return spp;
 	}
 
-
-	public static JComponent setTitle(JComponent comp, String title) {
-		comp.setBorder(new TitledBorder(title));
-		return comp;
-	}
 
 	public static <BtClass extends AbstractButton> BtClass createBtn(String cmd, ActionListener al, Class<BtClass> bc) {
 		try {

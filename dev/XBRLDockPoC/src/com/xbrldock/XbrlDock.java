@@ -134,7 +134,7 @@ public abstract class XbrlDock implements XbrlDockConsts, XbrlDockUtilsConsts, X
 		target.flush();
 	}
 	
-	public static boolean checkFlag(String flag) {
+	public static boolean checkUserFlag(String flag) {
 		return Boolean.TRUE.equals(XbrlDockUtils.simpleGet(APP_CONFIG, XDC_CFGTOKEN_userFlags, flag));
 	}
 

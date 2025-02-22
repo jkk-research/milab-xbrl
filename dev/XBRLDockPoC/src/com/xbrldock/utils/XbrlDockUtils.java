@@ -2,6 +2,7 @@ package com.xbrldock.utils;
 
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.Map;
@@ -25,6 +26,10 @@ public class XbrlDockUtils implements XbrlDockUtilsConsts {
 
 	public static boolean isEmpty(String str) {
 		return (null == str) || str.isEmpty();
+	}
+
+	public static boolean isArr(Object[] a) {
+		return (null != a) && (a.length > 0);
 	}
 
 	public static boolean isEqual(Object o1, Object o2) {
@@ -314,6 +319,14 @@ public class XbrlDockUtils implements XbrlDockUtilsConsts {
 
 		return target;
 	}
+	
+	public static boolean checkFlag(Object root, String flag, Object... path) {
+		Collection fc = XbrlDockUtils.simpleGet(root, (isArr(path) ? path : XDC_GEN_TOKEN_flags));
+		
+		return (null == fc) ? false : fc.contains(flag);
+	}
+
+
 	
 //	private static ThreadLocal<Map<String, Object>> TL_PMAP = new ThreadLocal<Map<String,Object>>() {
 //		protected java.util.Map<String,Object> initialValue() {

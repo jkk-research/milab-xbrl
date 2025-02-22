@@ -118,7 +118,7 @@ public class XbrlDockGuiStorePanel extends JPanel implements XbrlDockGuiConsts, 
 		repInfo = new XbrlDockGuiUtilsHtmlDisplay();
 
 		repFilterTA = new JTextArea();
-		if (XbrlDock.checkFlag(XDC_FLAG_ADMIN)) {
+		if (XbrlDock.checkUserFlag(XDC_FLAG_ADMIN)) {
 			repFilterTA.setText("\"HU\".equals(sourceAtts.country)");
 		}
 		btFilter = XbrlDockGuiUtils.createBtn(XDC_CMD_GEN_FILTER, al, JButton.class);

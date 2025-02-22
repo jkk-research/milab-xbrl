@@ -128,7 +128,7 @@
 			"type": "Real"
 		},
 		"vsme_UndertakingCategory": {
-			"type": "Identifier",
+			"type": "String",
 			"flags": [
 				"Calculated"
 			],
