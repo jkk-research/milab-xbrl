@@ -1,9 +1,14 @@
 package org.xbrldock.vsme.poc;
 
-import com.xbrldock.XbrlDockConsts;
+import java.util.Map;
+import java.util.TreeMap;
+
+import com.xbrldock.XbrlDock;
+import com.xbrldock.poc.XbrlDockPocConsts;
+import com.xbrldock.utils.XbrlDockUtils;
 import com.xbrldock.utils.XbrlDockUtilsConsts;
 
-public interface VsmePocConsts extends XbrlDockConsts, XbrlDockUtilsConsts {
+public interface VsmePocConsts extends XbrlDockPocConsts, XbrlDockUtilsConsts {
 	String VSME_standard = "standard";
 	String VSME_meta = "meta";
 	
@@ -12,6 +17,7 @@ public interface VsmePocConsts extends XbrlDockConsts, XbrlDockUtilsConsts {
 	String VSME_items = "items";
 	String VSME_attributes = "attributes";
 	String VSME_options = "options";
+	String VSME_expressions = "expressions";
 	
 	
 	String VSME_msgLevel = "msgLevel";
@@ -19,4 +25,19 @@ public interface VsmePocConsts extends XbrlDockConsts, XbrlDockUtilsConsts {
 	String VSME_msgExpr = "msgExpr";
 	
 	String VSME_AGENT_reportFrame = "reportFrame";
+	
+	
+	public class ExprCtx {
+		Map<String, Object> data = new TreeMap<String, Object>();
+		String exprId;
+
+		public <RetType> RetType get(Object root, Object... path) {
+			return XbrlDockUtils.simpleGet((null == root) ? data : root, path);
+		}
+
+		public void setMessage(String msgCode, String msgText) {
+			XbrlDock.log(EventLevel.Error, exprId, msgCode, msgText);
+		}
+	};
+
 }

@@ -12,9 +12,9 @@ import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.FocusAdapter;
 import java.awt.event.FocusEvent;
-import java.text.NumberFormat;
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.Enumeration;
 import java.util.Map;
 import java.util.TreeMap;
 
@@ -35,19 +35,21 @@ import javax.swing.event.DocumentEvent;
 import javax.swing.event.DocumentListener;
 import javax.swing.table.DefaultTableModel;
 import javax.swing.table.JTableHeader;
-import javax.swing.text.NumberFormatter;
 
 import org.jsoup.nodes.Document;
 import org.jsoup.nodes.Element;
 import org.jsoup.select.Elements;
 
+import com.xbrldock.XbrlDock;
 import com.xbrldock.XbrlDockConsts;
 import com.xbrldock.XbrlDockException;
 import com.xbrldock.poc.gui.XbrlDockGuiUtilsHtmlDisplay;
 import com.xbrldock.poc.gui.XbrlDockGuiWidgetGrid;
 import com.xbrldock.utils.XbrlDockUtils;
 import com.xbrldock.utils.XbrlDockUtilsGui;
+import com.xbrldock.utils.XbrlDockUtilsMvel;
 
+@SuppressWarnings({ "unchecked", "rawtypes" })
 public class VsmeFrame implements VsmePocConsts, XbrlDockConsts.GenAgent {
 
 	Document standard;
@@ -62,13 +64,11 @@ public class VsmeFrame implements VsmePocConsts, XbrlDockConsts.GenAgent {
 	JFrame frame;
 	XbrlDockGuiUtilsHtmlDisplay htmlStandard;
 	XbrlDockGuiUtilsHtmlDisplay htmlHelp;
+	Map<String, Object> widgets = new TreeMap<>();
 
 	JComboBox<String> cbPageSelector;
 	JPanel pnlValueEditor;
 	JPanel pnlReportPage;
-
-	NumberFormatter fmtInt = new NumberFormatter(NumberFormat.getInstance());
-	NumberFormatter fmtReal = new NumberFormatter(NumberFormat.getInstance());
 
 	XbrlDockGuiWidgetGrid gridMsg;
 
@@ -100,12 +100,6 @@ public class VsmeFrame implements VsmePocConsts, XbrlDockConsts.GenAgent {
 			cbPageSelector = new JComboBox<String>();
 
 			pnlReportPage = new JPanel(new GridBagLayout());
-//			fmtInt.setValueClass(Integer.class);
-//			fmtInt.setAllowsInvalid(false);
-//			fmtInt.setCommitsOnValidEdit(true);
-//			fmtReal.setValueClass(Double.class);
-//			fmtReal.setAllowsInvalid(false);
-//			fmtReal.setCommitsOnValidEdit(true);
 
 			pnlReport.add(cbPageSelector, BorderLayout.NORTH);
 			pnlReport.add(new JScrollPane(pnlReportPage), BorderLayout.CENTER);
@@ -216,7 +210,7 @@ public class VsmeFrame implements VsmePocConsts, XbrlDockConsts.GenAgent {
 					String s = doc.getText(0, doc.getLength());
 
 					if (XbrlDockUtils.isEmpty(s)) {
-						report.remove(id);
+						setReportValue(null, id);
 					} else {
 						Object val = s;
 
@@ -236,7 +230,7 @@ public class VsmeFrame implements VsmePocConsts, XbrlDockConsts.GenAgent {
 							SwingUtilities.invokeLater(resetValue);
 						}
 
-						report.put(id, val);
+						setReportValue(val, id);
 					}
 				}
 			} catch (Throwable e1) {
@@ -254,10 +248,93 @@ public class VsmeFrame implements VsmePocConsts, XbrlDockConsts.GenAgent {
 			if (comp instanceof AbstractButton) {
 				AbstractButton abtn = (AbstractButton) comp;
 				if (abtn.isSelected()) {
-					report.put((String) abtn.getClientProperty(XDC_EXT_TOKEN_id), abtn.getActionCommand());
+					setReportValue(abtn.getActionCommand(), (String) abtn.getClientProperty(XDC_EXT_TOKEN_id));
 				}
 			}
 		}
+	};
+
+	private void setGuiValue(Object value, String attId, int row, String col) {
+		Object w = widgets.get(attId);
+		
+		if ( w instanceof JTextField ) {
+			((JTextField)w).setText(XbrlDockUtils.toString(value));
+		} else if ( w instanceof ButtonGroup ) {
+			if ( null == value ) {
+				for ( Enumeration<AbstractButton> eb = ((ButtonGroup)w).getElements(); eb.hasMoreElements(); ) {
+					AbstractButton ab = eb.nextElement();
+					ab.setSelected(XbrlDockUtils.isEqual(value, ab.getActionCommand()));
+				}
+			}
+		}
+	};
+
+	private Object setReportValue(Object value, String attId) {
+		Object orig = report.get(attId);
+
+		if (null == value) {
+			report.remove(attId);
+			if (null != orig) {
+				reportUpdated(value, attId, -1, null);
+			}
+		} else {
+			if (!XbrlDockUtils.isEqual(value, orig)) {
+				report.put(attId, value);
+				reportUpdated(value, attId, -1, null);
+			}
+		}
+
+		return orig;
+	};
+
+	private void reportUpdated(Object value, String attId, int row, String col) {
+		Collection<Map<String, Object>> expressions = (Collection<Map<String, Object>>) meta.get(VSME_expressions);
+
+		ExprCtx ectx = null;
+
+		for (Map<String, Object> e : expressions) {
+			Collection<String> ei = (Collection<String>) e.get(VSME_items);
+
+			if (ei.contains(attId)) {
+				String expr = (String) e.get(XDC_FORMULA_formula);
+
+				if (!XbrlDockUtils.isEmpty(expr)) {
+					String tn = (String) e.get(XDC_GEN_TOKEN_target);
+					Object target = XbrlDockUtils.simpleGet(meta, VSME_attributes, tn);
+
+					if (null == ectx) {
+						ectx = new ExprCtx();
+						ectx.data.put("report", report);
+						ectx.data.put("ectx", ectx);
+					}
+
+					ectx.exprId = (String) e.get(XDC_EXT_TOKEN_id);
+
+					if (XbrlDockUtils.isEmpty(ectx.exprId)) {
+						ectx.exprId = tn;
+					}
+
+					ectx.data.put(XDC_GEN_TOKEN_target, target);
+
+					Object result;
+//					result = VsmeTest.categoryExpr(ctx);
+					Object comp = XbrlDockUtilsMvel.compile(expr);
+					result = XbrlDockUtilsMvel.evalCompiled(comp, ectx, ectx.data);
+
+					if (XbrlDockUtils.isEqual(result, -1)) {
+						XbrlDock.log(EventLevel.Error, "Invalid category, above Medium level");
+					} else {
+						setReportValue(result, tn);
+						XbrlDock.log(EventLevel.Trace, "Setting attribute", tn, "to", result);
+						setGuiValue(result, tn, row, col);
+					}
+				}
+			}
+		}
+	}
+
+	@SuppressWarnings("unused")
+	private void setReportValue(Object value, String attId, int row, String col) {
 	};
 
 	private void setReportPage(String pageId) {
@@ -273,7 +350,7 @@ public class VsmeFrame implements VsmePocConsts, XbrlDockConsts.GenAgent {
 		for (String i : items) {
 			XbrlDockUtilsGui.nextGBRow(gbc, true);
 			JLabel label = new JLabel(i);
-			
+
 			Map<String, Object> attDef = XbrlDockUtils.simpleGet(meta, VSME_attributes, i);
 			String attType = XbrlDockUtils.simpleGet(attDef, XDC_EXT_TOKEN_type);
 
@@ -291,8 +368,8 @@ public class VsmeFrame implements VsmePocConsts, XbrlDockConsts.GenAgent {
 				label = null;
 				break;
 			}
-			
-			if ( null != label ) {
+
+			if (null != label) {
 				Element se = standardElements.get(i);
 				if (null != se) {
 					label.setToolTipText(se.text());
@@ -318,36 +395,40 @@ public class VsmeFrame implements VsmePocConsts, XbrlDockConsts.GenAgent {
 
 	public JComponent createGrid(String i, Map<String, Object> attDef) {
 		Collection<Map> atts = XbrlDockUtils.simpleGet(attDef, VSME_attributes);
-		
-		if ( null == atts ) {
+
+		if (null == atts) {
 			String src = XbrlDockUtils.simpleGet(attDef, XDC_GEN_TOKEN_source);
 			atts = XbrlDockUtils.simpleGet(meta, "tables", src, VSME_attributes);
 		}
-		
+
 		DefaultTableModel tm = new DefaultTableModel(4, 0) {
+			private static final long serialVersionUID = 1L;
+
 			@Override
 			public boolean isCellEditable(int row, int column) {
 				return true;
 			}
 		};
 
-		for ( Map a : atts ) {
+		for (Map a : atts) {
 			tm.addColumn(a.get(XDC_EXT_TOKEN_id));
 		}
-		
+
 		JTable tbl = new JTable(tm);
 		tbl.setGridColor(Color.darkGray);
-    JTableHeader header = tbl.getTableHeader();
-    header.setBackground(Color.LIGHT_GRAY);
-    header.setForeground(Color.blue);
-    
+		JTableHeader header = tbl.getTableHeader();
+		header.setBackground(Color.LIGHT_GRAY);
+		header.setForeground(Color.blue);
+
 		JScrollPane scp = new JScrollPane(tbl);
-		scp.setPreferredSize(new Dimension(600,100));
-		
+		scp.setPreferredSize(new Dimension(600, 100));
+
 		XbrlDockUtilsGui.setTitle(scp, i);
-		
+
 		tbl.addFocusListener(fa);
 		
+		widgets.put(i, tbl);
+
 		return scp;
 	}
 
@@ -358,6 +439,7 @@ public class VsmeFrame implements VsmePocConsts, XbrlDockConsts.GenAgent {
 			JPanel ret = new JPanel(new GridLayout(options.size(), 1));
 
 			ButtonGroup bgr = new ButtonGroup();
+			widgets.put(i, bgr);
 
 			for (Object o : options) {
 				String id = XbrlDockUtils.simpleGet(o, XDC_EXT_TOKEN_id);
@@ -367,6 +449,7 @@ public class VsmeFrame implements VsmePocConsts, XbrlDockConsts.GenAgent {
 				bt.addActionListener(al);
 				bgr.add(bt);
 				ret.add(bt);
+				widgets.put(id, bt);
 			}
 
 			return ret;
@@ -397,6 +480,8 @@ public class VsmeFrame implements VsmePocConsts, XbrlDockConsts.GenAgent {
 			doc.putProperty(XDC_EXT_TOKEN_type, attType);
 			doc.putProperty(XDC_CFGTOKEN_gui, tf);
 		}
+
+		widgets.put(i, tf);
 		return tf;
 	}
 
