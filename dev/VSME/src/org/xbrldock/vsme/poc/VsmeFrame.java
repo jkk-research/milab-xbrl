@@ -13,16 +13,21 @@ import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.FocusAdapter;
 import java.awt.event.FocusEvent;
+import java.awt.event.ItemEvent;
+import java.awt.event.ItemListener;
 import java.awt.event.MouseAdapter;
 import java.io.File;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Enumeration;
 import java.util.Map;
+import java.util.Set;
 import java.util.TreeMap;
+import java.util.TreeSet;
 
 import javax.swing.AbstractButton;
 import javax.swing.ButtonGroup;
+import javax.swing.Icon;
 import javax.swing.JButton;
 import javax.swing.JComboBox;
 import javax.swing.JComponent;
@@ -35,6 +40,7 @@ import javax.swing.JScrollPane;
 import javax.swing.JTabbedPane;
 import javax.swing.JTable;
 import javax.swing.JTextField;
+import javax.swing.JToggleButton;
 import javax.swing.SwingUtilities;
 import javax.swing.event.DocumentEvent;
 import javax.swing.event.DocumentListener;
@@ -69,6 +75,10 @@ public class VsmeFrame implements VsmePocConsts, XbrlDockConsts.GenAgent {
 		MouseAdapter rowRemover = new MouseAdapter() {
 			@Override
 			public void mouseClicked(java.awt.event.MouseEvent evt) {
+				if (protAtts.contains(attId)) {
+					return;
+				}
+
 				JTable tbl = (JTable) evt.getSource();
 				int col = tbl.columnAtPoint(evt.getPoint());
 				if (atts.size() == col) {
@@ -168,6 +178,7 @@ public class VsmeFrame implements VsmePocConsts, XbrlDockConsts.GenAgent {
 	Map<String, Element> standardElements;
 
 	Map<String, Object> report;
+	Set<String> protAtts = new TreeSet<>();
 	ArrayList<Map<String, String>> messages;
 
 	JFrame frame;
@@ -182,6 +193,7 @@ public class VsmeFrame implements VsmePocConsts, XbrlDockConsts.GenAgent {
 	XbrlDockGuiWidgetGrid gridMsg;
 
 	JFileChooser fc;
+	Icon iProt;
 
 	@Override
 	public Object process(String cmd, Map<String, Object> params) throws Exception {
@@ -229,6 +241,9 @@ public class VsmeFrame implements VsmePocConsts, XbrlDockConsts.GenAgent {
 			JComponent cpLeft = XbrlDockUtilsGui.createSplit(false, pnlReport, gridMsg.getComp(), 0.8);
 			cp.add(XbrlDockUtilsGui.createSplit(true, cpLeft, cpRight, 0.8), BorderLayout.CENTER);
 			cp.add(pnlCmds, BorderLayout.SOUTH);
+
+			Dimension dimProt = new Dimension(15, 15);
+			iProt = XbrlDockUtilsGui.getIcon(VSME_protect, dimProt);
 
 			break;
 		case XDC_CMD_GEN_Begin:
@@ -371,7 +386,13 @@ public class VsmeFrame implements VsmePocConsts, XbrlDockConsts.GenAgent {
 					fcRet = fc.showSaveDialog(frame);
 					if (fcRet == JFileChooser.APPROVE_OPTION) {
 						File file = fc.getSelectedFile();
+						if (!protAtts.isEmpty()) {
+							report.put(VSME_protect, new ArrayList(protAtts));
+						}
 						XbrlDockUtilsJson.writeJson(file, report);
+						if (!protAtts.isEmpty()) {
+							report.put(VSME_protect, protAtts);
+						}
 					}
 					break;
 				case XDC_CMD_GEN_LOAD:
@@ -381,10 +402,27 @@ public class VsmeFrame implements VsmePocConsts, XbrlDockConsts.GenAgent {
 						File file = fc.getSelectedFile();
 						report = XbrlDockUtilsJson.readJson(file);
 
+						Collection<String> c = (Collection) report.get(VSME_protect);
+						if (null != c) {
+							report.remove(VSME_protect);
+							for (String p : c) {
+								setGuiProtected(p, true);
+							}
+						}
+
 						for (Map.Entry<String, Object> re : report.entrySet()) {
 							setGuiValue(re.getValue(), re.getKey());
 						}
 					}
+					break;
+				case VSME_protect:
+					JToggleButton tb = (JToggleButton) e.getSource();
+					String id = (String) tb.getClientProperty(XDC_EXT_TOKEN_id);
+
+					boolean prot = tb.isSelected();
+
+					setGuiProtected(id, prot);
+					setGuiValue(protAtts, cmd);
 					break;
 				}
 			} catch (Throwable t) {
@@ -407,11 +445,39 @@ public class VsmeFrame implements VsmePocConsts, XbrlDockConsts.GenAgent {
 		}
 	};
 
+	private ItemListener il = new ItemListener() {
+		@Override
+		public void itemStateChanged(ItemEvent e) {
+			if (ItemEvent.SELECTED == e.getStateChange()) {
+				setReportValue(e.getItem(), (String) ((JComboBox) e.getSource()).getClientProperty(XDC_EXT_TOKEN_id));
+			}
+		}
+	};
+
+	protected void setGuiProtected(String id, boolean prot) {
+		if (prot) {
+			protAtts.add(id);
+			report.put(VSME_protect, protAtts);
+		} else {
+			protAtts.remove(id);
+			if (protAtts.isEmpty()) {
+				report.remove(VSME_protect);
+			}
+		}
+
+		Object w = widgets.get(id);
+		if (w instanceof JComponent) {
+			((JComponent) w).setEnabled(!prot);
+		}
+	}
+
 	private void setGuiValue(Object value, String attId) {
 		Object w = widgets.get(attId);
 
 		if (w instanceof JTextField) {
 			((JTextField) w).setText(XbrlDockUtils.toString(value));
+		} else if (w instanceof JComboBox) {
+			((JComboBox) w).setSelectedItem(value);
 		} else if (w instanceof ButtonGroup) {
 			for (Enumeration<AbstractButton> eb = ((ButtonGroup) w).getElements(); eb.hasMoreElements();) {
 				AbstractButton ab = eb.nextElement();
@@ -516,16 +582,27 @@ public class VsmeFrame implements VsmePocConsts, XbrlDockConsts.GenAgent {
 			switch (attType) {
 			case "String":
 			case "Real":
+			case "AttRef":
 				comp = createTextField(i, attType, attDef);
 				break;
 			case "Identifier":
-				comp = createRadio(i, attDef);
+				comp = createSelector(i, attDef);
+//				comp = createRadio(i, attDef);
 				break;
 			case "Table":
 				comp = createGrid(i, attDef);
 				label = null;
 				break;
 			}
+
+			gbc.anchor = GridBagConstraints.PAGE_START;
+			JToggleButton btProtect = XbrlDockUtilsGui.createBtn(VSME_protect, alCmd, JToggleButton.class);
+			btProtect.setText("");
+			btProtect.setIcon(iProt);
+
+			pnlReportPage.add(btProtect, gbc);
+			btProtect.putClientProperty(XDC_EXT_TOKEN_id, i);
+			XbrlDockUtilsGui.nextGBCell(gbc, true);
 
 			if (null != label) {
 				Element se = standardElements.get(i);
@@ -552,27 +629,6 @@ public class VsmeFrame implements VsmePocConsts, XbrlDockConsts.GenAgent {
 	}
 
 	public JComponent createGrid(String i, Map<String, Object> attDef) {
-//		Collection<Map> atts = XbrlDockUtils.simpleGet(attDef, VSME_attributes);
-//
-//		if (null == atts) {
-//			String src = XbrlDockUtils.simpleGet(attDef, XDC_GEN_TOKEN_source);
-//			atts = XbrlDockUtils.simpleGet(meta, "tables", src, VSME_attributes);
-//		}
-//
-//		DefaultTableModel tm = new DefaultTableModel(4, 0) {
-//			private static final long serialVersionUID = 1L;
-//
-//			@Override
-//			public boolean isCellEditable(int row, int column) {
-//				return true;
-//			}
-//		};
-//
-//		for (Map a : atts) {
-//			tm.addColumn(a.get(XDC_EXT_TOKEN_id));
-//		}
-//
-//		JTable tbl = new JTable(tm);
 		AttGridModel agm = new AttGridModel(i, attDef);
 		JTable tbl = new JTable(agm);
 		tbl.addMouseListener(agm.rowRemover);
@@ -618,6 +674,39 @@ public class VsmeFrame implements VsmePocConsts, XbrlDockConsts.GenAgent {
 		}
 
 		return null;
+	}
+
+	public JComponent createSelector(String i, Map<String, Object> attDef) {
+
+		Collection<Object> options = XbrlDockUtils.simpleGet(attDef, VSME_options);
+		if (null != options) {
+			JComboBox<String> ret = new JComboBox<String>();
+			ret.putClientProperty(XDC_EXT_TOKEN_id, i);
+			widgets.put(i, ret);
+
+			if (XbrlDockUtils.checkFlag(attDef, "AllowsText")) {
+				ret.setEditable(true);
+			}
+
+			for (Object o : options) {
+				String id = XbrlDockUtils.simpleGet(o, XDC_EXT_TOKEN_id);
+				ret.addItem(id);
+			}
+			ret.setSelectedIndex(-1);
+			ret.addItemListener(il);
+
+			return ret;
+		} else {
+			String source = XbrlDockUtils.simpleGet(attDef, XDC_GEN_TOKEN_source);
+			Map<String, Object> srcDef = XbrlDockUtils.simpleGet(meta, "imports", source);
+			
+			if ( null != srcDef ) {
+				
+			}
+		}
+		
+		return null;
+
 	}
 
 	public JComponent createTextField(String i, String attType, Map<String, Object> attDef) {

@@ -20,6 +20,8 @@ public interface VsmePocConsts extends XbrlDockPocConsts, XbrlDockUtilsConsts {
 	String VSME_expressions = "expressions";
 	
 	
+	String VSME_protect = "vsme_protect";
+	
 	String VSME_msgLevel = "msgLevel";
 	String VSME_msgRef = "msgRef";
 	String VSME_msgExpr = "msgExpr";

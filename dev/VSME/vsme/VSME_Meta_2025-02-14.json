@@ -6,7 +6,21 @@
 	},
 	"imports": {
 		"NACE": "data/NACE_2025-02-14.json",
-		"Country": "data/Countries_2025-02-14.json"
+		"Country": {
+			"source": "data/Countries_2025-02-26.csv",
+			"sep": ";",
+			"attributes": [
+				{
+					"id": "country",
+					"type": "String"
+				},
+				{
+					"id": "name",
+					"type": "String"
+				}
+			],
+			"id": "country"
+		}
 	},
 	"tables": {
 		"vsme_Locations": {
@@ -65,6 +79,20 @@
 			"flags": [
 				"Mandatory",
 				"AllowsText"
+			],
+			"options": [
+				{
+					"id": "vsme_LegalForm_Private"
+				},
+				{
+					"id": "vsme_LegalForm_Proprietorship"
+				},
+				{
+					"id": "vsme_LegalForm_Partnership"
+				},
+				{
+					"id": "vsme_LegalForm_Cooperative"
+				}
 			]
 		},
 		"vsme_UndertakingContact": {
@@ -88,8 +116,8 @@
 				}
 			]
 		},
-		"vsme_ReportOmittedDisclosures": {
-			"type": "Identifier",
+		"vsme_protect": {
+			"type": "AttRef",
 			"flags": [
 				"Calculated",
 				"Set"
@@ -255,7 +283,7 @@
 				"vsme_UndertakingContact",
 				"vsme_UndertakingIdentifiers",
 				"vsme_ReportModules",
-				"vsme_ReportOmittedDisclosures",
+				"vsme_protect",
 				"vsme_ReportEntity",
 				"vsme_UndertakingSubsidiaries",
 				"vsme_UndertakingNACE",

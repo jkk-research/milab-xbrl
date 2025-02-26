@@ -1,9 +1,14 @@
 package com.xbrldock.utils;
 
+import java.awt.Dimension;
 import java.awt.GridBagConstraints;
+import java.awt.Image;
+import java.awt.Toolkit;
 import java.awt.event.ActionListener;
 
 import javax.swing.AbstractButton;
+import javax.swing.Icon;
+import javax.swing.ImageIcon;
 import javax.swing.JComboBox;
 import javax.swing.JComponent;
 import javax.swing.JSplitPane;
@@ -13,24 +18,29 @@ import com.xbrldock.XbrlDockException;
 
 public class XbrlDockUtilsGui implements XbrlDockUtilsConsts {
 	
+	public interface WidgetContainer {
+		JComponent getWidget();
+	}
+
 	public static JComponent setTitle(JComponent comp, String title) {
 		comp.setBorder(new TitledBorder(title));
 		return comp;
 	}
 
 	public static void nextGBRow(GridBagConstraints gbc, boolean reset) {
-		++ gbc.gridy;
+		++gbc.gridy;
 		gbc.gridx = -1;
+		gbc.gridwidth = gbc.gridheight = 1;
 		nextGBCell(gbc, reset);
 	}
 
 	public static void nextGBCell(GridBagConstraints gbc, boolean reset) {
-		++ gbc.gridx;
-		
-		if ( reset ) {
+		gbc.gridx += gbc.gridwidth;
+
+		if (reset) {
 			gbc.gridwidth = gbc.gridheight = 1;
 			gbc.ipadx = gbc.ipady = 0;
-			gbc.weightx = gbc.weighty = 0.0;			
+			gbc.weightx = gbc.weighty = 0.0;
 			gbc.fill = GridBagConstraints.HORIZONTAL;
 //			gbc.insets = null;
 			gbc.anchor = GridBagConstraints.CENTER;
@@ -43,7 +53,6 @@ public class XbrlDockUtilsGui implements XbrlDockUtilsConsts {
 		spp.setContinuousLayout(true);
 		return spp;
 	}
-
 
 	public static <BtClass extends AbstractButton> BtClass createBtn(String cmd, ActionListener al, Class<BtClass> bc) {
 		try {
@@ -68,4 +77,19 @@ public class XbrlDockUtilsGui implements XbrlDockUtilsConsts {
 		ab.setText(XbrlDockUtils.camel2Label(cmd));
 		return ab;
 	}
+
+	public static Icon getIcon(String id) {
+		return getIcon(id, null);
+	}
+
+	public static Icon getIcon(String id, Dimension prefSize) {
+		Image img = Toolkit.getDefaultToolkit().getImage("res/" + id + ".png");
+
+		if (null != prefSize) {
+			img = img.getScaledInstance(prefSize.width, prefSize.width, java.awt.Image.SCALE_SMOOTH);
+		}
+		
+		return new ImageIcon(img);
+	}
+
 }

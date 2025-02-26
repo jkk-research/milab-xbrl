@@ -1,6 +1,12 @@
 package com.xbrldock.utils;
 
+import java.io.BufferedReader;
+import java.io.File;
+import java.io.FileReader;
+import java.util.ArrayList;
 import java.util.Collection;
+import java.util.HashMap;
+import java.util.Map;
 import java.util.regex.Pattern;
 
 import com.xbrldock.XbrlDockException;
@@ -147,4 +153,52 @@ public class XbrlDockUtilsCsv implements XbrlDockUtilsConsts {
 		}
 	}
 
+	public static int readCsv(File f, GenAgent dataHandler) throws Exception {
+		return readCsv(f, dataHandler, "\t");
+	}
+
+	public static int readCsv(File f, GenAgent dataHandler, String sep) throws Exception {
+
+		int colCount = 0;
+		int rowCount = 0;
+		ArrayList<String> colNames = null;
+		ArrayList<String> values = new ArrayList<>();
+		Map<String, Object> data = new HashMap<>();
+
+
+		XbrlDockUtilsCsv.CsvLineReader lineReader = new XbrlDockUtilsCsv.CsvLineReader(sep, values);
+
+		try (FileReader fr = new FileReader(f); BufferedReader br = new BufferedReader(fr)) {
+			for (String line = br.readLine(); null != line; line = br.readLine()) {
+				values.clear();
+
+				if (!lineReader.csvReadLine(line)) {
+					continue;
+				}
+
+				if (null == colNames) {
+					colNames = new ArrayList<>(values);
+					colCount = colNames.size();					
+				} else {
+					for (int i = 0; i < colCount; ++i) {
+						data.put(colNames.get(i), values.get(i));
+					}
+
+					String ret = (String) dataHandler.process(XDC_CMD_GEN_Process, data);
+					
+					++rowCount;
+					
+					if ( XDC_CMD_GEN_STOP.equals(ret)) {
+						break;
+					}
+				}
+			}
+			
+			if ( null != colNames) {
+				dataHandler.process(XDC_CMD_GEN_End, null);
+			}
+		}
+
+		return rowCount;
+	}
 }

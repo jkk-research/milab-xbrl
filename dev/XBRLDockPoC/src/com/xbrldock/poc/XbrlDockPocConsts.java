@@ -9,17 +9,12 @@ public interface XbrlDockPocConsts extends XbrlDockConsts, XbrlDockUtilsConsts {
 	String XDC_CFGTOKEN_AGENT_manualReports = "manualReports";
 	String XDC_CFGTOKEN_AGENT_gui = "gui";
 	
-	String XDC_CMD_GEN_SAVE = "save";
-	String XDC_CMD_GEN_LOAD = "load";
-	String XDC_CMD_GEN_REFRESH = "refresh";
 	String XDC_CMD_GEN_GETCATALOG = "getCatalog";
 	String XDC_CMD_GEN_SETMAIN = "setMain";
 	String XDC_CMD_GEN_SELECT = "select";
 	String XDC_CMD_GEN_ACTIVATE = "activate";
 	String XDC_CMD_GEN_FILTER = "filter";
 	String XDC_CMD_GEN_SETLANG = "setLanguage";
-	String XDC_CMD_GEN_TEST01 = "test01";
-	String XDC_CMD_GEN_TEST02 = "test02";
 
 	String XDC_CMD_CONN_VISITREPORT = "visitReport";
 

@@ -16,6 +16,14 @@ public interface XbrlDockConsts {
 	String XDC_CMD_GEN_Process = "xdc_Process";
 	String XDC_CMD_GEN_End = "xdc_End";
 	String XDC_CMD_GEN_Release = "xdc_Release";
+	
+	String XDC_CMD_GEN_SAVE = "save";
+	String XDC_CMD_GEN_LOAD = "load";
+	String XDC_CMD_GEN_REFRESH = "refresh";
+	String XDC_CMD_GEN_STOP = "stop";
+	String XDC_CMD_GEN_TEST01 = "test01";
+	String XDC_CMD_GEN_TEST02 = "test02";
+
 
 	public interface GenAgent {
 		Object process(String cmd, Map<String, Object> params) throws Exception;
