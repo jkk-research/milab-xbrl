@@ -422,27 +422,27 @@ h4 {
 	<div id="vsme029">
 		<p>29. The undertaking shall disclose its total energy consumption in MWh, with a breakdown as per the table
 			below, if it can obtain the necessary information to provide such a breakdown:</p>
-		<table style="width: 100%">
+		<table id="vsme_Energy" style="width: 100%">
 			<tr>
 				<td></td>
-				<td>Renewable</td>
-				<td>Non-renewable</td>
-				<td>Total</td>
+				<td id="vsme_EnergySourceRenewable">Renewable</td>
+				<td id="vsme_EnergySourceNonRenewable">Non-renewable</td>
+				<td id="vsme_EnergySourceTotal">Total</td>
 			</tr>
 			<tr>
-				<td>Electricity (as reflected in utility billings)</td>
-				<td></td>
-				<td></td>
-				<td></td>
-			</tr>
-			<tr>
-				<td>Fuels</td>
+				<td id="vsme_EnergyTypeElectricity">Electricity (as reflected in utility billings)</td>
 				<td></td>
 				<td></td>
 				<td></td>
 			</tr>
 			<tr>
-				<td>Total</td>
+				<td id="vsme_EnergyTypeFuels">Fuels</td>
+				<td></td>
+				<td></td>
+				<td></td>
+			</tr>
+			<tr>
+				<td id="vsme_EnergyTypeTotal">Total</td>
 				<td colspan="3"></td>
 			</tr>
 		</table>
@@ -1010,10 +1010,10 @@ h4 {
 		<table>
 			<tr>
 				<td></td>
-				<td>Do you have existing sustainability practices/ policies/ future initiatives that address any of the
+				<td id="vsme_SustIssueInitExists">Do you have existing sustainability practices/ policies/ future initiatives that address any of the
 					following sustainability issues? [YES/NO]</td>
-				<td>Are they publicly available? [YES/NO]</td>
-				<td>Do the policies have any targets? [YES/NO]</td>
+				<td id="vsme_SustIssueInitPublic">Are they publicly available? [YES/NO]</td>
+				<td id="vsme_SustIssueInitTarget">Do the policies have any targets? [YES/NO]</td>
 			</tr>
 
 			<tr>
@@ -3695,7 +3695,7 @@ h4 {
 		<li id="vsme_Issue_Pollution">Pollution
 			<ul>
 				<li id="vsme_Issue_Pollution_Air">Pollution of air</li>
-				<li id="vsme_Issue_Pollution_Water">Pollution of water</li>
+				<li id="vsme_Issue_Pollution_Water" name="ESRS taxonomy id">Pollution of water</li>
 				<li id="vsme_Issue_Pollution_Soil">Pollution of soil</li>
 				<li id="vsme_Issue_Pollution_Organisms">Pollution of living organisms and food resources</li>
 				<li id="vsme_Issue_Pollution_Concern">Substances of concern</li>

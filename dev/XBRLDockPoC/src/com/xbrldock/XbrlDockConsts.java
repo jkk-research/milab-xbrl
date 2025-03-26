@@ -115,7 +115,14 @@ public interface XbrlDockConsts {
 	String XDC_GEN_TOKEN_source = "source";
 	String XDC_GEN_TOKEN_target = "target";
 	String XDC_GEN_TOKEN_processor = "processor";
+	String XDC_GEN_TOKEN_editor = "editor";
+	String XDC_GEN_TOKEN_agent = "agent";
 	String XDC_GEN_TOKEN_flags = "flags";
+	String XDC_GEN_TOKEN_row = "row";
+	String XDC_GEN_TOKEN_col = "col";
+
+	String XDC_GEN_TOKEN_method = "method";
+	String XDC_GEN_TOKEN_sum = "sum";
 
 	String XDC_UTILS_MVEL_mvelCondition = "xdc_mvelCondition";
 	String XDC_UTILS_MVEL_mvelText = "xdc_mvelText";
@@ -138,6 +145,10 @@ public interface XbrlDockConsts {
 	String XDC_EXT_TOKEN_lang = "lang";
 	String XDC_EXT_TOKEN_startDate = "startDate";
 	String XDC_EXT_TOKEN_endDate = "endDate";
+
+	String XDC_EXT_TOKEN_uri = "uri";
+	String XDC_EXT_TOKEN_root = "root";
+	String XDC_EXT_TOKEN_node = "node";
 
 	String XDC_ENTITY_TOKEN_idType = "idType";
 	String XDC_ENTITY_TOKEN_urlSource = "urlSource";

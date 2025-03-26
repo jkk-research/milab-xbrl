@@ -67,7 +67,7 @@ public class XbrlDockUtilsGui implements XbrlDockUtilsConsts {
 	public static JComboBox<?> setActive(JComboBox<?> cb, String cmd, ActionListener al) {
 		cb.addActionListener(al);
 		cb.setActionCommand(cmd);
-		setTitle(cb, XbrlDockUtils.camel2Label(cmd));
+//		setTitle(cb, XbrlDockUtils.camel2Label(cmd));
 		return cb;
 	}
 

@@ -5,7 +5,9 @@
 		"time": "2025-02-14"
 	},
 	"imports": {
-		"NACE": "data/NACE_2025-02-14.json",
+		"NACEx": 		{
+					"source": "data/NACE_2025-02-14.json"
+					},
 		"Country": {
 			"source": "data/Countries_2025-02-26.csv",
 			"sep": ";",
@@ -19,7 +21,7 @@
 					"type": "String"
 				}
 			],
-			"id": "country"
+			"id": ["country"]
 		}
 	},
 	"tables": {
@@ -68,6 +70,31 @@
 					"type": "String"
 				}
 			]
+		},
+		"vsme_SustainabilityInitiativeDeclaration": {
+			"type": "Table",
+			"attributes": [
+				{
+					"id": "vsme_SustIssueNotRelevant",
+					"type": "Boolean"
+				},
+				{
+					"id": "vsme_SustIssueInitExists",
+					"type": "Boolean"
+				},
+				{
+					"id": "vsme_SustIssueInitPublic",
+					"type": "Boolean"
+				},
+				{
+					"id": "vsme_SustIssueInitTarget",
+					"type": "Boolean"
+				}
+			],
+			"rows": {
+				"source": "standard",
+				"id": "vsme_Issue"
+			}
 		}
 	},
 	"attributes": {
@@ -160,6 +187,9 @@
 			"flags": [
 				"Calculated"
 			],
+			"guidance": [
+				"vsme002"
+			],
 			"options": [
 				{
 					"id": "vsme_UndertakingCategory_Micro",
@@ -191,10 +221,6 @@
 			"type": "Identifier",
 			"source": "Country"
 		},
-		"vsme_UndertakingAssets": {
-			"type": "Table",
-			"source": "vsme_Locations"
-		},
 		"vsme_UndertakingSites": {
 			"type": "Table",
 			"source": "vsme_Locations"
@@ -221,6 +247,81 @@
 				{
 					"id": "vsme_CertificationDescription",
 					"type": "Text"
+				}
+			]
+		},
+		"vsme_SustainabilityInitiativeDeclaration": {
+			"type": "Table",
+			"attributes": [
+				{
+					"id": "vsme_SustIssue",
+					"type": "String"
+				},
+				{
+					"id": "vsme_SustIssueNotRelevant",
+					"type": "Boolean"
+				},
+				{
+					"id": "vsme_SustIssueInitExists",
+					"type": "Boolean"
+				},
+				{
+					"id": "vsme_SustIssueInitPublic",
+					"type": "Boolean"
+				},
+				{
+					"id": "vsme_SustIssueInitTarget",
+					"type": "Boolean"
+				}
+			],
+			"rowSource": {
+				"source": "standard",
+				"id": "vsme_Issue",
+				"fill": {
+					"vsme_SustIssue": "id"
+				}
+			}
+		},
+		"vsme_Energy": {
+			"type": "Table",
+			"editor": {
+				"agent": "EnergyEditor"
+			},
+			"attributes": [
+				{
+					"id": "id",
+					"type": "String"
+				},
+				{
+					"id": "vsme_EnergySourceRenewable",
+					"type": "Real"
+				},
+				{
+					"id": "vsme_EnergySourceNonRenewable",
+					"type": "Real"
+				},
+				{
+					"id": "vsme_EnergySourceTotal",
+					"type": "Real",
+					"calc": {
+						"method": "sum",
+						"source": "row"
+					}
+				}
+			],
+			"rows": [
+				{
+					"id": "vsme_EnergyTypeElectricity"
+				},
+				{
+					"id": "vsme_EnergyTypeFuels"
+				},
+				{
+					"id": "vsme_EnergyTypeTotal",
+					"calc": {
+						"method": "sum",
+						"source": "col"
+					}
 				}
 			]
 		}
@@ -291,9 +392,20 @@
 				"vsme_UndertakingTurnover",
 				"vsme_UndertakingEmployees",
 				"vsme_UndertakingCategory",
-				"vsme_UndertakingAssets",
 				"vsme_UndertakingSites",
 				"vsme_Certifications"
+			]
+		},
+		{
+			"id": "h3_B2",
+			"items": [
+				"vsme_SustainabilityInitiativeDeclaration"
+			]
+		},
+		{
+			"id": "h3_B3",
+			"items": [
+				"vsme_Energy"
 			]
 		}
 	],
