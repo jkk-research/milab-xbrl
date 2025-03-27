@@ -1,7 +1,6 @@
 package org.xbrldock.vsme.poc;
 
 import java.awt.BorderLayout;
-import java.awt.Color;
 import java.awt.Container;
 import java.awt.Dimension;
 import java.awt.FlowLayout;
@@ -15,12 +14,10 @@ import java.awt.event.FocusAdapter;
 import java.awt.event.FocusEvent;
 import java.awt.event.ItemEvent;
 import java.awt.event.ItemListener;
-import java.awt.event.MouseAdapter;
 import java.io.File;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Enumeration;
-import java.util.Iterator;
 import java.util.Map;
 import java.util.Set;
 import java.util.TreeMap;
@@ -46,8 +43,6 @@ import javax.swing.SwingUtilities;
 import javax.swing.event.DocumentEvent;
 import javax.swing.event.DocumentListener;
 import javax.swing.filechooser.FileNameExtensionFilter;
-import javax.swing.table.AbstractTableModel;
-import javax.swing.table.JTableHeader;
 
 import org.jsoup.nodes.Document;
 import org.jsoup.nodes.Element;
@@ -60,275 +55,12 @@ import com.xbrldock.poc.gui.XbrlDockGuiUtilsHtmlDisplay;
 import com.xbrldock.poc.gui.XbrlDockGuiWidgetGrid;
 import com.xbrldock.utils.XbrlDockUtils;
 import com.xbrldock.utils.XbrlDockUtilsGui;
+import com.xbrldock.utils.XbrlDockUtilsHtml;
 import com.xbrldock.utils.XbrlDockUtilsJson;
 import com.xbrldock.utils.XbrlDockUtilsMvel;
 
 @SuppressWarnings({ "unchecked", "rawtypes" })
-public class VsmeFrame implements VsmePocConsts, XbrlDockConsts.GenAgent {
-
-	class AttGridModel extends AbstractTableModel {
-		private static final long serialVersionUID = 1L;
-
-		String attId;
-		ArrayList<Map> atts;
-		ArrayList<Map> rowDefs;
-		ArrayList<Map> calcDefs = new ArrayList<>();
-		ArrayList<Map<String, Object>> values;
-		Object editor;
-
-		boolean editRows = true;
-
-		MouseAdapter clickListener = new MouseAdapter() {
-			@Override
-			public void mouseClicked(java.awt.event.MouseEvent evt) {
-				if (protAtts.contains(attId)) {
-					return;
-				}
-
-				JTable tbl = (JTable) evt.getSource();
-				int col = tbl.columnAtPoint(evt.getPoint());
-				int row = tbl.rowAtPoint(evt.getPoint());
-
-				if (atts.size() == col) {
-					if ((0 <= row) && (row < values.size())) {
-						values.remove(row);
-
-						if (values.isEmpty()) {
-							report.remove(attId);
-						}
-
-						fireTableRowsDeleted(row, row);
-					}
-				} else if (null != editor) {
-					Map<String, Object> p = new TreeMap<>();
-					
-					p.put(XDC_EXT_TOKEN_id, attId);
-					p.put(XDC_GEN_TOKEN_row, row);
-					p.put(XDC_GEN_TOKEN_col, atts.get(col));
-					activateEditor(editor, p);
-				}
-			}
-		};
-
-		public AttGridModel(String attId, Map<String, Object> attDef) {
-			this.attId = attId;
-
-			values = XbrlDockUtils.simpleGet(report, attId);
-			if (null == values) {
-				values = new ArrayList<>();
-			}
-
-			atts = XbrlDockUtils.simpleGet(attDef, VSME_attributes);
-
-			if (null == atts) {
-				String src = XbrlDockUtils.simpleGet(attDef, XDC_GEN_TOKEN_source);
-				atts = XbrlDockUtils.simpleGet(meta, "tables", src, VSME_attributes);
-			}
-
-			for (Map<String, Object> d : atts) {
-				optAddCalc(d);
-			}
-
-			rowDefs = XbrlDockUtils.simpleGet(attDef, VSME_rows);
-			Map<String, Object> rowSource = XbrlDockUtils.simpleGet(attDef, VSME_rowSource);
-
-			if ((null != rowDefs) || (null != rowSource)) {
-				editRows = false;
-
-				if (!report.containsKey(attId)) {
-					if (null != rowDefs) {
-						for (Map<String, Object> rd : rowDefs) {
-							TreeMap<String, Object> em = new TreeMap<String, Object>();
-							values.add(em);
-							em.put(XDC_EXT_TOKEN_id, XbrlDockUtils.simpleGet(rd, XDC_EXT_TOKEN_id));
-							optAddCalc(rd);
-						}
-					} else if (null != rowSource) {
-						if (XbrlDockUtils.isEqual(VSME_standard, XbrlDockUtils.simpleGet(rowSource, XDC_GEN_TOKEN_source))) {
-							Map<String, String> fill = XbrlDockUtils.simpleGet(rowSource, VSME_fill);
-
-							Element e = standard.getElementById(XbrlDockUtils.simpleGet(rowSource, XDC_EXT_TOKEN_id));
-							for (Iterator<Element> eit = e.children().iterator(); eit.hasNext();) {
-								Element ei = eit.next();
-								TreeMap<String, Object> em = new TreeMap<String, Object>();
-								values.add(em);
-
-								for (Map.Entry<String, String> fe : fill.entrySet()) {
-									em.put(fe.getKey(), ei.attr(fe.getValue()));
-								}
-							}
-						}
-					}
-
-					report.put(attId, values);
-				}
-			}
-
-			editor = XbrlDockUtils.simpleGet(attDef, XDC_GEN_TOKEN_editor);
-		}
-
-		public void optAddCalc(Map<String, Object> d) {
-			Map<String, Object> cd = XbrlDockUtils.simpleGet(d, VSME_calc);
-			if (null != cd) {
-				calcDefs.add(cd);
-				cd.put(XDC_EXT_TOKEN_id, d.get(XDC_EXT_TOKEN_id));
-			}
-		}
-
-		@Override
-		public int getColumnCount() {
-			return editRows ? (atts.size() + 1) : atts.size();
-		}
-
-		@Override
-		public String getColumnName(int column) {
-			return (atts.size() > column) ? (String) atts.get(column).get(XDC_EXT_TOKEN_id) : "Del";
-		}
-
-		@Override
-		public Class<?> getColumnClass(int columnIndex) {
-			if (columnIndex == atts.size()) {
-				return Icon.class;
-			}
-
-			String type = (String) atts.get(columnIndex).get(XDC_EXT_TOKEN_type);
-
-			switch (type) {
-			case "Boolean":
-				return Boolean.class;
-			case "Real":
-				return Double.class;
-			}
-
-			return Object.class;
-		}
-
-		@Override
-		public int getRowCount() {
-			return editRows ? (values.size() + 1) : values.size();
-		}
-
-		@Override
-		public Object getValueAt(int rowIndex, int columnIndex) {
-			if (rowIndex == values.size()) {
-				return null;
-			}
-
-			if (columnIndex == atts.size()) {
-				return iDel;
-			}
-
-			return values.get(rowIndex).get(atts.get(columnIndex).get(XDC_EXT_TOKEN_id));
-		}
-
-		@Override
-		public boolean isCellEditable(int rowIndex, int columnIndex) {
-			if (null != editor) {
-				return false;
-			}
-			if (!editRows && (0 == columnIndex)) {
-				return false;
-			}
-			return atts.size() > columnIndex;
-		}
-
-		@Override
-		public void setValueAt(Object aValue, int rowIndex, int columnIndex) {
-			if (rowIndex == values.size()) {
-				values.add(new TreeMap<String, Object>());
-
-				if (0 == rowIndex) {
-					report.put(attId, values);
-				}
-
-				fireTableRowsInserted(rowIndex, rowIndex);
-			}
-
-			String colId = (String) atts.get(columnIndex).get(XDC_EXT_TOKEN_id);
-			setReportValue(aValue, attId, rowIndex, colId);
-
-			if (!calcDefs.isEmpty()) {
-				Set<String> updatedCols = new TreeSet<>();
-				for (Map<String, Object> cd : calcDefs) {
-					executeCD(cd, rowIndex, colId);
-
-					if (XbrlDockUtils.isEqual(XDC_GEN_TOKEN_row, cd.get(XDC_GEN_TOKEN_source))) {
-						updatedCols.add((String) cd.get(XDC_EXT_TOKEN_id));
-					}
-				}
-
-				for (String ccol : updatedCols) {
-					for (Map<String, Object> cdc : calcDefs) {
-						if (XbrlDockUtils.isEqual(XDC_GEN_TOKEN_col, cdc.get(XDC_GEN_TOKEN_source))) {
-							executeCD(cdc, rowIndex, ccol);
-						}
-					}
-				}
-
-				fireTableDataChanged();
-			}
-		}
-
-		public void executeCD(Map<String, Object> cd, int rowIndex, String colId) {
-			ArrayList<Object> data = new ArrayList<>();
-
-			String cid = (String) cd.get(XDC_EXT_TOKEN_id);
-			int ri = rowIndex;
-
-			String s = (String) cd.get(XDC_GEN_TOKEN_source);
-			switch (s) {
-			case XDC_GEN_TOKEN_row:
-				for (Map.Entry<String, Object> ve : values.get(rowIndex).entrySet()) {
-					if (XbrlDockUtils.isEqual(cid, ve.getKey())) {
-						continue;
-					}
-					data.add(ve.getValue());
-				}
-				break;
-			case XDC_GEN_TOKEN_col:
-				int cr = 0;
-				for (Map<String, Object> r : values) {
-					if (XbrlDockUtils.isEqual(cid, r.get(XDC_EXT_TOKEN_id))) {
-						ri = cr;
-						continue;
-					}
-					++cr;
-					data.add(r.get(colId));
-				}
-				cid = colId;
-				break;
-			}
-
-			s = (String) cd.get(XDC_GEN_TOKEN_method);
-
-			double aggVal = 0.0;
-
-			switch (s) {
-			case XDC_GEN_TOKEN_sum:
-				for (Object n : data) {
-					try {
-						aggVal += Double.parseDouble(XbrlDockUtils.toString(n));
-					} catch (Throwable t) {
-
-					}
-				}
-				break;
-			}
-
-			setReportValue(aggVal, attId, ri, cid);
-		}
-
-		public void updateValue(Object value) {
-			if (null == value) {
-				values.clear();
-			} else {
-				values = (ArrayList<Map<String, Object>>) value;
-			}
-
-			fireTableDataChanged();
-		}
-	}
-
+public class VsmeFrame implements VsmePocConsts, XbrlDockConsts.GenAgent, VsmePocConsts.EditContext {
 	Document standard;
 	Map<String, Object> meta;
 
@@ -353,12 +85,17 @@ public class VsmeFrame implements VsmePocConsts, XbrlDockConsts.GenAgent {
 
 	JFileChooser fc;
 	Icon iProt;
-	Icon iDel;
 
 	@Override
 	public Object process(String cmd, Map<String, Object> params) throws Exception {
 		switch (cmd) {
 		case XDC_CMD_GEN_Init:
+			String fName = XbrlDockUtils.simpleGet(params, VSME_meta);
+			meta = XbrlDockUtilsJson.readJson(new File(fName));
+
+			fName = XbrlDockUtils.simpleGet(meta, VSME_meta, VSME_standard);
+			standard = XbrlDockUtilsHtml.readHtml(fName);
+
 			frame = new JFrame((String) XbrlDockUtils.simpleGet(params, XDC_EXT_TOKEN_name));
 			frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
 
@@ -404,12 +141,10 @@ public class VsmeFrame implements VsmePocConsts, XbrlDockConsts.GenAgent {
 
 			Dimension dimBtn = new Dimension(15, 15);
 			iProt = XbrlDockUtilsGui.getIcon(VSME_protect, dimBtn);
-			iDel = XbrlDockUtilsGui.getIcon("delete", dimBtn);
 
 			break;
 		case XDC_CMD_GEN_Begin:
-			meta = XbrlDockUtils.simpleGet(params, VSME_meta);
-			standard = XbrlDockUtils.simpleGet(params, VSME_standard);
+
 			readStandard();
 
 			panelMap = new TreeMap<String, Object>();
@@ -421,7 +156,7 @@ public class VsmeFrame implements VsmePocConsts, XbrlDockConsts.GenAgent {
 
 			report = new TreeMap<String, Object>();
 
-			setReportPage(XbrlDockUtils.simpleGet(meta, VSME_start));
+			setReportPage(XbrlDockUtils.simpleGet(meta, XDC_GEN_TOKEN_start));
 
 			cbPageSelector.addActionListener(al);
 
@@ -434,6 +169,21 @@ public class VsmeFrame implements VsmePocConsts, XbrlDockConsts.GenAgent {
 		return null;
 	}
 
+	@Override
+	public Map<String, Object> getMeta() {
+		return meta;
+	}
+
+	@Override
+	public Map<String, Object> getReport() {
+		return report;
+	}
+
+	@Override
+	public Document getStandard() {
+		return standard;
+	}
+	
 	void readStandard() {
 		Elements nl = standard.getAllElements();
 
@@ -452,17 +202,15 @@ public class VsmeFrame implements VsmePocConsts, XbrlDockConsts.GenAgent {
 			if (!XbrlDockUtils.isEmpty(id)) {
 				standardElements.put(id, e);
 			}
-
 		}
 	}
-	
-	protected void activateEditor(Object e, Map<String, Object> p) {
+
+	@Override
+	public void activateEditor(Object e, Map<String, Object> p) {
 		JLabel lb = (JLabel) pnlValueEditor.getComponent(0);
-		
+
 		lb.setText(XbrlDockUtils.sbAppend(null, ": ", false, e, p).toString());
 	}
-
-
 
 	FocusAdapter selActivator = new FocusAdapter() {
 		public void focusGained(FocusEvent e) {
@@ -677,8 +425,7 @@ public class VsmeFrame implements VsmePocConsts, XbrlDockConsts.GenAgent {
 				ab.setSelected(XbrlDockUtils.isEqual(value, ab.getActionCommand()));
 			}
 		} else if (w instanceof JTable) {
-			AttGridModel agm = (AttGridModel) ((JTable) w).getModel();
-			agm.updateValue(value);
+			((VsmeDataGrid.GridModel) ((JTable) w).getModel()).updateValue(value);
 		}
 	};
 
@@ -686,7 +433,8 @@ public class VsmeFrame implements VsmePocConsts, XbrlDockConsts.GenAgent {
 		return setReportValue(value, attId, -1, null);
 	};
 
-	private Object setReportValue(Object value, String attId, int row, String col) {
+	@Override
+	public Object setReportValue(Object value, String attId, int row, String col) {
 		Map<String, Object> target = report;
 		Object orig = target.get(attId);
 		String key = attId;
@@ -705,20 +453,6 @@ public class VsmeFrame implements VsmePocConsts, XbrlDockConsts.GenAgent {
 			target.put(key, value);
 			reportUpdated(value, attId, row, col);
 		}
-
-//		if (-1 == row) {
-//			if (null == value) {
-//				report.remove(attId);
-//				if (null != orig) {
-//					reportUpdated(value, attId, row, col);
-//				}
-//			} else {
-//				if (!XbrlDockUtils.isEqual(value, orig)) {
-//					report.put(attId, value);
-//					reportUpdated(value, attId, row, col);
-//				}
-//			}
-//		}
 
 		return orig;
 	};
@@ -848,26 +582,12 @@ public class VsmeFrame implements VsmePocConsts, XbrlDockConsts.GenAgent {
 	}
 
 	public JComponent createGrid(String i, Map<String, Object> attDef) {
-		AttGridModel agm = new AttGridModel(i, attDef);
-		JTable tbl = new JTable(agm);
-		tbl.addMouseListener(agm.clickListener);
+		VsmeDataGrid grid = new VsmeDataGrid(i, attDef, this);
 
-		tbl.setGridColor(Color.darkGray);
-		JTableHeader header = tbl.getTableHeader();
-		header.setBackground(Color.LIGHT_GRAY);
-		header.setForeground(Color.blue);
+		widgets.put(i, grid.getTable());
 
-		JScrollPane scp = new JScrollPane(tbl);
-		if (agm.editRows) {
-			scp.setPreferredSize(new Dimension(600, 100));
-		}
-
-		XbrlDockUtilsGui.setTitle(scp, i);
-
-		widgets.put(i, tbl);
-
-		return scp;
-	}
+		return grid.getWidget();
+}
 
 	public JComponent createRadio(String i, Map<String, Object> attDef) {
 		Collection<Object> options = XbrlDockUtils.simpleGet(attDef, VSME_options);

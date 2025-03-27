@@ -1,15 +1,14 @@
 {
   "app" : {
-    "javaClass" : "org.xbrldock.vsme.poc.VsmeMain",
-		"standard" : "vsme/VSME_Standard_2025-02-14.html",
-		"meta" : "vsme/VSME_Meta_2025-02-14.json",
     "userFlags" : {
       "admin" : [ "lkedves" ]
     },
+		"start" : "reportFrame",
     "agents" : {
 			"reportFrame" : {
 			  "javaClass" : "org.xbrldock.vsme.poc.VsmeFrame",
-				"name" : "VSME Report frame"
+				"name" : "VSME Report frame",
+				"meta" : "vsme/VSME_Meta_2025-02-14.json"
 			},
     }
   }

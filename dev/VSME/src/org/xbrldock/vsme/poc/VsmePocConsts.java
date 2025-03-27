@@ -3,6 +3,8 @@ package org.xbrldock.vsme.poc;
 import java.util.Map;
 import java.util.TreeMap;
 
+import org.jsoup.nodes.Document;
+
 import com.xbrldock.XbrlDock;
 import com.xbrldock.poc.XbrlDockPocConsts;
 import com.xbrldock.utils.XbrlDockUtils;
@@ -12,7 +14,6 @@ public interface VsmePocConsts extends XbrlDockPocConsts, XbrlDockUtilsConsts {
 	String VSME_standard = "standard";
 	String VSME_meta = "meta";
 	
-	String VSME_start = "start";
 	String VSME_panels = "panels";
 	String VSME_items = "items";
 	String VSME_attributes = "attributes";
@@ -33,6 +34,13 @@ public interface VsmePocConsts extends XbrlDockPocConsts, XbrlDockUtilsConsts {
 	
 	String VSME_AGENT_reportFrame = "reportFrame";
 	
+	public interface EditContext {
+		Map<String, Object> getMeta();
+		Document getStandard();
+		Map<String, Object> getReport();
+		Object setReportValue(Object val, String attId, int rowIndex, String colId);
+		void activateEditor(Object editor, Map<String, Object> p);
+	}
 	
 	public class ExprCtx {
 		Map<String, Object> data = new TreeMap<String, Object>();

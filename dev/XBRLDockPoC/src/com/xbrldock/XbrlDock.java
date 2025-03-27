@@ -15,7 +15,7 @@ import com.xbrldock.utils.XbrlDockUtilsConsts;
 import com.xbrldock.utils.XbrlDockUtilsJson;
 
 @SuppressWarnings({ "unchecked", "rawtypes" })
-public abstract class XbrlDock implements XbrlDockConsts, XbrlDockUtilsConsts, XbrlDockConsts.GenAgent {
+public class XbrlDock implements XbrlDockConsts, XbrlDockUtilsConsts, XbrlDockConsts.GenAgent {
 
 	private static XbrlDock XBRLDOCK;
 	
@@ -27,7 +27,7 @@ public abstract class XbrlDock implements XbrlDockConsts, XbrlDockUtilsConsts, X
 	protected final static ArrayList<String> APP_ARGS = new ArrayList<>();
 
 	private final Map<String, GenAgent> agents = new TreeMap<>();
-
+	
 	public static void main(String[] args) {
 		try {
 			for (Map.Entry<String, String> e : System.getenv().entrySet()) {
@@ -77,8 +77,12 @@ public abstract class XbrlDock implements XbrlDockConsts, XbrlDockUtilsConsts, X
 				}
 			}
 
-			XBRLDOCK = XbrlDockUtils.createObject(XbrlDockUtils.safeGet(APP_CONFIG, XDC_CFGTOKEN_app, MAP_CREATOR));
-
+			Map appCfg = XbrlDockUtils.safeGet(APP_CONFIG, XDC_CFGTOKEN_app, MAP_CREATOR);
+			if ( null == appCfg.get(XDC_CFGTOKEN_javaClass) ) {
+				appCfg.put(XDC_CFGTOKEN_javaClass, XbrlDock.class.getName());
+			}
+			
+			XBRLDOCK = XbrlDockUtils.createObject(appCfg);
 			XBRLDOCK.process(XDC_CMD_GEN_Begin);
 
 		} catch (Throwable t) {
@@ -90,6 +94,24 @@ public abstract class XbrlDock implements XbrlDockConsts, XbrlDockUtilsConsts, X
 		LOG_STREAM.println("*   Main Complete    *");
 		LOG_STREAM.println("*                    *");
 		LOG_STREAM.println("**********************");
+	}
+	
+	Map<String, Object> self;
+
+	@Override
+	public Object process(String cmd, Map<String, Object> params) throws Exception {
+		switch (cmd) {
+		case XDC_CMD_GEN_Init:
+			this.self = params;
+
+			break;
+		case XDC_CMD_GEN_Begin:
+			String main = (String) self.get(XDC_GEN_TOKEN_start);
+			XbrlDock.callAgent(main, XDC_CMD_GEN_Begin);
+			break;
+		}
+		
+		return null;
 	}
 
 //	protected abstract void run() throws Exception;

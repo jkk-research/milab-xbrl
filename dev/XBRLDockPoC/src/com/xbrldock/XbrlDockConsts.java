@@ -21,6 +21,7 @@ public interface XbrlDockConsts {
 	String XDC_CMD_GEN_LOAD = "load";
 	String XDC_CMD_GEN_REFRESH = "refresh";
 	String XDC_CMD_GEN_STOP = "stop";
+	String XDC_CMD_GEN_DELETE = "delete";
 	String XDC_CMD_GEN_TEST01 = "test01";
 	String XDC_CMD_GEN_TEST02 = "test02";
 
@@ -120,6 +121,7 @@ public interface XbrlDockConsts {
 	String XDC_GEN_TOKEN_flags = "flags";
 	String XDC_GEN_TOKEN_row = "row";
 	String XDC_GEN_TOKEN_col = "col";
+	String XDC_GEN_TOKEN_start = "start";
 
 	String XDC_GEN_TOKEN_method = "method";
 	String XDC_GEN_TOKEN_sum = "sum";
