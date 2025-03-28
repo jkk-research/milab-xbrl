@@ -17,9 +17,11 @@ import javax.swing.border.TitledBorder;
 import com.xbrldock.XbrlDockException;
 
 public class XbrlDockUtilsGui implements XbrlDockUtilsConsts {
-	
+
 	public interface WidgetContainer {
 		JComponent getWidget();
+
+		void setGuiValue(Object value);
 	}
 
 	public static JComponent setTitle(JComponent comp, String title) {
@@ -88,7 +90,7 @@ public class XbrlDockUtilsGui implements XbrlDockUtilsConsts {
 		if (null != prefSize) {
 			img = img.getScaledInstance(prefSize.width, prefSize.width, java.awt.Image.SCALE_SMOOTH);
 		}
-		
+
 		return new ImageIcon(img);
 	}
 

@@ -6,25 +6,20 @@ import java.awt.Dimension;
 import java.awt.FlowLayout;
 import java.awt.GridBagConstraints;
 import java.awt.GridBagLayout;
-import java.awt.GridLayout;
 import java.awt.Insets;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.FocusAdapter;
 import java.awt.event.FocusEvent;
-import java.awt.event.ItemEvent;
-import java.awt.event.ItemListener;
 import java.io.File;
 import java.util.ArrayList;
 import java.util.Collection;
-import java.util.Enumeration;
 import java.util.Map;
 import java.util.Set;
 import java.util.TreeMap;
 import java.util.TreeSet;
 
 import javax.swing.AbstractButton;
-import javax.swing.ButtonGroup;
 import javax.swing.Icon;
 import javax.swing.JButton;
 import javax.swing.JComboBox;
@@ -33,15 +28,9 @@ import javax.swing.JFileChooser;
 import javax.swing.JFrame;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
-import javax.swing.JRadioButton;
 import javax.swing.JScrollPane;
 import javax.swing.JTabbedPane;
-import javax.swing.JTable;
-import javax.swing.JTextField;
 import javax.swing.JToggleButton;
-import javax.swing.SwingUtilities;
-import javax.swing.event.DocumentEvent;
-import javax.swing.event.DocumentListener;
 import javax.swing.filechooser.FileNameExtensionFilter;
 
 import org.jsoup.nodes.Document;
@@ -55,6 +44,7 @@ import com.xbrldock.poc.gui.XbrlDockGuiUtilsHtmlDisplay;
 import com.xbrldock.poc.gui.XbrlDockGuiWidgetGrid;
 import com.xbrldock.utils.XbrlDockUtils;
 import com.xbrldock.utils.XbrlDockUtilsGui;
+import com.xbrldock.utils.XbrlDockUtilsGui.WidgetContainer;
 import com.xbrldock.utils.XbrlDockUtilsHtml;
 import com.xbrldock.utils.XbrlDockUtilsJson;
 import com.xbrldock.utils.XbrlDockUtilsMvel;
@@ -74,7 +64,7 @@ public class VsmeFrame implements VsmePocConsts, XbrlDockConsts.GenAgent, VsmePo
 	JFrame frame;
 	XbrlDockGuiUtilsHtmlDisplay htmlStandard;
 	XbrlDockGuiUtilsHtmlDisplay htmlHelp;
-	Map<String, Object> widgets = new TreeMap<>();
+	Map<String, WidgetContainer> editors = new TreeMap<>();
 
 	ArrayList<String> pageIDs = new ArrayList<>();
 	JComboBox<String> cbPageSelector;
@@ -183,7 +173,7 @@ public class VsmeFrame implements VsmePocConsts, XbrlDockConsts.GenAgent, VsmePo
 	public Document getStandard() {
 		return standard;
 	}
-	
+
 	void readStandard() {
 		Elements nl = standard.getAllElements();
 
@@ -212,13 +202,6 @@ public class VsmeFrame implements VsmePocConsts, XbrlDockConsts.GenAgent, VsmePo
 		lb.setText(XbrlDockUtils.sbAppend(null, ": ", false, e, p).toString());
 	}
 
-	FocusAdapter selActivator = new FocusAdapter() {
-		public void focusGained(FocusEvent e) {
-			Object id = ((JComponent) e.getSource()).getClientProperty(XDC_EXT_TOKEN_id);
-
-		};
-	};
-
 	FocusAdapter fa = new FocusAdapter() {
 		@Override
 		public void focusGained(FocusEvent e) {
@@ -233,71 +216,6 @@ public class VsmeFrame implements VsmePocConsts, XbrlDockConsts.GenAgent, VsmePo
 			}
 
 			htmlHelp.setText(help);
-		}
-	};
-
-	DocumentListener dl = new DocumentListener() {
-		JTextField fld;
-		String value;
-
-		Runnable resetValue = new Runnable() {
-			@Override
-			public void run() {
-				fld.setText(value);
-			}
-		};
-
-		@Override
-		public void removeUpdate(DocumentEvent e) {
-			updateValue(e);
-		}
-
-		@Override
-		public void insertUpdate(DocumentEvent e) {
-			updateValue(e);
-		}
-
-		@Override
-		public void changedUpdate(DocumentEvent e) {
-			updateValue(e);
-		}
-
-		void updateValue(DocumentEvent e) {
-			try {
-				javax.swing.text.Document doc = e.getDocument();
-				String id = (String) doc.getProperty(XDC_EXT_TOKEN_id);
-
-				if (null != id) {
-					String s = doc.getText(0, doc.getLength());
-
-					if (XbrlDockUtils.isEmpty(s)) {
-						setReportValue(null, id);
-					} else {
-						Object val = s;
-
-						try {
-							switch ((String) doc.getProperty(XDC_EXT_TOKEN_type)) {
-							case "Real":
-								val = Double.parseDouble(s);
-								break;
-							case "Int":
-								val = Long.parseLong(s);
-								break;
-							}
-						} catch (Throwable t) {
-							value = XbrlDockUtils.toString(report.get(id));
-							fld = (JTextField) doc.getProperty(XDC_CFGTOKEN_gui);
-							java.awt.Toolkit.getDefaultToolkit().beep();
-							SwingUtilities.invokeLater(resetValue);
-						}
-
-						setReportValue(val, id);
-					}
-				}
-			} catch (Throwable e1) {
-				XbrlDockException.wrap(e1);
-			}
-
 		}
 	};
 
@@ -338,7 +256,9 @@ public class VsmeFrame implements VsmePocConsts, XbrlDockConsts.GenAgent, VsmePo
 						}
 
 						for (String k : new TreeSet<String>(report.keySet())) {
-							setGuiValue(report.get(k), k);
+							Object val = report.get(k);
+//							XbrlDock.log(EventLevel.Trace, k, val);
+							setGuiValue(val, k);
 						}
 					}
 					break;
@@ -378,23 +298,6 @@ public class VsmeFrame implements VsmePocConsts, XbrlDockConsts.GenAgent, VsmePo
 		}
 	};
 
-	private ItemListener il = new ItemListener() {
-		@Override
-		public void itemStateChanged(ItemEvent e) {
-			if (ItemEvent.SELECTED == e.getStateChange()) {
-				setReportValue(e.getItem(), (String) ((JComboBox) e.getSource()).getClientProperty(XDC_EXT_TOKEN_id));
-			}
-		}
-	};
-
-	private GenAgent selectorListener = new GenAgent() {
-		@Override
-		public Object process(String cmd, Map<String, Object> params) throws Exception {
-			// TODO Auto-generated method stub
-			return null;
-		}
-	};
-
 	protected void setGuiProtected(String id, boolean prot) {
 		if (prot) {
 			protAtts.add(id);
@@ -406,31 +309,15 @@ public class VsmeFrame implements VsmePocConsts, XbrlDockConsts.GenAgent, VsmePo
 			}
 		}
 
-		Object w = widgets.get(id);
-		if (w instanceof JComponent) {
-			((JComponent) w).setEnabled(!prot);
-		}
+		editors.get(id).getWidget().setEnabled(!prot);
 	}
 
 	private void setGuiValue(Object value, String attId) {
-		Object w = widgets.get(attId);
+		WidgetContainer wc = editors.get(attId);
 
-		if (w instanceof JTextField) {
-			((JTextField) w).setText(XbrlDockUtils.toString(value));
-		} else if (w instanceof JComboBox) {
-			((JComboBox) w).setSelectedItem(value);
-		} else if (w instanceof ButtonGroup) {
-			for (Enumeration<AbstractButton> eb = ((ButtonGroup) w).getElements(); eb.hasMoreElements();) {
-				AbstractButton ab = eb.nextElement();
-				ab.setSelected(XbrlDockUtils.isEqual(value, ab.getActionCommand()));
-			}
-		} else if (w instanceof JTable) {
-			((VsmeDataGrid.GridModel) ((JTable) w).getModel()).updateValue(value);
+		if (null != wc) {
+			wc.setGuiValue(value);
 		}
-	};
-
-	private Object setReportValue(Object value, String attId) {
-		return setReportValue(value, attId, -1, null);
 	};
 
 	@Override
@@ -522,22 +409,19 @@ public class VsmeFrame implements VsmePocConsts, XbrlDockConsts.GenAgent, VsmePo
 				Map<String, Object> attDef = XbrlDockUtils.simpleGet(meta, VSME_attributes, i);
 				String attType = XbrlDockUtils.simpleGet(attDef, XDC_EXT_TOKEN_type);
 
-				JComponent comp = null;
+				WidgetContainer wc = null;
 				switch (attType) {
-				case "String":
-				case "Real":
-				case "AttRef":
-					comp = createTextField(i, attType, attDef);
-					break;
-				case "Identifier":
-					comp = createSelector(i, attDef);
-//				comp = createRadio(i, attDef);
-					break;
 				case "Table":
-					comp = createGrid(i, attDef);
+					wc = new VsmeDataGrid(this, i, attDef);
 					label = null;
 					break;
+				default:
+					wc = new VsmeDataEditor(this, i, attDef);
+					break;
 				}
+
+				editors.put(i, wc);
+				JComponent comp = wc.getWidget();
 
 				gbc.anchor = GridBagConstraints.PAGE_START;
 				JToggleButton btProtect = XbrlDockUtilsGui.createBtn(VSME_protect, alCmd, JToggleButton.class);
@@ -579,94 +463,6 @@ public class VsmeFrame implements VsmePocConsts, XbrlDockConsts.GenAgent, VsmePo
 
 		pnlReportPage.invalidate();
 		pnlReportPage.getParent().revalidate();
-	}
-
-	public JComponent createGrid(String i, Map<String, Object> attDef) {
-		VsmeDataGrid grid = new VsmeDataGrid(i, attDef, this);
-
-		widgets.put(i, grid.getTable());
-
-		return grid.getWidget();
-}
-
-	public JComponent createRadio(String i, Map<String, Object> attDef) {
-		Collection<Object> options = XbrlDockUtils.simpleGet(attDef, VSME_options);
-
-		if (null != options) {
-			JPanel ret = new JPanel(new GridLayout(options.size(), 1));
-
-			ButtonGroup bgr = new ButtonGroup();
-			widgets.put(i, bgr);
-
-			for (Object o : options) {
-				String id = XbrlDockUtils.simpleGet(o, XDC_EXT_TOKEN_id);
-				JRadioButton bt = new JRadioButton(id);
-				bt.putClientProperty(XDC_EXT_TOKEN_id, i);
-				bt.setActionCommand(id);
-				bt.addActionListener(al);
-				bgr.add(bt);
-				ret.add(bt);
-				widgets.put(id, bt);
-			}
-
-			return ret;
-		}
-
-		return null;
-	}
-
-	public JComponent createSelector(String i, Map<String, Object> attDef) {
-		JComponent ret = null;
-
-		Collection<Object> options = XbrlDockUtils.simpleGet(attDef, VSME_options);
-		if (null != options) {
-			JComboBox<String> cb = new JComboBox<String>();
-			widgets.put(i, cb);
-
-			if (XbrlDockUtils.checkFlag(attDef, "AllowsText")) {
-				cb.setEditable(true);
-			}
-
-			for (Object o : options) {
-				String id = XbrlDockUtils.simpleGet(o, XDC_EXT_TOKEN_id);
-				cb.addItem(id);
-			}
-			cb.setSelectedIndex(-1);
-			cb.addItemListener(il);
-
-			ret = cb;
-		} else {
-			JTextField tf = new JTextField();
-			tf.setEditable(false);
-			tf.addFocusListener(selActivator);
-		}
-
-		return ret;
-
-	}
-
-	public JComponent createTextField(String i, String attType, Map<String, Object> attDef) {
-		JTextField tf = new JTextField();
-
-		switch (attType) {
-		case "Real":
-		case "Int":
-			tf.setHorizontalAlignment(JTextField.RIGHT);
-			break;
-		}
-
-		if (XbrlDockUtils.checkFlag(attDef, "Calculated")) {
-			tf.setEditable(false);
-		} else {
-			javax.swing.text.Document doc = tf.getDocument();
-			doc.addDocumentListener(dl);
-			doc.putProperty(XDC_EXT_TOKEN_id, i);
-			doc.putProperty(XDC_EXT_TOKEN_type, attType);
-			doc.putProperty(XDC_CFGTOKEN_gui, tf);
-		}
-
-		widgets.put(i, tf);
-		return tf;
 	}
 
 }

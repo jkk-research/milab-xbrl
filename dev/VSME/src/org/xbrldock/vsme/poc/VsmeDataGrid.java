@@ -298,7 +298,7 @@ public class VsmeDataGrid implements VsmePocConsts, XbrlDockUtilsGui.WidgetConta
 
 	GenAgent listener;
 
-	public VsmeDataGrid(String attId, Map<String, Object> attDef, EditContext ctx) {
+	public VsmeDataGrid(EditContext ctx, String attId, Map<String, Object> attDef) {
 		this.ctx = ctx;
 		this.attId = attId;
 		this.attDef = attDef;
@@ -324,6 +324,11 @@ public class VsmeDataGrid implements VsmePocConsts, XbrlDockUtilsGui.WidgetConta
 	@Override
 	public JComponent getWidget() {
 		return scp;
+	}
+	
+	@Override
+	public void setGuiValue(Object value) {
+		mdl.updateValue(value);
 	}
 
 	public JTable getTable() {
