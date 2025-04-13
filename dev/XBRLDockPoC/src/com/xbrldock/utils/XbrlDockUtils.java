@@ -383,4 +383,14 @@ public class XbrlDockUtils implements XbrlDockUtilsConsts {
 		return optCleanUrl(realRef);
 	}
 
+	public static String buildKey(Map from, String sep, String missing, String... keys) {
+		StringBuilder sb = null;
+		
+		for ( String k : keys ) {
+			sb = sbAppend(sb, sep, true, from.getOrDefault(k, missing));
+		}
+		
+		return sb.toString();
+	}
+
 }

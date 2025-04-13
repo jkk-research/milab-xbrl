@@ -10,12 +10,21 @@ import java.io.OutputStream;
 import java.net.HttpURLConnection;
 import java.net.URL;
 import java.nio.file.Files;
+import java.security.cert.CertificateException;
 import java.util.Collections;
 import java.util.Map;
 import java.util.Map.Entry;
 import java.util.Set;
 import java.util.TreeMap;
 import java.util.zip.GZIPInputStream;
+
+import javax.net.ssl.HostnameVerifier;
+import javax.net.ssl.HttpsURLConnection;
+import javax.net.ssl.SSLContext;
+import javax.net.ssl.SSLSession;
+import javax.net.ssl.TrustManager;
+import javax.net.ssl.X509TrustManager;
+import java.security.cert.X509Certificate;
 
 import org.apache.commons.compress.utils.IOUtils;
 import org.xml.sax.InputSource;
@@ -122,6 +131,40 @@ public class XbrlDockUtilsNet implements XbrlDockUtilsConsts {
 
 		return null;
 	}
+
+	// https://betterstack.com/community/questions/resolving-java-ssl-handshake-exception/
+  public static void disableCertificateValidation() {
+    try {
+        TrustManager[] trustAllCerts = new TrustManager[]{
+            new X509TrustManager() {
+                public X509Certificate[] getAcceptedIssuers() {
+                    return null;
+                }
+                @Override
+								public void checkClientTrusted(java.security.cert.X509Certificate[] chain, String authType) throws CertificateException {
+									// TODO Auto-generated method stub
+									
+								}
+								@Override
+								public void checkServerTrusted(java.security.cert.X509Certificate[] chain, String authType) throws CertificateException {
+									// TODO Auto-generated method stub
+									
+								}
+            }
+        };
+
+        SSLContext sc = SSLContext.getInstance("SSL");
+        sc.init(null, trustAllCerts, new java.security.SecureRandom());
+        HttpsURLConnection.setDefaultSSLSocketFactory(sc.getSocketFactory());
+        HttpsURLConnection.setDefaultHostnameVerifier(new HostnameVerifier() {
+            public boolean verify(String hostname, SSLSession session) {
+                return true;
+            }
+        });
+    } catch (Exception e) {
+        e.printStackTrace();
+    }
+}
 
 	public static void download(String url, File file, String... headers) throws Exception {
 		XbrlDock.log(EventLevel.Info, "Downloading url", url, "to file", file.getCanonicalPath());

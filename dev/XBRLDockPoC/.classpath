@@ -10,5 +10,7 @@
 	<classpathentry kind="lib" path="lib/zip/commons-compress-1.23.0.jar"/>
 	<classpathentry kind="lib" path="lib/expr/mvel2-2.4.15.Final.jar"/>
 	<classpathentry exported="true" kind="lib" path="lib/html/jsoup-1.18.3.jar"/>
+	<classpathentry kind="lib" path="lib/pdf/pdfbox-app-3.0.4.jar"/>
+	<classpathentry kind="lib" path="lib/pdf/itextpdf-5.5.13.jar"/>
 	<classpathentry kind="output" path="bin"/>
 </classpath>
