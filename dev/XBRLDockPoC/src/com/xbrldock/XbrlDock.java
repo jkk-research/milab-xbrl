@@ -12,7 +12,7 @@ import java.util.TreeSet;
 
 import com.xbrldock.utils.XbrlDockUtils;
 import com.xbrldock.utils.XbrlDockUtilsConsts;
-import com.xbrldock.utils.XbrlDockUtilsJson;
+import com.xbrldock.utils.stream.XbrlDockStreamJson;
 
 @SuppressWarnings({ "unchecked", "rawtypes" })
 public class XbrlDock implements XbrlDockConsts, XbrlDockUtilsConsts, XbrlDockConsts.GenAgent {
@@ -61,7 +61,7 @@ public class XbrlDock implements XbrlDockConsts, XbrlDockUtilsConsts, XbrlDockCo
 			
 			String cfgFile = XbrlDockUtils.simpleGet(APP_CONFIG, XDC_CFGTOKEN_env, "cfg");
 
-			Map cfgData = XbrlDockUtilsJson.readJson(XbrlDockUtils.isEmpty(cfgFile) ? XDC_FNAME_CONFIG : cfgFile );
+			Map cfgData = XbrlDockStreamJson.readJson(XbrlDockUtils.isEmpty(cfgFile) ? XDC_FNAME_CONFIG : cfgFile );
 
 			if (null != cfgData) {
 				APP_CONFIG.putAll(cfgData);

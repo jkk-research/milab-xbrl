@@ -25,7 +25,7 @@ import com.xbrldock.poc.format.XbrlDockFormatAgentXhtmlReader;
 import com.xbrldock.poc.utils.XbrlDockPocReportInfoExtender;
 import com.xbrldock.utils.XbrlDockUtils;
 import com.xbrldock.utils.XbrlDockUtilsFile;
-import com.xbrldock.utils.XbrlDockUtilsJson;
+import com.xbrldock.utils.stream.XbrlDockStreamJson;
 
 @SuppressWarnings({ "rawtypes", "unchecked" })
 public class XbrlDockReportStore implements XbrlDockReportConsts, XbrlDockPocRefactorUtils, XbrlDockConsts.GenAgent {
@@ -62,7 +62,7 @@ public class XbrlDockReportStore implements XbrlDockReportConsts, XbrlDockPocRef
 
 		File fc = new File(dirStore, XDC_FNAME_CONNCATALOG);
 		if (fc.isFile()) {
-			catalog = XbrlDockUtilsJson.readJson(fc);
+			catalog = XbrlDockStreamJson.readJson(fc);
 		} else {
 			catalog = new HashMap();
 		}

@@ -15,7 +15,7 @@ import com.xbrldock.format.XbrlDockFormatConsts;
 import com.xbrldock.format.XbrlDockFormatUtils;
 import com.xbrldock.poc.utils.XbrlDockPocUtilsValueConverter;
 import com.xbrldock.utils.XbrlDockUtils;
-import com.xbrldock.utils.XbrlDockUtilsXml;
+import com.xbrldock.utils.stream.XbrlDockStreamXml;
 
 public class XbrlDockFormatAgentXhtmlReader implements XbrlDockFormatConsts, XbrlDockConsts.GenAgent {
 
@@ -48,7 +48,7 @@ public class XbrlDockFormatAgentXhtmlReader implements XbrlDockFormatConsts, Xbr
 		try {
 			String sVal;
 
-			Document doc = XbrlDockUtilsXml.parseDoc(in);
+			Document doc = XbrlDockStreamXml.parseDoc(in);
 			Element eHtml = doc.getDocumentElement();
 			
 			NamedNodeMap headAtts = eHtml.getAttributes();
@@ -98,12 +98,12 @@ public class XbrlDockFormatAgentXhtmlReader implements XbrlDockFormatConsts, Xbr
 
 					segmentData.put(XDC_FACT_TOKEN_context, e.getAttribute("id"));
 
-					sVal = XbrlDockUtilsXml.getInfo(e, nsXbrli, "instant");
+					sVal = XbrlDockStreamXml.getInfo(e, nsXbrli, "instant");
 					if (XbrlDockUtils.isEmpty(sVal)) {
-						String cs = XbrlDockUtilsXml.getInfo(e, nsXbrli, "startDate");
+						String cs = XbrlDockStreamXml.getInfo(e, nsXbrli, "startDate");
 						segmentData.put(XDC_EXT_TOKEN_startDate, cs);
 
-						String ce = XbrlDockUtilsXml.getInfo(e, nsXbrli, "endDate");
+						String ce = XbrlDockStreamXml.getInfo(e, nsXbrli, "endDate");
 						segmentData.put(XDC_EXT_TOKEN_endDate, ce);
 					} else {
 						segmentData.put(XDC_FACT_TOKEN_instant, sVal);
@@ -113,13 +113,13 @@ public class XbrlDockFormatAgentXhtmlReader implements XbrlDockFormatConsts, Xbr
 
 					eS = (Element) e.getElementsByTagName("xbrli:segment").item(0);
 					if (null == eS) {
-						segmentData.put(XDC_FACT_TOKEN_entity, XbrlDockUtilsXml.getInfo(e, nsXbrli, "entity"));
+						segmentData.put(XDC_FACT_TOKEN_entity, XbrlDockStreamXml.getInfo(e, nsXbrli, "entity"));
 						eS = (Element) e.getElementsByTagName("xbrli:scenario").item(0);
 					} else {
 						NodeList nn = e.getElementsByTagName("xbrli:entity");
 						if (0 < nl.getLength()) {
 							Element ee = (Element) nn.item(0);
-							sVal = XbrlDockUtilsXml.getInfo(ee, nsXbrli, "identifier");
+							sVal = XbrlDockStreamXml.getInfo(ee, nsXbrli, "identifier");
 							segmentData.putIfAbsent(XDC_FACT_TOKEN_entity, sVal);
 						}
 					}
@@ -153,12 +153,12 @@ public class XbrlDockFormatAgentXhtmlReader implements XbrlDockFormatConsts, Xbr
 
 					segmentData.put(XDC_FACT_TOKEN_unit, e.getAttribute("id"));
 
-					sVal = XbrlDockUtilsXml.getInfo(e, nsXbrli, "unitNumerator");
+					sVal = XbrlDockStreamXml.getInfo(e, nsXbrli, "unitNumerator");
 					if (XbrlDockUtils.isEmpty(sVal)) {
-						segmentData.put(XDC_FACT_TOKEN_measure, XbrlDockUtilsXml.getInfo(e, nsXbrli, "measure"));
+						segmentData.put(XDC_FACT_TOKEN_measure, XbrlDockStreamXml.getInfo(e, nsXbrli, "measure"));
 					} else {
 						segmentData.put(XDC_FACT_TOKEN_unitNumerator, sVal);
-						segmentData.put(XDC_FACT_TOKEN_unitDenominator, XbrlDockUtilsXml.getInfo(e, nsXbrli, "unitDenominator"));
+						segmentData.put(XDC_FACT_TOKEN_unitDenominator, XbrlDockStreamXml.getInfo(e, nsXbrli, "unitDenominator"));
 					}
 
 					dataHandler.process(XDC_REP_SEG_Unit, XbrlDockUtils.setParams(XDC_GEN_TOKEN_source, segmentData));

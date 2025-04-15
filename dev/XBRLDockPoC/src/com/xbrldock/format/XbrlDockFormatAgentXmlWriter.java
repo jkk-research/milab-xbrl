@@ -15,7 +15,7 @@ import com.xbrldock.XbrlDockConsts;
 import com.xbrldock.XbrlDockException;
 //import com.xbrldock.poc.report.XbrlDockReportUtils;
 import com.xbrldock.utils.XbrlDockUtils;
-import com.xbrldock.utils.XbrlDockUtilsXml;
+import com.xbrldock.utils.stream.XbrlDockStreamXml;
 
 @SuppressWarnings({ "rawtypes", "unchecked" })
 public class XbrlDockFormatAgentXmlWriter implements XbrlDockFormatConsts, XbrlDockConsts.GenAgent {
@@ -75,7 +75,7 @@ public class XbrlDockFormatAgentXmlWriter implements XbrlDockFormatConsts, XbrlD
 		}
 
 		try {
-			xmlDoc = XbrlDockUtilsXml.createDoc();
+			xmlDoc = XbrlDockStreamXml.createDoc();
 			xmlDoc.setXmlStandalone(true);
 			eRoot = xmlDoc.createElement(XDC_FMTXML_TOKEN_xbrl);
 			xmlDoc.appendChild(eRoot);
@@ -118,37 +118,37 @@ public class XbrlDockFormatAgentXmlWriter implements XbrlDockFormatConsts, XbrlD
 			if (XbrlDockUtils.isEmpty(segId)) {
 				break;
 			}
-			e = XbrlDockUtilsXml.createElement(xmlDoc, nsXbrli, XDC_FACT_TOKEN_unit, null, segId);
+			e = XbrlDockStreamXml.createElement(xmlDoc, nsXbrli, XDC_FACT_TOKEN_unit, null, segId);
 			
 			sVal = (String) data.get(XDC_FACT_TOKEN_measure);
 			if (!XbrlDockUtils.isEmpty(sVal)) {
-				XbrlDockUtilsXml.createElement(xmlDoc, nsXbrli, XDC_FACT_TOKEN_measure, e, null).setTextContent(sVal);
+				XbrlDockStreamXml.createElement(xmlDoc, nsXbrli, XDC_FACT_TOKEN_measure, e, null).setTextContent(sVal);
 			} else {
-				e1 = XbrlDockUtilsXml.createElement(xmlDoc, nsXbrli, XDC_FACT_TOKEN_divide, e, null);
+				e1 = XbrlDockStreamXml.createElement(xmlDoc, nsXbrli, XDC_FACT_TOKEN_divide, e, null);
 
-				e2 = XbrlDockUtilsXml.createElement(xmlDoc, nsXbrli, XDC_FACT_TOKEN_unitNumerator, e1, null);
-				XbrlDockUtilsXml.createElement(xmlDoc, nsXbrli, XDC_FACT_TOKEN_measure, e2, null).setTextContent((String) data.get(XDC_FACT_TOKEN_unitNumerator));
+				e2 = XbrlDockStreamXml.createElement(xmlDoc, nsXbrli, XDC_FACT_TOKEN_unitNumerator, e1, null);
+				XbrlDockStreamXml.createElement(xmlDoc, nsXbrli, XDC_FACT_TOKEN_measure, e2, null).setTextContent((String) data.get(XDC_FACT_TOKEN_unitNumerator));
 
-				e2 = XbrlDockUtilsXml.createElement(xmlDoc, nsXbrli, XDC_FACT_TOKEN_unitDenominator, e1, null);
-				XbrlDockUtilsXml.createElement(xmlDoc, nsXbrli, XDC_FACT_TOKEN_measure, e2, null).setTextContent((String) data.get(XDC_FACT_TOKEN_unitDenominator));
+				e2 = XbrlDockStreamXml.createElement(xmlDoc, nsXbrli, XDC_FACT_TOKEN_unitDenominator, e1, null);
+				XbrlDockStreamXml.createElement(xmlDoc, nsXbrli, XDC_FACT_TOKEN_measure, e2, null).setTextContent((String) data.get(XDC_FACT_TOKEN_unitDenominator));
 			}
 			break;
 		case XDC_REP_SEG_Context:
-			e = XbrlDockUtilsXml.createElement(xmlDoc, nsXbrli, XDC_FACT_TOKEN_context, null, segId);
-			e1 = XbrlDockUtilsXml.createElement(xmlDoc, nsXbrli, XDC_FACT_TOKEN_entity, e, null);
-			e2 = XbrlDockUtilsXml.createElement(xmlDoc, nsXbrli, XDC_EXT_TOKEN_identifier, e1, null);
+			e = XbrlDockStreamXml.createElement(xmlDoc, nsXbrli, XDC_FACT_TOKEN_context, null, segId);
+			e1 = XbrlDockStreamXml.createElement(xmlDoc, nsXbrli, XDC_FACT_TOKEN_entity, e, null);
+			e2 = XbrlDockStreamXml.createElement(xmlDoc, nsXbrli, XDC_EXT_TOKEN_identifier, e1, null);
 
 			e2.setAttribute(XDC_EXT_TOKEN_scheme, entityIdSchema);
 			e2.setTextContent((String) data.get(XDC_FACT_TOKEN_entity));
 
-			e1 = XbrlDockUtilsXml.createElement(xmlDoc, nsXbrli, XDC_FACT_TOKEN_period, e, null);
+			e1 = XbrlDockStreamXml.createElement(xmlDoc, nsXbrli, XDC_FACT_TOKEN_period, e, null);
 			sVal = (String) data.get(XDC_FACT_TOKEN_instant);
 
 			if (XbrlDockUtils.isEmpty(sVal)) {
-				XbrlDockUtilsXml.createElement(xmlDoc, nsXbrli, XDC_EXT_TOKEN_startDate, e1, null).setTextContent((String) data.get(XDC_EXT_TOKEN_startDate));
-				XbrlDockUtilsXml.createElement(xmlDoc, nsXbrli, XDC_EXT_TOKEN_endDate, e1, null).setTextContent((String) data.get(XDC_EXT_TOKEN_endDate));
+				XbrlDockStreamXml.createElement(xmlDoc, nsXbrli, XDC_EXT_TOKEN_startDate, e1, null).setTextContent((String) data.get(XDC_EXT_TOKEN_startDate));
+				XbrlDockStreamXml.createElement(xmlDoc, nsXbrli, XDC_EXT_TOKEN_endDate, e1, null).setTextContent((String) data.get(XDC_EXT_TOKEN_endDate));
 			} else {
-				XbrlDockUtilsXml.createElement(xmlDoc, nsXbrli, XDC_FACT_TOKEN_instant, e1, null).setTextContent(sVal);
+				XbrlDockStreamXml.createElement(xmlDoc, nsXbrli, XDC_FACT_TOKEN_instant, e1, null).setTextContent(sVal);
 			}
 
 			sVal = XbrlDockUtils.toString(data.get(XDC_FACT_TOKEN_dimensions));
@@ -159,10 +159,10 @@ public class XbrlDockFormatAgentXmlWriter implements XbrlDockFormatConsts, XbrlD
 
 				String[] dd = sVal.split(",");
 
-				e1 = XbrlDockUtilsXml.createElement(xmlDoc, nsXbrli, XDC_FACT_TOKEN_scenario, e, null);
+				e1 = XbrlDockStreamXml.createElement(xmlDoc, nsXbrli, XDC_FACT_TOKEN_scenario, e, null);
 				for (String dv : dd) {
 					String[] ds = dv.split("=");
-					e2 = XbrlDockUtilsXml.createElement(xmlDoc, nsXbrli, XDC_FMTXML_TOKEN_explicitMember, e1, null);
+					e2 = XbrlDockStreamXml.createElement(xmlDoc, nsXbrli, XDC_FMTXML_TOKEN_explicitMember, e1, null);
 					e2.setAttribute(XDC_FMTXML_TOKEN_dimension, ds[0].trim());
 					e2.setTextContent(ds[1].trim());
 				}
@@ -177,18 +177,18 @@ public class XbrlDockFormatAgentXmlWriter implements XbrlDockFormatConsts, XbrlD
 			}
 
 			sVal = (String) data.get(XDC_FACT_TOKEN_concept);
-			e = XbrlDockUtilsXml.createElement(xmlDoc, null, sVal, null, segId);
+			e = XbrlDockStreamXml.createElement(xmlDoc, null, sVal, null, segId);
 
-			XbrlDockUtilsXml.optSet(e, null, XDC_FMTXML_TOKEN_contextRef, data.get(XDC_FACT_TOKEN_context));
+			XbrlDockStreamXml.optSet(e, null, XDC_FMTXML_TOKEN_contextRef, data.get(XDC_FACT_TOKEN_context));
 
 			String factValue;
 
 			if (XDC_FACT_VALTYPE_text.equals(factType) || XDC_FACT_VALTYPE_string.equals(factType)) {
-				XbrlDockUtilsXml.optSet(e, null, XDC_EXT_TOKEN_lang, data.get(XDC_FACT_TOKEN_language));
+				XbrlDockStreamXml.optSet(e, null, XDC_EXT_TOKEN_lang, data.get(XDC_FACT_TOKEN_language));
 				factValue = (String) data.get(XDC_EXT_TOKEN_value);
 			} else {
-				XbrlDockUtilsXml.optSet(e, null, XDC_FMTXML_TOKEN_unitRef, data.get(XDC_FACT_TOKEN_unit));
-				XbrlDockUtilsXml.optSet(e, null, XDC_FACT_TOKEN_decimals, data.get(XDC_FACT_TOKEN_decimals));
+				XbrlDockStreamXml.optSet(e, null, XDC_FMTXML_TOKEN_unitRef, data.get(XDC_FACT_TOKEN_unit));
+				XbrlDockStreamXml.optSet(e, null, XDC_FACT_TOKEN_decimals, data.get(XDC_FACT_TOKEN_decimals));
 
 				Object val = data.get(XDC_EXT_TOKEN_value);
 				factValue = (val instanceof BigDecimal) ? df.format((BigDecimal) val) : XbrlDockUtils.toString(val);
@@ -219,7 +219,7 @@ public class XbrlDockFormatAgentXmlWriter implements XbrlDockFormatConsts, XbrlD
 						}
 					}
 				}
-				XbrlDockUtilsXml.saveDoc(xmlDoc, new File(targetDir, repId + XDC_FEXT_XML), 2);
+				XbrlDockStreamXml.saveDoc(xmlDoc, new File(targetDir, repId + XDC_FEXT_XML), 2);
 			}
 		} catch (Throwable e) {
 			XbrlDockException.wrap(e, "Exporting report to XML", repId);

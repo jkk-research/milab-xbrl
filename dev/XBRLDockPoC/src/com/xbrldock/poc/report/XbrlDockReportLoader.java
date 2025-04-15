@@ -17,8 +17,8 @@ import com.xbrldock.XbrlDockConsts;
 import com.xbrldock.XbrlDockException;
 import com.xbrldock.poc.conn.XbrlDockConnUtils;
 import com.xbrldock.utils.XbrlDockUtils;
-import com.xbrldock.utils.XbrlDockUtilsCsv;
-import com.xbrldock.utils.XbrlDockUtilsCsvWriterAgent;
+import com.xbrldock.utils.stream.XbrlDockStreamCsv;
+import com.xbrldock.utils.stream.XbrlDockStreamCsvWriterAgent;
 
 @SuppressWarnings({ "rawtypes", "unchecked" })
 public class XbrlDockReportLoader implements XbrlDockReportConsts, XbrlDockConsts.GenAgent {
@@ -40,8 +40,8 @@ public class XbrlDockReportLoader implements XbrlDockReportConsts, XbrlDockConst
 
 	ArrayList<String> errors = new ArrayList<>();
 
-	XbrlDockUtilsCsvWriterAgent cwData = new XbrlDockUtilsCsvWriterAgent();
-	XbrlDockUtilsCsvWriterAgent cwText = new XbrlDockUtilsCsvWriterAgent();
+	XbrlDockStreamCsvWriterAgent cwData = new XbrlDockStreamCsvWriterAgent();
+	XbrlDockStreamCsvWriterAgent cwText = new XbrlDockStreamCsvWriterAgent();
 
 	public XbrlDockReportLoader(File dataRoot) {
 		this.dataRoot = dataRoot;
@@ -212,7 +212,7 @@ public class XbrlDockReportLoader implements XbrlDockReportConsts, XbrlDockConst
 		Map<String, Object> segment = new HashMap<>();
 		Map<String, Object> fact = new HashMap<>();
 
-		XbrlDockUtilsCsv.CsvLineReader lineReader = new XbrlDockUtilsCsv.CsvLineReader("\t", values);
+		XbrlDockStreamCsv.CsvLineReader lineReader = new XbrlDockStreamCsv.CsvLineReader("\t", values);
 
 		try (FileReader fr = new FileReader(f); BufferedReader br = new BufferedReader(fr)) {
 			for (String line = br.readLine(); null != line; line = br.readLine()) {

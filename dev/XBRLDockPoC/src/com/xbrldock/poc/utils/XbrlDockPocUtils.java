@@ -14,7 +14,7 @@ import org.w3c.dom.NodeList;
 import com.xbrldock.poc.XbrlDockPocConsts;
 import com.xbrldock.utils.XbrlDockUtils;
 import com.xbrldock.utils.XbrlDockUtilsFile;
-import com.xbrldock.utils.XbrlDockUtilsXml;
+import com.xbrldock.utils.stream.XbrlDockStreamXml;
 
 @SuppressWarnings({ "rawtypes", "unchecked" })
 public class XbrlDockPocUtils extends XbrlDockUtils implements XbrlDockPocConsts {
@@ -49,7 +49,7 @@ public class XbrlDockPocUtils extends XbrlDockUtils implements XbrlDockPocConsts
 		int nc;
 
 		File fCat = new File(fMetaInf, XDC_FNAME_FILINGCATALOG);
-		Element eCatalog = XbrlDockUtilsXml.parseDoc(fCat).getDocumentElement();
+		Element eCatalog = XbrlDockStreamXml.parseDoc(fCat).getDocumentElement();
 
 		String base = eCatalog.getAttribute("xml:base");
 		if (XbrlDockUtils.isEmpty(base)) {
@@ -75,12 +75,12 @@ public class XbrlDockPocUtils extends XbrlDockUtils implements XbrlDockPocConsts
 		}
 
 		File fTax = new File(fMetaInf, XDC_FNAME_FILINGTAXPACK);
-		Element eTaxPack = XbrlDockUtilsXml.parseDoc(fTax).getDocumentElement();
+		Element eTaxPack = XbrlDockStreamXml.parseDoc(fTax).getDocumentElement();
 
 		Set epRefs = new TreeSet();
 		Set allRefs = new TreeSet();
 
-		XbrlDockUtilsXml.ChildProcessor procEntryPointItem = new XbrlDockUtilsXml.ChildProcessor() {
+		XbrlDockStreamXml.ChildProcessor procEntryPointItem = new XbrlDockStreamXml.ChildProcessor() {
 			Map epInfo;
 
 			@Override
@@ -120,12 +120,12 @@ public class XbrlDockPocUtils extends XbrlDockUtils implements XbrlDockPocConsts
 			}
 		};
 
-		XbrlDockUtilsXml.ChildProcessor procEntryPointList = new XbrlDockUtilsXml.ChildProcessor() {
+		XbrlDockStreamXml.ChildProcessor procEntryPointList = new XbrlDockStreamXml.ChildProcessor() {
 			@Override
 			public void processChild(String tagName, Element ch) {
 				switch (tagName) {
 				case "entryPoint":
-					XbrlDockUtilsXml.processChildren(ch, procEntryPointItem);
+					XbrlDockStreamXml.processChildren(ch, procEntryPointItem);
 					break;
 				default:
 					break;
@@ -133,12 +133,12 @@ public class XbrlDockPocUtils extends XbrlDockUtils implements XbrlDockPocConsts
 			}
 		};
 
-		XbrlDockUtilsXml.processChildren(eTaxPack, new XbrlDockUtilsXml.ChildProcessor() {
+		XbrlDockStreamXml.processChildren(eTaxPack, new XbrlDockStreamXml.ChildProcessor() {
 			@Override
 			public void processChild(String tagName, Element ch) {
 				switch (tagName) {
 				case "entryPoints":
-					XbrlDockUtilsXml.processChildren(ch, procEntryPointList);
+					XbrlDockStreamXml.processChildren(ch, procEntryPointList);
 					break;
 				default:
 					XbrlDockUtils.simpleSet(t, ch.getTextContent().replaceAll("\\s+", " ").trim(), XDC_METAINFO_pkgInfo, tagName);

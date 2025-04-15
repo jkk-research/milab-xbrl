@@ -12,7 +12,7 @@ import com.xbrldock.XbrlDockConsts;
 import com.xbrldock.XbrlDockException;
 import com.xbrldock.dev.XbrlDockDevCounter;
 import com.xbrldock.utils.XbrlDockUtils;
-import com.xbrldock.utils.XbrlDockUtilsXml;
+import com.xbrldock.utils.stream.XbrlDockStreamXml;
 
 @SuppressWarnings({ "unchecked" })
 public class XbrlDockMetaRefCollector implements XbrlDockMetaConsts, XbrlDockConsts.GenAgent {
@@ -132,7 +132,7 @@ public class XbrlDockMetaRefCollector implements XbrlDockMetaConsts, XbrlDockCon
 
 			if (taxRef.startsWith(p)) {
 				File fr = new File(pe.getValue(), taxRef.substring(p.length()));
-				taxRoot = XbrlDockUtilsXml.parseDoc(fr).getDocumentElement();
+				taxRoot = XbrlDockStreamXml.parseDoc(fr).getDocumentElement();
 				break;
 			}
 		}

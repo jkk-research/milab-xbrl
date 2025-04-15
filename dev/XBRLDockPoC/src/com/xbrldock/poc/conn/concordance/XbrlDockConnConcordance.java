@@ -23,9 +23,9 @@ import com.xbrldock.poc.report.XbrlDockReportExprEval;
 import com.xbrldock.poc.report.XbrlDockReportLoader;
 import com.xbrldock.utils.XbrlDockUtils;
 import com.xbrldock.utils.XbrlDockUtilsFile;
-import com.xbrldock.utils.XbrlDockUtilsJson;
 import com.xbrldock.utils.XbrlDockUtilsMvel;
 import com.xbrldock.utils.XbrlDockUtilsMvel.MvelUtilsGen;
+import com.xbrldock.utils.stream.XbrlDockStreamJson;
 
 @SuppressWarnings({ "rawtypes", "unchecked" })
 public class XbrlDockConnConcordance implements XbrlDockConnConcordanceConsts, XbrlDockPocRefactorUtils, XbrlDockConsts.GenAgent {
@@ -282,7 +282,7 @@ public class XbrlDockConnConcordance implements XbrlDockConnConcordanceConsts, X
 			XbrlDockUtils.safeGet(mm, from, ARRAY_CREATOR).add(k);
 		}
 
-		XbrlDockUtilsJson.writeJson(new File(dirStore, "concordance.json"), conCfg);
+		XbrlDockStreamJson.writeJson(new File(dirStore, "concordance.json"), conCfg);
 
 	}
 

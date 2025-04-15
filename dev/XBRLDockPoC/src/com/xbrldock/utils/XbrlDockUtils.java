@@ -319,15 +319,13 @@ public class XbrlDockUtils implements XbrlDockUtilsConsts {
 
 		return target;
 	}
-	
+
 	public static boolean checkFlag(Object root, String flag, Object... path) {
 		Collection fc = XbrlDockUtils.simpleGet(root, (isArr(path) ? path : XDC_GEN_TOKEN_flags));
-		
+
 		return (null == fc) ? false : fc.contains(flag);
 	}
 
-
-	
 //	private static ThreadLocal<Map<String, Object>> TL_PMAP = new ThreadLocal<Map<String,Object>>() {
 //		protected java.util.Map<String,Object> initialValue() {
 //			return new TreeMap<String, Object>();
@@ -385,11 +383,46 @@ public class XbrlDockUtils implements XbrlDockUtilsConsts {
 
 	public static String buildKey(Map from, String sep, String missing, String... keys) {
 		StringBuilder sb = null;
-		
-		for ( String k : keys ) {
+
+		for (String k : keys) {
 			sb = sbAppend(sb, sep, true, from.getOrDefault(k, missing));
 		}
-		
+
+		return sb.toString();
+	}
+
+	public static boolean optAdd(Collection target, Collection coll) {
+		boolean ret = false;
+
+		for (Object o : coll) {
+			ret |= optAdd(target, o);
+		}
+
+		return ret;
+	}
+
+	public static boolean optAdd(Collection target, Object o) {
+		if (target.contains(o)) {
+			return false;
+		} else {
+			target.add(o);
+			return true;
+		}
+	}
+
+	public static String toKey(Object object) {
+		StringBuilder sb = new StringBuilder();
+
+		boolean up = true;
+		for (Character c : toString(object).toCharArray()) {
+			if (Character.isLetterOrDigit(c)) {
+				sb.append(up ? Character.toUpperCase(c) : c);
+				up = false;
+			} else {
+				up = true;
+			}
+		}
+
 		return sb.toString();
 	}
 

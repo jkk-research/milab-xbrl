@@ -26,8 +26,8 @@ import com.xbrldock.poc.report.XbrlDockReportLoader;
 import com.xbrldock.poc.utils.XbrlDockPocReportInfoExtender;
 import com.xbrldock.utils.XbrlDockUtils;
 import com.xbrldock.utils.XbrlDockUtilsFile;
-import com.xbrldock.utils.XbrlDockUtilsJson;
 import com.xbrldock.utils.XbrlDockUtilsNet;
+import com.xbrldock.utils.stream.XbrlDockStreamJson;
 
 @SuppressWarnings({ "rawtypes", "unchecked" })
 public class XbrlDockConnXbrlOrg
@@ -70,7 +70,7 @@ public class XbrlDockConnXbrlOrg
 
 		File fc = new File(dirStore, XDC_FNAME_CONNCATALOG);
 		if (fc.isFile()) {
-			catalog = XbrlDockUtilsJson.readJson(fc);
+			catalog = XbrlDockStreamJson.readJson(fc);
 		}
 
 		testMode = false;
@@ -496,7 +496,7 @@ public class XbrlDockConnXbrlOrg
 
 //		Map resp = XbrlDockUtilsJson.readJson(new File(dataRoot, PATH_SRVRESP));
 //		Map resp = XbrlDockUtilsJson.readJson(new File("temp/ESEFTest/20240907_ESEF_All.json"));
-		Map resp = XbrlDockUtilsJson.readJson(new File(dirInput, "update/ESEF_All.json"));
+		Map resp = XbrlDockStreamJson.readJson(new File(dirInput, "update/ESEF_All.json"));
 
 		Map entities = XbrlDockUtils.safeGet(catalog, XDC_CONN_CAT_TOKEN_entities, MAP_CREATOR);
 		Map langs = XbrlDockUtils.safeGet(catalog, XDC_CONN_CAT_TOKEN_languages, MAP_CREATOR);
@@ -588,7 +588,7 @@ public class XbrlDockConnXbrlOrg
 
 		if (0 < ret) {
 			File fc = new File(dirStore, XDC_FNAME_CONNCATALOG);
-			XbrlDockUtilsJson.writeJson(fc, catalog);
+			XbrlDockStreamJson.writeJson(fc, catalog);
 		}
 
 		return ret;

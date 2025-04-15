@@ -22,9 +22,9 @@ import com.xbrldock.dev.XbrlDockDevCounter;
 import com.xbrldock.poc.utils.XbrlDockPocUtils;
 import com.xbrldock.utils.XbrlDockUtils;
 import com.xbrldock.utils.XbrlDockUtilsFile;
-import com.xbrldock.utils.XbrlDockUtilsJson;
 import com.xbrldock.utils.XbrlDockUtilsNet;
-import com.xbrldock.utils.XbrlDockUtilsXml;
+import com.xbrldock.utils.stream.XbrlDockStreamJson;
+import com.xbrldock.utils.stream.XbrlDockStreamXml;
 
 @SuppressWarnings({ "rawtypes", "unchecked" })
 public class XbrlDockMetaManager implements XbrlDockMetaConsts, XbrlDockConsts.GenAgent {
@@ -107,7 +107,7 @@ public class XbrlDockMetaManager implements XbrlDockMetaConsts, XbrlDockConsts.G
 
 		File fc = new File(metaStoreRoot, XDC_FNAME_METACATALOG);
 		if (fc.isFile()) {
-			Map mc = XbrlDockUtilsJson.readJson(fc);
+			Map mc = XbrlDockStreamJson.readJson(fc);
 			metaCatalog.putAll(mc);
 		}
 	}
@@ -209,7 +209,7 @@ public class XbrlDockMetaManager implements XbrlDockMetaConsts, XbrlDockConsts.G
 
 			if (null == cachedContent) {
 				try (InputStream is = XbrlDockUtilsNet.resolveEntityStream(url)) {
-					Element eDoc = XbrlDockUtilsXml.parseDoc(is).getDocumentElement();
+					Element eDoc = XbrlDockStreamXml.parseDoc(is).getDocumentElement();
 
 					XbrlDock.log(EventLevel.Trace, "loading ", url);
 
@@ -300,7 +300,7 @@ public class XbrlDockMetaManager implements XbrlDockMetaConsts, XbrlDockConsts.G
 		}
 
 		if (updateCatalog) {
-			XbrlDockUtilsJson.writeJson(new File(metaStoreRoot, XDC_FNAME_METACATALOG), metaCatalog);
+			XbrlDockStreamJson.writeJson(new File(metaStoreRoot, XDC_FNAME_METACATALOG), metaCatalog);
 		}
 	}
 
@@ -370,13 +370,13 @@ public class XbrlDockMetaManager implements XbrlDockMetaConsts, XbrlDockConsts.G
 				}
 				if (!XbrlDockUtils.isEmpty(itemId)) {
 					em = mcData.getItem(itemId, ns);
-					XbrlDockUtilsXml.readAtts(e, null, em);
+					XbrlDockStreamXml.readAtts(e, null, em);
 				}
 				break;
 			case "roleType":
 				em = mcData.getItem(itemId, ns);
-				XbrlDockUtilsXml.readAtts(e, null, em);
-				XbrlDockUtilsXml.readChildNodes(e, em);
+				XbrlDockStreamXml.readAtts(e, null, em);
+				XbrlDockStreamXml.readChildNodes(e, em);
 
 				break;
 			}
@@ -443,7 +443,7 @@ public class XbrlDockMetaManager implements XbrlDockMetaConsts, XbrlDockConsts.G
 				case "message":
 					break;
 				case "reference":
-					Map rm = XbrlDockUtilsXml.readChildNodes(e, null);
+					Map rm = XbrlDockStreamXml.readChildNodes(e, null);
 					int refIdx = mcData.storeDocumentRef(rm);
 					content.put(roleID + XDC_SEP_ID + label, refIdx);
 					storeInContent = false;
@@ -456,7 +456,7 @@ public class XbrlDockMetaManager implements XbrlDockMetaConsts, XbrlDockConsts.G
 					break;
 				case "formula":
 					formOb = addFormulaOb(mcData, XDC_FORMULA_expressions, e);
-					formOb.put(XDC_FACT_TOKEN_concept, XbrlDockUtilsXml.getInfo(e, "formula", "qname"));
+					formOb.put(XDC_FACT_TOKEN_concept, XbrlDockStreamXml.getInfo(e, "formula", "qname"));
 					formOb.put(XDC_FORMULA_formula, e.getAttribute("value"));
 
 //					XbrlDock.log(EventLevel.Trace, "Calculation", e.getAttribute("id"), XbrlDockUtilsXml.getInfo(e, "formula", "qname"), e.getAttribute("value"));
@@ -478,12 +478,12 @@ public class XbrlDockMetaManager implements XbrlDockMetaConsts, XbrlDockConsts.G
 					em = mcData.getItem(url, iid, null);
 					em.put("id", iid);
 					em.put(XDC_METATOKEN_tagName, tn);
-					XbrlDockUtilsXml.readAtts(e, "value", em);
+					XbrlDockStreamXml.readAtts(e, "value", em);
 					break;
 				}
 				break;
 			case "arc":
-				Map<String, String> am = XbrlDockUtilsXml.readAtts(e, null, null);
+				Map<String, String> am = XbrlDockStreamXml.readAtts(e, null, null);
 				am.put("xlink:role", roleID);
 				am.put(XDC_EXT_TOKEN_type, XbrlDockUtils.getPostfix(eParent.getTagName(), ":"));
 				arcs.add(am);
@@ -503,7 +503,7 @@ public class XbrlDockMetaManager implements XbrlDockMetaConsts, XbrlDockConsts.G
 
 			if (storeInContent) {
 				if (null == em) {
-					em = XbrlDockUtilsXml.readAtts(e, "value", null);
+					em = XbrlDockStreamXml.readAtts(e, "value", null);
 					em.put(XDC_METATOKEN_url, url + "#" + em.get("id"));
 				}
 				content.put(roleID + XDC_SEP_ID + label, em);

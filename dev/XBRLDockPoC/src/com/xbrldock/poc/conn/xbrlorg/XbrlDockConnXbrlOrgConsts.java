@@ -1,9 +1,9 @@
 package com.xbrldock.poc.conn.xbrlorg;
 
 import com.xbrldock.poc.conn.XbrlDockConnConsts;
-import com.xbrldock.utils.XbrlDockUtilsJsonApiConsts;
+import com.xbrldock.utils.stream.XbrlDockStreamJsonApiConsts;
 
-public interface XbrlDockConnXbrlOrgConsts extends XbrlDockConnConsts, XbrlDockUtilsJsonApiConsts {
+public interface XbrlDockConnXbrlOrgConsts extends XbrlDockConnConsts, XbrlDockStreamJsonApiConsts {
 
 	String PATH_SRVRESP = "filings.org.response.json";
 	

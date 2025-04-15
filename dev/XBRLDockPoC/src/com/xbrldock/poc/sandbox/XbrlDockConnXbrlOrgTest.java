@@ -19,7 +19,7 @@ import com.xbrldock.poc.conn.xbrlorg.XbrlDockConnXbrlOrgConsts;
 import com.xbrldock.poc.report.XbrlDockReportLoader;
 import com.xbrldock.utils.XbrlDockUtils;
 import com.xbrldock.utils.XbrlDockUtilsFile;
-import com.xbrldock.utils.XbrlDockUtilsJson;
+import com.xbrldock.utils.stream.XbrlDockStreamJson;
 
 @SuppressWarnings({ "rawtypes" })
 public class XbrlDockConnXbrlOrgTest implements XbrlDockConnXbrlOrgConsts {
@@ -112,7 +112,7 @@ public class XbrlDockConnXbrlOrgTest implements XbrlDockConnXbrlOrgConsts {
 		XbrlDock.log(EventLevel.Trace, "Stats complete", mon.getCount(), stats);
 	}
 	public static void test() throws Exception {
-		Map<String, Map<String, Object>> reports = XbrlDockUtilsJson.readJson("temp/allReports.json");
+		Map<String, Map<String, Object>> reports = XbrlDockStreamJson.readJson("temp/allReports.json");
 
 		Map<String, String> repErr = new TreeMap<>();
 		Map<String, String> zipErr = new TreeMap<>();

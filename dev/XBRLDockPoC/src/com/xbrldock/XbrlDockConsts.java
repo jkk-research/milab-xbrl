@@ -119,7 +119,9 @@ public interface XbrlDockConsts {
 	String XDC_GEN_TOKEN_editor = "editor";
 	String XDC_GEN_TOKEN_agent = "agent";
 	String XDC_GEN_TOKEN_flags = "flags";
+	String XDC_GEN_TOKEN_attributes = "attributes";
 	String XDC_GEN_TOKEN_row = "row";
+	String XDC_GEN_TOKEN_rows = "rows";
 	String XDC_GEN_TOKEN_col = "col";
 	String XDC_GEN_TOKEN_start = "start";
 

@@ -19,7 +19,7 @@ import com.xbrldock.dev.XbrlDockDevCounter;
 import com.xbrldock.poc.utils.XbrlDockPocUtils;
 import com.xbrldock.utils.XbrlDockUtils;
 import com.xbrldock.utils.XbrlDockUtilsFile;
-import com.xbrldock.utils.XbrlDockUtilsJson;
+import com.xbrldock.utils.stream.XbrlDockStreamJson;
 
 @SuppressWarnings({ "rawtypes", "unchecked" })
 public class XbrlDockMetaContainer implements XbrlDockMetaConsts {
@@ -393,12 +393,12 @@ public class XbrlDockMetaContainer implements XbrlDockMetaConsts {
 			metaInfo.put(XDC_METATOKEN_references, cnt.getCount());
 			cnt.process(XDC_CMD_GEN_Init, null);
 
-			XbrlDockUtilsJson.writeJson(new File(fDir, XDC_TAXONOMYHEAD_FNAME), metaInfo);
-			XbrlDockUtilsJson.writeJson(new File(fDir, XDC_TAXONOMYDATA_FNAME), contentByURL);
-			XbrlDockUtilsJson.writeJson(new File(fDir, XDC_TAXONOMYREFS_FNAME), references);
+			XbrlDockStreamJson.writeJson(new File(fDir, XDC_TAXONOMYHEAD_FNAME), metaInfo);
+			XbrlDockStreamJson.writeJson(new File(fDir, XDC_TAXONOMYDATA_FNAME), contentByURL);
+			XbrlDockStreamJson.writeJson(new File(fDir, XDC_TAXONOMYREFS_FNAME), references);
 
 			for (Entry<String, Map<String, Object>> le : labels.entrySet()) {
-				XbrlDockUtilsJson.writeJson(new File(fDir, XDC_TAXONOMYRES_FNAME_PREFIX + le.getKey() + XDC_FEXT_JSON), le.getValue());
+				XbrlDockStreamJson.writeJson(new File(fDir, XDC_TAXONOMYRES_FNAME_PREFIX + le.getKey() + XDC_FEXT_JSON), le.getValue());
 			}
 
 			updated = false;
@@ -421,7 +421,7 @@ public class XbrlDockMetaContainer implements XbrlDockMetaConsts {
 
 				if (fRes.isFile()) {
 					try {
-						m = XbrlDockUtilsJson.readJson(fRes);
+						m = XbrlDockStreamJson.readJson(fRes);
 					} catch (Exception e) {
 					}
 				}
@@ -442,8 +442,8 @@ public class XbrlDockMetaContainer implements XbrlDockMetaConsts {
 
 		if (fDir.isDirectory()) {
 //		metaInfo.putAll(XbrlDockUtilsJson.readJson(new File(fDir, XDC_TAXONOMYHEAD_FNAME)));
-			contentByURL.putAll(XbrlDockUtilsJson.readJson(new File(fDir, XDC_TAXONOMYDATA_FNAME)));
-			references.putAll(XbrlDockUtilsJson.readJson(new File(fDir, XDC_TAXONOMYREFS_FNAME)));
+			contentByURL.putAll(XbrlDockStreamJson.readJson(new File(fDir, XDC_TAXONOMYDATA_FNAME)));
+			references.putAll(XbrlDockStreamJson.readJson(new File(fDir, XDC_TAXONOMYREFS_FNAME)));
 
 			loadSet(ownedUrls, XDC_METAINFO_ownedUrls);
 			loadSet(loaded, XDC_METATOKEN_includes);
