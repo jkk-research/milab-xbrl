@@ -9,11 +9,12 @@ import java.util.UUID;
 import com.xbrldock.XbrlDock;
 import com.xbrldock.dev.XbrlDockDevMonitor;
 import com.xbrldock.utils.XbrlDockUtils;
-import com.xbrldock.utils.XbrlDockUtilsCsv;
 import com.xbrldock.utils.XbrlDockUtilsFile;
-import com.xbrldock.utils.XbrlDockUtilsJson;
 import com.xbrldock.utils.XbrlDockUtilsNet;
-import com.xbrldock.utils.XbrlDockUtilsPdf;
+import com.xbrldock.utils.stream.XbrlDockStreamCsv;
+import com.xbrldock.utils.stream.XbrlDockStreamJson;
+import com.xbrldock.utils.stream.XbrlDockStreamPdf;
+import com.xbrldock.utils.stream.XbrlDockStreamUtils;
 
 public class SrnMain extends XbrlDock implements SrnConsts {
 
@@ -48,6 +49,14 @@ public class SrnMain extends XbrlDock implements SrnConsts {
 			fName = XbrlDockUtils.simpleGet(appParams, "params", mode, XDC_GEN_TOKEN_target);
 			File dir = new File(fName);
 			XbrlDockUtilsFile.ensureDir(dir);
+			
+			File logJson = new File(dir, "log.json");
+			if ( logJson.isFile() ) {
+				File logCsv = new File(dir, "log.csv");
+				XbrlDock.log(EventLevel.Info, "Only converting log to csv", logCsv.getCanonicalPath());
+				XbrlDockStreamUtils.json2Csv(logJson, logCsv, ",");
+				return null;
+			}
 
 			XbrlDockUtilsNet.disableCertificateValidation();
 
@@ -138,9 +147,9 @@ public class SrnMain extends XbrlDock implements SrnConsts {
 				}
 			};
 
-			XbrlDockUtilsCsv.readCsv(f, rowProc, ";");
+			XbrlDockStreamCsv.readCsv(f, rowProc, ";");
 
-			XbrlDockUtilsJson.writeJson(new File(dir, "log.json"), log);
+			XbrlDockStreamJson.writeJson(logJson, log);
 
 			break;
 		}
@@ -154,7 +163,7 @@ public class SrnMain extends XbrlDock implements SrnConsts {
 		try {
 			switch (ext) {
 			case "pdf":
-				tm.put("pdfPageCount", XbrlDockUtilsPdf.getPageCount(report.getCanonicalPath()));
+				tm.put("pdfPageCount", XbrlDockStreamPdf.getPageCount(report.getCanonicalPath()));
 				break;
 			}
 		} catch (Throwable e) {
