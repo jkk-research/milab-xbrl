@@ -49,18 +49,18 @@ public class VsmeDataGrid implements VsmePocConsts, XbrlDockUtilsGui.WidgetConta
 				values = new ArrayList<>();
 			}
 
-			atts = XbrlDockUtils.simpleGet(attDef, VSME_attributes);
+			atts = XbrlDockUtils.simpleGet(attDef, XDC_GEN_TOKEN_attributes);
 
 			if (null == atts) {
 				String src = XbrlDockUtils.simpleGet(attDef, XDC_GEN_TOKEN_source);
-				atts = XbrlDockUtils.simpleGet(ctx.getMeta(), "tables", src, VSME_attributes);
+				atts = XbrlDockUtils.simpleGet(ctx.getMeta(), "tables", src, XDC_GEN_TOKEN_attributes);
 			}
 
 			for (Map<String, Object> d : atts) {
 				optAddCalc(d);
 			}
 
-			rowDefs = XbrlDockUtils.simpleGet(attDef, VSME_rows);
+			rowDefs = XbrlDockUtils.simpleGet(attDef, XDC_GEN_TOKEN_rows);
 			Map<String, Object> rowSource = XbrlDockUtils.simpleGet(attDef, VSME_rowSource);
 
 			if ((null != rowDefs) || (null != rowSource)) {

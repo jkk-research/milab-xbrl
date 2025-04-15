@@ -45,8 +45,9 @@ import com.xbrldock.poc.gui.XbrlDockGuiWidgetGrid;
 import com.xbrldock.utils.XbrlDockUtils;
 import com.xbrldock.utils.XbrlDockUtilsGui;
 import com.xbrldock.utils.XbrlDockUtilsGui.WidgetContainer;
-import com.xbrldock.utils.XbrlDockUtilsHtml;
-import com.xbrldock.utils.XbrlDockUtilsJson;
+import com.xbrldock.utils.stream.XbrlDockStreamHtml;
+import com.xbrldock.utils.stream.XbrlDockStreamJson;
+import com.xbrldock.utils.stream.XbrlDockStreamXlsx;
 import com.xbrldock.utils.XbrlDockUtilsMvel;
 
 @SuppressWarnings({ "unchecked", "rawtypes" })
@@ -81,10 +82,10 @@ public class VsmeFrame implements VsmePocConsts, XbrlDockConsts.GenAgent, VsmePo
 		switch (cmd) {
 		case XDC_CMD_GEN_Init:
 			String fName = XbrlDockUtils.simpleGet(params, VSME_meta);
-			meta = XbrlDockUtilsJson.readJson(new File(fName));
+			meta = XbrlDockStreamJson.readJson(new File(fName));
 
 			fName = XbrlDockUtils.simpleGet(meta, VSME_meta, VSME_standard);
-			standard = XbrlDockUtilsHtml.readHtml(fName);
+			standard = XbrlDockStreamHtml.readHtml(fName);
 
 			frame = new JFrame((String) XbrlDockUtils.simpleGet(params, XDC_EXT_TOKEN_name));
 			frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
@@ -120,6 +121,7 @@ public class VsmeFrame implements VsmePocConsts, XbrlDockConsts.GenAgent, VsmePo
 			JPanel pnlCmds = new JPanel(new FlowLayout(FlowLayout.CENTER));
 			pnlCmds.add(XbrlDockUtilsGui.createBtn(XDC_CMD_GEN_LOAD, alCmd, JButton.class));
 			pnlCmds.add(XbrlDockUtilsGui.createBtn(XDC_CMD_GEN_SAVE, alCmd, JButton.class));
+			pnlCmds.add(XbrlDockUtilsGui.createBtn(XDC_CMD_GEN_TEST01, alCmd, JButton.class));
 
 			messages = new ArrayList<>();
 			gridMsg = new XbrlDockGuiWidgetGrid(new LabeledAccess("Level", VSME_msgLevel), new LabeledAccess("Location", VSME_msgRef),
@@ -234,7 +236,7 @@ public class VsmeFrame implements VsmePocConsts, XbrlDockConsts.GenAgent, VsmePo
 						if (!protAtts.isEmpty()) {
 							report.put(VSME_protect, new ArrayList(protAtts));
 						}
-						XbrlDockUtilsJson.writeJson(file, report);
+						XbrlDockStreamJson.writeJson(file, report);
 						if (!protAtts.isEmpty()) {
 							report.put(VSME_protect, protAtts);
 						}
@@ -245,7 +247,7 @@ public class VsmeFrame implements VsmePocConsts, XbrlDockConsts.GenAgent, VsmePo
 
 					if (fcRet == JFileChooser.APPROVE_OPTION) {
 						File file = fc.getSelectedFile();
-						report = XbrlDockUtilsJson.readJson(file);
+						report = XbrlDockStreamJson.readJson(file);
 
 						Collection<String> c = (Collection) report.get(VSME_protect);
 						if (null != c) {
@@ -261,6 +263,15 @@ public class VsmeFrame implements VsmePocConsts, XbrlDockConsts.GenAgent, VsmePo
 							setGuiValue(val, k);
 						}
 					}
+					break;
+				case XDC_CMD_GEN_TEST01:
+					Map<String, Object> cfgE = XbrlDockUtils.simpleGet(meta, XDC_CMD_METAMGR_IMPORT, "Emissions");
+					String fName = XbrlDockUtils.simpleGet(cfgE, XDC_GEN_TOKEN_source);
+					File eXls = new File(fName);
+					
+					@SuppressWarnings("unused") 
+					Map<String, Map<String, Object>> em = XbrlDockStreamXlsx.toMap(eXls, cfgE);
+
 					break;
 				case VSME_protect:
 					JToggleButton tb = (JToggleButton) e.getSource();
@@ -357,7 +368,7 @@ public class VsmeFrame implements VsmePocConsts, XbrlDockConsts.GenAgent, VsmePo
 
 				if (!XbrlDockUtils.isEmpty(expr)) {
 					String tn = (String) e.get(XDC_GEN_TOKEN_target);
-					Object target = XbrlDockUtils.simpleGet(meta, VSME_attributes, tn);
+					Object target = XbrlDockUtils.simpleGet(meta, XDC_GEN_TOKEN_attributes, tn);
 
 					if (null == ectx) {
 						ectx = new ExprCtx();
@@ -406,7 +417,7 @@ public class VsmeFrame implements VsmePocConsts, XbrlDockConsts.GenAgent, VsmePo
 				XbrlDockUtilsGui.nextGBRow(gbc, true);
 				JLabel label = new JLabel(i);
 
-				Map<String, Object> attDef = XbrlDockUtils.simpleGet(meta, VSME_attributes, i);
+				Map<String, Object> attDef = XbrlDockUtils.simpleGet(meta, XDC_GEN_TOKEN_attributes, i);
 				String attType = XbrlDockUtils.simpleGet(attDef, XDC_EXT_TOKEN_type);
 
 				WidgetContainer wc = null;

@@ -4,10 +4,10 @@
 		"url": "https://www.efrag.org/sites/default/files/sites/webpublishing/SiteAssets/VSME%20Standard.pdf",
 		"time": "2025-02-14"
 	},
-	"imports": {
-		"NACEx": 		{
-					"source": "data/NACE_2025-02-14.json"
-					},
+	"import": {
+		"NACEx": {
+				"source": "data/NACE_2025-02-14.json"
+		},
 		"Country": {
 			"source": "data/Countries_2025-02-26.csv",
 			"sep": ";",
@@ -22,6 +22,346 @@
 				}
 			],
 			"id": ["country"]
+		},
+		"Emissions": {
+			"source": "data/Emission_Factors_for_Cross_Sector_Tools_V2.0_0.xlsx",
+			"members": [ 
+				{
+					"sheet": "Stationary Combustion",
+					"attributes": [
+						{
+							"id": "fuelType",
+							"source": "B"
+						},
+						{
+							"id": "fuel",
+							"source": "C"
+						},
+						{
+							"id": "TJ_tonne",
+							"source": "D"
+						}
+					],
+					"members": {
+						"usage" : "StatComb",
+						"product" : "Energy"
+					},
+					"id": ["usage", "product", "fuel"],
+					"rows": "6-59"
+				},
+				{
+					"sheet": "Stationary Combustion",
+					"attributes": [
+						{
+							"id": "fuelType",
+							"source": "B"
+						},
+						{
+							"id": "fuel",
+							"source": "C"
+						},
+						{
+							"id": "kg_TJ",
+							"source": "E"
+						},
+						{
+							"id": "kg_tonne",
+							"source": "F"
+						},
+						{
+							"id": "kg_litre",
+							"source": "I"
+						},
+						{
+							"id": "kg_m3",
+							"source": "J"
+						}
+					],
+					"members": {
+						"usage" : "StatComb",
+						"product" : "CO2"
+					},
+					"id": ["usage", "product", "fuel"],
+					"rows": "6-59"
+				},
+				{
+					"sheet": "Stationary Combustion",
+					"attributes": [
+						{
+							"id": "fuelType",
+							"source": "B"
+						},
+						{
+							"id": "fuel",
+							"source": "C"
+						},
+						{
+							"id": "kg_TJ",
+							"source": "E"
+						},
+						{
+							"id": "kg_tonne",
+							"source": "F"
+						},
+						{
+							"id": "kg_litre",
+							"source": "I"
+						},
+						{
+							"id": "kg_m3",
+							"source": "J"
+						}
+					],
+					"members": {
+						"usage" : "StatComb",
+						"product" : "CH4"
+					},
+					"id": ["usage", "product", "fuel"],
+					"rows": "71-124"
+				},
+				{
+					"sheet": "Stationary Combustion",
+					"attributes": [
+						{
+							"id": "fuelType",
+							"source": "B"
+						},
+						{
+							"id": "fuel",
+							"source": "C"
+						},
+						{
+							"id": "kg_TJ",
+							"source": "E"
+						},
+						{
+							"id": "kg_tonne",
+							"source": "F"
+						},
+						{
+							"id": "kg_litre",
+							"source": "I"
+						},
+						{
+							"id": "kg_m3",
+							"source": "J"
+						}
+					],
+					"members": {
+						"usage" : "StatComb",
+						"product" : "N2O"
+					},
+					"id": ["usage", "product", "fuel"],
+					"rows": "136-189"
+				},
+				{
+					"sheet": "Mobile Combustion - Fuel Use",
+					"attributes": [
+						{
+							"id": "region",
+							"source": "B"
+						},
+						{
+							"id": "fuel",
+							"source": "C"
+						},
+						{
+							"id": "fossil",
+							"source": "D"
+						},
+						{
+							"id": "biogenic",
+							"source": "E"
+						},
+						{
+							"id": "unit",
+							"source": "F"
+						}
+					],
+					"members": {
+						"usage" : "MobCombFuelUse",
+						"product" : "CO2"
+					},
+					"id": ["usage", "product", "fuel"],
+					"rows": "4-36"
+				},
+				{
+					"sheet": "Mobile Combustion - Fuel Use",
+					"attributes": [
+						{
+							"id": "region",
+							"source": "B"
+						},
+						{
+							"id": "fuel",
+							"source": "C"
+						},
+						{
+							"id": "transport",
+							"source": "D"
+						},
+						{
+							"id": "vehicle",
+							"source": "E"
+						},
+						{
+							"id": "CH4",
+							"source": "F"
+						},
+						{
+							"id": "unit",
+							"source": "G"
+						}
+					],
+					"members": {
+						"usage" : "MobCombFuelUse",
+						"product" : "CH4"
+					},
+					"id": ["usage", "product", "fuel"],
+					"rows": "46-98"
+				},
+				{
+					"sheet": "Mobile Combustion - Fuel Use",
+					"attributes": [
+						{
+							"id": "region",
+							"source": "B"
+						},
+						{
+							"id": "fuel",
+							"source": "C"
+						},
+						{
+							"id": "transport",
+							"source": "D"
+						},
+						{
+							"id": "vehicle",
+							"source": "E"
+						},
+						{
+							"id": "N2O",
+							"source": "H"
+						},
+						{
+							"id": "unit",
+							"source": "I"
+						}
+					],
+					"members": {
+						"usage" : "MobCombFuelUse",
+						"product" : "N2O"
+					},
+					"id": ["usage", "product", "fuel"],
+					"rows": "46-98"
+				},
+				{
+					"sheet": "Mobile Combustion - Distance",
+					"attributes": [
+						{
+							"id": "vehicleType",
+							"source": "B"
+						},
+						{
+							"id": "miles_gallon",
+							"source": "D"
+						},
+						{
+							"id": "km_l",
+							"source": "E"
+						}
+					],
+					"members": {
+						"usage" : "DistanceFuelEconomy"
+					},
+					"id": ["usage", "vehicleType"],
+					"rows": "6-11"
+				},
+				{
+					"sheet": "Mobile Combustion - Distance",
+					"attributes": [
+						{
+							"id": "region",
+							"source": "B"
+						},
+						{
+							"id": "vehicle",
+							"source": "C"
+						},
+						{
+							"id": "vehicleYear",
+							"source": "D"
+						},
+						{
+							"id": "fuel",
+							"source": "E"
+						},
+						{
+							"id": "CH4_emission",
+							"source": "F"
+						},
+						{
+							"id": "CH4_unit",
+							"source": "G"
+						},
+						{
+							"id": "N2O_emission",
+							"source": "H"
+						},
+						{
+							"id": "N2O_unit",
+							"source": "I"
+						}
+					],
+					"members": {
+						"usage" : "DistanceEmission"
+					},
+					"id": ["usage", "region", "vehicle", "vehicleYear", "fuel"],
+					"rows": "18-177"
+				},
+				{
+					"sheet": "Mobile Combustion - Distance",
+					"attributes": [
+						{
+							"id": "region",
+							"source": "B"
+						},
+						{
+							"id": "vehicle",
+							"source": "C"
+						},
+						{
+							"id": "size",
+							"source": "D"
+						},
+						{
+							"id": "weight_laden",
+							"source": "E"
+						},
+						{
+							"id": "fuel",
+							"source": "F"
+						},
+						{
+							"id": "CO2_kg_km",
+							"source": "G"
+						},
+						{
+							"id": "CH4_g_km",
+							"source": "H"
+						},
+						{
+							"id": "N2O_g_km",
+							"source": "I"
+						}
+					],
+					"members": {
+						"usage" : "DistanceEmission"
+					},
+					"id": ["usage", "region", "vehicle", "size", "weight_laden", "fuel"],
+					"rows": "183-235"
+				}
+			]
 		}
 	},
 	"tables": {

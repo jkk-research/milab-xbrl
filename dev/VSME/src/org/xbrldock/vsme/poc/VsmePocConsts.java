@@ -16,12 +16,10 @@ public interface VsmePocConsts extends XbrlDockPocConsts, XbrlDockUtilsConsts {
 
 	String VSME_panels = "panels";
 	String VSME_items = "items";
-	String VSME_attributes = "attributes";
 	String VSME_options = "options";
 	String VSME_expressions = "expressions";
 
 	String VSME_rowSource = "rowSource";
-	String VSME_rows = "rows";
 	String VSME_fill = "fill";
 	String VSME_calc = "calc";
 
