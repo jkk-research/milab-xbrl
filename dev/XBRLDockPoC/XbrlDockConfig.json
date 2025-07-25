@@ -20,12 +20,18 @@
         "dirStore" : "work/knowledge/taxonomies",
         "dirInput" : "work/input/taxonomies"
       },
-      "esefConn" : {
-        "javaClass" : "com.xbrldock.poc.conn.xbrlorg.XbrlDockConnXbrlOrg",
-        "name" : "xbrl.org",
-        "dirStore" : "work/knowledge/connectors/filings.xbrl.org",
-        "dirInput" : "work/input/connectors/filings.xbrl.org"
-      },
+			"esefConn" : {
+			  "javaClass" : "com.xbrldock.poc.conn.xbrlorg.XbrlDockConnXbrlOrg",
+			  "name" : "xbrl.org",
+			  "dirStore" : "work/knowledge/connectors/filings.xbrl.org",
+			  "dirInput" : "work/input/connectors/filings.xbrl.org"
+			},
+			"manualConn" : {
+			  "javaClass" : "com.xbrldock.poc.conn.manual.XbrlDockConnManual",
+			  "name" : "manual",
+			  "dirStore" : "work/knowledge/connectors/manual",
+			  "dirInput" : "work/input/connectors/manual"
+			},
       "facStore" : {
         "javaClass" : "com.xbrldock.poc.report.XbrlDockReportStore",
         "name" : "fac",
@@ -55,13 +61,20 @@
           "javaClass" : "com.xbrldock.poc.gui.XbrlDockGuiMetaManagerPanel",
           "name" : "Taxonomy Manager",
           "placeholder" : "Select a taxonomy in the list above to see its properties."
-        }, {
-          "id" : "esefConn",
-          "javaClass" : "com.xbrldock.poc.gui.XbrlDockGuiStorePanel",
-          "guiCommands" : [ "test01", "test02" ],
-          "name" : "ESEF Connector",
-          "store" : "esefConn",
-          "placeholder" : "Select a report in the list above to see its properties."
+					}, {
+				   "id" : "esefConn",
+				   "javaClass" : "com.xbrldock.poc.gui.XbrlDockGuiStorePanel",
+				   "guiCommands" : [ "test01", "test02" ],
+				   "name" : "ESEF Connector",
+				   "store" : "esefConn",
+				   "placeholder" : "Select a report in the list above to see its properties."
+					 }, {
+					    "id" : "manualConn",
+					    "javaClass" : "com.xbrldock.poc.gui.XbrlDockGuiStorePanel",
+					    "guiCommands" : [ "test01" ],
+					    "name" : "Manual Connector",
+					    "store" : "manualConn",
+					    "placeholder" : "Select a report in the list above to see its properties."
         }, {
           "id" : "facConn",
           "javaClass" : "com.xbrldock.poc.gui.XbrlDockGuiStorePanel",

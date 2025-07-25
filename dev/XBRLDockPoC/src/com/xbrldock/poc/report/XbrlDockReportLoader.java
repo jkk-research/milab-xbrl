@@ -47,7 +47,7 @@ public class XbrlDockReportLoader implements XbrlDockReportConsts, XbrlDockConst
 		this.dataRoot = dataRoot;
 	}
 
-	private void setReportData(Map reportData) throws Exception {
+	public void setReportData(Map reportData) throws Exception {
 		this.reportData = reportData;
 
 //		File dir = flat ? new File(dataRoot, XbrlDockUtils.strTime()) : XbrlDockConnUtils.getFilingDir(dataRoot, reportData, true, true);
